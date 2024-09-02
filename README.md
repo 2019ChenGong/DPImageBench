@@ -6,6 +6,8 @@
 ## 1. Contents
   - [1. Contents](#1-contents)
   - [2. Introduction](#2-introduction)
+    - [2.1 Currently Supported Algorithms](#21-currently-supported-algorithms)
+  - [3. Repo Contents](#3-repo-contents)
   - [3. Get Start](#3-get-start)
     - [3.1 Installation](#31-installation)
     - [3.2 Dataset and Files Preparation](#32-dataset-and-files-preparation)
@@ -14,14 +16,13 @@
   - [4. Contacts](#4-contacts)
   - [5. Acknowledgment](#5-acknowledgment)
 
-
 ## 2. Introduction
 
-**Currently Supported Algorithms:**
+### 2.1 Currently Supported Algorithms
 
 We list currently supported DP image synthesis methods as follows.
 
-  | Algorithm Name |  Link                                                         |
+  | Methods |  Link                                                         |
   | -------------- | ------------------------------------------------------------ |
   | DP-MERF            |  [\[AISTATS 2021\] DP-MERF: Differentially Private Mean Embeddings With Randomfeatures for Practical Privacy-Preserving Data Generation](https://proceedings.mlr.press/v130/harder21a.html) |
   | DP-Kernel        |  [\[NeuriPS 2023\] Functional Renyi Differential Privacy for Generative Modeling](https://proceedings.neurips.cc/paper_files/paper/2023/hash/2f9ee101e35b890d9eae79ee27bcd69a-Abstract-Conference.html) |
@@ -34,6 +35,11 @@ We list currently supported DP image synthesis methods as follows.
   | DP-LDM            | [\[2305.15759\] Differentially Private Latent Diffusion Models (arxiv.org)](https://arxiv.org/abs/2302.13861)            |
   | DP-Promise       | [\[UESNIX Security 2024\] DP-promise: Differentially Private Diffusion Probabilistic Models for Image Synthesis](https://www.usenix.org/conference/usenixsecurity24/presentation/wang-haichen) |
   | PrivImage       | [\[UESNIX Security 2024\] PrivImage: Differentially Private Synthetic Image Generation using Diffusion Models with Semantic-Aware Pretraining](https://www.usenix.org/conference/usenixsecurity24/presentation/li-kecen) |
+
+
+## 3. Repo Contents
+
+Below is the directory structure of the DPImageBench project, which encapsulates its three core functionalities within the watermark/, visualize/, and evaluation/ directories. To facilitate user understanding and demonstrate the toolkit's ease of use, we provide a variety of test cases. The test code can be found in the test/ directory.
 
 
 ```plaintext
