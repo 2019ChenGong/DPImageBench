@@ -4,4 +4,6 @@
 *.c
 *.cpp
 *.so
+exp
 
+models/pretrained_models
