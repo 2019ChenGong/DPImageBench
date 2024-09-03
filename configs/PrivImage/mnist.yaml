@@ -1,6 +1,6 @@
 setup:
   method: dpsgd-diffusion
-  torchmp: True
+  run_type: torchmp
   n_gpus_per_node: 3
   n_nodes: 1
   node_rank: 0
@@ -20,7 +20,7 @@ public_data:
     num_words: 1
     sigma: 484
     batch_size: 5000
-    model_path: models/pretrained_models/imagenet_classifer_0.454_ckpt.pth
+    model_path: models/pretrained_models/imagenet_classifier_0.454_ckpt.pth
 
 sensitive_data:
   name: mnist

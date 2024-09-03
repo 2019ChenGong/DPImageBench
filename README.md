@@ -126,7 +126,7 @@ DPImageBench/
 # Get Start on DPImageBench
 
  ```
-conda activate dpdm
+conda activate dpbench
 cd /p/fzv6enresearch/DPImageBench
 python run.py configs/DP_MERF/mnist.yaml
  ```

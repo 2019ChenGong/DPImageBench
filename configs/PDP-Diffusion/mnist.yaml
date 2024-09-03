@@ -1,6 +1,6 @@
 setup:
   method: dpsgd-diffusion
-  torchmp: True
+  run_type: torchmp
   n_gpus_per_node: 3
   n_nodes: 1
   node_rank: 0
