@@ -32,7 +32,6 @@ model:
   pca_dim: 10
   thresh: 0.5
   random_label: False
-  shuffle: False
   # new flag
   batch_teachers: 100
   teachers_batch: 40
@@ -54,6 +53,7 @@ train:
   d_step: 1
   learning_rate: 1e-3
   beta1: 0.5
+  shuffle: True
   increasing_dim: False
   save_epoch: True
   pretrain: False

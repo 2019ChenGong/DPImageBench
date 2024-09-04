@@ -72,13 +72,13 @@ def evenly_partition_dataset(data, labels, nb_teachers):
     partition_labels = []
 
     while True:
-        partition_data.append(data_sel[i][data_sel_id[i]])
+        partition_data.append(data_sel[i][data_sel_id[i]].unsqueeze(0))
         partition_labels.append(np_utils.to_categorical(i, nclasses))
 
         if len(partition_data) == batch_len:
-            partition_data = np.asarray(partition_data)
+            partition_data = torch.cat(partition_data)
             partition_labels = np.asarray(partition_labels)
-            yield partition_data, partition_labels
+            yield partition_data, torch.from_numpy(partition_labels).float()
             partition_data = []
             partition_labels = []
 
@@ -574,7 +574,7 @@ class DCGAN(object):
             self.epoch = epoch
             print("----------------epoch: %d --------------------" % epoch)
             print("-------------------train-teachers----------------")
-            batch_idxs = int(config.train_size // self.batch_size)
+            batch_idxs = int(self.train_size // self.batch_size)
             # The idex of each batch
             print("Train %d idxs" % batch_idxs)
             for idx in range(0, batch_idxs):

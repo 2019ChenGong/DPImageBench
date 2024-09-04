@@ -33,6 +33,7 @@ model:
   wgan: False
   pca_dim: 10
   random_label: False
+  save_vote: False
   batch_teachers: 50
   teachers_batch: 80
 

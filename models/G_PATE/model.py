@@ -4,17 +4,18 @@ import time
 import math
 import tensorflow as tf
 import numpy as np
-import logging
+import json
 import sys
-from sklearn.utils import shuffle
-from sklearn.random_projection import GaussianRandomProjection
-
-
+import logging
 from models.G_PATE.ops import *
 from models.G_PATE.utils import *
 from models.G_PATE.rdp_utils import *
 from models.G_PATE.pate_core import *
+# import pandas as pd
 from models.G_PATE.dp_pca import ComputeDPPrincipalProjection
+from sklearn.random_projection import GaussianRandomProjection
+from sklearn.utils import shuffle
+from collections import defaultdict
 
 
 def partition_dataset(data, labels, nb_teachers, teacher_id):
@@ -62,11 +63,12 @@ def sigmoid_cross_entropy_with_logits(x, y):
 
 class DCGAN(object):
     def __init__(self, sess, image_size=32,
+                 batch_size=64, sample_num=64,
                  y_dim=10, z_dim=100, gf_dim=64, df_dim=32, sample_step=800,
                  gfc_dim=1024, dfc_dim=256, dataset_name='default',
                  batch_teachers=10, teachers_batch=2,
                  orders=None,
-                 pca=False, pca_dim=5, random_proj=False, wgan=False,
+                 thresh=None, pca=False, pca_dim=5, random_proj=False, wgan=False,
                  wgan_scale=10, config=None):
         """
 
@@ -93,12 +95,17 @@ class DCGAN(object):
 
         self.dp_eps_list = []
         self.rdp_eps_list = []
+        self.rdp_order_list = []
+        self.thresh = thresh
         self.dataset = dataset_name
         self.batch_teachers = batch_teachers
         self.teachers_batch = teachers_batch
         self.overall_teachers = batch_teachers * teachers_batch
 
         self.sess = sess
+
+        self.batch_size = batch_size
+        self.sample_num = sample_num
 
         self.input_height = image_size
         self.input_width = image_size
@@ -132,7 +139,6 @@ class DCGAN(object):
             self.orders = np.hstack([1.1, np.arange(2, config.orders)])
 
         self.rdp_counter = np.zeros(self.orders.shape)
-
 
     def aggregate_results(self, output_list, config, thresh=None, epoch=None):
         if self.pca:
@@ -196,14 +202,16 @@ class DCGAN(object):
                                                   self.orders, thresh=thresh)
         return res, rdp_budget
 
-    def non_private_aggregation(self, output_list):
+    def non_private_aggregation(self, output_list, config):
         # TODO update nonprivate aggregation
         sum_arr = np.zeros(output_list[0].shape)
         for arr in output_list:
             sum_arr += arr
         return sum_arr / len(output_list)
 
+
     def build_model(self):
+
         image_dims = [self.input_height, self.input_width, self.c_dim]
 
         self.inputs = tf.placeholder(
@@ -292,7 +300,7 @@ class DCGAN(object):
         self.g_save_vars = [var for var in t_vars if 'g_' in var.name]
         self.d_save_vars = [var for var in t_vars if 'd_' in var.name]
         # print(self.d_save_vars)
-        logging.info(self.save_vars)
+        print(self.save_vars)
         # self.d_save_vars = {'k': v for k, v in zip(self.d_save_vars, self.d_save_vars)}
         self.saver = tf.train.Saver(max_to_keep=5, var_list=self.save_vars)
         self.saver_g = tf.train.Saver(max_to_keep=5, var_list=self.g_save_vars)
@@ -309,13 +317,14 @@ class DCGAN(object):
         return y_vec
 
     def train_together(self, sensitive_data, config):
-        # Load the dataset, ignore test data for now
-        self.batch_size = config.batch_size
+
         data_X, data_y = sensitive_data
+
         self.c_dim = data_X.shape[-1]
         self.grayscale = (self.c_dim == 1)
         self.input_height = self.input_width = data_X.shape[1]
         self.output_height = self.output_width = data_X.shape[2]
+
         train_data_list = []
         train_label_list = []
 
@@ -325,8 +334,8 @@ class DCGAN(object):
         #         self.train_data_list.append(partition_data)
         #         self.train_label_list.append(partition_labels)
         # else:
-        data_X, data_y = shuffle(data_X, data_y)
-        from collections import defaultdict
+        if config.shuffle:
+            data_X, data_y = shuffle(data_X, data_y)
         self.save_dict = defaultdict(lambda: False)
         for i in range(self.overall_teachers):
             partition_data, partition_labels = partition_dataset(data_X, data_y, self.overall_teachers, i)
@@ -337,17 +346,18 @@ class DCGAN(object):
 
         if self.train_size < self.batch_size:
             self.batch_size = self.train_size
-            print('adjusted batch size:', self.batch_size)
+            logging.info('adjusted batch size:', self.batch_size)
             # raise Exception("[!] Entire dataset size (%d) is less than the configured batch_size (%d) " % (
             # self.train_size, self.batch_size))
 
         self.build_model()
-        logging.info("Training teacher models and student model together...")
+    
+        print("Training teacher models and student model together...")
 
         if not config.non_private:
             assert len(train_data_list) == self.overall_teachers
         else:
-            logging.info(str(len(train_data_list)))
+            print(str(len(train_data_list)))
 
         if self.pca:
             data = data_X.reshape([data_X.shape[0], -1])
@@ -379,6 +389,20 @@ class DCGAN(object):
             except:
                 tf.initialize_all_variables().run()
             self.load_pretrain(config.checkpoint_dir)
+            # data = self.gen_data(5000)
+            # output_dir = os.path.join(self.checkpoint_dir, self.sample_dir)
+            # if not os.path.exists(output_dir):
+            #     os.makedirs(output_dir)
+            # filename = 'private.data_epoch_' + str(-1) + '.pkl'
+            # outfile = os.path.join(output_dir, filename)
+            # mkdir(output_dir)
+            # with open(outfile, 'wb') as f:
+            #     pickle.dump(data, f)
+            # current_scope = tf.contrib.framework.get_name_scope()
+            # with tf.variable_scope(current_scope, reuse=True):
+            #     biases = tf.get_variable("teacher0/d_h0_conv/biases")
+            #     biases = tf.Print(biases, [biases])
+            #     self.sess.run(biases)
 
         if 'slt' in self.dataset_name:
             self.g_sum = merge_summary([self.z_sum, self.G_sum, self.g_loss_sum])
@@ -402,11 +426,11 @@ class DCGAN(object):
 
         self.save_d(config.teacher_dir, 0, -1)
         for epoch in range(config.epoch):
-            logging.info("----------------epoch: %d --------------------" % epoch)
-            logging.info("-------------------train-teachers----------------")
+            print("----------------epoch: %d --------------------" % epoch)
+            print("-------------------train-teachers----------------")
             batch_idxs = int(self.train_size // self.batch_size)
             # The idex of each batch
-            logging.info("Train %d idxs" % batch_idxs)
+            print("Train %d idxs" % batch_idxs)
             for idx in range(0, batch_idxs):
 
                 batch_z = np.random.uniform(-1, 1, [self.batch_size, self.z_dim]).astype(np.float32)
@@ -527,7 +551,7 @@ class DCGAN(object):
 
                     img_grads_agg_list = []
                     for j in range(self.batch_size):
-                        thresh = config.thresh
+                        thresh = self.thresh
 
                         if config.non_private:
                             img_grads_agg_tmp = self.non_private_aggregation([grads[j] for grads in img_grads_list],
@@ -553,8 +577,8 @@ class DCGAN(object):
                         # calculate privacy budget and break if exceeds threshold
                         eps, order = compute_eps_from_delta(self.orders, self.rdp_counter, config.dp.delta)
 
-                        if eps > config.dp.epsilon:
-                            logging.info("New budget (eps = %.2f) exceeds threshold of %.2f. Early break (eps = %.2f)." % (
+                        if eps > config.max_eps:
+                            print("New budget (eps = %.2f) exceeds threshold of %.2f. Early break (eps = %.2f)." % (
                             eps, config.dp.epsilon, self.dp_eps_list[-1]))
 
                             # save privacy budget
@@ -605,8 +629,24 @@ class DCGAN(object):
                         })
 
                 counter += 1
-                logging.info("Epoch: [%2d/%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f, g_loss_before: %.8f, dp_eps: %.8f, rdp_order: %d" \
+                print("Epoch: [%2d/%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f, g_loss_before: %.8f, dp_eps: %.8f, rdp_order: %d" \
                       % (epoch, config.epoch, idx, batch_idxs, time.time() - start_time, errD, errG, errG2, eps, order))
+            # filename = 'epoch'+str(epoch)+'_errD'+str(errD)+'_errG'+str(errG)+'_teachers'+str(self.batch_teachers)+'f.csv'
+            # if epoch % 4 == 0:
+            print('----------------------generate sample----------------------')
+            # data = self.gen_data(500)
+            # output_dir = os.path.join(self.checkpoint_dir, self.sample_dir)
+            # if not os.path.exists(output_dir):
+            #     os.makedirs(output_dir)
+            # filename = 'private.data_epoch_' + str(epoch) + '.pkl'
+            # outfile = os.path.join(output_dir, filename)
+            # mkdir(output_dir)
+            # with open(outfile,'wb') as f:
+            #     pickle.dump(data, f)
+
+
+            filename = 'epoch' + str(epoch) + '_errD' + str(errD) + '_errG' + str(errG) + '_teachers' + str(
+                self.batch_teachers) + 'f.csv'
 
             # save each epoch
             self.save(config.checkpoint_dir, counter)
@@ -694,9 +734,9 @@ class DCGAN(object):
             else:
                 return tf.nn.sigmoid(deconv2d(h2, [self.batch_size, s_h, s_w, self.c_dim], name='g_h3'))
 
+
     def gen_data(self, n_batch, label=None):
-        x_list = []
-        y_list = []
+        output_list = []
         for i in range(n_batch):
             batch_z = np.random.uniform(-1, 1, [self.batch_size, self.z_dim]).astype(np.float32)
 
@@ -706,30 +746,26 @@ class DCGAN(object):
                 else:
                     batch_labels = np.zeros((self.batch_size, self.y_dim), dtype=np.float)
                     batch_labels[:, label] = 1.0
+
                 outputs = self.sess.run(self.G,
                                         feed_dict={
                                             self.z: batch_z,
                                             self.y: batch_labels,
                                         })
                 outputsX = outputs.reshape([self.batch_size, -1])
-                outputsy = np.argmax(batch_labels, axis=1)
+                outputs = np.hstack([outputsX, batch_labels[:, 0:10]])
             else:
                 outputs = self.sess.run(self.G,
                                         feed_dict={
                                             self.z: batch_z,
                                         })
                 outputsX = outputs.reshape([self.batch_size, -1])
-                outputsy = None
+                outputs = outputsX
 
-            x_list.append(outputsX)
-            y_list.append(outputsy)
+            output_list.append(outputs)
 
-        x_list = np.vstack(x_list)
-        if self.y is not None:
-            y_list = np.concatenate(y_list)
-        else:
-            y_list = None
-        return x_list, y_list
+        output_arr = np.vstack(output_list)
+        return output_arr
 
     @property
     def model_dir(self):
@@ -787,6 +823,25 @@ class DCGAN(object):
         counter = int(next(re.finditer("(\d+)(?!.*\d)", ckpt_name)).group(0))
         print(" [*] Success to read {}".format(ckpt_name))
         return True, counter
+
+    # def load(self, checkpoint_dir):
+    #     import re
+    #     print(" [*] Reading checkpoints...")
+    #     checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
+    #     print(checkpoint_dir)
+    #     ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
+    #     print(ckpt)
+    #     print(ckpt.model_checkpoint_path)
+    #     if ckpt and ckpt.model_checkpoint_path:
+    #         ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
+    #         print(ckpt_name)
+    #         self.saver.restore(self.sess, os.path.join(checkpoint_dir, ckpt_name))
+    #         counter = int(next(re.finditer("(\d+)(?!.*\d)", ckpt_name)).group(0))
+    #         print(" [*] Success to read {}".format(ckpt_name))
+    #         return True, counter
+    #     else:
+    #         print(" [*] Failed to find a checkpoint")
+    #         return False, 0
 
     def load_d(self, checkpoint_dir, batch_num, epoch):
         import re
