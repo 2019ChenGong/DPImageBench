@@ -728,13 +728,13 @@ class DCGAN(object):
                         order = 0
                     else:
                         # calculate privacy budget and break if exceeds threshold
-                        eps, order = compute_eps_from_delta(self.orders, self.rdp_counter, config.dp_delta)
+                        eps, order = compute_eps_from_delta(self.orders, self.rdp_counter, config.dp.delta)
                         if config.signsgd_dept:
                             eps_dept, order_dept = compute_eps_from_delta(self.orders, self.rdp_counter_dept, config.dp_delta)
 
-                        if eps > config.epsilon:
+                        if eps > config.dp.epsilon:
                             print("New budget (eps = %.2f) exceeds threshold of %.2f. Early break (eps = %.2f)." % (
-                                eps, config.epsilon, self.dp_eps_list[-1]))
+                                eps, config.dp.epsilon, self.dp_eps_list[-1]))
 
                             # save privacy budget
                             self.save(config.checkpoint_dir, counter)
@@ -751,14 +751,7 @@ class DCGAN(object):
                                 np.savetxt(config.checkpoint_dir + "/dept_rdp_order.txt", np.asarray(self.rdp_order_list_dept),
                                            delimiter=",")
 
-                            gen_batch = 100000 // self.batch_size + 1
-                            data = self.gen_data(gen_batch)
-                            data = data[:100000]
-                            import joblib
-                            interval = 100000 // 10
-                            for slice in range(10):
-                                joblib.dump(data[slice * interval: (slice+1) * interval], config.checkpoint_dir + '/eps-%.2f.data' % self.dp_eps_list[-1] + f'-{slice}.pkl')
-                            sys.exit()
+                            return self.dp_eps_list[-1], config.dp.delta
 
                     self.dp_eps_list.append(eps)
                     self.rdp_order_list.append(order)

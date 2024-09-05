@@ -72,7 +72,7 @@ class G_PATE(DPSynther):
         np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
 
         show_images = []
-        for cls in range(self.num_class):
+        for cls in range(self.model.y_dim):
             show_images.append(syn_data[syn_labels==cls][:8])
         show_images = np.concatenate(show_images)
         torchvision.utils.save_image(torch.from_numpy(show_images), os.path.join(config.log_dir, 'sample.png'), padding=1, nrow=8)

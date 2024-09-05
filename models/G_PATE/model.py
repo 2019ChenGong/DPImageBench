@@ -589,12 +589,7 @@ class DCGAN(object):
                             np.savetxt(config.checkpoint_dir + "/rdp_order.txt", np.asarray(self.rdp_order_list),
                                        delimiter=",")
 
-                            gen_batch = 100000 // self.batch_size + 1
-                            data = self.gen_data(gen_batch)
-                            data = data[:100000]
-                            import joblib
-                            joblib.dump(data, config.checkpoint_dir + '/eps-%.2f.data' % self.dp_eps_list[-1])
-                            sys.exit()
+                            return self.dp_eps_list[-1], config.dp.delta
 
                     self.dp_eps_list.append(eps)
                     self.rdp_order_list.append(order)
@@ -643,10 +638,6 @@ class DCGAN(object):
             # mkdir(output_dir)
             # with open(outfile,'wb') as f:
             #     pickle.dump(data, f)
-
-
-            filename = 'epoch' + str(epoch) + '_errD' + str(errD) + '_errG' + str(errG) + '_teachers' + str(
-                self.batch_teachers) + 'f.csv'
 
             # save each epoch
             self.save(config.checkpoint_dir, counter)
