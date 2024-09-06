@@ -577,7 +577,7 @@ class DCGAN(object):
                         # calculate privacy budget and break if exceeds threshold
                         eps, order = compute_eps_from_delta(self.orders, self.rdp_counter, config.dp.delta)
 
-                        if eps > config.max_eps:
+                        if eps > config.dp.epsilon:
                             print("New budget (eps = %.2f) exceeds threshold of %.2f. Early break (eps = %.2f)." % (
                             eps, config.dp.epsilon, self.dp_eps_list[-1]))
 

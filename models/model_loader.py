@@ -19,6 +19,9 @@ def load_model(config, sess=None):
     elif config.setup.method == 'DataLens':
         from models.datalens import DataLens
         model = DataLens(config.model, config.setup.local_rank, sess)
+    elif config.setup.method == 'dpsgd-gan':
+        from models.dpsgd_gan import DPGAN
+        model = DPGAN(config.model, config.setup.local_rank)
     else:
         raise NotImplementedError('{} is not yet implemented.'.format(config.setup.method))
     

@@ -66,6 +66,8 @@ train:
 gen:
   data_num: 60000
   batch_size: 1000
+  num_channels: 1
+  resolution: 28
   log_dir: null
 
 eval:

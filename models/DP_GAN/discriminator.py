@@ -24,7 +24,6 @@ class DiscOptBlock(nn.Module):
         if not apply_d_sn:
             #self.bn0 = MODULES.d_bn(in_features=in_channels)
             #self.bn1 = MODULES.d_bn(in_features=out_channels)
-            print(in_channels)
             self.bn0 = nn.GroupNorm(min(32, in_channels), in_channels)
             self.bn1 = nn.GroupNorm(min(32, out_channels), out_channels)
 

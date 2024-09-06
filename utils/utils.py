@@ -8,7 +8,6 @@ from omegaconf import OmegaConf
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
-import tensorflow as tf
 
 from models.model_loader import load_model
 from data.dataset_loader import load_data
@@ -49,6 +48,7 @@ def run(func, config):
         for p in processes:
             p.join()
     elif config.setup.run_type == "tfmp":
+        import tensorflow as tf
         config.setup.local_rank = 0
         config.setup.global_rank = 0
         global FLAGS
@@ -59,6 +59,7 @@ def run(func, config):
 
 
 def main_tf(_):
+    import tensorflow as tf
     global FLAGS
     run_config = tf.ConfigProto()
     run_config.gpu_options.allow_growth = True

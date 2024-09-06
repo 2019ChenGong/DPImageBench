@@ -3,15 +3,12 @@ import logging
 import torch
 import numpy as np
 import torch.distributed as dist
-import torchvision.models as torch_models
 from torch.utils.data.distributed import DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 import pickle
 import torchvision
-from torchvision import transforms
 
 from models.DP_Diffusion.model.ncsnpp import NCSNpp
-from data.stylegan3.dataset import ImageFolderDataset
 from models.DP_Diffusion.utils.util import set_seeds, make_dir, save_checkpoint, sample_random_image_batch, compute_fid
 from models.DP_Diffusion.dnnlib.util import open_url
 from models.DP_Diffusion.model.ema import ExponentialMovingAverage

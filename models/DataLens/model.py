@@ -846,7 +846,7 @@ class DCGAN(object):
             np.savetxt(config.checkpoint_dir + "/dept_rdp_order.txt", np.asarray(self.rdp_order_list_dept),
                        delimiter=",")
 
-        return self.dp_eps_list[-1], config.dp_delta
+        return self.dp_eps_list[-1], config.dp.delta
 
     def discriminator(self, image, y):
         if self.config.simple_gan:

@@ -7,7 +7,6 @@
 from os.path import dirname, exists, join, isfile
 from datetime import datetime
 import random
-import math
 import os
 import sys
 import glob
@@ -17,16 +16,12 @@ from torch.nn import DataParallel
 from torchvision.datasets import CIFAR10, CIFAR100
 from torch.nn.parallel import DistributedDataParallel
 from torchvision.utils import save_image
-from tqdm import tqdm
 import torch
 import torch.distributed as dist
 import torch.nn.functional as F
-import shutil
 import numpy as np
 import matplotlib.pyplot as plt
 
-from models.DP_GAN import sample
-from models.DP_GAN import ckpt
 
 
 class make_empty_object(object):
@@ -208,14 +203,6 @@ def toggle_grad(model, grad, num_freeze_layers=-1, is_stylegan=False):
                         param.requires_grad = False
 
 
-def load_log_dicts(directory, file_name, ph):
-    try:
-        log_dict = ckpt.load_prev_dict(directory=directory, file_name=file_name)
-    except:
-        log_dict = ph
-    return log_dict
-
-
 def make_model_require_grad(model):
     if isinstance(model, DataParallel) or isinstance(model, DistributedDataParallel):
         model = model.module
@@ -288,41 +275,6 @@ def calculate_all_sn(model, prefix):
                 weight_v = operations.weight_v
                 sigmas[prefix + "_" + name] = torch.dot(weight_u, torch.mv(weight_orig, weight_v)).item()
     return sigmas
-
-
-def apply_standing_statistics(generator, standing_max_batch, standing_step, DATA, MODEL, LOSS, OPTIMIZATION, RUN, STYLEGAN,
-                              device, global_rank, logger):
-    generator.train()
-    generator.apply(reset_bn_statistics)
-    if global_rank == 0:
-        logger.info("Acuumulate statistics of batchnorm layers to improve generation performance.")
-    for i in tqdm(range(standing_step)):
-        batch_size_per_gpu = standing_max_batch // OPTIMIZATION.world_size
-        if RUN.distributed_data_parallel:
-            rand_batch_size = random.randint(1, batch_size_per_gpu)
-        else:
-            rand_batch_size = random.randint(1, batch_size_per_gpu) * OPTIMIZATION.world_size
-        fake_images, fake_labels, _, _, _, _, _ = sample.generate_images(z_prior=MODEL.z_prior,
-                                                                   truncation_factor=-1,
-                                                                   batch_size=rand_batch_size,
-                                                                   z_dim=MODEL.z_dim,
-                                                                   num_classes=DATA.num_classes,
-                                                                   y_sampler="totally_random",
-                                                                   radius="N/A",
-                                                                   generator=generator,
-                                                                   discriminator=None,
-                                                                   is_train=True,
-                                                                   LOSS=LOSS,
-                                                                   RUN=RUN,
-                                                                   MODEL=MODEL,
-                                                                   is_stylegan=MODEL.backbone in ["stylegan2", "stylegan3"],
-                                                                   generator_mapping=None,
-                                                                   generator_synthesis=None,
-                                                                   style_mixing_p=0.0,
-                                                                   stylegan_update_emas=False,
-                                                                   device=device,
-                                                                   cal_trsp_cost=False)
-    generator.eval()
 
 def define_sampler(dataset_name, dis_cond_mtd, batch_size, num_classes):
     if dis_cond_mtd != "W/O":
@@ -442,68 +394,6 @@ def plot_spectrum_image(real_spectrum, fake_spectrum, directory, logger, logging
     fig.savefig(save_path)
     if logging:
         logger.info("Save image to {}".format(save_path))
-
-
-
-def save_images_png(data_loader, generator, discriminator, is_generate, num_images, y_sampler, batch_size, z_prior,
-                    truncation_factor, z_dim, num_classes, LOSS, OPTIMIZATION, RUN, MODEL, is_stylegan, generator_mapping,
-                    generator_synthesis, directory, device):
-    num_batches = math.ceil(float(num_images) / float(batch_size))
-    if RUN.distributed_data_parallel: num_batches = num_batches//OPTIMIZATION.world_size + 1
-    if is_generate:
-        image_type = "fake"
-    else:
-        image_type = "real"
-        data_iter = iter(data_loader)
-
-    print("Save {num_images} {image_type} images in png format.".format(num_images=num_images, image_type=image_type))
-
-    directory = join(directory, image_type)
-    if exists(directory):
-        shutil.rmtree(directory)
-    os.makedirs(directory)
-    for f in range(num_classes):
-        os.makedirs(join(directory, str(f)))
-
-    with torch.no_grad() if not LOSS.apply_lo else dummy_context_mgr() as mpc:
-        for i in tqdm(range(0, num_batches), disable=False):
-            start = i * batch_size
-            end = start + batch_size
-            if is_generate:
-                images, labels, _, _, _, _, _= sample.generate_images(z_prior=z_prior,
-                                                                 truncation_factor=truncation_factor,
-                                                                 batch_size=batch_size,
-                                                                 z_dim=z_dim,
-                                                                 num_classes=num_classes,
-                                                                 y_sampler=y_sampler,
-                                                                 radius="N/A",
-                                                                 generator=generator,
-                                                                 discriminator=discriminator,
-                                                                 is_train=False,
-                                                                 LOSS=LOSS,
-                                                                 RUN=RUN,
-                                                                 MODEL=MODEL,
-                                                                 is_stylegan=is_stylegan,
-                                                                 generator_mapping=generator_mapping,
-                                                                 generator_synthesis=generator_synthesis,
-                                                                 style_mixing_p=0.0,
-                                                                 stylegan_update_emas=False,
-                                                                 device=device,
-                                                                 cal_trsp_cost=False)
-            else:
-                try:
-                    images, labels = next(data_iter)
-                except StopIteration:
-                    break
-
-            for idx, img in enumerate(images.detach()):
-                if batch_size * i + idx < num_images:
-                    save_image(((img+1)/2).clamp(0.0, 1.0),
-                               join(directory, str(labels[idx].item()), "{idx}.png".format(idx=batch_size * i + idx)))
-                else:
-                    pass
-
-    print("Finish saving png images to {directory}/*/*.png".format(directory=directory))
 
 
 def orthogonalize_model(model, strength=1e-4, blacklist=[]):
