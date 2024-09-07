@@ -35,14 +35,13 @@ model:
   # new flag
   batch_teachers: 100
   teachers_batch: 40
-  sample_step: 10
 
 pretrain:
   log_dir: null
 
 train:
   batch_size: 64
-  epoch: 1000
+  epoch: 300
   non_private: False
   sigma: 1000
   sigma_thresh: 3000
@@ -55,7 +54,7 @@ train:
   beta1: 0.5
   shuffle: True
   increasing_dim: False
-  save_epoch: True
+  save_epoch: False
   pretrain: False
   checkpoint_dir: checkpoint
   teacher_dir: teacher

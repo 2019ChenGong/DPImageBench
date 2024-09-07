@@ -64,7 +64,7 @@ def sigmoid_cross_entropy_with_logits(x, y):
 class DCGAN(object):
     def __init__(self, sess, image_size=32,
                  batch_size=64, sample_num=64,
-                 y_dim=10, z_dim=100, gf_dim=64, df_dim=32, sample_step=800,
+                 y_dim=10, z_dim=100, gf_dim=64, df_dim=32,
                  gfc_dim=1024, dfc_dim=256, dataset_name='default',
                  batch_teachers=10, teachers_batch=2,
                  orders=None,
@@ -88,7 +88,6 @@ class DCGAN(object):
         self.wgan = wgan
         self.wgan_scale = wgan_scale
 
-        self.sample_step = sample_step
         self.pca = pca
         self.pca_dim = pca_dim
         self.random_proj = random_proj
@@ -582,7 +581,7 @@ class DCGAN(object):
                             eps, config.dp.epsilon, self.dp_eps_list[-1]))
 
                             # save privacy budget
-                            self.save(config.checkpoint_dir, counter)
+                            # self.save(config.checkpoint_dir, counter)
                             np.savetxt(config.checkpoint_dir + "/dp_eps.txt", np.asarray(self.dp_eps_list), delimiter=",")
                             np.savetxt(config.checkpoint_dir + "/rdp_eps.txt", np.asarray(self.rdp_eps_list),
                                        delimiter=",")
@@ -626,21 +625,10 @@ class DCGAN(object):
                 counter += 1
                 print("Epoch: [%2d/%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f, g_loss_before: %.8f, dp_eps: %.8f, rdp_order: %d" \
                       % (epoch, config.epoch, idx, batch_idxs, time.time() - start_time, errD, errG, errG2, eps, order))
-            # filename = 'epoch'+str(epoch)+'_errD'+str(errD)+'_errG'+str(errG)+'_teachers'+str(self.batch_teachers)+'f.csv'
-            # if epoch % 4 == 0:
-            print('----------------------generate sample----------------------')
-            # data = self.gen_data(500)
-            # output_dir = os.path.join(self.checkpoint_dir, self.sample_dir)
-            # if not os.path.exists(output_dir):
-            #     os.makedirs(output_dir)
-            # filename = 'private.data_epoch_' + str(epoch) + '.pkl'
-            # outfile = os.path.join(output_dir, filename)
-            # mkdir(output_dir)
-            # with open(outfile,'wb') as f:
-            #     pickle.dump(data, f)
+
 
             # save each epoch
-            self.save(config.checkpoint_dir, counter)
+            # self.save(config.checkpoint_dir, counter)
             np.savetxt(config.checkpoint_dir + "/dp_eps.txt", np.asarray(self.dp_eps_list), delimiter=",")
             np.savetxt(config.checkpoint_dir + "/rdp_order.txt", np.asarray(self.rdp_order_list), delimiter=",")
             np.savetxt(config.checkpoint_dir + "/rdp_eps.txt", np.asarray(self.rdp_eps_list), delimiter=",")
@@ -657,7 +645,7 @@ class DCGAN(object):
 
         #
         # save after training
-        self.save(config.checkpoint_dir, counter)
+        # self.save(config.checkpoint_dir, counter)
         np.savetxt(config.checkpoint_dir + "/dp_eps.txt", np.asarray(self.dp_eps_list), delimiter=",")
         np.savetxt(config.checkpoint_dir + "/rdp_eps.txt", np.asarray(self.rdp_eps_list), delimiter=",")
         np.savetxt(config.checkpoint_dir + "/rdp_order.txt", np.asarray(self.rdp_order_list), delimiter=",")
