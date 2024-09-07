@@ -10,7 +10,7 @@ import pickle
 import torchvision
 
 from models.DP_Diffusion.model.ema import ExponentialMovingAverage
-from models.DP_GAN.utils.util import set_seeds, make_dir, save_checkpoint, sample_random_image_batch, compute_fid, generate_batch
+from models.DP_GAN.utils.util import set_seeds, make_dir, save_checkpoint, sample_random_image_batch, compute_fid, generate_batch, save_img
 from models.DP_Diffusion.dnnlib.util import open_url
 
 from models.DP_GAN.generator import Generator
@@ -177,20 +177,20 @@ class DPGAN(DPSynther):
                             state['step'] += 1
                             state['emaG'].update(G.parameters())
 
-                            if state['step'] % config.snapshot_freq == 0 and state['step'] >= config.snapshot_threshold and self.global_rank == 0:
+                            if state['step'] % config.snapshot_freq == 0 and state['step'] >= config.snapshot_threshold:
                                 logging.info(
                                     'Saving snapshot checkpoint and sampling single batch at iteration %d.' % state['step'])
 
                                 with torch.no_grad():
                                     ema.store(G.parameters())
                                     ema.copy_to(G.parameters())
-                                    sample_random_image_batch(G, snapshot_sampling_shape, os.path.join(
-                                    sample_dir, 'iter_%d' % state['step']), self.device, self.num_classes)
+                                    samples = sample_random_image_batch(G, snapshot_sampling_shape, self.device, self.num_classes)
                                     ema.restore(G.parameters())
-
-                                save_checkpoint(os.path.join(checkpoint_dir, 'snapshot_checkpoint.pth'), state)
+                                
+                                if self.global_rank == 0:
+                                    make_dir(os.path.join(sample_dir, 'iter_%d' % state['step']))
+                                    save_img(samples, os.path.join(os.path.join(sample_dir, 'iter_%d' % state['step']), 'sample.png'))
                             dist.barrier()
-                            print(D_steps, '1111', self.device)
                             if state['step'] % config.fid_freq == 0 and state['step'] >= config.fid_threshold:
                                 with torch.no_grad():
                                     ema.store(G.parameters())
@@ -201,7 +201,6 @@ class DPGAN(DPSynther):
                                     if self.global_rank == 0:
                                         logging.info('FID at iteration %d: %.6f' % (state['step'], fid))
                             dist.barrier()
-                            print(D_steps, '2222')
                             if state['step'] % config.save_freq == 0 and state['step'] >= config.save_threshold and self.global_rank == 0:
                                 checkpoint_file = os.path.join(
                                     checkpoint_dir, 'checkpoint_%d.pth' % state['step'])
@@ -223,13 +222,14 @@ class DPGAN(DPSynther):
         with torch.no_grad():
             ema.store(G.parameters())
             ema.copy_to(G.parameters())
-            if self.global_rank == 0:
-                sample_random_image_batch(snapshot_sampling_shape, G, os.path.join(sample_dir, 'final'), self.device, self.num_classes)
+            samples = sample_random_image_batch(G, snapshot_sampling_shape, self.device, self.num_classes)
             fid = compute_fid(config.final_fid_samples, self.global_size, fid_sampling_shape, G, inception_model,
                             self.fid_stats, self.device, self.num_classes)
             ema.restore(G.parameters())
 
         if self.global_rank == 0:
+            make_dir(os.path.join(sample_dir, 'final'))
+            save_img(samples, os.path.join(os.path.join(sample_dir, 'final'), 'sample.png'))
             logging.info('Final FID %.6f' % (fid))
         dist.barrier()
 

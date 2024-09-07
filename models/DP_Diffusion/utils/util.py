@@ -67,8 +67,12 @@ def sample_random_image_batch(sampling_shape, sampler, path, device, n_classes=N
 
     x = torch.randn(sampling_shape, device=device)
     if n_classes is not None:
-        y = torch.randint(n_classes, size=(
-            sampling_shape[0],), dtype=torch.int32, device=device)
+        num_per_cls = sampling_shape[0] // n_classes
+        y = []
+        for cls in range(n_classes):
+            y.extend([cls]*num_per_cls)
+        y = torch.tensor(y, dtype=torch.int32, device=device)
+        #y = torch.randint(n_classes, size=(sampling_shape[0],), dtype=torch.int32, device=device)
     else:
         y = None
 

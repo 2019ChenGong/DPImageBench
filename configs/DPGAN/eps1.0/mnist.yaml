@@ -33,7 +33,7 @@ model:
     attn_g_loc: [2]
     apply_attn: True
   Discriminator:
-    d_conv_dim: 96
+    d_conv_dim: 80
 
 pretrain:
   log_dir: null
@@ -44,14 +44,14 @@ train:
   batch_size: 4096
   snapshot_batch_size: 80
   fid_batch_size: 256
-  n_epochs: 100
+  n_epochs: 150
   d_updates: 5
-  log_freq: 5
-  snapshot_freq: 5
+  log_freq: 10
+  snapshot_freq: 10
   snapshot_threshold: 1
   save_freq: 100000
   save_threshold: 1
-  fid_freq: 10
+  fid_freq: 20
   fid_samples: 5000
   final_fid_samples: 6000
   fid_threshold: 1

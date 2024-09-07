@@ -62,21 +62,22 @@ def save_img(x, filename, figsize=None):
     plt.close()
 
 
-def sample_random_image_batch(G, sampling_shape, path, device, n_classes=None, name='sample'):
-    make_dir(path)
-
+def sample_random_image_batch(G, sampling_shape, device, n_classes=None):
     x = torch.randn(sampling_shape, device=device)
     if n_classes is not None:
-        y = torch.randint(n_classes, size=(
-            sampling_shape[0],), dtype=torch.int32, device=device)
+        num_per_cls = sampling_shape[0] // n_classes
+        y = []
+        for cls in range(n_classes):
+            y.extend([cls]*num_per_cls)
+        y = torch.tensor(y, dtype=torch.int32, device=device)
+        #y = torch.randint(n_classes, size=(sampling_shape[0],), dtype=torch.int32, device=device)
     else:
         y = None
 
     x = G(x, y)
     x = x / 2. + .5
 
-    save_img(x, os.path.join(path, name + '.png'))
-    np.save(os.path.join(path, name), x.cpu())
+    return x
 
 
 def calculate_frechet_distance(mu1, sigma1, mu2, sigma2):
