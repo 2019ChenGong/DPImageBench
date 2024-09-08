@@ -715,7 +715,8 @@ class DCGAN(object):
 
 
     def gen_data(self, n_batch, label=None):
-        output_list = []
+        x_list = []
+        y_list = []
         for i in range(n_batch):
             batch_z = np.random.uniform(-1, 1, [self.batch_size, self.z_dim]).astype(np.float32)
 
@@ -725,26 +726,30 @@ class DCGAN(object):
                 else:
                     batch_labels = np.zeros((self.batch_size, self.y_dim), dtype=np.float)
                     batch_labels[:, label] = 1.0
-
                 outputs = self.sess.run(self.G,
                                         feed_dict={
                                             self.z: batch_z,
                                             self.y: batch_labels,
                                         })
                 outputsX = outputs.reshape([self.batch_size, -1])
-                outputs = np.hstack([outputsX, batch_labels[:, 0:10]])
+                outputsy = np.argmax(batch_labels, axis=1)
             else:
                 outputs = self.sess.run(self.G,
                                         feed_dict={
                                             self.z: batch_z,
                                         })
                 outputsX = outputs.reshape([self.batch_size, -1])
-                outputs = outputsX
+                outputsy = None
 
-            output_list.append(outputs)
+            x_list.append(outputsX)
+            y_list.append(outputsy)
 
-        output_arr = np.vstack(output_list)
-        return output_arr
+        x_list = np.vstack(x_list)
+        if self.y is not None:
+            y_list = np.concatenate(y_list)
+        else:
+            y_list = None
+        return x_list, y_list
 
     @property
     def model_dir(self):
