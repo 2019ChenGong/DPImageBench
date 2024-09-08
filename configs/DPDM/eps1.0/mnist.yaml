@@ -49,7 +49,7 @@ model:
     s_churn: 100
     s_min: 0.05
     s_max: 50
-    num_steps: 50
+    num_steps: 1000
     tmin: .002
     tmax: 80.
     rho: 7.
@@ -59,7 +59,7 @@ model:
     s_churn: 10
     s_min: 0.1
     s_max: 50
-    num_steps: 50
+    num_steps: 1000
     tmin: .002
     tmax: 80.
     rho: 7.
@@ -73,7 +73,7 @@ train:
   log_dir: null
   seed: 0
   batch_size: 4096
-  n_epochs: 1
+  n_epochs: 150
   log_freq: 100
   snapshot_freq: 2000
   snapshot_threshold: 1
@@ -81,7 +81,7 @@ train:
   save_threshold: 1
   fid_freq: 2000
   fid_samples: 5000
-  final_fid_samples: 6000
+  final_fid_samples: 60000
   fid_threshold: 1
   gen: False
   gen_batch_size: 8192

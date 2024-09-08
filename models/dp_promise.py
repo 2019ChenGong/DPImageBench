@@ -485,3 +485,363 @@ class DP_Diffusion(DPSynther):
             return syn_data, syn_labels
         else:
             return None, None
+    
+
+    def stage1_train(self, sensitive_dataloader, config):
+        sample_dir = os.path.join(config.log_dir, 'samples')
+        checkpoint_dir = os.path.join(config.log_dir, 'checkpoints')
+        fid_dir = os.path.join(config.log_dir, 'fid')
+
+        if self.global_rank == 0:
+            make_dir(config.log_dir)
+            make_dir(sample_dir)
+            make_dir(checkpoint_dir)
+            make_dir(fid_dir)
+        dist.barrier()
+
+        dataset_loader = torch.utils.data.DataLoader(
+        dataset=sensitive_dataloader.dataset, batch_size=config.batch_size//self.global_size, sampler=DistributedSampler(sensitive_dataloader.dataset), num_workers=2,
+        pin_memory=True)
+
+        model = DDP(self.model)
+        if self.ckpt is not None:
+            state = torch.load(self.ckpt, map_location=self.device)
+            logging.info(model.load_state_dict(state['model'], strict=True))
+        ema = ExponentialMovingAverage(
+            model.parameters(), decay=self.ema_rate)
+
+        if config.optim.optimizer == 'Adam':
+            optimizer = torch.optim.Adam(model.parameters(), **config.optim.params)
+        elif config.optim.optimizer == 'SGD':
+            optimizer = torch.optim.SGD(model.parameters(), **config.optim.params)
+        else:
+            raise NotImplementedError
+
+        state = dict(model=model, ema=ema, optimizer=optimizer, step=0)
+
+        if self.global_rank == 0:
+            model_parameters = filter(
+                lambda p: p.requires_grad, model.parameters())
+            n_params = sum([np.prod(p.size()) for p in model_parameters])
+            logging.info('Number of trainable parameters in model: %d' % n_params)
+            logging.info('Number of total epochs: %d' % config.n_epochs)
+            logging.info('Starting training at step %d' % state['step'])
+        dist.barrier()
+
+        if config.loss.version == 'edm':
+            loss_fn = EDMLoss(**config.loss).get_loss
+        elif config.loss.version == 'vpsde':
+            loss_fn = VPSDELoss(**config.loss).get_loss
+        elif config.loss.version == 'vesde':
+            loss_fn = VESDELoss(**config.loss).get_loss
+        elif config.loss.version == 'v':
+            loss_fn = VLoss(**config.loss).get_loss
+        else:
+            raise NotImplementedError
+
+        with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
+            inception_model = pickle.load(f).to(self.device)
+
+        def sampler(x, y=None):
+            if self.sampler.type == 'ddim':
+                return ddim_sampler(x, y, model, **self.sampler)
+            elif self.sampler.type == 'edm':
+                return edm_sampler(x, y, model, **self.sampler)
+            else:
+                raise NotImplementedError
+
+        snapshot_sampling_shape = (self.sampler.snapshot_batch_size,
+                                self.network.num_in_channels, self.network.image_size, self.network.image_size)
+        fid_sampling_shape = (self.sampler.fid_batch_size, self.network.num_in_channels,
+                            self.network.image_size, self.network.image_size)
+
+        for epoch in range(config.n_epochs):
+            with BatchMemoryManager(
+                    data_loader=dataset_loader,
+                    max_physical_batch_size=config.dp.max_physical_batch_size,
+                    optimizer=optimizer,
+                    n_splits=config.dp.n_splits if config.dp.n_splits > 0 else None) as memory_safe_data_loader:
+
+                for _, (train_x, train_y) in enumerate(memory_safe_data_loader):
+                    if state['step'] % config.snapshot_freq == 0 and state['step'] >= config.snapshot_threshold and self.global_rank == 0:
+                        logging.info(
+                            'Saving snapshot checkpoint and sampling single batch at iteration %d.' % state['step'])
+
+                        model.eval()
+                        with torch.no_grad():
+                            ema.store(model.parameters())
+                            ema.copy_to(model.parameters())
+                            sample_random_image_batch(snapshot_sampling_shape, sampler, os.path.join(
+                                sample_dir, 'iter_%d' % state['step']), self.device, self.network.label_dim)
+                            ema.restore(model.parameters())
+                        model.train()
+
+                        save_checkpoint(os.path.join(
+                            checkpoint_dir, 'snapshot_checkpoint.pth'), state)
+                    dist.barrier()
+
+                    if state['step'] % config.fid_freq == 0 and state['step'] >= config.fid_threshold:
+                        model.eval()
+                        with torch.no_grad():
+                            ema.store(model.parameters())
+                            ema.copy_to(model.parameters())
+                            fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, self.network.label_dim)
+                            ema.restore(model.parameters())
+
+                            if self.global_rank == 0:
+                                logging.info('FID at iteration %d: %.6f' % (state['step'], fid))
+                            dist.barrier()
+                        model.train()
+
+                    if state['step'] % config.save_freq == 0 and state['step'] >= config.save_threshold and self.global_rank == 0:
+                        checkpoint_file = os.path.join(
+                            checkpoint_dir, 'checkpoint_%d.pth' % state['step'])
+                        save_checkpoint(checkpoint_file, state)
+                        logging.info(
+                            'Saving  checkpoint at iteration %d' % state['step'])
+                    dist.barrier()
+
+                    if len(train_y.shape) == 2:
+                        train_x = train_x.to(torch.float32) / 255.
+                        train_y = torch.argmax(train_y, dim=1)
+                    
+                    x = train_x.to(self.device) * 2. - 1.
+                    y = train_y.to(self.device).long()
+
+                    optimizer.zero_grad(set_to_none=True)
+                    loss = torch.mean(loss_fn(model, x, y))
+                    loss.backward()
+                    optimizer.step()
+
+                    if (state['step'] + 1) % config.log_freq == 0 and self.global_rank == 0:
+                        logging.info('Loss: %.4f, step: %d' %
+                                    (loss, state['step'] + 1))
+                    dist.barrier()
+
+                    state['step'] += 1
+                    if not optimizer._is_last_step_skipped:
+                        state['ema'].update(model.parameters())
+
+                logging.info('Eps-value after %d epochs: %.4f' %
+                            (epoch + 1, privacy_engine.get_epsilon(config.dp.delta)))
+
+        if self.global_rank == 0:
+            checkpoint_file = os.path.join(checkpoint_dir, 'final_checkpoint.pth')
+            save_checkpoint(checkpoint_file, state)
+            logging.info('Saving final checkpoint.')
+        dist.barrier()
+
+        def sampler_final(x, y=None):
+            if self.sampler_fid.type == 'ddim':
+                return ddim_sampler(x, y, model, **self.sampler_fid)
+            elif self.sampler_fid.type == 'edm':
+                return edm_sampler(x, y, model, **self.sampler_fid)
+            else:
+                raise NotImplementedError
+
+        model.eval()
+        with torch.no_grad():
+            ema.store(model.parameters())
+            ema.copy_to(model.parameters())
+            if self.global_rank == 0:
+                sample_random_image_batch(snapshot_sampling_shape, sampler_final, os.path.join(
+                                    sample_dir, 'final'), self.device, self.network.label_dim)
+            fid = compute_fid(config.final_fid_samples, self.global_size, fid_sampling_shape, sampler_final, inception_model, self.fid_stats, self.device, self.network.label_dim)
+
+        if self.global_rank == 0:
+            logging.info('Final FID %.6f' % (fid))
+        dist.barrier()
+
+        self.ema = ema
+
+    def stage2_train(self, sensitive_dataloader, config):
+        sample_dir = os.path.join(config.log_dir, 'samples')
+        checkpoint_dir = os.path.join(config.log_dir, 'checkpoints')
+        fid_dir = os.path.join(config.log_dir, 'fid')
+
+        if self.global_rank == 0:
+            make_dir(config.log_dir)
+            make_dir(sample_dir)
+            make_dir(checkpoint_dir)
+            make_dir(fid_dir)
+        dist.barrier()
+
+        model = DPDDP(self.model)
+        if self.ckpt is not None:
+            state = torch.load(self.ckpt, map_location=self.device)
+            logging.info(model.load_state_dict(state['model'], strict=True))
+        ema = ExponentialMovingAverage(
+            model.parameters(), decay=self.ema_rate)
+
+        if config.optim.optimizer == 'Adam':
+            optimizer = torch.optim.Adam(model.parameters(), **config.optim.params)
+        elif config.optim.optimizer == 'SGD':
+            optimizer = torch.optim.SGD(model.parameters(), **config.optim.params)
+        else:
+            raise NotImplementedError
+
+        state = dict(model=model, ema=ema, optimizer=optimizer, step=0)
+
+        if self.global_rank == 0:
+            model_parameters = filter(
+                lambda p: p.requires_grad, model.parameters())
+            n_params = sum([np.prod(p.size()) for p in model_parameters])
+            logging.info('Number of trainable parameters in model: %d' % n_params)
+            logging.info('Number of total epochs: %d' % config.n_epochs)
+            logging.info('Starting training at step %d' % state['step'])
+        dist.barrier()
+
+        privacy_engine = PrivacyEngine()
+        if config.dp.sdq is None:
+            account_history = None
+            alpha_history = None
+        else:
+            account_history = [tuple(item) for item in config.dp.privacy_history]
+            if config.dp.alpha_num == 0:
+                alpha_history = None
+            else:
+                alpha = np.arange(config.dp.alpha_num) / config.dp.alpha_num
+                alpha = alpha * (config.dp.alpha_max-config.dp.alpha_min)
+                alpha += config.dp.alpha_min 
+                alpha_history = list(alpha)
+
+        model, optimizer, dataset_loader = privacy_engine.make_private_with_epsilon(
+            module=model,
+            optimizer=optimizer,
+            data_loader=sensitive_dataloader,
+            target_delta=config.dp.delta,
+            target_epsilon=config.dp.epsilon,
+            epochs=config.n_epochs,
+            max_grad_norm=config.dp.max_grad_norm,
+            noise_multiplicity=config.loss.n_noise_samples,
+            account_history=account_history,
+            alpha_history=alpha_history,
+        )
+
+        if config.loss.version == 'edm':
+            loss_fn = EDMLoss(**config.loss).get_loss
+        elif config.loss.version == 'vpsde':
+            loss_fn = VPSDELoss(**config.loss).get_loss
+        elif config.loss.version == 'vesde':
+            loss_fn = VESDELoss(**config.loss).get_loss
+        elif config.loss.version == 'v':
+            loss_fn = VLoss(**config.loss).get_loss
+        else:
+            raise NotImplementedError
+
+        with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
+            inception_model = pickle.load(f).to(self.device)
+
+        def sampler(x, y=None):
+            if self.sampler.type == 'ddim':
+                return ddim_sampler(x, y, model, **self.sampler)
+            elif self.sampler.type == 'edm':
+                return edm_sampler(x, y, model, **self.sampler)
+            else:
+                raise NotImplementedError
+
+        snapshot_sampling_shape = (self.sampler.snapshot_batch_size,
+                                self.network.num_in_channels, self.network.image_size, self.network.image_size)
+        fid_sampling_shape = (self.sampler.fid_batch_size, self.network.num_in_channels,
+                            self.network.image_size, self.network.image_size)
+
+        for epoch in range(config.n_epochs):
+            with BatchMemoryManager(
+                    data_loader=dataset_loader,
+                    max_physical_batch_size=config.dp.max_physical_batch_size,
+                    optimizer=optimizer,
+                    n_splits=config.dp.n_splits if config.dp.n_splits > 0 else None) as memory_safe_data_loader:
+
+                for _, (train_x, train_y) in enumerate(memory_safe_data_loader):
+                    if state['step'] % config.snapshot_freq == 0 and state['step'] >= config.snapshot_threshold and self.global_rank == 0:
+                        logging.info(
+                            'Saving snapshot checkpoint and sampling single batch at iteration %d.' % state['step'])
+
+                        model.eval()
+                        with torch.no_grad():
+                            ema.store(model.parameters())
+                            ema.copy_to(model.parameters())
+                            sample_random_image_batch(snapshot_sampling_shape, sampler, os.path.join(
+                                sample_dir, 'iter_%d' % state['step']), self.device, self.network.label_dim)
+                            ema.restore(model.parameters())
+                        model.train()
+
+                        save_checkpoint(os.path.join(
+                            checkpoint_dir, 'snapshot_checkpoint.pth'), state)
+                    dist.barrier()
+
+                    if state['step'] % config.fid_freq == 0 and state['step'] >= config.fid_threshold:
+                        model.eval()
+                        with torch.no_grad():
+                            ema.store(model.parameters())
+                            ema.copy_to(model.parameters())
+                            fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, self.network.label_dim)
+                            ema.restore(model.parameters())
+
+                            if self.global_rank == 0:
+                                logging.info('FID at iteration %d: %.6f' % (state['step'], fid))
+                            dist.barrier()
+                        model.train()
+
+                    if state['step'] % config.save_freq == 0 and state['step'] >= config.save_threshold and self.global_rank == 0:
+                        checkpoint_file = os.path.join(
+                            checkpoint_dir, 'checkpoint_%d.pth' % state['step'])
+                        save_checkpoint(checkpoint_file, state)
+                        logging.info(
+                            'Saving  checkpoint at iteration %d' % state['step'])
+                    dist.barrier()
+
+                    if len(train_y.shape) == 2:
+                        train_x = train_x.to(torch.float32) / 255.
+                        train_y = torch.argmax(train_y, dim=1)
+                    
+                    x = train_x.to(self.device) * 2. - 1.
+                    y = train_y.to(self.device).long()
+
+                    optimizer.zero_grad(set_to_none=True)
+                    loss = torch.mean(loss_fn(model, x, y))
+                    loss.backward()
+                    optimizer.step()
+
+                    if (state['step'] + 1) % config.log_freq == 0 and self.global_rank == 0:
+                        logging.info('Loss: %.4f, step: %d' %
+                                    (loss, state['step'] + 1))
+                    dist.barrier()
+
+                    state['step'] += 1
+                    if not optimizer._is_last_step_skipped:
+                        state['ema'].update(model.parameters())
+
+                logging.info('Eps-value after %d epochs: %.4f' %
+                            (epoch + 1, privacy_engine.get_epsilon(config.dp.delta)))
+
+        if self.global_rank == 0:
+            checkpoint_file = os.path.join(checkpoint_dir, 'final_checkpoint.pth')
+            save_checkpoint(checkpoint_file, state)
+            logging.info('Saving final checkpoint.')
+        dist.barrier()
+
+        def sampler_final(x, y=None):
+            if self.sampler_fid.type == 'ddim':
+                return ddim_sampler(x, y, model, **self.sampler_fid)
+            elif self.sampler_fid.type == 'edm':
+                return edm_sampler(x, y, model, **self.sampler_fid)
+            else:
+                raise NotImplementedError
+
+        model.eval()
+        with torch.no_grad():
+            ema.store(model.parameters())
+            ema.copy_to(model.parameters())
+            if self.global_rank == 0:
+                sample_random_image_batch(snapshot_sampling_shape, sampler_final, os.path.join(
+                                    sample_dir, 'final'), self.device, self.network.label_dim)
+            fid = compute_fid(config.final_fid_samples, self.global_size, fid_sampling_shape, sampler_final, inception_model,
+                            self.fid_stats, self.device, self.network.label_dim)
+            ema.restore(self.model.parameters())
+
+        if self.global_rank == 0:
+            logging.info('Final FID %.6f' % (fid))
+        dist.barrier()
+
+        self.ema = ema
