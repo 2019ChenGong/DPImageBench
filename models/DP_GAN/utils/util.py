@@ -128,7 +128,7 @@ def compute_fid(n_samples, n_gpus, sampling_shape, G, inception_model, stats_pat
     return fid
 
 
-def generate_batch(G, sampling_shape, device, labels, n_classes):
+def generate_batch(G, sampling_shape, device, n_classes):
     x = torch.randn(sampling_shape, device=device)
     with torch.no_grad():
         if labels is None:
@@ -139,14 +139,8 @@ def generate_batch(G, sampling_shape, device, labels, n_classes):
             x = G(x)
         else:
             if isinstance(labels, int):
-                if labels == n_classes:
-                    labels = torch.randint(
-                        n_classes, (sampling_shape[0],)).to(x.device)
-                elif sampling_shape[0] % labels == 0:
-                    labels = torch.tensor(
-                        [[i] * labels for i in range(n_classes)], device=x.device).view(-1)
-                else:
-                    raise NotImplementedError
+                labels = torch.randint(
+                    n_classes, (sampling_shape[0],)).to(x.device)
             else:
                 raise NotImplementedError
 

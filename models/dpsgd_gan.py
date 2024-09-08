@@ -255,7 +255,7 @@ class DPGAN(DPSynther):
             syn_data = []
             syn_labels = []
         for _ in range(config.data_num // (sampling_shape[0] * self.global_size) + 1):
-            x, y = generate_batch(G, sampling_shape, self.device, 8, self.num_classes)
+            x, y = generate_batch(G, sampling_shape, self.device, self.num_classes)
             dist.barrier()
             if self.global_rank == 0:
                 gather_x = [torch.zeros_like(x) for _ in range(self.global_size)]
