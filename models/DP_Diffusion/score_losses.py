@@ -170,17 +170,67 @@ class EDMLoss:
         loss = torch.mean(loss.reshape(loss.shape[0], -1), dim=-1)
         return loss
     
-    def reconstruction(self, model, x, y):
+    def get_loss_stage1(self, model, x, y, min_sigma):
         y = dropout_label_for_cfg_training(
             y, self.n_noise_samples, self.n_classes, self.label_unconditioning_prob, x.device)
 
-        log_sigma = self.p_mean + self.p_std * torch.randn((x.shape[0],), device=x.device)
+        log_sigma = self.p_mean + self.p_std * \
+            torch.randn(
+                (x.shape[0], self.n_noise_samples), device=x.device)
 
-        sigma = log_sigma.exp()
+        sigma = log_sigma.exp().view(-1)
+        
+        is_good = sigma>=min_sigma
+        good_sigma = sigma[is_good]
+        for i in range(len(is_good)):
+            if not is_good[i]:
+                sigma[i] = good_sigma[np.random.randint(low=0, high=len(good_sigma))]
+        sigma = sigma.view(x.shape[0], self.n_noise_samples)
 
         sigma = add_dimensions(sigma, len(x.shape) - 1)
-        x_noisy = x + sigma * torch.randn_like(x, device=x.device)
+        x_repeated = x.unsqueeze(1).repeat_interleave(
+            self.n_noise_samples, dim=1)
+        x_noisy = x_repeated + sigma * \
+            torch.randn_like(x_repeated, device=x.device)
 
-        pred = model(x_noisy, sigma.reshape(-1, *sigma.shape[2:]), y)
+        w = (sigma ** 2. + self.sigma_data ** 2.) / \
+            (sigma * self.sigma_data) ** 2.
 
-        return pred, x
+        pred = model(x_noisy.reshape(-1, *x.shape[1:]), sigma.reshape(-1, *sigma.shape[2:]), y).reshape(
+            x.shape[0], self.n_noise_samples, *x.shape[1:])
+        loss = w * (pred - x_repeated) ** 2.
+        loss = torch.mean(loss.reshape(loss.shape[0], -1), dim=-1)
+        return loss
+
+    def get_loss_stage2(self, model, x, y, max_sigma):
+        y = dropout_label_for_cfg_training(
+            y, self.n_noise_samples, self.n_classes, self.label_unconditioning_prob, x.device)
+
+        log_sigma = self.p_mean + self.p_std * \
+            torch.randn(
+                (x.shape[0], self.n_noise_samples), device=x.device)
+
+        sigma = log_sigma.exp().view(-1)
+        
+        is_good = sigma<=max_sigma
+        good_sigma = sigma[is_good]
+        for i in range(len(is_good)):
+            if not is_good[i]:
+                sigma[i] = good_sigma[np.random.randint(low=0, high=len(good_sigma))]
+        sigma = sigma.view(x.shape[0], self.n_noise_samples)
+
+        sigma = add_dimensions(sigma, len(x.shape) - 1)
+        x_repeated = x.unsqueeze(1).repeat_interleave(
+            self.n_noise_samples, dim=1)
+        x_noisy = x_repeated + sigma * \
+            torch.randn_like(x_repeated, device=x.device)
+
+        w = (sigma ** 2. + self.sigma_data ** 2.) / \
+            (sigma * self.sigma_data) ** 2.
+
+        pred = model(x_noisy.reshape(-1, *x.shape[1:]), sigma.reshape(-1, *sigma.shape[2:]), y).reshape(
+            x.shape[0], self.n_noise_samples, *x.shape[1:])
+        loss = w * (pred - x_repeated) ** 2.
+        loss = torch.mean(loss.reshape(loss.shape[0], -1), dim=-1)
+        return loss
+

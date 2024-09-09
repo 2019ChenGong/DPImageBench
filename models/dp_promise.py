@@ -529,13 +529,7 @@ class DP_Diffusion(DPSynther):
         dist.barrier()
 
         if config.loss.version == 'edm':
-            loss_fn = EDMLoss(**config.loss).get_loss
-        elif config.loss.version == 'vpsde':
-            loss_fn = VPSDELoss(**config.loss).get_loss
-        elif config.loss.version == 'vesde':
-            loss_fn = VESDELoss(**config.loss).get_loss
-        elif config.loss.version == 'v':
-            loss_fn = VLoss(**config.loss).get_loss
+            loss_fn = EDMLoss(**config.loss).get_loss_stage1
         else:
             raise NotImplementedError
 
@@ -622,8 +616,8 @@ class DP_Diffusion(DPSynther):
                     if not optimizer._is_last_step_skipped:
                         state['ema'].update(model.parameters())
 
-                logging.info('Eps-value after %d epochs: %.4f' %
-                            (epoch + 1, privacy_engine.get_epsilon(config.dp.delta)))
+                # logging.info('Eps-value after %d epochs: %.4f' %
+                #             (epoch + 1, privacy_engine.get_epsilon(config.dp.delta)))
 
         if self.global_rank == 0:
             checkpoint_file = os.path.join(checkpoint_dir, 'final_checkpoint.pth')
@@ -719,13 +713,7 @@ class DP_Diffusion(DPSynther):
         )
 
         if config.loss.version == 'edm':
-            loss_fn = EDMLoss(**config.loss).get_loss
-        elif config.loss.version == 'vpsde':
-            loss_fn = VPSDELoss(**config.loss).get_loss
-        elif config.loss.version == 'vesde':
-            loss_fn = VESDELoss(**config.loss).get_loss
-        elif config.loss.version == 'v':
-            loss_fn = VLoss(**config.loss).get_loss
+            loss_fn = EDMLoss(**config.loss).get_loss_stage2
         else:
             raise NotImplementedError
 

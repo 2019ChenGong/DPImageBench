@@ -430,12 +430,8 @@ class DP_Diffusion(DPSynther):
 
     def generate(self, config):
         logging.info("start to generate {} samples".format(config.data_num))
-        workdir = os.path.join(config.log_dir, 'samples{}_acc'.format(config.data_num))
-        sample_dir = os.path.join(workdir, 'samples/')
         if self.global_rank == 0:
             make_dir(config.log_dir)
-            make_dir(workdir)
-            make_dir(sample_dir)
         dist.barrier()
 
         sampling_shape = (config.batch_size, self.network.num_in_channels, self.network.image_size, self.network.image_size)
@@ -472,7 +468,7 @@ class DP_Diffusion(DPSynther):
 
         if self.global_rank == 0:
             logging.info("Generation Finished!")
-            syn_data = np.concatenate(syn_data) / 2 + 0.5
+            syn_data = np.concatenate(syn_data)
             syn_labels = np.concatenate(syn_labels)
 
             np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
