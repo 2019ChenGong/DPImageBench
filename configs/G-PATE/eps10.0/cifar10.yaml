@@ -1,6 +1,6 @@
 setup:
   method: dpsgd-diffusion
-  run_type: torchmp
+  torchmp: True
   n_gpus_per_node: 3
   n_nodes: 1
   node_rank: 0
@@ -42,7 +42,7 @@ model:
     tmax: 80.
     rho: 7.
     guid_scale: 0.
-    snapshot_batch_size: 80
+    snapshot_batch_size: 64
     fid_batch_size: 256
   sampler_fid:
     type: edm
@@ -67,10 +67,9 @@ model:
     labels: 10
 
 pretrain:
-  log_dir: null
+  null
 
 train:
-  log_dir: null
   seed: 0
   batch_size: 4096
   n_epochs: 150
@@ -97,7 +96,7 @@ train:
     n_noise_samples: 32
     n_classes: 10
   dp:
-    sdq: null
+    sdq: True
     privacy_history: [[5, 0.1, 75]]
     alpha_num: 0
     max_grad_norm: 1.0

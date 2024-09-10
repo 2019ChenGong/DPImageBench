@@ -53,7 +53,7 @@ train:
   save_threshold: 1
   fid_freq: 20
   fid_samples: 5000
-  final_fid_samples: 6000
+  final_fid_samples: 60000
   fid_threshold: 1
   optim:
     optimizer: Adam
@@ -72,7 +72,7 @@ train:
     n_splits: 32
 
 gen:
-  data_num: 2000
+  data_num: 60000
   batch_size: 1000
   log_dir: null
 

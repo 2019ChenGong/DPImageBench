@@ -7,7 +7,7 @@ setup:
   master_address: '127.0.0.1'
   master_port: 6025
   omp_n_threads: 8
-  workdir: exp/privimage/mnist_eps1.0
+  workdir: exp/dpldm/mnist_eps1.0
 
 public_data:
   name: imagenet
@@ -16,11 +16,7 @@ public_data:
   n_classes: 1000
   train_path: /p/fzv6enresearch/kecen/data/imagenet32
   selective:
-    ratio: 0.01
-    num_words: 1
-    sigma: 484
-    batch_size: 5000
-    model_path: models/pretrained_models/imagenet_classifier_0.454_ckpt.pth
+    ratio: 1.0
 
 sensitive_data:
   name: mnist
@@ -59,7 +55,7 @@ model:
     s_churn: 100
     s_min: 0.05
     s_max: 50
-    num_steps: 50
+    num_steps: 1000
     tmin: .002
     tmax: 80.
     rho: 7.
@@ -69,7 +65,7 @@ model:
     s_churn: 10
     s_min: 0.1
     s_max: 50
-    num_steps: 50
+    num_steps: 1000
     tmin: .002
     tmax: 80.
     rho: 7.
@@ -77,10 +73,9 @@ model:
     labels: 10
 
 pretrain:
-  log_dir: null
   seed: 0
   batch_size: 64
-  n_epochs: 10
+  n_epochs: 1
   log_freq: 100
   snapshot_freq: 2000
   snapshot_threshold: 1
@@ -103,10 +98,10 @@ pretrain:
     n_classes: 10
 
 train:
-  log_dir: null
   seed: 0
   batch_size: 4096
-  n_epochs: 1
+  n_epochs: 150
+  partly_finetune: True
   log_freq: 100
   snapshot_freq: 2000
   snapshot_threshold: 1
@@ -114,7 +109,7 @@ train:
   save_threshold: 1
   fid_freq: 2000
   fid_samples: 5000
-  final_fid_samples: 6000
+  final_fid_samples: 60000
   fid_threshold: 1
   optim:
     optimizer: Adam
@@ -128,8 +123,8 @@ train:
     n_noise_samples: 32
     n_classes: 10
   dp:
-    sdq: True
-    privacy_history: [[484, 1.0, 1]]
+    sdq: null
+    privacy_history: [[5, 0.1, 75]]
     alpha_num: 0
     max_grad_norm: 1.0
     delta: 1e-5
@@ -138,7 +133,7 @@ train:
     n_splits: 32
 
 gen:
-  data_num: 2000
+  data_num: 60000
   batch_size: 1000
   log_dir: null
 

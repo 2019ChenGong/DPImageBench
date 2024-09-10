@@ -1,7 +1,7 @@
 setup:
   method: G-PATE
   run_type: tfmp
-  workdir: exp/g_pate/mnist_eps1.0
+  workdir: exp/g_pate/mnist_eps10.0
 
 public_data:
   name: null
@@ -22,7 +22,7 @@ model:
   train: True
   load_d: True
   orders: 200
-  z_dim: 50
+  z_dim: 100
   y_dim: 10
   tanh: False
   random_proj: True
@@ -33,7 +33,7 @@ model:
   thresh: 0.5
   random_label: False
   # new flag
-  batch_teachers: 100
+  batch_teachers: 50
   teachers_batch: 40
 
 pretrain:
@@ -43,8 +43,8 @@ train:
   batch_size: 64
   epoch: 1000
   non_private: False
-  sigma: 1000
-  sigma_thresh: 3000
+  sigma: 100
+  sigma_thresh: 600
   pca_sigma: 1.0
   step_size: 1e-4
   proj_mat: 1
@@ -60,7 +60,7 @@ train:
   teacher_dir: teacher
   dp:
     delta: 1e-5
-    epsilon: 1.
+    epsilon: 10.
 
 gen:
   data_num: 60000

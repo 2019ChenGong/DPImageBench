@@ -2,7 +2,6 @@ import os
 import logging
 import datetime
 import os
-import numpy as np
 
 from omegaconf import OmegaConf
 import torch
@@ -11,6 +10,7 @@ import torch.multiprocessing as mp
 
 from models.model_loader import load_model
 from data.dataset_loader import load_data
+from evaluation.evaluator import Evaluator
 
 
 def make_dir(dir):
@@ -76,7 +76,8 @@ def main_tf(_):
 
         syn_data, syn_labels = model.generate(FLAGS.gen)
 
-        # evaluation
+    evaluator = Evaluator(FLAGS)
+    evaluator.eval(syn_data, syn_labels, sensitive_test_loader)
 
 def setup(config, fn):
     os.environ['MASTER_ADDR'] = config.setup.master_address

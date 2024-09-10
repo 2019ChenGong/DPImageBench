@@ -128,5 +128,13 @@ DPImageBench/
  ```
 conda activate dpbench
 cd /p/fzv6enresearch/DPImageBench
-python run.py configs/DP_MERF/mnist.yaml
+python run.py configs/{model_name}/eps{epsilon}/{dataset_name}.yaml
  ```
+
+Availabe `model_name` are [`DataLens`, `DP-Kernel`, `DP-LDM`, `DP-MERF`, `DP-Promise`, `DPDM`, `DPSDA`, `G-PATE`, `PDP-Diffusion`, `PrivImage`]. (DPSDA may face the issue of insufficient CPU memory.)
+
+Availabe `epsilon` is [`1.0`].
+
+Availabe `dataset_name` is [`mnist`].
+
+So far, I only implement FID in our evaluation.

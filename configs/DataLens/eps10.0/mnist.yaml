@@ -1,7 +1,7 @@
 setup:
-  method: G-PATE
+  method: DataLens
   run_type: tfmp
-  workdir: exp/g_pate/mnist_eps1.0
+  workdir: exp/datalens/mnist_eps10.0
 
 public_data:
   name: null
@@ -19,40 +19,54 @@ model:
   sess: null
   image_size: 28
   dataset: mnist
+
   train: True
   load_d: True
   orders: 200
   z_dim: 50
   y_dim: 10
   tanh: False
-  random_proj: True
+
+  random_proj: False
+  simple_gan: False
   pca: False
   wgan: False
-  pca_sigma: 1.0
   pca_dim: 10
-  thresh: 0.5
   random_label: False
-  # new flag
-  batch_teachers: 100
-  teachers_batch: 40
+  save_vote: False
+  batch_teachers: 50
+  teachers_batch: 80
 
 pretrain:
   log_dir: null
 
 train:
   batch_size: 64
-  epoch: 1000
+  epoch: 300
   non_private: False
-  sigma: 1000
+  shuffle: True
+  sigma: 800
   sigma_thresh: 3000
+  pretrain_teacher: 10
+  topk: 200
+  thresh: 0.2
+  max_grad: 1e-5
+  mean_kernel: False
+  signsgd: True
+  signsgd_nothresh: False
+  klevelsgd: False
+  sketchsgd: False
+  signsgd_dept: False
+  stochastic: True
+  klevel: 4
   pca_sigma: 1.0
   step_size: 1e-4
+  learning_rate: 1e-3
   proj_mat: 1
   g_step: 1
-  d_step: 1
-  learning_rate: 1e-3
+  d_step: 2
   beta1: 0.5
-  shuffle: True
+  save_vote: False
   increasing_dim: False
   save_epoch: False
   pretrain: False

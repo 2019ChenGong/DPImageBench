@@ -19,7 +19,7 @@ sensitive_data:
   n_classes: 10
   train_path: /p/fzv6enresearch/kecen/data
   test_path: /p/fzv6enresearch/kecen/data
-  fid_stats: /p/fzv6enresearch/kecen/data/cifar10_train.zip
+  fid_stats: /p/fzv6enresearch/kecen/data/mnist_train.npz
 
 model:
   image_size: 32
@@ -30,7 +30,7 @@ model:
   sigma_list: [1, 2, 4, 8, 16]
 
 pretrain:
-  null
+  log_dir: null
 
 train:
   max_iter: 200002
