@@ -40,7 +40,7 @@ model:
     model_path: models/pretrained_models/imagenet64_cond_270M_250K.pt
 
 pretrain:
-  null
+  log_dir: null
 
 train:
   batch_size: 2000
@@ -67,3 +67,7 @@ gen:
   log_dir: null
   num_channels: 1
   resolution: 28
+
+
+eval:
+  batch_size: 1000

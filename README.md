@@ -137,4 +137,4 @@ Availabe `epsilon` is [`1.0`].
 
 Availabe `dataset_name` is [`mnist`].
 
-So far, I only implement FID in our evaluation.
+So far, I have only implemented FID in our evaluation.

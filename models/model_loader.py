@@ -4,6 +4,9 @@ def load_model(config, sess=None):
     if config.setup.method == 'DP-MERF':
         from models.dp_merf import DP_MERF
         model = DP_MERF(config.model, config.setup.local_rank)
+    elif config.setup.method == 'DP-NTK':
+        from models.dp_ntk import DP_NTK
+        model = DP_NTK(config.model, config.setup.local_rank)
     elif config.setup.method == 'DP-Kernel':
         from models.dp_kernel import DP_Kernel
         model = DP_Kernel(config.model, config.setup.local_rank)
