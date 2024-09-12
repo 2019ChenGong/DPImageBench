@@ -43,8 +43,8 @@ pretrain:
   log_dir: null
 
 train:
-  batch_size: 2000
-  feature_extractor_batch_size: 1000
+  batch_size: 1000
+  feature_extractor_batch_size: 500
   private_image_size: 28
   private_num_classes: 10
   num_samples_schedule: [60000,60000,60000,60000,60000,60000,60000,60000]
