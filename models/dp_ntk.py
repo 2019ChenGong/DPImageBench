@@ -74,7 +74,7 @@ class DP_NTK(DPSynther):
             """ synthetic data """
             gen_code, gen_labels = self.model_gen.get_code(config.batch_size, self.device)
             gen_code = gen_code.to(self.device)
-            gen_samples = self.model_gen(gen_code)
+            gen_samples = self.model_gen(gen_code.detach())
             _, gen_labels_numerical = torch.max(gen_labels, dim=1)
 
             """ synthetic data mean_emb init """
@@ -87,7 +87,8 @@ class DP_NTK(DPSynther):
 
                 """ get NTK features """
                 f_idx_grad = torch.autograd.grad(f_x, self.model_ntk.parameters(),
-                                                grad_outputs=f_x.data.new(f_x.shape).fill_(1), create_graph=True)
+                                                grad_outputs=torch.ones_like(f_x), create_graph=True)
+                # f_idx_grad = torch.autograd.grad(f_x.sum(), self.model_ntk.parameters(), create_graph=True)
                 for g in f_idx_grad:
                     mean_v_samp = torch.cat((mean_v_samp, g.flatten()))
                 # mean_v_samp = mean_v_samp[:-1]
@@ -99,6 +100,7 @@ class DP_NTK(DPSynther):
             mean_emb2 = mean_emb2 / config.batch_size
 
             """ calculate loss """
+            # loss = (self.noisy_mean_emb - mean_emb2).sum()
             loss = torch.norm(self.noisy_mean_emb - mean_emb2, p=2) ** 2
             loss.backward()
             optimizer.step()
@@ -111,88 +113,6 @@ class DP_NTK(DPSynther):
         
         torch.save(self.model_gen.state_dict(), os.path.join(config.log_dir, 'gen.pt'))
 
-# def gen_step(model_ntk, ar, device):
-#     random.seed(ar.seed)
-#     pt.manual_seed(ar.seed)
-
-#     """ setup """
-#     input_dim = 784
-#     image_size = 28
-#     n_data = 60_000
-#     n_classes = 10
-
-#     print('data: ', ar.data)
-#     model = ConvCondGen(ar.d_code, ar.gen_spec, n_classes, '16,8', '5,5').to(device)
-
-#     optimizer = optim.Adam(model.parameters(), lr=ar.lr)
-#     scheduler = StepLR(optimizer, step_size=1, gamma=ar.lr_decay)
-#     training_loss_per_epoch = np.zeros(ar.n_iter)
-
-#     """ initialize the variables """
-#     mean_v_samp = pt.Tensor([]).to(device)
-#     for p in model_ntk.parameters():
-#         mean_v_samp = pt.cat((mean_v_samp, p.flatten()))
-#     d = len(mean_v_samp)
-#     print('Feature Length:', d)
-
-#     if ar.tgt_eps is None:
-#         noise_mean_emb1 = pt.load(ar.save_dir + f'mean_emb1_{d}_{ar.seed}.pth')
-#     else:
-#         noise_mean_emb1 = pt.load(ar.save_dir + f'mean_emb1_{d}_{ar.seed}_{ar.tgt_eps}.pth')
-#     model_ntk.load_state_dict(pt.load(ar.save_dir + f'model_{d}_{ar.seed}.pth', map_location=device))
-
-#     """ random noise func for generators """
-#     code_fun = model.get_code
-
-#     """ generate 100 samples for output log """
-#     fixed_labels = pt.repeat_interleave(pt.arange(10, device=device), 10)
-#     print(fixed_labels.shape)
-#     fixed_noise = code_fun(batch_size=100, labels=fixed_labels[:, None])
-
-#     """ training a Generator via minimizing MMD """
-#     for epoch in range(ar.n_iter):  # loop over the dataset multiple times
-#         running_loss = 0.0
-#         optimizer.zero_grad()  # zero the parameter gradients
-
-#         """ synthetic data """
-#         gen_code, gen_labels = code_fun(ar.batch_size)
-#         gen_code = gen_code.to(device)
-#         gen_samples = model(gen_code)
-#         _, gen_labels_numerical = pt.max(gen_labels, dim=1)
-
-#         """ synthetic data mean_emb init """
-#         mean_emb2 = pt.zeros((d, n_classes), device=device)
-#         for idx in range(gen_samples.shape[0]):
-#             """ manually set the weight if needed """
-#             # model_ntk.fc1.weight = torch.nn.Parameter(output_weights[gen_labels_numerical[idx], :][None, :])
-#             mean_v_samp = pt.Tensor([]).to(device)  # sample mean vector init
-#             f_x = model_ntk(gen_samples[idx][None, :])
-
-#             """ get NTK features """
-#             f_idx_grad = pt.autograd.grad(f_x, model_ntk.parameters(),
-#                                              grad_outputs=f_x.data.new(f_x.shape).fill_(1), create_graph=True)
-#             for g in f_idx_grad:
-#                 mean_v_samp = pt.cat((mean_v_samp, g.flatten()))
-#             # mean_v_samp = mean_v_samp[:-1]
-
-#             """ normalize the sample mean vector """
-#             mean_emb2[:, gen_labels_numerical[idx]] += mean_v_samp / pt.linalg.vector_norm(mean_v_samp)
-
-#         """ average by batch size """
-#         mean_emb2 = pt.div(mean_emb2, ar.batch_size)
-
-#         """ calculate loss """
-#         loss = pt.norm(noise_mean_emb1 - mean_emb2, p=2) ** 2
-#         loss.backward()
-#         optimizer.step()
-
-#         running_loss += loss.item()
-#         if (epoch + 1) % ar.log_interval == 0:
-#             log_gen_data(model, device, epoch, n_classes, ar.log_dir)
-#             print('epoch # and running loss are ', [epoch, running_loss])
-#             training_loss_per_epoch[epoch] = running_loss
-#         if epoch % ar.scheduler_interval == 0:
-#             scheduler.step()
     def generate(self, config):
         os.mkdir(config.log_dir)
 

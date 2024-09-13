@@ -36,12 +36,12 @@ pretrain:
   log_dir: null
 
 train:
-  n_iter: 10
+  n_iter: 2000
   batch_size: 5000
   lr: 1e-2
   lr_decay: 0.9
   scheduler_interval: 2001
-  log_interval: 1
+  log_interval: 100
   log_dir: null
   dp:
     epsilon: 1.0

@@ -88,7 +88,7 @@ class DPSDA(DPSynther):
             samples=samples,
             additional_info=additional_info,
             folder=f'{config.log_dir}/{0}',
-            plot_images=True)
+            plot_images=False)
 
         start_t = 1
 
@@ -203,7 +203,7 @@ class DPSDA(DPSynther):
                     samples=samples,
                     additional_info=additional_info,
                     folder=f'{config.log_dir}/{t}',
-                    plot_images=True)
+                    plot_images=False)
         
         self.samples = np.transpose(samples.astype('float'), (0, 3, 1, 2)) / 255.
         self.labels = np.concatenate([[cls] * num_samples_per_class for cls in private_classes])

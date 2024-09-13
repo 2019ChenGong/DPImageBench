@@ -5,6 +5,19 @@ from scipy import linalg
 import logging
 
 
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
+
+import logging
+import os
+
+from sklearn import linear_model, neural_network
+from sklearn.metrics import f1_score, accuracy_score, confusion_matrix
+from evaluation.ema import ExponentialMovingAverage
+from evaluation.classifier.wrn import WideResNet
+
+
 from models.DP_Diffusion.dnnlib.util import open_url
 
 
@@ -21,7 +34,10 @@ class Evaluator(object):
             return
         
         fid = self.cal_fid(synthetic_images)
+
+        acc = self.cal_acc(synthetic_images, synthetic_labels, sensitive_test_loader)
         logging.info("The FID of synthetic images is {}".format(fid))
+        logging.info("The best acc of synthetic images is {}".format(acc))
         print("The FID of synthetic images is {}".format(fid))
 
     def cal_fid(self, synthetic_images, batch_size=500):
@@ -59,5 +75,64 @@ class Evaluator(object):
         fd = np.real(m + np.trace(sigma + data_pools_sigma - s * 2))
 
         return fd
+    
+    def cal_acc(self, synthetic_images, synthetic_labels, sensitive_test_loader):
+        batch_size = 256
+        lr = 1e-4
+        max_epoch = 50
+        num_classes = len(set(synthetic_labels))
+        criterion = nn.CrossEntropyLoss()
+        model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes).to(self.device)
+        ema = ExponentialMovingAverage(model.parameters(), 0.9999)
+
+        optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-5, nesterov=True)
+        #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
+
+        train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images).float(), torch.from_numpy(synthetic_labels).long()), shuffle=True, batch_size=batch_size, num_workers=2)
+
+        best_acc = 0.
+
+        for epoch in range(max_epoch):
+            model.train()
+            total = 0
+            correct = 0
+            for _, (inputs, targets) in enumerate(train_loader):
+                inputs, targets = inputs.to(self.device), targets.to(self.device)
+                optimizer.zero_grad()
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
+                loss.backward()
+                optimizer.step()
+
+                _, predicted = outputs.max(1)
+                total += targets.size(0)
+                correct += predicted.eq(targets).sum().item()
+                
+                ema.update(model.parameters())
+            train_acc = correct / total * 100
+            #scheduler.step()
+            model.eval()
+            ema.store(model.parameters())
+            ema.copy_to(model.parameters())
+            total = 0
+            correct = 0
+            with torch.no_grad():
+                for _, (inputs, targets) in enumerate(sensitive_test_loader):
+                    inputs, targets = inputs.to(self.device), targets.to(self.device)
+                    outputs = model(inputs)
+                    loss = criterion(outputs, targets)
+
+                    _, predicted = outputs.max(1)
+                    total += targets.size(0)
+                    correct += predicted.eq(targets).sum().item()
+            
+            test_acc = correct / total * 100
+
+            if test_acc >= best_acc:
+                best_acc = test_acc
+
+            logging.info("Epoch: {} Train acc: {} Test acc: {}".format(epoch, train_acc, test_acc))
+            ema.restore(model.parameters())
+        return best_acc
     
     

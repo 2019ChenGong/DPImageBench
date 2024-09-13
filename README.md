@@ -109,19 +109,9 @@ DPImageBench/
 └── requirements.txt            # Dependencies required for the project
 ```
 
-# Folder Description
+# Questions
 
-`data` contains tools for data loading.
-
-`DataLens` and `G-PATE` are methods to be implemented.
-
-`dnnlib` and `torch_utils` are used for load Inception V3.
-
-`models` contains the implemented methods.
-
-`opacus` is a modified opacus package.
-
-`exp` contains my debug logs, and does not need to be uploaded.
+How to manage data?
 
 # Get Start on DPImageBench
 
@@ -131,10 +121,10 @@ cd /p/fzv6enresearch/DPImageBench
 python run.py configs/{model_name}/eps{epsilon}/{dataset_name}.yaml
  ```
 
-Availabe `model_name` are [`DataLens`, `DP-Kernel`, `DP-LDM`, `DP-MERF`, `DP-Promise`, `DPDM`, `DPSDA`, `G-PATE`, `PDP-Diffusion`, `PrivImage`]. (DPSDA may face the issue of insufficient CPU memory.)
+Available `model_name` are [`DataLens`, `DP-Kernel`, `DP-LDM`, `DP-MERF`, `DP-Promise`, `DPDM`, `DPSDA`, `G-PATE`, `PDP-Diffusion`, `PrivImage`].
 
-Availabe `epsilon` is [`1.0`].
+Available `epsilon` is [`1.0`].
 
-Availabe `dataset_name` is [`mnist`].
+Available `dataset_name` is [`mnist`].
 
 So far, I have only implemented FID in our evaluation.

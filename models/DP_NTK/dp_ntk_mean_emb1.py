@@ -40,7 +40,7 @@ def calc_mean_emb1(model_ntk, sensitive_dataloader, n_classes, noise_factor, dev
 
     """ adding DP noise to sensitive data """
     noise = pt.randn_like(mean_emb1)
-    noise = noise * noise_factor
+    noise = noise * noise_factor * 2 / n_data
     noise_mean_emb1 = mean_emb1 + noise
 
     return noise_mean_emb1

@@ -36,14 +36,14 @@ model:
     rescale_timesteps: False
     use_ddim: True
     timestep_respacing: 10
-    batch_size: 2000
+    batch_size: 1000
     model_path: models/pretrained_models/imagenet64_cond_270M_250K.pt
 
 pretrain:
   log_dir: null
 
 train:
-  batch_size: 1000
+  batch_size: 2000
   feature_extractor_batch_size: 500
   private_image_size: 28
   private_num_classes: 10
