@@ -77,7 +77,7 @@ class Evaluator(object):
         return fd
     
     def cal_acc(self, synthetic_images, synthetic_labels, sensitive_test_loader):
-        batch_size = 256
+        batch_size = 64
         lr = 1e-4
         max_epoch = 50
         num_classes = len(set(synthetic_labels))

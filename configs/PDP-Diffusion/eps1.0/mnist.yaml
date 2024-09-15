@@ -101,6 +101,7 @@ train:
   seed: 0
   batch_size: 4096
   n_epochs: 150
+  partly_finetune: False
   log_freq: 100
   snapshot_freq: 2000
   snapshot_threshold: 1
