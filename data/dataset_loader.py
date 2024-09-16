@@ -1,8 +1,8 @@
+import os
 import torch
 import torch.nn.functional as F
 import torchvision
 from torchvision import transforms
-from torchvision import models as torch_models
 import numpy as np
 import logging
 
@@ -12,30 +12,37 @@ from data.SpecificImagenet import SpecificClassImagenet
 from models.PrivImage import resnet
 
 def load_sensitive_data(config):
-    if config.sensitive_data.name == "mnist":
-        sensitive_train_set = torchvision.datasets.MNIST(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
-        sensitive_test_set = torchvision.datasets.MNIST(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
-    elif config.sensitive_data.name == "fmnist":
-        sensitive_train_set = torchvision.datasets.FashionMNIST(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
-        sensitive_test_set = torchvision.datasets.FashionMNIST(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
-    elif config.sensitive_data.name == "cifar10":
-        sensitive_train_set = torchvision.datasets.CIFAR10(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
-        sensitive_test_set = torchvision.datasets.CIFAR10(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
-    elif config.sensitive_data.name == "cifar100":
-        sensitive_train_set = torchvision.datasets.CIFAR100(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
-        sensitive_test_set = torchvision.datasets.CIFAR100(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
-    elif config.sensitive_data.name == "celeba":
-        sensitive_train_set = ImageFolderDataset(
-            config.sensitive_data.train_path, config.sensitive_data.resolution, attr='Male', split='train', use_labels=True)
-        sensitive_test_set = ImageFolderDataset(
-            config.sensitive_data.test_path, config.sensitive_data.resolution, attr='Male', split='test', use_labels=True)
-    elif config.sensitive_data.name == "camelyon":
-        sensitive_train_set = ImageFolderDataset(
-            config.sensitive_data.train_path, config.sensitive_data.resolution, attr='Male', split='train', use_labels=True)
-        sensitive_test_set = ImageFolderDataset(
-            config.sensitive_data.test_path, config.sensitive_data.resolution, attr='Male', split='test', use_labels=True)
-    else:
-        raise NotImplementedError('{} is not yet implemented.'.format(config.sensitive_data.name))
+    
+    sensitive_train_set = ImageFolderDataset(
+            config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
+    sensitive_test_set = ImageFolderDataset(
+        config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
+
+
+    # if config.sensitive_data.name == "mnist":
+    #     sensitive_train_set = torchvision.datasets.MNIST(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
+    #     sensitive_test_set = torchvision.datasets.MNIST(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
+    # elif config.sensitive_data.name == "fmnist":
+    #     sensitive_train_set = torchvision.datasets.FashionMNIST(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
+    #     sensitive_test_set = torchvision.datasets.FashionMNIST(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
+    # elif config.sensitive_data.name == "cifar10":
+    #     sensitive_train_set = torchvision.datasets.CIFAR10(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
+    #     sensitive_test_set = torchvision.datasets.CIFAR10(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
+    # elif config.sensitive_data.name == "cifar100":
+    #     sensitive_train_set = torchvision.datasets.CIFAR100(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
+    #     sensitive_test_set = torchvision.datasets.CIFAR100(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
+    # elif config.sensitive_data.name == "celeba":
+    #     sensitive_train_set = ImageFolderDataset(
+    #         config.sensitive_data.train_path, config.sensitive_data.resolution, attr='Male', split='train', use_labels=True)
+    #     sensitive_test_set = ImageFolderDataset(
+    #         config.sensitive_data.test_path, config.sensitive_data.resolution, attr='Male', split='test', use_labels=True)
+    # elif config.sensitive_data.name == "camelyon":
+    #     sensitive_train_set = ImageFolderDataset(
+    #         config.sensitive_data.train_path, config.sensitive_data.resolution, split='train', use_labels=True)
+    #     sensitive_test_set = ImageFolderDataset(
+    #         config.sensitive_data.test_path, config.sensitive_data.resolution, split='test', use_labels=True)
+    # else:
+    #     raise NotImplementedError('{} is not yet implemented.'.format(config.sensitive_data.name))
     
 
     sensitive_train_loader = torch.utils.data.DataLoader(dataset=sensitive_train_set, shuffle=True, drop_last=False, batch_size=config.train.batch_size)

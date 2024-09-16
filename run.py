@@ -29,7 +29,7 @@ def main(config):
 if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', nargs="*", default=["configs/DPDM/eps1.0/mnist.yaml"])
+    parser.add_argument('--config', nargs="*", default=["configs/DP-MERF/eps1.0/mnist_28.yaml"])
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)

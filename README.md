@@ -118,12 +118,19 @@ conda create -n dpimagebench python=3.7
 conda activate dpimagebench
 pip install torch==1.12.1+cu116 torchvision==0.13.1+cu116 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu116
 pip install tensorflow-gpu==1.14.0
-pip install re.txt
+pip install requirements.txt
 cd opacus; pip install -e .; cd ..
 cd models/DPSDA/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
  ```
 
-### 3.2 Running
+### 3.2 Download Dataset
+
+ ```
+sh scripts/download_celeba.sh
+cd data; python download_dataset.py; cd ..
+ ```
+
+### 3.3 Running
 
  ```
 conda activate dpimagebench

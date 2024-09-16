@@ -180,16 +180,14 @@ class ImageFolderDataset(Dataset):
     def __init__(self,
         path,                   # Path to directory or zip.
         resolution      = None, # Ensure specific resolution, None = highest available.
+        c = None,
         transform = None,
-        attr = None,
-        split = None,
         **super_kwargs,         # Additional arguments for the Dataset base class.
     ):
         self._path = path
         self._zipfile = None
+        self.c = c
         self.transform = transform
-        self.attr = attr
-        self.split = split
 
         if os.path.isdir(self._path):
             self._type = 'dir'
@@ -202,11 +200,6 @@ class ImageFolderDataset(Dataset):
 
         PIL.Image.init()
         self._image_fnames = sorted(fname for fname in self._all_fnames if self._file_ext(fname) in PIL.Image.EXTENSION)
-
-        if split == 'train' and 'celeba' in path:
-            self._image_fnames = self._image_fnames[:182637]
-        elif split == 'test' and 'celeba' in path:
-            self._image_fnames = self._image_fnames[182637:]
         
         if len(self._image_fnames) == 0:
             raise IOError('No image files found in the specified path')
@@ -251,28 +244,16 @@ class ImageFolderDataset(Dataset):
             if pyspng is not None and self._file_ext(fname) == '.png':
                 image = pyspng.load(f.read())
             else:
-                if self.transform is None:
-                    image = np.array(PIL.Image.open(f))
+                if self.c == 1:
+                    image = np.array(PIL.Image.open(f).convert("L"))
                 else:
-                    image = np.array(self.transform(PIL.Image.open(f)))
-                    image = image.transpose(1, 2, 0)
+                    image = np.array(PIL.Image.open(f))
         if image.ndim == 2:
             image = image[:, :, np.newaxis] # HW => HWC
         image = image.transpose(2, 0, 1) # HWC => CHW
         return image
 
     def _load_raw_labels(self):
-        if 'celeba' in self._path:
-            import pandas as pd
-            label_csv = pd.read_csv("dataset/list_attr_celeba.csv")
-            label = np.array(label_csv[self.attr].to_list())
-            label[label==-1] = 0
-            if self.split == 'train':
-                label = label[:182637]
-            elif self.split == 'test':
-                label = label[182637:]
-            return label
-
         fname = 'dataset.json'
         if fname not in self._all_fnames:
             return None

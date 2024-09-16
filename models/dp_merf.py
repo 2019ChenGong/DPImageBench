@@ -42,8 +42,7 @@ class DP_MERF(DPSynther):
 
         logging.info("The noise factor is {}".format(self.noise_factor))
 
-        sr_loss, mb_loss, _ = get_rff_losses(sensitive_dataloader, self.n_feat, self.d_rff, self.rff_sigma, self.device, 
-                                             self.num_class, self.noise_factor, self.mmd_type)
+        sr_loss, mb_loss, _ = get_rff_losses(sensitive_dataloader, self.n_feat, self.d_rff, self.rff_sigma, self.device, self.num_class, self.noise_factor, self.mmd_type)
 
         # rff_mmd_loss = get_rff_mmd_loss(n_feat, ar.d_rff, ar.rff_sigma, device, ar.n_labels, ar.noise_factor, ar.batch_size)
 

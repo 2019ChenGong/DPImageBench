@@ -17,9 +17,9 @@ sensitive_data:
   num_channels: 1
   resolution: 28
   n_classes: 10
-  train_path: /p/fzv6enresearch/kecen/data
-  test_path: /p/fzv6enresearch/kecen/data
-  fid_stats: /p/fzv6enresearch/kecen/data/mnist_train.npz
+  train_path: dataset/mnist/train_28.zip
+  test_path: dataset/mnist/test_28.zip
+  fid_stats: dataset/mnist/fid_stats.npz
 
 model:
   ckpt: null
