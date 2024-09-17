@@ -22,9 +22,8 @@ import torch
 import torchvision
 from torchvision import transforms
 
-new_cwd = os.path.dirname(os.getcwd())    
-# os.chdir(new_cwd)
-sys.path.insert(0, new_cwd) 
+new_cwd = os.path.dirname(os.getcwd())
+sys.path.insert(0, new_cwd)
 from data.stylegan3.dataset import ImageFolderDataset
 from models.DP_Diffusion.dnnlib.util import open_url
 

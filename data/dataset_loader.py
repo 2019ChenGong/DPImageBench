@@ -18,7 +18,6 @@ def load_sensitive_data(config):
     sensitive_test_set = ImageFolderDataset(
         config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
 
-
     # if config.sensitive_data.name == "mnist":
     #     sensitive_train_set = torchvision.datasets.MNIST(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
     #     sensitive_test_set = torchvision.datasets.MNIST(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())

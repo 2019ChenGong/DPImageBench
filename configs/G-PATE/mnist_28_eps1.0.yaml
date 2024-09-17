@@ -1,7 +1,7 @@
 setup:
   method: G-PATE
   run_type: tfmp
-  workdir: exp/g_pate/mnist_eps1.0
+  workdir: exp/g_pate/mnist_28_eps1.0
 
 public_data:
   name: null
@@ -13,7 +13,7 @@ sensitive_data:
   n_classes: 10
   train_path: dataset/mnist/train_28.zip
   test_path: dataset/mnist/test_28.zip
-  fid_stats: dataset/mnist/fid_stats.npz
+  fid_stats: dataset/mnist/fid_stats_28.npz
 
 model:
   sess: null

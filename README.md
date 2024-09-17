@@ -123,13 +123,15 @@ pip install tensorflow-gpu==1.14.0
 pip install requirements.txt
 cd opacus; pip install -e .; cd ..
 cd models/DPSDA/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
+cd models; gdown https://drive.google.com/uc?id=; unzip pretrained_models.zip; cd ..
  ```
 
-### 3.2 Download Dataset
+### 3.2 Prepare Dataset
 
  ```
-sh scripts/download_celeba.sh
-cd data; python download_dataset.py; cd ..
+mkdir dataset
+sh scripts/download_dataset.sh
+python preprocess_dataset.py; cd ..
  ```
 
 ### 3.3 Running
@@ -137,13 +139,13 @@ cd data; python download_dataset.py; cd ..
  ```
 conda activate dpimagebench
 cd DPImageBench
-python run.py configs/{model_name}/eps{epsilon}/{dataset_name}.yaml
+python run.py --config configs/{model_name}/{dataset_name}_eps{epsilon}.yaml
  ```
 
-Available `model_name` are [`DataLens`, `DP-Kernel`, `DP-LDM`, `DP-MERF`, `DP-Promise`, `DPDM`, `DPSDA`, `G-PATE`, `PDP-Diffusion`, `PrivImage`].
+Available `model_name` are [`DP-NTK`, `DP-Kernel`, `DP-LDM`, `DP-MERF`, `DP-Promise`, `DPDM`, `DPSDA`, `G-PATE`, `PDP-Diffusion`, `PrivImage`].
 
 Available `epsilon` is [`1.0`].
 
-Available `dataset_name` is [`mnist`].
+Available `dataset_name` is [`mnist_28`].
 
 So far, I have only implemented FID in our evaluation.
