@@ -44,17 +44,19 @@ Below is the directory structure of the DPImageBench project, which encapsulates
 
 ```plaintext
 DPImageBench/
-├── config/                     # Configuration files for various watermark algorithms
-│   ├── EWD.json           
-│   ├── EXPEdit.json       
-│   ├── EXP.json           
-│   ├── KGW.json
-│   ├── ITSEdit.json            
-│   ├── SIR.json            
-│   ├── SWEET.json         
-│   ├── Unigram.json        
-│   ├── UPV.json           
-│   └── XSIR.json           
+├── config/                     # Configuration files for various DP image synthesis algorithms
+│   ├──            
+│   ├── DP-MERF      
+│   ├── DP-NTK       
+│   ├── DP-Kernel
+│   ├── DPSDA            
+│   ├── G-PATE            
+│   ├── DP-GAN         
+│   ├── DPDM        
+│   ├── PDP-Diffusion      
+│   ├── DP-LDM   
+│   ├── DP-Promise     
+│   └── PDP-Diffusion         
 ├── dataset/                    # Datasets used in the project
 │   ├── c4/
 │   ├── human_eval/
