@@ -18,7 +18,7 @@ git clone git@github.com:2019ChenGong/DPImageBench.git (***We may need provide t
 cd DPImageBench
 cd opacus; pip install -e .; cd ..
 cd models/DPSDA/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
-cd models; gdown https://drive.google.com/uc?id=; unzip pretrained_models.zip; cd ..
+cd models; gdown https://drive.google.com/uc?id=1yVTWzaSqJVDJy8CsZKtqDoBNeM6154D4; unzip pretrained_models.zip; cd ..
  ```
 
 ## 2 Prepare Dataset
