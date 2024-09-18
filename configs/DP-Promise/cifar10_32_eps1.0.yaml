@@ -1,5 +1,5 @@
 setup:
-  method: dpsgd-diffusion
+  method: dp-promise
   torchmp: True
   n_gpus_per_node: 3
   n_nodes: 1

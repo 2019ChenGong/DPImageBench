@@ -181,10 +181,11 @@ class EDMLoss:
         sigma = log_sigma.exp().view(-1)
         
         is_good = sigma>=min_sigma
-        good_sigma = sigma[is_good]
-        for i in range(len(is_good)):
-            if not is_good[i]:
-                sigma[i] = good_sigma[np.random.randint(low=0, high=len(good_sigma))]
+        sigma[~is_good] = min_sigma
+        # good_sigma = sigma[is_good]
+        # for i in range(len(is_good)):
+        #     if not is_good[i]:
+        #         sigma[i] = good_sigma[np.random.randint(low=0, high=len(good_sigma))]
         sigma = sigma.view(x.shape[0], self.n_noise_samples)
 
         sigma = add_dimensions(sigma, len(x.shape) - 1)

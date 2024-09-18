@@ -74,9 +74,11 @@ class DP_Diffusion(DPSynther):
             raise NotImplementedError
         
         self.ema = ExponentialMovingAverage(self.model.parameters(), decay=self.ema_rate)
+        self.is_pretrain = True
     
     def pretrain(self, public_dataloader, config):
         if public_dataloader is None:
+            self.is_pretrain = False
             return
 
         set_seeds(self.global_rank, config.seed)
@@ -240,11 +242,11 @@ class DP_Diffusion(DPSynther):
         dist.barrier()
 
         if config.partly_finetune:
-            for name, param in model.named_parameters():
+            for name, param in self.model.named_parameters():
                 layer_idx = int(name.split('.')[2])
                 if layer_idx > 3 and 'NIN' not in name:
                     param.requires_grad = False
-                    if config.setup.global_rank == 0:
+                    if self.global_rank == 0:
                         logging.info('{} is frozen'.format(name))
 
         model = DPDDP(self.model)
@@ -273,7 +275,7 @@ class DP_Diffusion(DPSynther):
         dist.barrier()
 
         privacy_engine = PrivacyEngine()
-        if config.dp.sdq is None:
+        if config.dp.sdq is None or not self.is_pretrain:
             account_history = None
             alpha_history = None
         else:

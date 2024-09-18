@@ -118,6 +118,10 @@ class Evaluator(object):
             correct = 0
             with torch.no_grad():
                 for _, (inputs, targets) in enumerate(sensitive_test_loader):
+                    if len(targets.shape) == 2:
+                        inputs = inputs.to(torch.float32) / 255.
+                        targets = torch.argmax(targets, dim=1)
+
                     inputs, targets = inputs.to(self.device), targets.to(self.device)
                     outputs = model(inputs)
                     loss = criterion(outputs, targets)

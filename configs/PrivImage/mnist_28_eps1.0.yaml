@@ -80,7 +80,7 @@ pretrain:
   log_dir: null
   seed: 0
   batch_size: 64
-  n_epochs: 10
+  n_epochs: 150
   log_freq: 100
   snapshot_freq: 2000
   snapshot_threshold: 1
@@ -88,6 +88,7 @@ pretrain:
   save_threshold: 1
   fid_freq: 2000
   fid_samples: 5000
+  final_fid_samples: 60000
   fid_threshold: 1
   label_random: True
   optim:
