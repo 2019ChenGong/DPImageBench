@@ -46,7 +46,7 @@ python run.py public_data.name=null setup.n_gpus_per_node=3 --config configs/DP-
 python run.py public_data.name=null --config configs/DP-MERF/mnist_28_eps1.0.yaml
  ```
  ```
-python run.py public_data.name=null setup.n_gpus_per_node=3 --config configs/DP-Promise/mnist_28_eps1.0.yaml
+python run.py public_data.name=null setup.n_gpus_per_node=3 train.n_epochs=1 train.n_epochs1=1 --config configs/DP-Promise/mnist_28_eps1.0.yaml
  ```
   ```
 python run.py public_data.name=null setup.n_gpus_per_node=3 --config configs/DPDM/mnist_28_eps1.0.yaml

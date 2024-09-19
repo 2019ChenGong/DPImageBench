@@ -452,6 +452,7 @@ class DP_Promise(DPSynther):
                 sample_random_image_batch(snapshot_sampling_shape, sampler_final, os.path.join(
                                     sample_dir, 'final'), self.device, self.network.label_dim)
             fid = compute_fid(config.final_fid_samples, self.global_size, fid_sampling_shape, sampler_final, inception_model, self.fid_stats, self.device, self.network.label_dim)
+        model.train()
 
         if self.global_rank == 0:
             logging.info('Final FID %.6f' % (fid))
@@ -505,6 +506,17 @@ class DP_Promise(DPSynther):
             max_grad_norm=config.dp.max_grad_norm,
             noise_multiplicity=config.loss.n_noise_samples,
         )
+
+        # model, optimizer, dataset_loader = privacy_engine.make_private_with_epsilon(
+        #     module=model,
+        #     optimizer=optimizer,
+        #     data_loader=sensitive_dataloader,
+        #     target_delta=config.dp.delta,
+        #     target_epsilon=config.dp.epsilon,
+        #     epochs=config.n_epochs,
+        #     max_grad_norm=config.dp.max_grad_norm,
+        #     noise_multiplicity=config.loss.n_noise_samples,
+        # )
 
         if config.loss.version == 'edm':
             loss_fn = EDMLoss(**config.loss).get_loss_stage2

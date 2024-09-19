@@ -55,7 +55,7 @@ model:
     s_churn: 100
     s_min: 0.05
     s_max: 50
-    num_steps: 10
+    num_steps: 1000
     tmin: .002
     tmax: 80.
     rho: 7.
@@ -65,7 +65,7 @@ model:
     s_churn: 10
     s_min: 0.1
     s_max: 50
-    num_steps: 10
+    num_steps: 1000
     tmin: .002
     tmax: 80.
     rho: 7.
@@ -117,8 +117,8 @@ train:
     params:
       lr: 3e-4
       weight_decay: 0.
-  batch_size1: 900
-  n_epochs1: 1
+  batch_size1: 64
+  n_epochs1: 3
   optim1:
     optimizer: Adam
     params:
