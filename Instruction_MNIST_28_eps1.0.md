@@ -30,36 +30,41 @@ cd data; python preprocess_dataset.py --data_name mnist; cd ..
 
 ## 3 Running
 
- ```
-python run.py public_data.name=null --config configs/DP-NTK/mnist_28_eps1.0.yaml
- ```
-  ```
-python run.py public_data.name=null --config configs/DP-Kernel/mnist_28_eps1.0.yaml
- ```
+These methods do not need much GPU Memory and can be run on the same node.
+
 ```
-python run.py public_data.name=null --config configs/G-PATE/mnist_28_eps1.0.yaml
- ```
-  ```
-python run.py public_data.name=null setup.n_gpus_per_node=3 --config configs/DP-LDM/mnist_28_eps1.0.yaml
- ```
-  ```
-python run.py public_data.name=null --config configs/DP-MERF/mnist_28_eps1.0.yaml
- ```
- ```
-python run.py public_data.name=null setup.n_gpus_per_node=3 train.n_epochs=1 train.n_epochs1=1 --config configs/DP-Promise/mnist_28_eps1.0.yaml
- ```
-  ```
-python run.py public_data.name=null setup.n_gpus_per_node=3 --config configs/DPDM/mnist_28_eps1.0.yaml
- ```
-  ```
-python run.py public_data.name=null --config configs/DPSDA/mnist_28_eps1.0.yaml
- ```
-  ```
-python run.py public_data.name=null setup.n_gpus_per_node=3 --config configs/PDP-Diffusion/mnist_28_eps1.0.yaml
- ```
-  ```
-python run.py public_data.name=null setup.n_gpus_per_node=3 --config configs/PrivImage/mnist_28_eps1.0.yaml
- ```
+python run.py public_data.name=null --method DP-NTK --data_name mnist_28 --epsilon 1.0
+```
+```
+python run.py public_data.name=null --method DP-Kernel --data_name mnist_28 --epsilon 1.0
+```
+```
+python run.py public_data.name=null --method G-PATE --data_name mnist_28 --epsilon 1.0
+```
+```
+python run.py public_data.name=null --method DP-MERF --data_name mnist_28 --epsilon 1.0
+```
+
+Each of these methods needs nearly 40x3 GB GPU Memory totally.
+
+```
+python run.py public_data.name=null setup.n_gpus_per_node=3 --method DP-Promise --data_name mnist_28 --epsilon 1.0
+```
+```
+python run.py public_data.name=null setup.n_gpus_per_node=3 --method DPDM --data_name mnist_28 --epsilon 1.0
+```
+```
+python run.py public_data.name=null --method DPSDA --data_name mnist_28 --epsilon 1.0
+```
+```
+python run.py public_data.name=null setup.n_gpus_per_node=3 --method PDP-Diffusion --data_name mnist_28 --epsilon 1.0
+```
+```
+python run.py public_data.name=null setup.n_gpus_per_node=3 --method PrivImage --data_name mnist_28 --epsilon 1.0
+```
+```
+python run.py public_data.name=null setup.n_gpus_per_node=3 --method DP-LDM --data_name mnist_28 --epsilon 1.0
+```
 
 n_gpus_per_node is the number of GPUs on your node.
 

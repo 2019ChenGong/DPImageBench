@@ -39,6 +39,10 @@ class G_PATE(DPSynther):
         
         data_x, data_y = [], []
         for x, y in sensitive_dataloader:
+            if len(y.shape) == 2:
+                x = x.to(torch.float32) / 255.
+                y = torch.argmax(y, dim=1)
+
             data_x.append(x)
             data_y.append(y)
         

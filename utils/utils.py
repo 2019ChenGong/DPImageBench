@@ -1,7 +1,6 @@
 import os
 import logging
 import datetime
-import os
 
 from omegaconf import OmegaConf
 import torch
@@ -118,7 +117,8 @@ def initialize_environment(config):
 
 
 def parse_config(opt, unknown):
-    configs = [OmegaConf.load(cfg) for cfg in opt.config]
+    config_path = os.path.join(opt.config_dir, opt.method, opt.data_name + "_eps" + opt.epsilon + ".yaml")
+    configs = [OmegaConf.load(config_path)]
     cli = OmegaConf.from_dotlist(unknown)
     config = OmegaConf.merge(*configs, cli)
     return config
