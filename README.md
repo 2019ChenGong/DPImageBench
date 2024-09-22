@@ -57,9 +57,11 @@ DPImageBench/
 │   ├── DP-LDM   
 │   ├── DP-Promise     
 │   └── PDP-Diffusion         
-├── dataset/                    # Datasets used in the project
-│   ├── c4/
-│   ├── human_eval/
+├── dataset/                    # Datasets studied in the project
+│   ├── camelyon/
+│   ├── celeba/
+│   ├── imagenet/
+│   ├── mnist/
 │   └── wmt16_de_en/
 ├── evaluation/                 # Evaluation module of MarkLLM, including tools and pipelines
 │   ├── dataset.py              # Script for handling dataset operations within evaluations

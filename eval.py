@@ -23,8 +23,11 @@ def main(config):
 if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', nargs="*", default=["configs/DP-Kernel/eps1.0/mnist.yaml"])
-    parser.add_argument('--exp_path', default="exp/dp-kernel/mnist_eps1.0-2024-09-13-05-30-10/")
+    parser.add_argument('--config_dir', default="configs")
+    parser.add_argument('--method', default="DP-Kernel")
+    parser.add_argument('--epsilon', default="1.0")
+    parser.add_argument('--data_name', default="mnist_28")
+    parser.add_argument('--exp_path', default="exp/dp-kernel/mnist_28_eps1.0-2024-09-20-09-32-07/")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)

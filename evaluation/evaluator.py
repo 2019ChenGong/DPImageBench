@@ -11,11 +11,12 @@ from torch.utils.data import DataLoader, TensorDataset
 
 import logging
 import os
+from sklearn.metrics import f1_score, accuracy_score, classification_report
 
 from sklearn import linear_model, neural_network
-from sklearn.metrics import f1_score, accuracy_score, confusion_matrix
 from evaluation.ema import ExponentialMovingAverage
 from evaluation.classifier.wrn import WideResNet
+from evaluation.classifier.mnist_cnn import CNN
 
 
 from models.DP_Diffusion.dnnlib.util import open_url
@@ -33,9 +34,11 @@ class Evaluator(object):
         if self.device != 0:
             return
         
-        fid = self.cal_fid(synthetic_images)
+        # fid = self.cal_fid(synthetic_images)
+        fid = 0
 
         acc = self.cal_acc(synthetic_images, synthetic_labels, sensitive_test_loader)
+        # acc = self.cal_acc_mnist(synthetic_images, synthetic_labels, sensitive_test_loader)
         logging.info("The FID of synthetic images is {}".format(fid))
         logging.info("The best acc of synthetic images is {}".format(acc))
         print("The FID of synthetic images is {}".format(fid))
@@ -82,10 +85,11 @@ class Evaluator(object):
         max_epoch = 50
         num_classes = len(set(synthetic_labels))
         criterion = nn.CrossEntropyLoss()
-        model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes).to(self.device)
+        model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3).to(self.device)
         ema = ExponentialMovingAverage(model.parameters(), 0.9999)
 
-        optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-5, nesterov=True)
+        # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-5, nesterov=True)
+        optimizer = optim.Adam(model.parameters(), lr=lr)
         #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
 
         train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images).float(), torch.from_numpy(synthetic_labels).long()), shuffle=True, batch_size=batch_size, num_workers=2)
@@ -138,5 +142,76 @@ class Evaluator(object):
             logging.info("Epoch: {} Train acc: {} Test acc: {}".format(epoch, train_acc, test_acc))
             ema.restore(model.parameters())
         return best_acc
+    
+    def cal_acc_mnist(self, synthetic_images, synthetic_labels, sensitive_test_loader):
+        num_classes = 10
+        lr = 3e-4
+        batch_size = 64
+        max_epoch = 50
+        criterion = nn.CrossEntropyLoss()
+        model = CNN(img_dim=(1, 28, 28), num_classes=num_classes).cuda()
+        ema = ExponentialMovingAverage(model.parameters(), 0.9999)
+
+        optimizer = optim.Adam(model.parameters(), lr=lr)
+        
+        train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images).float(), torch.from_numpy(synthetic_labels).long()), shuffle=True, batch_size=batch_size, num_workers=2)
+
+        model.train()
+        best_acc = 0.
+        for epoch in range(max_epoch):
+            total = 0
+            correct = 0
+            for _, (inputs, targets) in enumerate(train_loader):
+                inputs, targets = inputs.cuda(), targets.cuda()
+                optimizer.zero_grad()
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
+                loss.backward()
+                optimizer.step()
+
+                _, predicted = outputs.max(1)
+                total += targets.size(0)
+                correct += predicted.eq(targets).sum().item()
+                
+                ema.update(model.parameters())
+            train_acc = correct / total * 100
+            #scheduler.step()
+            model.eval()
+            ema.store(model.parameters())
+            ema.copy_to(model.parameters())
+            total = 0
+            correct = 0
+            y_list = []
+            pred_list = []
+            with torch.no_grad():
+                for _, (inputs, targets) in enumerate(sensitive_test_loader):
+                    if len(targets.shape) == 2:
+                        inputs = inputs.to(torch.float32) / 255.
+                        targets = torch.argmax(targets, dim=1)
+                    inputs, targets = inputs.cuda(), targets.cuda()
+                    outputs = model(inputs)
+                    loss = criterion(outputs, targets)
+
+                    _, predicted = outputs.max(1)
+                    total += targets.size(0)
+                    correct += predicted.eq(targets).sum().item()
+                    y_list.append(targets.detach().cpu())
+                    pred_list.append(predicted.detach().cpu())
+            
+            y_list = torch.cat(y_list).numpy()
+            pred_list = torch.cat(pred_list).numpy()
+            report = classification_report(y_list, pred_list)
+            logging.info(report)
+            
+            test_acc = correct / total
+
+            if test_acc >= best_acc:
+                best_acc = test_acc
+
+            logging.info("Epoch: {} Train acc: {} Test acc: {}".format(epoch, train_acc, test_acc))
+            ema.restore(model.parameters())
+            model.train()
+
+        return test_acc
     
     
