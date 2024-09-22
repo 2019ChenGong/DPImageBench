@@ -10,13 +10,12 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
 import logging
-import os
-from sklearn.metrics import f1_score, accuracy_score, classification_report
 
-from sklearn import linear_model, neural_network
 from evaluation.ema import ExponentialMovingAverage
 from evaluation.classifier.wrn import WideResNet
-from evaluation.classifier.mnist_cnn import CNN
+from evaluation.classifier.resnet import ResNet
+from evaluation.classifier.resnext import ResNeXt
+from evaluation.classifier.densenet import DenseNet
 
 
 from models.DP_Diffusion.dnnlib.util import open_url
@@ -28,7 +27,9 @@ class Evaluator(object):
         self.device = config.setup.local_rank
 
         self.sensitive_stats_path = config.sensitive_data.fid_stats
+        self.acc_models = ["resnet", "wrn", "densenet", "resnext"]
         self.config = config
+        torch.cuda.empty_cache()
     
     def eval(self, synthetic_images, synthetic_labels, sensitive_test_loader):
         if self.device != 0:
@@ -36,12 +37,11 @@ class Evaluator(object):
         
         # fid = self.cal_fid(synthetic_images)
         fid = 0
-
-        acc = self.cal_acc(synthetic_images, synthetic_labels, sensitive_test_loader)
-        # acc = self.cal_acc_mnist(synthetic_images, synthetic_labels, sensitive_test_loader)
         logging.info("The FID of synthetic images is {}".format(fid))
-        logging.info("The best acc of synthetic images is {}".format(acc))
-        print("The FID of synthetic images is {}".format(fid))
+
+        for model_name in self.acc_models:
+            acc = self.cal_acc(model_name, synthetic_images, synthetic_labels, sensitive_test_loader)
+            logging.info("The best acc of synthetic images from {} is {}".format(model_name, acc))
 
     def cal_fid(self, synthetic_images, batch_size=500):
         with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
@@ -79,13 +79,23 @@ class Evaluator(object):
 
         return fd
     
-    def cal_acc(self, synthetic_images, synthetic_labels, sensitive_test_loader):
-        batch_size = 64
+    def cal_acc(self, model_name, synthetic_images, synthetic_labels, sensitive_test_loader):
+        batch_size = 512
         lr = 1e-4
         max_epoch = 50
         num_classes = len(set(synthetic_labels))
         criterion = nn.CrossEntropyLoss()
-        model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3).to(self.device)
+        if model_name == "wrn":
+            model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
+        elif model_name == "resnet":
+            model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2])
+        elif model_name == "resnext":
+            model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], dropRate=0.3)
+        elif model_name == "densenet":
+            model = DenseNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], dropRate=0.3)
+
+        model = torch.nn.DataParallel(model).to(self.device)
+
         ema = ExponentialMovingAverage(model.parameters(), 0.9999)
 
         # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-5, nesterov=True)
@@ -98,13 +108,16 @@ class Evaluator(object):
 
         for epoch in range(max_epoch):
             model.train()
+            train_loss = 0
+            test_loss = 0
             total = 0
             correct = 0
             for _, (inputs, targets) in enumerate(train_loader):
-                inputs, targets = inputs.to(self.device), targets.to(self.device)
+                inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
                 optimizer.zero_grad()
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
+                train_loss += loss.item()
                 loss.backward()
                 optimizer.step()
 
@@ -114,6 +127,7 @@ class Evaluator(object):
                 
                 ema.update(model.parameters())
             train_acc = correct / total * 100
+            train_loss = train_loss / total
             #scheduler.step()
             model.eval()
             ema.store(model.parameters())
@@ -126,92 +140,24 @@ class Evaluator(object):
                         inputs = inputs.to(torch.float32) / 255.
                         targets = torch.argmax(targets, dim=1)
 
-                    inputs, targets = inputs.to(self.device), targets.to(self.device)
+                    inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
                     outputs = model(inputs)
                     loss = criterion(outputs, targets)
+                    test_loss += loss.item()
 
                     _, predicted = outputs.max(1)
                     total += targets.size(0)
                     correct += predicted.eq(targets).sum().item()
             
             test_acc = correct / total * 100
+            test_loss = test_loss / total
 
             if test_acc >= best_acc:
                 best_acc = test_acc
 
-            logging.info("Epoch: {} Train acc: {} Test acc: {}".format(epoch, train_acc, test_acc))
+            logging.info("Epoch: {} Train acc: {} Test acc: {} Train loss: {} Test loss: {}".format(epoch, train_acc, test_acc, train_loss, test_loss))
             ema.restore(model.parameters())
+
         return best_acc
-    
-    def cal_acc_mnist(self, synthetic_images, synthetic_labels, sensitive_test_loader):
-        num_classes = 10
-        lr = 3e-4
-        batch_size = 64
-        max_epoch = 50
-        criterion = nn.CrossEntropyLoss()
-        model = CNN(img_dim=(1, 28, 28), num_classes=num_classes).cuda()
-        ema = ExponentialMovingAverage(model.parameters(), 0.9999)
-
-        optimizer = optim.Adam(model.parameters(), lr=lr)
-        
-        train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images).float(), torch.from_numpy(synthetic_labels).long()), shuffle=True, batch_size=batch_size, num_workers=2)
-
-        model.train()
-        best_acc = 0.
-        for epoch in range(max_epoch):
-            total = 0
-            correct = 0
-            for _, (inputs, targets) in enumerate(train_loader):
-                inputs, targets = inputs.cuda(), targets.cuda()
-                optimizer.zero_grad()
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
-                loss.backward()
-                optimizer.step()
-
-                _, predicted = outputs.max(1)
-                total += targets.size(0)
-                correct += predicted.eq(targets).sum().item()
-                
-                ema.update(model.parameters())
-            train_acc = correct / total * 100
-            #scheduler.step()
-            model.eval()
-            ema.store(model.parameters())
-            ema.copy_to(model.parameters())
-            total = 0
-            correct = 0
-            y_list = []
-            pred_list = []
-            with torch.no_grad():
-                for _, (inputs, targets) in enumerate(sensitive_test_loader):
-                    if len(targets.shape) == 2:
-                        inputs = inputs.to(torch.float32) / 255.
-                        targets = torch.argmax(targets, dim=1)
-                    inputs, targets = inputs.cuda(), targets.cuda()
-                    outputs = model(inputs)
-                    loss = criterion(outputs, targets)
-
-                    _, predicted = outputs.max(1)
-                    total += targets.size(0)
-                    correct += predicted.eq(targets).sum().item()
-                    y_list.append(targets.detach().cpu())
-                    pred_list.append(predicted.detach().cpu())
-            
-            y_list = torch.cat(y_list).numpy()
-            pred_list = torch.cat(pred_list).numpy()
-            report = classification_report(y_list, pred_list)
-            logging.info(report)
-            
-            test_acc = correct / total
-
-            if test_acc >= best_acc:
-                best_acc = test_acc
-
-            logging.info("Epoch: {} Train acc: {} Test acc: {}".format(epoch, train_acc, test_acc))
-            ema.restore(model.parameters())
-            model.train()
-
-        return test_acc
     
     
