@@ -6,6 +6,7 @@ import imageio
 from torchvision.utils import make_grid
 import torchvision
 import torch
+import scipy
 from models.DPSDA.dpsda.feature_extractor import extract_features
 from models.DPSDA.dpsda.metrics import make_fid_stats
 from models.DPSDA.dpsda.metrics import compute_fid
@@ -15,12 +16,36 @@ from models.DPSDA.apis import get_api_class_from_name
 
 import logging
 
-import importlib
-opacus = importlib.import_module('opacus')
-from opacus.accountants.utils import get_noise_multiplier
-
 
 from models.synthesizer import DPSynther
+
+
+def get_noise_multiplier(epsilon, num_steps, delta, min_noise_multiplier=1e-1, max_noise_multiplier=500, max_epsilon=1e7):
+
+    def delta_Gaussian(eps, mu):
+        """Compute delta of Gaussian mechanism with shift mu or equivalently noise scale 1/mu"""
+        if mu == 0:
+            return 0
+        return scipy.stats.norm.cdf(-eps / mu + mu / 2) - np.exp(eps) * scipy.stats.norm.cdf(-eps / mu - mu / 2)
+
+    def eps_Gaussian(delta, mu):
+        """Compute eps of Gaussian mechanism with shift mu or equivalently noise scale 1/mu"""
+        def f(x):
+            return delta_Gaussian(x, mu) - delta
+        return scipy.optimize.root_scalar(f, bracket=[0, max_epsilon], method='brentq').root
+
+    def compute_epsilon(noise_multiplier, num_steps, delta):
+        return eps_Gaussian(delta, np.sqrt(num_steps) / noise_multiplier)
+
+    def objective(x):
+        return compute_epsilon(noise_multiplier=x, num_steps=num_steps, delta=delta) - epsilon
+
+    output = scipy.optimize.root_scalar(objective, bracket=[min_noise_multiplier, max_noise_multiplier], method='brentq')
+    if not output.converged:
+        raise ValueError("Failed to converge")
+
+    return output.root
+
 
 class DPSDA(DPSynther):
     def __init__(self, config, device):
@@ -41,7 +66,7 @@ class DPSDA(DPSynther):
         os.mkdir(config.log_dir)
         tmp_folder = config.tmp_folder
 
-        self.noise_factor = get_noise_multiplier(target_epsilon=config.dp.epsilon, target_delta=config.dp.delta, sample_rate=1., steps=len(config.num_samples_schedule))
+        self.noise_factor = get_noise_multiplier(epsilon=config.dp.epsilon, delta=config.dp.delta, num_steps=len(config.num_samples_schedule) - 1)
 
         logging.info("The noise factor is {}".format(self.noise_factor))
 
