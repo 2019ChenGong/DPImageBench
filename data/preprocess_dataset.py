@@ -246,6 +246,12 @@ def main(config):
         elif data_name == "fmnist":
             sensitive_train_set = torchvision.datasets.FashionMNIST(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
             sensitive_test_set = torchvision.datasets.FashionMNIST(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
+        elif data_name == "eurosat":
+            sensitive_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "EuroSAT_RGB"), transform=transforms.ToTensor())
+            torch.manual_seed(0)
+            train_size = 23000
+            test_size = 4000
+            sensitive_train_set, sensitive_test_set = torch.utils.data.random_split(sensitive_set, [train_size, test_size])
         elif data_name == "cifar10":
             sensitive_train_set = torchvision.datasets.CIFAR10(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
             sensitive_test_set = torchvision.datasets.CIFAR10(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
