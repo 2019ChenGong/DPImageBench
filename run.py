@@ -8,6 +8,10 @@ from utils.utils import initialize_environment, run, parse_config
 from evaluation.evaluator import Evaluator
 
 def main(config):
+
+    # the result folder
+    config['setup']['workdir'] = f"exp/{config['setup']['method']}/{config['sensitive_data']['name']}_{config['sensitive_data']['resolution']}_eps{config['train']['dp']['epsilon']}"
+
     initialize_environment(config)
 
     model = load_model(config)
@@ -30,7 +34,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_dir', default="configs")
     parser.add_argument('--method', default="G-PATE")
-    parser.add_argument('--epsilon', default="1.0")
+    parser.add_argument('--epsilon', default="10.0")
     parser.add_argument('--data_name', default="mnist_28")
     opt, unknown = parser.parse_known_args()
 

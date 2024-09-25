@@ -117,7 +117,7 @@ def initialize_environment(config):
 
 
 def parse_config(opt, unknown):
-    config_path = os.path.join(opt.config_dir, opt.method, opt.data_name + "_eps" + opt.epsilon + ".yaml")
+    config_path = os.path.join(opt.config_dir, opt.method, opt.data_name + ".yaml")
     configs = [OmegaConf.load(config_path)]
     cli = OmegaConf.from_dotlist(unknown)
     config = OmegaConf.merge(*configs, cli)

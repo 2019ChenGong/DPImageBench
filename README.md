@@ -5,8 +5,11 @@
 
 ## Todo
 
-- [] recoding the intermediate results of methods.
-- [] Assigning GPU adaptively.
+- [] recoding the intermediate results of methods with tqdm.
+
+- [] DP LDM DPSDA error.
+
+- [] Add codes for no DP.
 
 ## 1. Contents
   - [1. Contents](#1-contents)

@@ -152,11 +152,10 @@ class DP_Diffusion(DPSynther):
         fid_sampling_shape = (self.sampler.fid_batch_size, self.network.num_in_channels,
                             self.network.image_size, self.network.image_size)
 
-        for epoch in tqdm(range(config.n_epochs), desc="Epochs"):
-
-            epoch_iter = tqdm(enumerate(dataset_loader), total=len(dataset_loader), leave=False, desc="Batches")
+        for epoch in range(config.n_epochs):
             
-            for _, (train_x, train_y) in epoch_iter:
+            for _, (train_x, train_y) in enumerate(dataset_loader):
+
                 if state['step'] % config.snapshot_freq == 0 and state['step'] >= config.snapshot_threshold and self.global_rank == 0:
                     logging.info('Saving snapshot checkpoint and sampling single batch at iteration %d.' % state['step'])
 
