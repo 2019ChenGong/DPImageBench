@@ -48,7 +48,147 @@ class DPGAN(DPSynther):
         self.D_copy = Discriminator(img_size=self.img_size, num_classes=self.num_classes, **config.Discriminator).to(self.device)
         self.D_copy.eval()
         self.ema_G = ExponentialMovingAverage(self.G.parameters(), decay=self.ema_rate)
+    
+    def pretrain(self, public_dataloader, config):
+        if public_dataloader is None:
+            return
+        set_seeds(self.global_rank, config.seed)
+        torch.cuda.device(self.local_rank)
+        self.device = 'cuda:%d' % self.local_rank
+
+        sample_dir = os.path.join(config.log_dir, 'samples')
+        checkpoint_dir = os.path.join(config.log_dir, 'checkpoints')
+        fid_dir = os.path.join(config.log_dir, 'fid')
+
+        if self.global_rank == 0:
+            make_dir(config.log_dir)
+            make_dir(sample_dir)
+            make_dir(checkpoint_dir)
+            make_dir(fid_dir)
+        dist.barrier()
+
+        D = DDP(self.D)
+        G = DDP(self.G)
+        G.eval()
+
+        ema = ExponentialMovingAverage(G.parameters(), decay=self.ema_rate)
+
+        if config.optim.optimizer == 'Adam':
+            optimizerD = torch.optim.Adam(D.parameters(), lr=config.optim.params.d_lr, betas=(config.optim.params.beta1, 0.999))
+            optimizerG = torch.optim.Adam(G.parameters(), lr=config.optim.params.g_lr, betas=(config.optim.params.beta1, 0.999))
+        else:
+            raise NotImplementedError
+
+        state = dict(G=G, D=D, emaG=ema, step=0)
+
+        if self.global_rank == 0:
+            model_parameters = filter(lambda p: p.requires_grad, G.parameters())
+            n_params = sum([np.prod(p.size()) for p in model_parameters])
+            logging.info('Number of trainable parameters in G: %d' % n_params)
+            model_parameters = filter(lambda p: p.requires_grad, D.parameters())
+            n_params = sum([np.prod(p.size()) for p in model_parameters])
+            logging.info('Number of trainable parameters in D: %d' % n_params)
+            logging.info('Number of total epochs: %d' % config.n_epochs)
+            logging.info('Starting training at step %d' % state['step'])
+        dist.barrier()
+
+        dataset_loader = public_dataloader
+
+        with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
+            inception_model = pickle.load(f).to(self.device)
         
+        snapshot_sampling_shape = (config.snapshot_batch_size, self.z_dim)
+        fid_sampling_shape = (config.fid_batch_size, self.z_dim)
+
+        D_steps = 0
+        for epoch in range(config.n_epochs):
+            for _, (train_x, train_y) in enumerate(dataset_loader):
+
+                if len(train_y.shape) == 2:
+                    train_x = train_x.to(torch.float32) / 255.
+                    train_y = torch.argmax(train_y, dim=1)
+                if config.label_random:
+                    train_y = torch.randint(low=0, high=self.num_classes, size=(train_x.shape[0], ))
+                
+                real_images = train_x.to(self.device) * 2. - 1.
+                real_labels = train_y.to(self.device).long()
+                batch_size = real_images.size(0)
+
+                fake_labels = torch.randint(0, self.num_classes, (batch_size, ), device=self.device)
+                noise = torch.randn((batch_size, 80), device=self.device)
+                fake_images = G(noise, fake_labels)
+
+                real_out = D(real_images, real_labels)
+                fake_out = D(fake_images.detach(), fake_labels)
+
+                loss_D = self.d_hinge(real_out, fake_out)
+                loss_D.backward()
+                optimizerD.step()
+                optimizerD.zero_grad(set_to_none=True)
+
+                D_steps += 1
+                if D_steps % config.d_updates == 0:
+                    self.d_copy(self.D.parameters(), self.D_copy.parameters())
+                    G.train()
+                    self.D_copy.zero_grad()
+                    optimizerG.zero_grad()
+                    batch_size = config.batch_size // self.global_size
+                    optimizerD.zero_grad(set_to_none=True)
+                    fake_labels = torch.randint(0, self.num_classes, (batch_size, ), device=self.device)
+                    noise = torch.randn((batch_size, 80), device=self.device)
+                    fake_images = G(noise, fake_labels)
+                    output_g = self.D_copy(fake_images, fake_labels)
+                    loss_G = self.g_hinge(output_g)
+                    loss_G.backward()
+                    optimizerG.step()
+                    G.eval()
+
+                    state['step'] += 1
+                    state['emaG'].update(G.parameters())
+
+                    if state['step'] % config.snapshot_freq == 0 and state['step'] >= config.snapshot_threshold:
+                        logging.info(
+                            'Saving snapshot checkpoint and sampling single batch at iteration %d.' % state['step'])
+
+                        with torch.no_grad():
+                            ema.store(G.parameters())
+                            ema.copy_to(G.parameters())
+                            samples = sample_random_image_batch(G, snapshot_sampling_shape, self.device, self.num_classes)
+                            ema.restore(G.parameters())
+                        
+                        if self.global_rank == 0:
+                            make_dir(os.path.join(sample_dir, 'iter_%d' % state['step']))
+                            save_img(samples, os.path.join(os.path.join(sample_dir, 'iter_%d' % state['step']), 'sample.png'))
+                    dist.barrier()
+                    if state['step'] % config.fid_freq == 0 and state['step'] >= config.fid_threshold:
+                        with torch.no_grad():
+                            ema.store(G.parameters())
+                            ema.copy_to(G.parameters())
+                            fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, G, inception_model, self.fid_stats, self.device, self.num_classes)
+                            ema.restore(G.parameters())
+
+                            if self.global_rank == 0:
+                                logging.info('FID at iteration %d: %.6f' % (state['step'], fid))
+                    dist.barrier()
+                    if state['step'] % config.save_freq == 0 and state['step'] >= config.save_threshold and self.global_rank == 0:
+                        checkpoint_file = os.path.join(
+                            checkpoint_dir, 'checkpoint_%d.pth' % state['step'])
+                        save_checkpoint(checkpoint_file, state)
+                        logging.info(
+                            'Saving  checkpoint at iteration %d' % state['step'])
+                    dist.barrier()
+                    if state['step'] % config.log_freq == 0 and self.global_rank == 0:
+                        logging.info('Loss D: %.4f, Loss G: %.4f, step: %d' %
+                                    (loss_D, loss_G, state['step'] + 1))
+
+        if self.global_rank == 0:
+            checkpoint_file = os.path.join(checkpoint_dir, 'final_checkpoint.pth')
+            save_checkpoint(checkpoint_file, state)
+            logging.info('Saving final checkpoint.')
+        dist.barrier()
+
+        ema.copy_to(self.G.parameters())
+        self.ema = ema
 
     def train(self, sensitive_dataloader, config):
         set_seeds(self.global_rank, config.seed)

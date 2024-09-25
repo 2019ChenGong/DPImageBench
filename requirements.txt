@@ -17,3 +17,4 @@ tensorboard==1.14.0
 tqdm==4.66.5
 gdown==4.7.3
 wilds==2.0.0
+protobuf==3.20

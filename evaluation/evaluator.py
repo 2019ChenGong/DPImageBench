@@ -27,7 +27,7 @@ class Evaluator(object):
         self.device = config.setup.local_rank
 
         self.sensitive_stats_path = config.sensitive_data.fid_stats
-        self.acc_models = ["resnet", "wrn", "densenet", "resnext"]
+        self.acc_models = ["resnet", "wrn", "resnext"]
         self.config = config
         torch.cuda.empty_cache()
     
@@ -39,9 +39,21 @@ class Evaluator(object):
         fid = 0
         logging.info("The FID of synthetic images is {}".format(fid))
 
+        acc_list = []
+
         for model_name in self.acc_models:
             acc = self.cal_acc(model_name, synthetic_images, synthetic_labels, sensitive_test_loader)
             logging.info("The best acc of synthetic images from {} is {}".format(model_name, acc))
+
+            acc_list.append(acc)
+        
+        acc_mean = np.array(acc_list).mean()
+        acc_std = np.array(acc_list).std()
+
+        logging.info(f"The best acc of accuracy of synthetic images from resnet, wrn, and resnext are {acc_list}.")
+
+        logging.info(f"The average and std of accuracy of synthetic images are {acc_mean:.2f} and {acc_std:.2f}")
+
 
     def cal_fid(self, synthetic_images, batch_size=500):
         with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:

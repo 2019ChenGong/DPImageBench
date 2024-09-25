@@ -8,6 +8,7 @@ from torch.utils.data.distributed import DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 import pickle
 import torchvision
+import tqdm
 
 from models.DP_Diffusion.model.ncsnpp import NCSNpp
 from models.DP_Diffusion.utils.util import set_seeds, make_dir, save_checkpoint, sample_random_image_batch, compute_fid
@@ -151,12 +152,13 @@ class DP_Diffusion(DPSynther):
         fid_sampling_shape = (self.sampler.fid_batch_size, self.network.num_in_channels,
                             self.network.image_size, self.network.image_size)
 
-        for epoch in range(config.n_epochs):
+        for epoch in tqdm(range(config.n_epochs), desc="Epochs"):
 
-            for _, (train_x, train_y) in enumerate(dataset_loader):
+            epoch_iter = tqdm(enumerate(dataset_loader), total=len(dataset_loader), leave=False, desc="Batches")
+            
+            for _, (train_x, train_y) in epoch_iter:
                 if state['step'] % config.snapshot_freq == 0 and state['step'] >= config.snapshot_threshold and self.global_rank == 0:
-                    logging.info(
-                        'Saving snapshot checkpoint and sampling single batch at iteration %d.' % state['step'])
+                    logging.info('Saving snapshot checkpoint and sampling single batch at iteration %d.' % state['step'])
 
                     model.eval()
                     with torch.no_grad():
@@ -167,8 +169,7 @@ class DP_Diffusion(DPSynther):
                         ema.restore(model.parameters())
                     model.train()
 
-                    save_checkpoint(os.path.join(
-                        checkpoint_dir, 'snapshot_checkpoint.pth'), state)
+                    save_checkpoint(os.path.join(checkpoint_dir, 'snapshot_checkpoint.pth'), state)
                 dist.barrier()
 
                 if state['step'] % config.fid_freq == 0 and state['step'] >= config.fid_threshold:
@@ -181,29 +182,20 @@ class DP_Diffusion(DPSynther):
 
                         if self.global_rank == 0:
                             logging.info('FID at iteration %d: %.6f' % (state['step'], fid))
-                        dist.barrier()
+                    dist.barrier()
                     model.train()
 
                 if state['step'] % config.save_freq == 0 and state['step'] >= config.save_threshold and self.global_rank == 0:
                     checkpoint_file = os.path.join(
                         checkpoint_dir, 'checkpoint_%d.pth' % state['step'])
                     save_checkpoint(checkpoint_file, state)
-                    logging.info(
-                        'Saving  checkpoint at iteration %d' % state['step'])
+                    logging.info('Saving checkpoint at iteration %d' % state['step'])
                 dist.barrier()
 
-                if len(train_y.shape) == 2:
-                    train_x = train_x.to(torch.float32) / 255.
-                    train_y = torch.argmax(train_y, dim=1)
-                
-                x = train_x.to(self.device) * 2. - 1.
-                if config.label_random:
-                    y = torch.randint(self.network.label_dim, size=(x.shape[0],), dtype=torch.int32, device=self.device)
-                else:
-                    y = train_y.to(self.device).long()
-
+                # Preprocess and train
+                train_x, train_y = preprocess_data(train_x, train_y, config, self.device)
                 optimizer.zero_grad(set_to_none=True)
-                loss = torch.mean(loss_fn(model, x, y))
+                loss = torch.mean(loss_fn(model, train_x, train_y))
                 loss.backward()
                 optimizer.step()
 
@@ -214,7 +206,7 @@ class DP_Diffusion(DPSynther):
                 state['step'] += 1
                 state['ema'].update(model.parameters())
 
-            logging.info('After %d epochs' % (epoch + 1))
+            logging.info('Completed Epoch %d' % (epoch + 1))
 
         if self.global_rank == 0:
             checkpoint_file = os.path.join(checkpoint_dir, 'final_checkpoint.pth')

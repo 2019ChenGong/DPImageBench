@@ -34,6 +34,27 @@ class DP_MERF(DPSynther):
         self.mmd_type = config.mmd_type
 
         self.gen = ConvCondGen(self.z_dim, self.h_dim, self.num_class, self.n_channels, self.kernel_sizes, self.n_feat).to(device)
+    def pretrain(self, public_dataloader, config):
+        if public_dataloader is None:
+            return
+        os.mkdir(config.log_dir)
+        # define loss function
+        n_data = len(public_dataloader.dataset)
+        sr_loss, mb_loss, _ = get_rff_losses(public_dataloader, self.n_feat, self.d_rff, self.rff_sigma, self.device, self.num_class, 0., self.mmd_type, label_random=config.label_random)
+
+        # rff_mmd_loss = get_rff_mmd_loss(n_feat, ar.d_rff, ar.rff_sigma, device, ar.n_labels, ar.noise_factor, ar.batch_size)
+
+        # init optimizer
+        optimizer = torch.optim.Adam(list(self.gen.parameters()), lr=config.lr)
+        scheduler = StepLR(optimizer, step_size=1, gamma=config.lr_decay)
+
+        # training loop
+        for epoch in range(1, config.epochs + 1):
+            train_single_release(self.gen, self.device, optimizer, epoch, sr_loss, config.log_interval, config.batch_size, n_data)
+            scheduler.step()
+
+        # save trained model and data
+        torch.save(self.gen.state_dict(), os.path.join(config.log_dir, 'gen.pt'))
 
     def train(self, sensitive_dataloader, config):
         os.mkdir(config.log_dir)
@@ -41,7 +62,8 @@ class DP_MERF(DPSynther):
         self.noise_factor = get_noise_multiplier(target_epsilon=config.dp.epsilon, target_delta=config.dp.delta, sample_rate=1., epochs=1)
 
         logging.info("The noise factor is {}".format(self.noise_factor))
-
+        
+        n_data = len(sensitive_dataloader.dataset)
         sr_loss, mb_loss, _ = get_rff_losses(sensitive_dataloader, self.n_feat, self.d_rff, self.rff_sigma, self.device, self.num_class, self.noise_factor, self.mmd_type)
 
         # rff_mmd_loss = get_rff_mmd_loss(n_feat, ar.d_rff, ar.rff_sigma, device, ar.n_labels, ar.noise_factor, ar.batch_size)
@@ -52,7 +74,7 @@ class DP_MERF(DPSynther):
 
         # training loop
         for epoch in range(1, config.epochs + 1):
-            train_single_release(self.gen, self.device, optimizer, epoch, sr_loss, config.log_interval, config.batch_size, config.n_data)
+            train_single_release(self.gen, self.device, optimizer, epoch, sr_loss, config.log_interval, config.batch_size, n_data)
             scheduler.step()
 
         # save trained model and data

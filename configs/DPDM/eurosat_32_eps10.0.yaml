@@ -33,7 +33,7 @@ model:
     label_dim: 10
     attn_resolutions:
     - 14
-    ch_mult: [2, 2]
+    ch_mult: [1, 2, 2]
   sampler:
     type: ddim
     stochastic: False
@@ -72,7 +72,7 @@ pretrain:
 train:
   log_dir: null
   seed: 0
-  batch_size: 4096
+  batch_size: 2048
   n_epochs: 150
   partly_finetune: False
   log_freq: 100

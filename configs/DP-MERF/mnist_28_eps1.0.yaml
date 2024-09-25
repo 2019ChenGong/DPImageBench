@@ -10,7 +10,13 @@ setup:
   workdir: exp/dp-merf/mnist_28_eps1.0
 
 public_data:
-  name: null
+  name: imagenet
+  num_channels: 1
+  resolution: 28
+  n_classes: 1000
+  train_path: dataset/imagenet/imagenet_32
+  selective:
+    ratio: 1.0
 
 sensitive_data:
   name: mnist
@@ -34,6 +40,12 @@ model:
 
 pretrain:
   log_dir: null
+  epochs: 1
+  batch_size: 100
+  lr: 0.01
+  lr_decay: 0.9
+  log_interval: 10000
+  label_random: True
 
 train:
   epochs: 5
@@ -41,7 +53,6 @@ train:
   lr: 0.01
   lr_decay: 0.9
   log_interval: 10000
-  n_data: 60000
   log_dir: null
   num_channels: 1
   resolution: 28

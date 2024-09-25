@@ -42,6 +42,73 @@ class DP_NTK(DPSynther):
 
         self.model_gen = ConvCondGen(self.z_dim, self.h_dim, self.n_classes, self.n_channels, self.kernel_sizes, self.input_dim).to(device)
         self.model_gen.train()
+    
+    def pretrain(self, public_dataloader, config):
+        if public_dataloader is None:
+            return
+        os.mkdir(config.log_dir)
+        # define loss function
+
+        self.noisy_mean_emb = calc_mean_emb1(self.model_ntk, public_dataloader, self.n_classes, 0., self.device, label_random=config.label_random)
+
+        torch.save(self.noisy_mean_emb, os.path.join(config.log_dir, 'noisy_mean_emb.pt'))
+
+        optimizer = torch.optim.Adam(self.model_gen.parameters(), lr=config.lr)
+        scheduler = StepLR(optimizer, step_size=1, gamma=config.lr_decay)
+
+        """ initialize the variables """
+        mean_v_samp = torch.Tensor([]).to(self.device)
+        for p in self.model_ntk.parameters():
+            mean_v_samp = torch.cat((mean_v_samp, p.flatten()))
+        d = len(mean_v_samp)
+        logging.info('Feature Length: {}'.format(d))
+
+        """ training a Generator via minimizing MMD """
+        for epoch in range(config.n_iter):  # loop over the dataset multiple times
+            running_loss = 0.0
+            optimizer.zero_grad()  # zero the parameter gradients
+
+            """ synthetic data """
+            gen_code, gen_labels = self.model_gen.get_code(config.batch_size, self.device)
+            gen_code = gen_code.to(self.device)
+            gen_samples = self.model_gen(gen_code.detach())
+            _, gen_labels_numerical = torch.max(gen_labels, dim=1)
+
+            """ synthetic data mean_emb init """
+            mean_emb2 = torch.zeros((d, self.n_classes), device=self.device)
+            for idx in range(gen_samples.shape[0]):
+                """ manually set the weight if needed """
+                # model_ntk.fc1.weight = torch.nn.Parameter(output_weights[gen_labels_numerical[idx], :][None, :])
+                mean_v_samp = torch.Tensor([]).to(self.device)  # sample mean vector init
+                f_x = self.model_ntk(gen_samples[idx][None, :])
+
+                """ get NTK features """
+                f_idx_grad = torch.autograd.grad(f_x, self.model_ntk.parameters(),
+                                                grad_outputs=torch.ones_like(f_x), create_graph=True)
+                # f_idx_grad = torch.autograd.grad(f_x.sum(), self.model_ntk.parameters(), create_graph=True)
+                for g in f_idx_grad:
+                    mean_v_samp = torch.cat((mean_v_samp, g.flatten()))
+                # mean_v_samp = mean_v_samp[:-1]
+
+                """ normalize the sample mean vector """
+                mean_emb2[:, gen_labels_numerical[idx]] += mean_v_samp / torch.linalg.vector_norm(mean_v_samp)
+
+            """ average by batch size """
+            mean_emb2 = mean_emb2 / config.batch_size
+
+            """ calculate loss """
+            # loss = (self.noisy_mean_emb - mean_emb2).sum()
+            loss = torch.norm(self.noisy_mean_emb - mean_emb2, p=2) ** 2
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item()
+            if (epoch + 1) % config.log_interval == 0:
+                logging.info('iter {} and running loss are {}'.format(epoch, running_loss))
+            if epoch % config.scheduler_interval == 0:
+                scheduler.step()
+        
+        torch.save(self.model_gen.state_dict(), os.path.join(config.log_dir, 'gen.pt'))
 
     def train(self, sensitive_dataloader, config):
         os.mkdir(config.log_dir)

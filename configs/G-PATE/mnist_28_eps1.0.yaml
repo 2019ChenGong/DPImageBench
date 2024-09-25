@@ -4,7 +4,13 @@ setup:
   workdir: exp/g_pate/mnist_28_eps1.0
 
 public_data:
-  name: null
+  name: imagenet
+  num_channels: 1
+  resolution: 28
+  n_classes: 1000
+  train_path: dataset/imagenet/imagenet_32
+  selective:
+    ratio: 1.0
 
 sensitive_data:
   name: mnist
@@ -38,8 +44,26 @@ model:
 
 pretrain:
   log_dir: null
+  batch_size: 64
+  epoch: 1
+  sigma: 0.
+  sigma_thresh: 0.
+  pca_sigma: 1.0
+  step_size: 1e-4
+  proj_mat: 1
+  g_step: 1
+  d_step: 1
+  learning_rate: 1e-3
+  beta1: 0.5
+  shuffle: True
+  increasing_dim: False
+  save_epoch: False
+  checkpoint_dir: checkpoint
+  teacher_dir: teacher
+  label_random: True
 
 train:
+  log_dir: null
   batch_size: 64
   epoch: 1000
   non_private: False

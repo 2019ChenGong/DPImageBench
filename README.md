@@ -5,8 +5,8 @@
 
 ## Todo
 
-- []
-- []
+- [] recoding the intermediate results of methods.
+- [] Assigning GPU adaptively.
 
 ## 1. Contents
   - [1. Contents](#1-contents)

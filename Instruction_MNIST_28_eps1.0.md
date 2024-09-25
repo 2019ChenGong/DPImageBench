@@ -13,9 +13,9 @@ conda create -n dpimagebench python=3.7
 conda activate dpimagebench
 pip install torch==1.12.1+cu116 torchvision==0.13.1+cu116 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu116
 pip install tensorflow-gpu==1.14.0
-pip install requirements.txt
 git clone git@github.com:2019ChenGong/DPImageBench.git (***We may need to provide the access token***.)
 cd DPImageBench
+pip install -r requirements.txt
 cd opacus; pip install -e .; cd ..
 cd models/DPSDA/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
 cd models; gdown https://drive.google.com/uc?id=1yVTWzaSqJVDJy8CsZKtqDoBNeM6154D4; unzip pretrained_models.zip; cd ..

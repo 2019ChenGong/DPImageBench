@@ -7,7 +7,6 @@ from data.dataset_loader import load_data
 from utils.utils import initialize_environment, run, parse_config
 from evaluation.evaluator import Evaluator
 
-
 def main(config):
     initialize_environment(config)
 
@@ -30,9 +29,9 @@ if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_dir', default="configs")
-    parser.add_argument('--method', default="DPDM")
-    parser.add_argument('--epsilon', default="10.0")
-    parser.add_argument('--data_name', default="eurosat_32")
+    parser.add_argument('--method', default="G-PATE")
+    parser.add_argument('--epsilon', default="1.0")
+    parser.add_argument('--data_name', default="mnist_28")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)

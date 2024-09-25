@@ -73,6 +73,7 @@ model:
     labels: 10
 
 pretrain:
+  log_dir: null
   seed: 0
   batch_size: 64
   n_epochs: 1

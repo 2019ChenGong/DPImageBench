@@ -10,7 +10,13 @@ setup:
   workdir: exp/dp-ntk/mnist_28_eps1.0
 
 public_data:
-  name: null
+  name: imagenet
+  num_channels: 1
+  resolution: 28
+  n_classes: 1000
+  train_path: dataset/imagenet/imagenet_32
+  selective:
+    ratio: 1.0
 
 sensitive_data:
   name: mnist
@@ -34,6 +40,13 @@ model:
 
 pretrain:
   log_dir: null
+  n_iter: 2000
+  batch_size: 5000
+  lr: 1e-2
+  lr_decay: 0.9
+  scheduler_interval: 2001
+  log_interval: 100
+  label_random: True
 
 train:
   n_iter: 2000

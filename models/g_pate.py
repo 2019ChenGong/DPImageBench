@@ -33,6 +33,40 @@ class G_PATE(DPSynther):
                         teachers_batch=config.teachers_batch,
                         wgan=config.wgan,
                         config=config)
+    
+    def pretrain(self, public_dataloader, config):
+        if public_dataloader is None:
+            return
+        os.mkdir(config.log_dir)
+        
+        data_x, data_y = [], []
+        for x, y in public_dataloader:
+            if len(y.shape) == 2:
+                x = x.to(torch.float32) / 255.
+                y = torch.argmax(y, dim=1)
+            if config.label_random:
+                y = torch.randint(low=0, high=self.model.y_dim, size=(x.shape[0], ))
+
+            data_x.append(x)
+            data_y.append(y)
+        
+        data_x = torch.cat(data_x).permute(0, 2, 3, 1)
+        data_y = torch.cat(data_y).long()
+        data_y = F.one_hot(data_y, num_classes=self.model.y_dim)
+
+        config.checkpoint_dir = os.path.join(config.log_dir, config.checkpoint_dir)
+        config.teacher_dir = os.path.join(config.log_dir, config.teacher_dir)
+
+        if not os.path.exists(config.checkpoint_dir):
+            os.makedirs(config.checkpoint_dir)
+        if not os.path.exists(config.teacher_dir):
+            os.makedirs(config.teacher_dir)
+
+        if self.config.wgan:
+            config.learning_rate = 5e-5
+            config.step_size = 5e-4
+
+        self.model.pretrain_together((data_x, data_y), config)
 
     def train(self, sensitive_dataloader, config):
         os.mkdir(config.log_dir)

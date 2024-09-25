@@ -32,6 +32,57 @@ class DP_Kernel(DPSynther):
         G_decoder = CondDecoder(self.image_size, self.nc, k=self.nz, ngf=self.ngf, num_classes=self.n_class)
         self.gen = CNetG(G_decoder).to(device)
         self.gen.apply(weights_init)
+    
+    def pretrain(self, public_dataloader, config):
+        if public_dataloader is None:
+            return
+        os.mkdir(config.log_dir)
+
+        fixed_noise = torch.randn(8 * self.n_class, self.nz).to(self.device)
+        fixed_label = torch.arange(self.n_class).repeat(8).to(self.device)
+
+        optimizer = torch.optim.RMSprop(self.gen.parameters(), lr=config.lr)
+        iter = 0
+        for _ in range(config.n_epochs):
+            for x, label in public_dataloader:
+                iter_loss = 0
+
+                if len(label.shape) == 2:
+                    x = x.to(torch.float32) / 255.
+                    label = torch.argmax(label, dim=1)
+                if x.shape[1] == 1:
+                    x = F.interpolate(x, size=[32, 32])
+                if config.label_random:
+                    label = torch.randint(low=0, high=self.n_class, size=(x.shape[0],)).long()
+                x = x.to(self.device) * 2 - 1
+                label = label.to(self.device)
+                batch_size = x.size(0)
+
+                gen_labels = torch.randint(self.n_class, (batch_size,)).to(self.device)
+
+                optimizer.zero_grad()
+
+                noise = torch.randn(batch_size, self.nz).to(self.device)
+                y = self.gen(noise, label=gen_labels)
+                label = F.one_hot(label, self.n_class).float()
+                gen_labels = F.one_hot(gen_labels, self.n_class).float()
+
+                #### compute mmd loss using my implementation ####
+                DP_mmd_loss = rbf_kernel_DP_loss_with_labels(x.view(batch_size, -1), y.view(batch_size, -1), label, gen_labels, self.sigma_list, 0.)
+
+                errG = torch.pow(DP_mmd_loss, 2)
+                errG.backward()
+                optimizer.step()
+                iter_loss += errG.item()
+
+            logging.info('Current iter: {}'.format(iter) + 'Total training iters: {}'.format(config.max_iter))
+            logging.info('Training loss: {}\tLoss:{:.6f}\t'.format(iter, iter_loss))
+            y_fixed = self.gen(fixed_noise, label=fixed_label)
+            y_fixed.data = y_fixed.data.mul(0.5).add(0.5)
+            grid = torchvision.utils.make_grid(y_fixed.data, nrow=10)
+            torchvision.utils.save_image(grid, os.path.join(config.log_dir, f'netG_iter{iter}_noise{self.noise_factor}_lr{config.lr}_bs{config.batch_size}.png'))
+            torch.save(self.gen.state_dict(), os.path.join(config.log_dir, f'netG_iter{iter}_noise{self.noise_factor}_lr{config.lr}_bs{config.batch_size}.pkl'))
+
 
     def train(self, sensitive_dataloader, config):
         os.mkdir(config.log_dir)
@@ -232,12 +283,15 @@ def rbf_kernel_DP_loss_with_labels(X, Y, x_label, y_label, sigma_list, noise_mul
     f_Dxy = torch.cat([f_Dx, f_Dy]) # size [N+M]
 
     # batch method
-    coeff =  math.sqrt(2 * len(sigma_list)) / N * noise_multiplier
-    mvn_Dxy = mvn(torch.zeros_like(f_Dxy), K * coeff)
-    f_Dxy_tilde = f_Dxy + mvn_Dxy.sample()
+    if noise_multiplier == 0.:
+        f_Dxy_tilde = f_Dxy
+    else:
+        coeff =  math.sqrt(2 * len(sigma_list)) / N * noise_multiplier
+        mvn_Dxy = mvn(torch.zeros_like(f_Dxy), K * coeff)
+        f_Dxy_tilde = f_Dxy + mvn_Dxy.sample()
+        del mvn_Dxy
     f_Dx_tilde = f_Dxy_tilde[:N] # [N]
     f_Dy_tilde = f_Dxy_tilde[N:] # [M]
-    del mvn_Dxy
     mmd_XX = torch.mean(f_Dx_tilde)
     mmd_XY = torch.mean(f_Dy_tilde)
     mmd_YY = torch.mean(K_YY)
