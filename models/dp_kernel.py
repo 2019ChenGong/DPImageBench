@@ -85,6 +85,10 @@ class DP_Kernel(DPSynther):
 
 
     def train(self, sensitive_dataloader, config):
+        if sensitive_dataloader is None:
+            return
+        if config.ckpt is not None:
+            self.gen.load_state_dict(torch.load(config.ckpt))
         os.mkdir(config.log_dir)
 
         self.noise_factor = get_noise_multiplier(target_epsilon=config.dp.epsilon, target_delta=config.dp.delta, sample_rate=1/len(sensitive_dataloader), steps=config.max_iter)

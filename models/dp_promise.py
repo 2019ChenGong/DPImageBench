@@ -225,6 +225,8 @@ class DP_Promise(DPSynther):
         
 
     def train(self, sensitive_dataloader, config):
+        if sensitive_dataloader is None:
+            return
         set_seeds(self.global_rank, config.seed)
         torch.cuda.device(self.local_rank)
         self.device = 'cuda:%d' % self.local_rank
@@ -322,7 +324,7 @@ class DP_Promise(DPSynther):
         pin_memory=True)
 
         model = DDP(self.model)
-        if self.ckpt is not None:
+        if config.ckpt is not None:
             state = torch.load(self.ckpt, map_location=self.device)
             logging.info(model.load_state_dict(state['model'], strict=True))
         ema = ExponentialMovingAverage(

@@ -69,6 +69,8 @@ class G_PATE(DPSynther):
         self.model.pretrain_together((data_x, data_y), config)
 
     def train(self, sensitive_dataloader, config):
+        if sensitive_dataloader is None:
+            return
         os.mkdir(config.log_dir)
         
         data_x, data_y = [], []

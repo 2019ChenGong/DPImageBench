@@ -192,7 +192,12 @@ class DP_Diffusion(DPSynther):
                 dist.barrier()
 
                 # Preprocess and train
-                train_x, train_y = preprocess_data(train_x, train_y, config, self.device)
+                if len(train_y.shape) == 2:
+                    train_x = train_x.to(torch.float32) / 255.
+                    train_y = torch.argmax(train_y, dim=1)
+                if config.label_random:
+                    train_y = torch.randint(low=0, high=self.num_classes, size=(train_x.shape[0], ))
+                # train_x, train_y = preprocess_data(train_x, train_y, config, self.device)
                 optimizer.zero_grad(set_to_none=True)
                 loss = torch.mean(loss_fn(model, train_x, train_y))
                 loss.backward()
@@ -218,6 +223,9 @@ class DP_Diffusion(DPSynther):
         
 
     def train(self, sensitive_dataloader, config):
+        if sensitive_dataloader is None:
+            return
+        
         set_seeds(self.global_rank, config.seed)
         torch.cuda.device(self.local_rank)
         self.device = 'cuda:%d' % self.local_rank
@@ -242,7 +250,7 @@ class DP_Diffusion(DPSynther):
                         logging.info('{} is frozen'.format(name))
 
         model = DPDDP(self.model)
-        if self.ckpt is not None:
+        if config.ckpt is not None:
             state = torch.load(self.ckpt, map_location=self.device)
             logging.info(model.load_state_dict(state['model'], strict=True))
         ema = ExponentialMovingAverage(

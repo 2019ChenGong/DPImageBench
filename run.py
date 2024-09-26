@@ -9,9 +9,6 @@ from evaluation.evaluator import Evaluator
 
 def main(config):
 
-    # the result folder
-    config['setup']['workdir'] = f"exp/{config['setup']['method']}/{config['sensitive_data']['name']}_{config['sensitive_data']['resolution']}_eps{config['train']['dp']['epsilon']}"
-
     initialize_environment(config)
 
     model = load_model(config)
@@ -36,8 +33,13 @@ if __name__ == '__main__':
     parser.add_argument('--method', default="G-PATE")
     parser.add_argument('--epsilon', default="10.0")
     parser.add_argument('--data_name', default="mnist_28")
+    parser.add_argument('--exp_description', default="")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)
+    if opt.exp_description == "":
+        config.setup.workdir = "exp/{}/{}_eps{}".format(str.lower(opt.method), opt.data_name, opt.epsilon)
+    else:
+        config.setup.workdir = "exp/{}/{}".format(str.lower(opt.method), opt.exp_description)
 
     run(main, config)

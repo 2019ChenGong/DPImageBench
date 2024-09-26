@@ -63,6 +63,7 @@ pretrain:
   label_random: True
 
 train:
+  ckpt: null
   log_dir: null
   batch_size: 64
   epoch: 1000

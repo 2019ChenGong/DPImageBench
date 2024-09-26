@@ -40,6 +40,7 @@ pretrain:
   log_dir: null
 
 train:
+  ckpt: null
   batch_size: 64
   epoch: 1000
   non_private: False

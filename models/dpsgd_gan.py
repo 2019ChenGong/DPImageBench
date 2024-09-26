@@ -191,6 +191,8 @@ class DPGAN(DPSynther):
         self.ema = ema
 
     def train(self, sensitive_dataloader, config):
+        if sensitive_dataloader is None:
+            return
         set_seeds(self.global_rank, config.seed)
         torch.cuda.device(self.local_rank)
         self.device = 'cuda:%d' % self.local_rank
@@ -208,6 +210,10 @@ class DPGAN(DPSynther):
 
         D = DPDDP(self.D)
         G = DDP(self.G)
+        if config.ckpt is not None:
+            state = torch.load(self.ckpt, map_location=self.device)
+            logging.info(D.load_state_dict(state['D'], strict=True))
+            logging.info(G.load_state_dict(state['G'], strict=True))
         G.eval()
 
         ema = ExponentialMovingAverage(G.parameters(), decay=self.ema_rate)

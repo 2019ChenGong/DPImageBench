@@ -1,5 +1,5 @@
 setup:
-  method: DP-MERF
+  method: DP-NTK
   run_type: normal
   n_gpus_per_node: 1
   n_nodes: 1
@@ -7,7 +7,7 @@ setup:
   master_address: '127.0.0.1'
   master_port: 6025
   omp_n_threads: 8
-  workdir: exp/dp-merf/mnist_28_eps1.0
+  workdir: exp/dp-ntk/mnist_28_eps1.0
 
 public_data:
   name: imagenet
@@ -19,43 +19,44 @@ public_data:
     ratio: 1.0
 
 sensitive_data:
-  name: mnist
+  name: fmnist
   num_channels: 1
   resolution: 28
   n_classes: 10
-  train_path: dataset/mnist/train_28.zip
-  test_path: dataset/mnist/test_28.zip
-  fid_stats: dataset/mnist/fid_stats_28.npz
+  train_path: dataset/fmnist/train_28.zip
+  test_path: dataset/fmnist/test_28.zip
+  fid_stats: dataset/fmnist/fid_stats_28.npz
 
 model:
+  model_ntk: fc_1l
+  ntk_width: 800
+  input_dim: 784
+  n_classes: 10
+
   z_dim: 5
   h_dim: '200'
-  num_class: 10
   n_channels: '16,8,1'
   kernel_sizes: '5,5'
-  n_feat: 784
-  d_rff: 10000
-  rff_sigma: '105'
-  mmd_type: sphere
 
 pretrain:
   log_dir: null
-  epochs: 1
-  batch_size: 100
-  lr: 0.01
+  n_iter: 2000
+  batch_size: 5000
+  lr: 1e-2
   lr_decay: 0.9
-  log_interval: 10000
+  scheduler_interval: 2001
+  log_interval: 100
   label_random: True
 
 train:
-  epochs: 5
-  batch_size: 100
-  lr: 0.01
+  ckpt: null
+  n_iter: 2000
+  batch_size: 5000
+  lr: 1e-2
   lr_decay: 0.9
-  log_interval: 10000
+  scheduler_interval: 2001
+  log_interval: 100
   log_dir: null
-  num_channels: 1
-  resolution: 28
   dp:
     epsilon: 1.0
     delta: 1e-5

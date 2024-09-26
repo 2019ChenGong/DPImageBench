@@ -12,6 +12,8 @@ from data.SpecificImagenet import SpecificClassImagenet
 from models.PrivImage import resnet
 
 def load_sensitive_data(config):
+    if config.sensitive_data.name is None:
+        return None, None
     
     sensitive_train_set = ImageFolderDataset(
             config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)

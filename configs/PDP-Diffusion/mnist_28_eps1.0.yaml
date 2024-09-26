@@ -7,7 +7,7 @@ setup:
   master_address: '127.0.0.1'
   master_port: 6025
   omp_n_threads: 8
-  workdir: exp/privimage/mnist_28_eps1.0
+  workdir: exp/pdp_diffusion/mnist_28_eps1.0
 
 public_data:
   name: imagenet
@@ -16,11 +16,7 @@ public_data:
   n_classes: 1000
   train_path: dataset/imagenet/imagenet_32
   selective:
-    ratio: 0.01
-    num_words: 1
-    sigma: 484
-    batch_size: 5000
-    model_path: models/pretrained_models/imagenet_classifier_0.454_ckpt.pth
+    ratio: 1.0
 
 sensitive_data:
   name: mnist
@@ -32,7 +28,6 @@ sensitive_data:
   fid_stats: dataset/mnist/fid_stats_28.npz
 
 model:
-  ckpt: null
   denoiser_name: edm
   denoiser_network: song
   ema_rate: .999
@@ -80,7 +75,7 @@ pretrain:
   log_dir: null
   seed: 0
   batch_size: 64
-  n_epochs: 150
+  n_epochs: 1
   log_freq: 100
   snapshot_freq: 2000
   snapshot_threshold: 1
@@ -104,7 +99,7 @@ pretrain:
     n_classes: 10
 
 train:
-  log_dir: null
+  ckpt: null
   seed: 0
   batch_size: 4096
   n_epochs: 150
@@ -130,8 +125,8 @@ train:
     n_noise_samples: 32
     n_classes: 10
   dp:
-    sdq: True
-    privacy_history: [[484, 1.0, 1]]
+    sdq: null
+    privacy_history: [[5, 0.1, 75]]
     alpha_num: 0
     max_grad_norm: 1.0
     delta: 1e-5
