@@ -21,8 +21,10 @@ class DP_NTK(DPSynther):
 
         self.config = config
         self.device = device
+        self.img_size = config.img_size
+        self.c = config.c
         self.ntk_width = config.ntk_width
-        self.input_dim = config.input_dim
+        self.input_dim = self.img_size * self.img_size * self.c
         self.n_classes = config.n_classes
 
         self.z_dim = config.z_dim
@@ -32,6 +34,8 @@ class DP_NTK(DPSynther):
 
         if config.model_ntk == 'fc_1l':
             self.model_ntk = NTK(input_size=self.input_dim, hidden_size_1=self.ntk_width, output_size=self.n_classes)
+        elif config.model_ntk == 'fc_2l':
+            self.model_ntk = NTK_TL(input_size=self.input_dim, hidden_size_1=self.ntk_width, hidden_size_2=config.ntk_width2, output_size=self.n_classes)
         elif config.model_ntk == 'lenet5':
             self.model_ntk = LeNet5()
         else:
@@ -40,7 +44,7 @@ class DP_NTK(DPSynther):
         self.model_ntk.to(device)
         self.model_ntk.eval()
 
-        self.model_gen = ConvCondGen(self.z_dim, self.h_dim, self.n_classes, self.n_channels, self.kernel_sizes, self.input_dim).to(device)
+        self.model_gen = ConvCondGen(self.z_dim, self.h_dim, self.n_classes, self.n_channels, self.c, self.kernel_sizes, self.input_dim).to(device)
         self.model_gen.train()
     
     def pretrain(self, public_dataloader, config):
@@ -153,16 +157,24 @@ class DP_NTK(DPSynther):
             for idx in range(gen_samples.shape[0]):
                 """ manually set the weight if needed """
                 # model_ntk.fc1.weight = torch.nn.Parameter(output_weights[gen_labels_numerical[idx], :][None, :])
-                mean_v_samp = torch.Tensor([]).to(self.device)  # sample mean vector init
+                # mean_v_samp = torch.Tensor([]).to(self.device)  # sample mean vector init
+                # f_x = self.model_ntk(gen_samples[idx][None, :])
+
+                # """ get NTK features """
+                # f_idx_grad = torch.autograd.grad(f_x, self.model_ntk.parameters(),
+                #                                 grad_outputs=torch.ones_like(f_x), create_graph=True)
+                # print(f_idx_grad[0].shape)
+
+                # for g in f_idx_grad:
+                #     mean_v_samp = torch.cat((mean_v_samp, g.flatten()))
+                # mean_v_samp = mean_v_samp[:-1]
+
                 f_x = self.model_ntk(gen_samples[idx][None, :])
 
                 """ get NTK features """
-                f_idx_grad = torch.autograd.grad(f_x, self.model_ntk.parameters(),
+                mean_v_samp = torch.autograd.grad(f_x, self.model_ntk.parameters(),
                                                 grad_outputs=torch.ones_like(f_x), create_graph=True)
-                # f_idx_grad = torch.autograd.grad(f_x.sum(), self.model_ntk.parameters(), create_graph=True)
-                for g in f_idx_grad:
-                    mean_v_samp = torch.cat((mean_v_samp, g.flatten()))
-                # mean_v_samp = mean_v_samp[:-1]
+                mean_v_samp = torch.cat([v.flatten() for v in mean_v_samp])
 
                 """ normalize the sample mean vector """
                 mean_emb2[:, gen_labels_numerical[idx]] += mean_v_samp / torch.linalg.vector_norm(mean_v_samp)
@@ -189,7 +201,7 @@ class DP_NTK(DPSynther):
 
         """evaluate the model"""
         syn_data, syn_labels = synthesize_mnist_with_uniform_labels(self.model_gen, self.device, gen_batch_size=config.batch_size, n_data=config.data_num, n_labels=self.n_classes)
-        syn_data = syn_data.reshape(syn_data.shape[0], config.num_channels, config.resolution, config.resolution)
+        syn_data = syn_data.reshape(syn_data.shape[0], self.c, self.img_size, self.img_size)
         syn_labels = syn_labels.reshape(-1)
         np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
 
@@ -202,9 +214,9 @@ class DP_NTK(DPSynther):
 
 
 class ConvCondGen(nn.Module):
-    def __init__(self, d_code, d_hid, n_labels, nc_str, ks_str, n_feats, use_sigmoid=True, batch_norm=True):
+    def __init__(self, d_code, d_hid, n_labels, nc_str, c, ks_str, n_feats, use_sigmoid=True, batch_norm=True):
         super(ConvCondGen, self).__init__()
-        self.nc = [int(k) for k in nc_str.split(',')]
+        self.nc = [int(k) for k in nc_str.split(',')] + [c]
         self.ks = [int(k) for k in ks_str.split(',')]  # kernel sizes
         d_hid = [int(k) for k in d_hid.split(',')]
         assert len(self.nc) == 3 and len(self.ks) == 2

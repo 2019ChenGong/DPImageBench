@@ -192,8 +192,10 @@ class DP_Diffusion(DPSynther):
                     train_x = train_x.to(torch.float32) / 255.
                     train_y = torch.argmax(train_y, dim=1)
                 if config.label_random:
-                    train_y = torch.randint(low=0, high=self.num_classes, size=(train_x.shape[0], ))
+                    train_y = torch.randint(low=0, high=self.network.label_dim, size=(train_x.shape[0], ))
+                train_x, train_y = train_x.to(self.device), train_y.to(self.device)
                 # train_x, train_y = preprocess_data(train_x, train_y, config, self.device)
+                train_y = None
                 optimizer.zero_grad(set_to_none=True)
                 loss = torch.mean(loss_fn(model, train_x, train_y))
                 loss.backward()

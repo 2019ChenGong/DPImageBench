@@ -1,7 +1,7 @@
 blobfile==2.0.2
 clean-fid==0.1.35
 click==8.1.7
-faiss-gpu
+faiss-gpu-cu12
 imageio==2.31.2
 matplotlib==3.5.3
 omegaconf==2.3.0

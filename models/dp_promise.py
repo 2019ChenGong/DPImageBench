@@ -192,7 +192,8 @@ class DP_Promise(DPSynther):
                 
                 x = train_x.to(self.device) * 2. - 1.
                 if config.label_random:
-                    y = torch.randint(self.network.label_dim, size=(x.shape[0],), dtype=torch.int32, device=self.device)
+                    y = train_y.to(self.device).long() % self.network.label_dim
+                    # y = torch.randint(self.network.label_dim, size=(x.shape[0],), dtype=torch.int32, device=self.device)
                 else:
                     y = train_y.to(self.device).long()
 
@@ -323,8 +324,7 @@ class DP_Promise(DPSynther):
         if config.ckpt is not None:
             state = torch.load(config.ckpt, map_location=self.device)
             logging.info(model.load_state_dict(state['model'], strict=True))
-        ema = ExponentialMovingAverage(
-            model.parameters(), decay=self.ema_rate)
+        ema = ExponentialMovingAverage(model.parameters(), decay=self.ema_rate)
 
         if config.optim1.optimizer == 'Adam':
             optimizer = torch.optim.Adam(model.parameters(), **config.optim1.params)
@@ -344,8 +344,8 @@ class DP_Promise(DPSynther):
             logging.info('Starting training at step %d' % state['step'])
         dist.barrier()
 
-        if config.loss.version == 'edm':
-            loss_fn = EDMLoss(**config.loss).get_loss_stage1
+        if config.loss1.version == 'edm':
+            loss_fn = EDMLoss(**config.loss1).get_loss_stage1
         else:
             raise NotImplementedError
 
@@ -432,28 +432,6 @@ class DP_Promise(DPSynther):
             checkpoint_file = os.path.join(checkpoint_dir, 'final_checkpoint.pth')
             save_checkpoint(checkpoint_file, state)
             logging.info('Saving final checkpoint.')
-        dist.barrier()
-
-        def sampler_final(x, y=None):
-            if self.sampler_fid.type == 'ddim':
-                return ddim_sampler(x, y, model, **self.sampler_fid)
-            elif self.sampler_fid.type == 'edm':
-                return edm_sampler(x, y, model, **self.sampler_fid)
-            else:
-                raise NotImplementedError
-
-        model.eval()
-        with torch.no_grad():
-            ema.store(model.parameters())
-            ema.copy_to(model.parameters())
-            if self.global_rank == 0:
-                sample_random_image_batch(snapshot_sampling_shape, sampler_final, os.path.join(
-                                    sample_dir, 'final'), self.device, self.network.label_dim)
-            fid = compute_fid(config.final_fid_samples, self.global_size, fid_sampling_shape, sampler_final, inception_model, self.fid_stats, self.device, self.network.label_dim)
-        model.train()
-
-        if self.global_rank == 0:
-            logging.info('Final FID %.6f' % (fid))
         dist.barrier()
 
         ema.copy_to(self.model.parameters())

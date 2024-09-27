@@ -30,7 +30,8 @@ sensitive_data:
 model:
   model_ntk: fc_1l
   ntk_width: 800
-  input_dim: 784
+  img_size: 28
+  c: 1
   n_classes: 10
 
   z_dim: 5
@@ -65,8 +66,6 @@ gen:
   data_num: 60000
   batch_size: 1000
   log_dir: null
-  num_channels: 1
-  resolution: 28
 
 eval:
   batch_size: 1000

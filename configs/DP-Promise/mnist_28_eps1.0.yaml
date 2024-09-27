@@ -130,6 +130,12 @@ train:
     p_std: 1.2
     n_noise_samples: 32
     n_classes: 10
+  loss1:
+    version: edm
+    p_mean: -1.2
+    p_std: 1.2
+    n_noise_samples: 32
+    n_classes: 10
   dp:
     sdq: False
     privacy_history: [[484, 1.0, 1]]

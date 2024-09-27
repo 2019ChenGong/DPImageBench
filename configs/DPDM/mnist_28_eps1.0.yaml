@@ -10,7 +10,13 @@ setup:
   workdir: exp/dpdm/mnist_28_eps1.0
 
 public_data:
-  name: null
+  name: imagenet
+  num_channels: 1
+  resolution: 28
+  n_classes: 1000
+  train_path: dataset/imagenet/imagenet_32
+  selective:
+    ratio: 1.0
 
 sensitive_data:
   name: mnist
@@ -67,6 +73,29 @@ model:
 
 pretrain:
   log_dir: null
+  seed: 0
+  batch_size: 64
+  n_epochs: 1
+  log_freq: 100
+  snapshot_freq: 2000
+  snapshot_threshold: 1
+  save_freq: 100000
+  save_threshold: 1
+  fid_freq: 2000
+  fid_samples: 5000
+  fid_threshold: 1
+  label_random: True
+  optim:
+    optimizer: Adam
+    params:
+      lr: 3e-4
+      weight_decay: 0.
+  loss: 
+    version: edm
+    p_mean: -1.2
+    p_std: 1.2
+    n_noise_samples: 1
+    n_classes: 10
 
 train:
   ckpt: null

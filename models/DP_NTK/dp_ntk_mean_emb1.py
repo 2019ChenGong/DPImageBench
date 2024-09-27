@@ -39,6 +39,7 @@ def calc_mean_emb1(model_ntk, sensitive_dataloader, n_classes, noise_factor, dev
             """ normalize the sample mean vector """
             mean_emb1[:, y_train[i]] += mean_v_samp / pt.linalg.vector_norm(mean_v_samp)
         n_data += data.shape[0]
+        break
 
     """ average by class count """
     mean_emb1 = pt.div(mean_emb1, n_data)
