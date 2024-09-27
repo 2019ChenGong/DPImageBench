@@ -109,7 +109,7 @@ def load_data(config):
 
     if config.public_data.name is None:
         return sensitive_train_loader, sensitive_test_loader, None
-    elif config.public_data.name == "imagenet":
+    else:
         trans = [
                 transforms.Resize(config.public_data.resolution),
                 transforms.RandomHorizontalFlip(p=0.5),
@@ -118,14 +118,18 @@ def load_data(config):
         if config.public_data.num_channels == 1:
             trans = [transforms.Grayscale(num_output_channels=1)] + trans
         trans = transforms.Compose(trans)
-        if config.public_data.selective.ratio == 1.0:
-            specific_class = None
+        if config.public_data.name == "imagenet":
+            if config.public_data.selective.ratio == 1.0:
+                specific_class = None
+            else:
+                with torch.no_grad():
+                    specific_class = semantic_query(sensitive_train_loader, config)
+            public_train_set = SpecificClassImagenet(root=config.public_data.train_path, specific_class=specific_class, transform=trans, split="train")
+        elif config.public_data.name == "places365":
+            # TODO: we only have a classifier on imagenet. Besides, we cannot train the classifer on LAION.
+            public_train_set = torchvision.datasets.Places365(root=config.public_data.train_path, small=True, download=True, transform=trans)
         else:
-            with torch.no_grad():
-                specific_class = semantic_query(sensitive_train_loader, config)
-        public_train_set = SpecificClassImagenet(root=config.public_data.train_path, specific_class=specific_class, transform=trans, split="train")
-    else:
-        raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
+            raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     
     public_train_loader = torch.utils.data.DataLoader(dataset=public_train_set, shuffle=True, drop_last=False, batch_size=config.pretrain.batch_size)
 

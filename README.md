@@ -7,9 +7,12 @@
 
 - [] recoding the intermediate results of methods with tqdm.
 
-- [] DP LDM DPSDA error.
-
 - [] Add codes for no DP.
+
+- [] the hyper-parameters of classification methods for fashionmnist are unreasonable.
+
+- [] mnist for g-pate, the acc is so low.
+
 
 ## 1. Contents
   - [1. Contents](#1-contents)

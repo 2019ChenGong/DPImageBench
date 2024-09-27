@@ -32,7 +32,6 @@ class DPGAN(DPSynther):
         self.global_rank = config.global_rank
         self.global_size = config.global_size
 
-        self.ckpt = config.ckpt
         self.fid_stats = config.fid_stats
         self.ema_rate = config.ema_rate
 
@@ -211,7 +210,7 @@ class DPGAN(DPSynther):
         D = DPDDP(self.D)
         G = DDP(self.G)
         if config.ckpt is not None:
-            state = torch.load(self.ckpt, map_location=self.device)
+            state = torch.load(config.ckpt, map_location=self.device)
             logging.info(D.load_state_dict(state['D'], strict=True))
             logging.info(G.load_state_dict(state['G'], strict=True))
         G.eval()

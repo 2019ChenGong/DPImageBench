@@ -6,7 +6,9 @@ import imageio
 from torchvision.utils import make_grid
 import torchvision
 import torch
-import scipy
+import scipy.optimize
+from scipy.optimize import root_scalar
+import scipy.stats
 from models.DPSDA.dpsda.feature_extractor import extract_features
 from models.DPSDA.dpsda.metrics import make_fid_stats
 from models.DPSDA.dpsda.metrics import compute_fid
@@ -32,7 +34,7 @@ def get_noise_multiplier(epsilon, num_steps, delta, min_noise_multiplier=1e-1, m
         """Compute eps of Gaussian mechanism with shift mu or equivalently noise scale 1/mu"""
         def f(x):
             return delta_Gaussian(x, mu) - delta
-        return scipy.optimize.root_scalar(f, bracket=[0, max_epsilon], method='brentq').root
+        return root_scalar(f, bracket=[0, max_epsilon], method='brentq').root
 
     def compute_epsilon(noise_multiplier, num_steps, delta):
         return eps_Gaussian(delta, np.sqrt(num_steps) / noise_multiplier)
@@ -40,7 +42,8 @@ def get_noise_multiplier(epsilon, num_steps, delta, min_noise_multiplier=1e-1, m
     def objective(x):
         return compute_epsilon(noise_multiplier=x, num_steps=num_steps, delta=delta) - epsilon
 
-    output = scipy.optimize.root_scalar(objective, bracket=[min_noise_multiplier, max_noise_multiplier], method='brentq')
+    output = root_scalar(objective, bracket=[min_noise_multiplier, max_noise_multiplier], method='brentq')
+
     if not output.converged:
         raise ValueError("Failed to converge")
 

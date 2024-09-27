@@ -34,7 +34,6 @@ class DP_Promise(DPSynther):
         self.global_rank = config.global_rank
         self.global_size = config.global_size
 
-        self.ckpt = config.ckpt
         self.denoiser_name = config.denoiser_name
         self.denoiser_network = config.denoiser_network
         self.ema_rate = config.ema_rate
@@ -96,9 +95,6 @@ class DP_Promise(DPSynther):
         dist.barrier()
 
         model = DDP(self.model)
-        if self.ckpt is not None:
-            state = torch.load(self.ckpt, map_location=self.device)
-            logging.info(model.load_state_dict(state['model'], strict=True))
         ema = ExponentialMovingAverage(model.parameters(), decay=self.ema_rate)
 
         if config.optim.optimizer == 'Adam':
@@ -325,7 +321,7 @@ class DP_Promise(DPSynther):
 
         model = DDP(self.model)
         if config.ckpt is not None:
-            state = torch.load(self.ckpt, map_location=self.device)
+            state = torch.load(config.ckpt, map_location=self.device)
             logging.info(model.load_state_dict(state['model'], strict=True))
         ema = ExponentialMovingAverage(
             model.parameters(), decay=self.ema_rate)
@@ -475,9 +471,6 @@ class DP_Promise(DPSynther):
         dist.barrier()
 
         model = DPDDP(self.model)
-        if self.ckpt is not None:
-            state = torch.load(self.ckpt, map_location=self.device)
-            logging.info(model.load_state_dict(state['model'], strict=True))
         ema = ExponentialMovingAverage(model.parameters(), decay=self.ema_rate)
 
         if config.optim.optimizer == 'Adam':
