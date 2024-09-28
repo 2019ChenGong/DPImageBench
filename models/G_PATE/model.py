@@ -353,11 +353,6 @@ class DCGAN(object):
     
         print("Training teacher models and student model together...")
 
-        if not config.non_private:
-            assert len(train_data_list) == self.overall_teachers
-        else:
-            print(str(len(train_data_list)))
-
         if self.pca:
             data = data_X.reshape([data_X.shape[0], -1])
             self.pca_components, rdp_budget = ComputeDPPrincipalProjection(

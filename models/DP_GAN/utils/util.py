@@ -131,20 +131,9 @@ def compute_fid(n_samples, n_gpus, sampling_shape, G, inception_model, stats_pat
 def generate_batch(G, sampling_shape, device, n_classes):
     x = torch.randn(sampling_shape, device=device)
     with torch.no_grad():
-        if labels is None:
-            if n_classes is not None:
-                raise ValueError(
-                    'Need to set labels for class-conditional sampling.')
+        labels = torch.randint(n_classes, (sampling_shape[0],)).to(x.device)
 
-            x = G(x)
-        else:
-            if isinstance(labels, int):
-                labels = torch.randint(
-                    n_classes, (sampling_shape[0],)).to(x.device)
-            else:
-                raise NotImplementedError
-
-            x = G(x, labels)
+        x = G(x, labels)
 
         x = (x / 2. + .5).clip(0., 1.)
 

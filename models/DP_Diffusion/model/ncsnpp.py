@@ -273,8 +273,7 @@ class NCSNpp(nn.Module):
                 if y is not None:
                     temb = temb + modules[m_idx](y)
                 else:
-                    temb = temb + modules[m_idx](torch.zeros((x.shape[0], ), device=x.device).long()) * 0
-                    # raise ValueError('Need to give a class label.')
+                    raise ValueError('Need to give a class label.')
                 m_idx += 1
 
             temb = modules[m_idx](temb)

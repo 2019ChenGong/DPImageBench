@@ -48,12 +48,12 @@ pretrain:
   fid_batch_size: 256
   n_epochs: 1
   d_updates: 5
-  log_freq: 10
+  log_freq: 100
   snapshot_freq: 10
   snapshot_threshold: 1
   save_freq: 100000
   save_threshold: 1
-  fid_freq: 20
+  fid_freq: 200
   fid_samples: 5000
   fid_threshold: 1
   label_random: True
