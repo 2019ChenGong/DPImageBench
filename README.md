@@ -13,6 +13,10 @@
 
 - [] mnist for g-pate, the acc is so low.
 
+- [] dpsda errors.
+
+- [] dpgan and privimage will not execute the downstream tasks.
+
 
 ## 1. Contents
   - [1. Contents](#1-contents)
