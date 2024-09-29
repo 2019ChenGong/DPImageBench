@@ -219,7 +219,7 @@ class ConvCondGen(nn.Module):
         self.nc = [int(k) for k in nc_str.split(',')] + [c]
         self.ks = [int(k) for k in ks_str.split(',')]  # kernel sizes
         d_hid = [int(k) for k in d_hid.split(',')]
-        assert len(self.nc) == 3 and len(self.ks) == 2
+        # assert len(self.nc) == 3 and len(self.ks) == 2
         self.hw = int(np.sqrt(n_feats // self.nc[-1])) // 4
         self.reshape_size = self.nc[0]*self.hw**2
         self.fc1 = nn.Linear(d_code + n_labels, d_hid[0])

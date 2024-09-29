@@ -20,7 +20,7 @@ def calc_mean_emb1(model_ntk, sensitive_dataloader, n_classes, noise_factor, dev
             data = data.to(pt.float32) / 255.
             labels = pt.argmax(labels, dim=1)
         if label_random:
-            labels = pt.randint(low=0, high=n_classes, size=(data.shape[0], ))
+            labels = labels % n_classes
         data, y_train = data.to(device), labels.to(device)
         for i in range(data.shape[0]):
             """ manually set the weight if needed """

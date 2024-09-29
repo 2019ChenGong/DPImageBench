@@ -1,10 +1,6 @@
 <!-- <div align=center> -->
-  
-# Question
 
-Perhaps the cluster of Microsoft Research offers a more convenient way to use the ImageNet dataset (it is too large), so Zinan won't need to download it separately. At least Microsoft Research Asia provided this.
-
-# Benchmark on MNIST_28
+# Pretraining on ImageNet28&32
 
 ## 1 Install DPImageBench
 
@@ -40,23 +36,35 @@ python run.py sensitive_data.name=null --method DP-Kernel --data_name mnist_28 -
 ```
 python run.py sensitive_data.name=null --method DP-MERF --data_name mnist_28 --epsilon 1.0 --exp_description pretrain_imagenet28
 ```
+```
+python run.py sensitive_data.name=null --method DP-NTK --data_name cifar10_32 --epsilon 1.0 --exp_description pretrain_imagenet32
+```
+```
+python run.py sensitive_data.name=null --method DP-Kernel --data_name cifar10_32 --epsilon 1.0 --exp_description pretrain_imagenet32
+```
+```
+python run.py sensitive_data.name=null --method DP-MERF --data_name cifar10_32 --epsilon 1.0 --exp_description pretrain_imagenet32
+```
 
 Each of these methods needs nearly 40x3 GB GPU Memory totally.
 
 ```
-python run.py sensitive_data.name=null setup.n_gpus_per_node=3 --method DP-Promise --data_name mnist_28 --epsilon 1.0 --exp_description pretrain_imagenet28
+python run.py sensitive_data.name=null setup.n_gpus_per_node=3 --method DPGAN --data_name mnist_28 --epsilon 1.0 --exp_description pretrain_imagenet28
 ```
 ```
 python run.py sensitive_data.name=null setup.n_gpus_per_node=3 --method DPDM --data_name mnist_28 --epsilon 1.0 --exp_description pretrain_imagenet28
 ```
 ```
-python run.py sensitive_data.name=null setup.n_gpus_per_node=3 --method PDP-Diffusion --data_name mnist_28 --epsilon 1.0 --exp_description pretrain_imagenet28
-```
-```
 python run.py sensitive_data.name=null setup.n_gpus_per_node=3 --method PrivImage --data_name mnist_28 --epsilon 1.0 --exp_description pretrain_imagenet28
 ```
 ```
-python run.py sensitive_data.name=null setup.n_gpus_per_node=3 --method DP-LDM --data_name mnist_28 --epsilon 1.0 --exp_description pretrain_imagenet28
+python run.py sensitive_data.name=null setup.n_gpus_per_node=3 --method DPGAN --data_name cifar10_32 --epsilon 1.0 --exp_description pretrain_imagenet32
+```
+```
+python run.py sensitive_data.name=null setup.n_gpus_per_node=3 --method DPDM --data_name cifar10_32 --epsilon 1.0 --exp_description pretrain_imagenet32
+```
+```
+python run.py sensitive_data.name=null setup.n_gpus_per_node=3 --method PrivImage --data_name cifar10_32 --epsilon 1.0 --exp_description pretrain_imagenet32
 ```
 
 n_gpus_per_node is the number of GPUs on your node.

@@ -45,7 +45,7 @@ class G_PATE(DPSynther):
                 x = x.to(torch.float32) / 255.
                 y = torch.argmax(y, dim=1)
             if config.label_random:
-                y = torch.randint(low=0, high=self.model.y_dim, size=(x.shape[0], ))
+                y = y % self.model.y_dim
 
             data_x.append(x)
             data_y.append(y)

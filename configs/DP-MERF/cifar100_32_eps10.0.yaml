@@ -19,18 +19,18 @@ public_data:
     ratio: 1.0
 
 sensitive_data:
-  name: cifar10
+  name: cifar100
   num_channels: 3
   resolution: 32
-  n_classes: 10
-  train_path: dataset/cifar10/train_32.zip
-  test_path: dataset/cifar10/test_32.zip
-  fid_stats: dataset/cifar10/fid_stats_32.npz
+  n_classes: 100
+  train_path: dataset/cifar100/train_32.zip
+  test_path: dataset/cifar100/test_32.zip
+  fid_stats: dataset/cifar100/fid_stats_32.npz
 
 model:
   z_dim: 5
   h_dim: '200'
-  num_class: 10
+  num_class: 100
   n_channels: '16,8,3'
   kernel_sizes: '5,5'
   n_feat: 3072

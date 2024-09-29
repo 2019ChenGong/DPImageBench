@@ -36,7 +36,7 @@ class Evaluator(object):
         torch.cuda.empty_cache()
     
     def eval(self, synthetic_images, synthetic_labels, sensitive_test_loader):
-        if self.device != 0:
+        if self.device != 0 or sensitive_test_loader is None:
             return
         
         # fid = self.cal_fid(synthetic_images)

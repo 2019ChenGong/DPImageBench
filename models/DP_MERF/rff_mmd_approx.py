@@ -118,9 +118,9 @@ def noisy_dataset_embedding(train_loader, w_freq, d_rff, device, n_labels, noise
       data = data.to(pt.float32) / 255.
       labels = pt.argmax(labels, dim=1)
     if label_random:
-      labels = pt.randint(low=0, high=n_labels, size=(data.shape[0],))
+      labels = labels % n_labels
     data, labels = data.to(device), labels.to(device)
-    data = flat_data(data, labels, device, n_labels=10, add_label=False)
+    data = flat_data(data, labels, device, n_labels=n_labels, add_label=False)
 
     data = data if pca_vecs is None else apply_pca(pca_vecs, data)
     emb_acc.append(data_label_embedding(data, labels, w_freq, mmd_type, labels_to_one_hot=True, n_labels=n_labels,

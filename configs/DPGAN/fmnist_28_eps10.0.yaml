@@ -94,7 +94,7 @@ train:
     alpha_num: 0
     max_grad_norm: 1.0
     delta: 1e-5
-    epsilon: 10.
+    epsilon: 1.
     max_physical_batch_size: 8192
     n_splits: 32
 

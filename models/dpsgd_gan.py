@@ -107,7 +107,7 @@ class DPGAN(DPSynther):
                     train_x = train_x.to(torch.float32) / 255.
                     train_y = torch.argmax(train_y, dim=1)
                 if config.label_random:
-                    train_y = torch.randint(low=0, high=self.num_classes, size=(train_x.shape[0], ))
+                    train_y = train_y % self.num_classes
                 
                 real_images = train_x.to(self.device) * 2. - 1.
                 real_labels = train_y.to(self.device).long()

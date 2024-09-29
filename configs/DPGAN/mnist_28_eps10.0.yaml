@@ -19,13 +19,13 @@ public_data:
     ratio: 1.0
 
 sensitive_data:
-  name: fmnist
+  name: mnist
   num_channels: 1
   resolution: 28
   n_classes: 10
-  train_path: dataset/fmnist/train_28.zip
-  test_path: dataset/fmnist/test_28.zip
-  fid_stats: dataset/fmnist/fid_stats_28.npz
+  train_path: dataset/mnist/train_28.zip
+  test_path: dataset/mnist/test_28.zip
+  fid_stats: dataset/mnist/fid_stats_28.npz
 
 model:
   ema_rate: .999
@@ -94,7 +94,7 @@ train:
     alpha_num: 0
     max_grad_norm: 1.0
     delta: 1e-5
-    epsilon: 10.
+    epsilon: 1.
     max_physical_batch_size: 8192
     n_splits: 32
 

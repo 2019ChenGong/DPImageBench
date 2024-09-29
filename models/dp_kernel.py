@@ -42,8 +42,7 @@ class DP_Kernel(DPSynther):
         fixed_label = torch.arange(self.n_class).repeat(8).to(self.device)
 
         optimizer = torch.optim.RMSprop(self.gen.parameters(), lr=config.lr)
-        iter = 0
-        for _ in range(config.n_epochs):
+        for epoch in range(config.n_epochs):
             for x, label in public_dataloader:
                 iter_loss = 0
 
@@ -53,7 +52,7 @@ class DP_Kernel(DPSynther):
                 if x.shape[1] == 1:
                     x = F.interpolate(x, size=[32, 32])
                 if config.label_random:
-                    label = torch.randint(low=0, high=self.n_class, size=(x.shape[0],)).long()
+                    label = label % self.n_class
                 x = x.to(self.device) * 2 - 1
                 label = label.to(self.device)
                 batch_size = x.size(0)
@@ -75,13 +74,12 @@ class DP_Kernel(DPSynther):
                 optimizer.step()
                 iter_loss += errG.item()
 
-            logging.info('Current iter: {}'.format(iter) + 'Total training iters: {}'.format(config.max_iter))
-            logging.info('Training loss: {}\tLoss:{:.6f}\t'.format(iter, iter_loss))
+            logging.info('Training loss: {}\tLoss:{:.6f}\t'.format(epoch, iter_loss))
             y_fixed = self.gen(fixed_noise, label=fixed_label)
             y_fixed.data = y_fixed.data.mul(0.5).add(0.5)
             grid = torchvision.utils.make_grid(y_fixed.data, nrow=10)
-            torchvision.utils.save_image(grid, os.path.join(config.log_dir, f'netG_iter{iter}_noise{self.noise_factor}_lr{config.lr}_bs{config.batch_size}.png'))
-            torch.save(self.gen.state_dict(), os.path.join(config.log_dir, f'netG_iter{iter}_noise{self.noise_factor}_lr{config.lr}_bs{config.batch_size}.pkl'))
+            torchvision.utils.save_image(grid, os.path.join(config.log_dir, f'netG_epoch{epoch}_lr{config.lr}_bs{config.batch_size}.png'))
+            torch.save(self.gen.state_dict(), os.path.join(config.log_dir, f'netG_epoch{epoch}_lr{config.lr}_bs{config.batch_size}.pkl'))
 
 
     def train(self, sensitive_dataloader, config):

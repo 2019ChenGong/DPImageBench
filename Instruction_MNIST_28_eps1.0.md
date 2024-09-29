@@ -48,6 +48,9 @@ python run.py public_data.name=null --method DP-MERF --data_name mnist_28 --epsi
 Each of these methods needs nearly 40x3 GB GPU Memory totally.
 
 ```
+python run.py public_data.name=null setup.n_gpus_per_node=3 --method DPGAN --data_name mnist_28 --epsilon 1.0
+```
+```
 python run.py public_data.name=null setup.n_gpus_per_node=3 --method DP-Promise --data_name mnist_28 --epsilon 1.0
 ```
 ```

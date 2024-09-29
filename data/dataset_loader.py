@@ -11,10 +11,7 @@ from data.stylegan3.dataset import ImageFolderDataset
 from data.SpecificImagenet import SpecificClassImagenet
 from models.PrivImage import resnet
 
-def load_sensitive_data(config):
-    if config.sensitive_data.name is None:
-        return None, None
-    
+def load_sensitive_data(config):    
     sensitive_train_set = ImageFolderDataset(
             config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
     sensitive_test_set = ImageFolderDataset(
@@ -132,5 +129,8 @@ def load_data(config):
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     
     public_train_loader = torch.utils.data.DataLoader(dataset=public_train_set, shuffle=True, drop_last=False, batch_size=config.pretrain.batch_size)
+
+    if config.sensitive_data.name is None:
+        return None, None, public_train_loader
 
     return sensitive_train_loader, sensitive_test_loader, public_train_loader
