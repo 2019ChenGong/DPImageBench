@@ -11,9 +11,9 @@
 
 - [] the hyper-parameters of classification methods for fashionmnist are unreasonable.
 
-- [] mnist for g-pate, privimage, the acc is so low.
+- [] mnist for g-pate, the acc is so low.
 
-- [] dpsda errors.
+- [] dpsda errors. [KC: error still exists?]
 
 
 ## 1. Contents

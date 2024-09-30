@@ -54,26 +54,21 @@ model:
     snapshot_batch_size: 80
     fid_batch_size: 256
   sampler_fid:
-    type: edm
-    s_churn: 100
-    s_min: 0.05
-    s_max: 50
-    num_steps: 10
+    type: ddim
+    stochastic: False
+    num_steps: 250
     tmin: .002
     tmax: 80.
     rho: 7.
     guid_scale: 0.
   sampler_acc:
-    type: edm
-    s_churn: 10
-    s_min: 0.1
-    s_max: 50
-    num_steps: 10
+    type: ddim
+    stochastic: False
+    num_steps: 250
     tmin: .002
     tmax: 80.
     rho: 7.
     guid_scale: 0.
-    labels: 10
 
 pretrain:
   log_dir: null
@@ -137,7 +132,7 @@ train:
     delta: 1e-5
     epsilon: 1.
     max_physical_batch_size: 8192
-    n_splits: 32
+    n_splits: 64
 
 gen:
   data_num: 60000

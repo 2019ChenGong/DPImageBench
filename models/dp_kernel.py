@@ -57,7 +57,7 @@ class DP_Kernel(DPSynther):
                 label = label.to(self.device)
                 batch_size = x.size(0)
 
-                gen_labels = torch.randint(self.n_class, (batch_size,)).to(self.device)
+                gen_labels = get_gen_labels(label, self.n_class)
 
                 optimizer.zero_grad()
 
@@ -113,7 +113,7 @@ class DP_Kernel(DPSynther):
                 label = label.to(self.device)
                 batch_size = x.size(0)
 
-                gen_labels = torch.randint(self.n_class, (batch_size,)).to(self.device)
+                gen_labels = get_gen_labels(label, self.n_class)
 
                 optimizer.zero_grad()
 
@@ -299,3 +299,27 @@ def rbf_kernel_DP_loss_with_labels(X, Y, x_label, y_label, sigma_list, noise_mul
     mmd_YY = torch.mean(K_YY)
 
     return mmd_XX - 2 * mmd_XY + mmd_YY
+
+
+def get_gen_labels(labels, num_classes):
+    return labels
+    def has_isolated_integer(int_list):
+        count_dict = {}
+        for num in int_list:
+            if num in count_dict:
+                count_dict[num] += 1
+            else:
+                count_dict[num] = 1
+
+        for count in count_dict.values():
+            if count == 1:
+                return True
+
+        return False
+    
+    gen_labels = torch.randint(num_classes, (labels.shape[0],)).to(labels.device)
+    while has_isolated_integer(torch.cat([labels, gen_labels])):
+        gen_labels = torch.randint(num_classes, (labels.shape[0],)).to(labels.device)
+    
+    return gen_labels
+    
