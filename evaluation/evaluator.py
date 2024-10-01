@@ -7,7 +7,9 @@ import zipfile
 import os
 
 
+import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
@@ -20,6 +22,7 @@ from evaluation.classifier.wrn import WideResNet
 from evaluation.classifier.resnet import ResNet
 from evaluation.classifier.resnext import ResNeXt
 from evaluation.classifier.densenet import DenseNet
+from data.preprocess_dataset import target_trans
 
 
 from models.DP_Diffusion.dnnlib.util import open_url
@@ -96,7 +99,7 @@ class Evaluator(object):
         return fd
     
     def cal_acc(self, model_name, synthetic_images, synthetic_labels, sensitive_test_loader):
-        batch_size = 512
+        batch_size = 256
         lr = 1e-4
         max_epoch = 50
         num_classes = len(set(synthetic_labels))
@@ -104,9 +107,9 @@ class Evaluator(object):
         if model_name == "wrn":
             model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
         elif model_name == "resnet":
-            model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2])
+            model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes)
         elif model_name == "resnext":
-            model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], dropRate=0.3)
+            model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
         # elif model_name == "densenet":
         #     model = DenseNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], dropRate=0.3)
 
@@ -176,137 +179,98 @@ class Evaluator(object):
 
         return best_acc
     
-    def unzip_file(self, zip_path, extract_to):
-        if not os.path.exists(extract_to):
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                zip_ref.extractall(extract_to)
     
-    def cal_acc_no_dp(self):
+    def cal_acc_no_dp(self, sensitive_train_loader, sensitive_test_loader):
+        if self.device != 0 or sensitive_test_loader is None or sensitive_train_loader is None:
+            return
+        batch_size = 256
+        lr = 1e-4
+        max_epoch = 50
+        criterion = nn.CrossEntropyLoss()
 
-        # Unzip train and test datasets if not already extracted
-        train_zip_path = self.config.sensitive_data.train_path  # This is the zip file path
-        test_zip_path = self.config.sensitive_data.test_path  # This is the zip file path
-        
-        # Set extraction paths
-        train_extract_path = train_zip_path.replace(".zip", "")  # Extract to the folder without .zip
-        test_extract_path = test_zip_path.replace(".zip", "")
-        
-        # Unzip the datasets if they are not already extracted
-        self.unzip_file(train_zip_path, train_extract_path)
-        self.unzip_file(test_zip_path, test_extract_path)
+        train_loader = DataLoader(sensitive_train_loader.dataset, batch_size=batch_size, shuffle=True)
+        test_loader = sensitive_test_loader
 
-        # Define transformations
-        transform = transforms.Compose([
-            transforms.Resize((32, 32)),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5,), (0.5,))  # Standardization
-        ])
-
-        # Load the dataset from the extracted directories
-        train_dataset = datasets.ImageFolder(root=train_extract_path, transform=transform)
-        test_dataset = datasets.ImageFolder(root=test_extract_path, transform=transform)
-
-        train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-        test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
-
-        # Extract training images and labels
-        train_images = []
-        train_labels = []
-        for images, labels in train_loader:
-            train_images.append(images.numpy())
-            train_labels.append(labels.numpy())
-        
-        train_images = np.concatenate(train_images, axis=0)
-        train_labels = np.concatenate(train_labels, axis=0)
+        num_classes = self.config.sensitive_data.n_classes
+        c = self.config.sensitive_data.num_channels
+        img_size = self.config.sensitive_data.resolution
 
         acc_list = []
 
-        # Loop through different models and calculate accuracy
         for model_name in self.acc_models:
-            acc = self.cal_acc(model_name, train_images, train_labels, test_loader)
-            logging.info(f"The best accuracy of model {model_name} on sensitive data is {acc:.2f}%")
-            acc_list.append(acc)
 
-        # Compute mean and standard deviation
-        acc_mean = np.mean(acc_list)
-        acc_std = np.std(acc_list)
+            if model_name == "wrn":
+                model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes, dropRate=0.3)
+            elif model_name == "resnet":
+                model = ResNet(in_c=c, img_size=img_size, num_classes=num_classes)
+            elif model_name == "resnext":
+                model = ResNeXt(in_c=c, img_size=img_size, num_classes=num_classes, dropRate=0.3)
 
-        logging.info(f"The best accuracies for resnet, wrn, and resnext are: {acc_list}")
-        logging.info(f"The average accuracy is {acc_mean:.2f}% and the standard deviation is {acc_std:.2f}%")
+            criterion = nn.CrossEntropyLoss()
 
-    def train_classifier_no_dp(self, model_name, synthetic_images, synthetic_labels, sensitive_test_loader):
-        batch_size = 512
-        lr = 1e-4
-        max_epoch = 50
-        num_classes = len(set(synthetic_labels))
-        criterion = nn.CrossEntropyLoss()
+            # Move model to device (GPU/CPU)
+            model = model.to(self.device)
 
-        if model_name == "wrn":
-            model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
-        elif model_name == "resnet":
-            model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes)
-        elif model_name == "resnext":
-            model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
+            # Define the loss function and optimizer
+            criterion = nn.CrossEntropyLoss()
+            optimizer = optim.Adam(model.parameters(), lr=lr)
 
-        model = torch.nn.DataParallel(model).to(self.device)
-
-        ema = ExponentialMovingAverage(model.parameters(), 0.9999)
-
-        optimizer = optim.Adam(model.parameters(), lr=lr)
-
-        train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images).float(), torch.from_numpy(synthetic_labels).long()), shuffle=True, batch_size=batch_size, num_workers=2)
-
-        best_acc = 0.
-
-        for epoch in range(max_epoch):
-            model.train()
-            total = 0
-            correct = 0
-            train_loss = 0.0
-            for _, (inputs, targets) in enumerate(train_loader):
-                inputs, targets = inputs.to(self.device), targets.to(self.device)
-                optimizer.zero_grad()
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
-                loss.backward()
-                optimizer.step()
-
-                train_loss += loss.item()
-                _, predicted = outputs.max(1)
-                total += targets.size(0)
-                correct += predicted.eq(targets).sum().item()
-
-                ema.update(model.parameters())
-
-            train_acc = correct / total * 100
-            logging.info(f"Epoch {epoch+1}/{max_epoch}, Train Accuracy: {train_acc:.2f}%")
-
-            model.eval()
-            ema.store(model.parameters())
-            ema.copy_to(model.parameters())
-            total = 0
-            correct = 0
-            test_loss = 0.0
-            with torch.no_grad():
-                for inputs, targets in sensitive_test_loader:
-                    inputs, targets = inputs.to(self.device), targets.to(self.device)
+            # Training the model
+            best_acc = 0.0
+            for epoch in range(max_epoch):
+                model.train()
+                running_loss = 0.0
+                correct = 0
+                total = 0
+                for inputs, labels in train_loader:
+                    inputs, labels = inputs.to(self.device), labels.to(self.device)
+                    inputs = inputs.float() / 255. * 2. - 1.
+                    labels = torch.argmax(labels, dim=1)
+                    # Zero the parameter gradients
+                    optimizer.zero_grad()
+                    # Forward pass
                     outputs = model(inputs)
-                    loss = criterion(outputs, targets)
-                    test_loss += loss.item()
+                    loss = criterion(outputs, labels)
+                    # Backward pass and optimize
+                    loss.backward()
+                    optimizer.step()
+                    # Calculate statistics
+                    running_loss += loss.item()
                     _, predicted = outputs.max(1)
-                    total += targets.size(0)
-                    correct += predicted.eq(targets).sum().item()
+                    total += labels.size(0)
+                    correct += predicted.eq(labels).sum().item()
 
-            test_acc = correct / total * 100
-            logging.info(f"Test Accuracy: {test_acc:.2f}%")
+                train_acc = 100. * correct / total
+                logging.info(f"Epoch [{epoch+1}/{max_epoch}], Loss: {running_loss / len(train_loader):.4f}, Train Accuracy: {train_acc:.2f}%")
 
-            if test_acc > best_acc:
-                best_acc = test_acc
+                # Testing the model
+                model.eval()
+                correct = 0
+                total = 0
+                with torch.no_grad():
+                    for inputs, labels in test_loader:
+                        inputs, labels = inputs.to(self.device), labels.to(self.device)
+                        inputs = inputs.float() / 255. * 2. - 1.
+                        labels = torch.argmax(labels, dim=1)
+                        outputs = model(inputs)
+                        _, predicted = outputs.max(1)
+                        total += labels.size(0)
+                        correct += predicted.eq(labels).sum().item()
 
-            ema.restore(model.parameters())
+                test_acc = 100. * correct / total
+                logging.info(f"Test Accuracy: {test_acc:.2f}%")
 
-        logging.info(f"The best accuracy for {model_name} is {best_acc:.2f}%")
-        return best_acc
+                # Return the best accuracy
+                if test_acc > best_acc:
+                    best_acc = test_acc
 
-    
-    
+            logging.info("The best acc of original images from {} is {}".format(model_name, best_acc))
+
+            acc_list.append(best_acc)
+
+        acc_mean = np.array(acc_list).mean()
+        acc_std = np.array(acc_list).std()
+
+        logging.info(f"The best acc of accuracy of synthetic images from resnet, wrn, and resnext are {acc_list}.")
+
+        logging.info(f"The average and std of accuracy of synthetic images are {acc_mean:.2f} and {acc_std:.2f}")

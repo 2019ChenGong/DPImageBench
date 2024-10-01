@@ -417,7 +417,7 @@ class DPGAN(DPSynther):
 
         if self.global_rank == 0:
             logging.info("Generation Finished!")
-            syn_data = np.concatenate(syn_data) / 2 + 0.5
+            syn_data = np.concatenate(syn_data)
             syn_labels = np.concatenate(syn_labels)
 
             np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)

@@ -11,10 +11,12 @@ def main(config):
 
     initialize_environment(config)
 
-    model = load_model(config)
+    # model = load_model(config)
+
+    sensitive_train_loader, sensitive_test_loader, _ = load_data(config)
 
     evaluator = Evaluator(config)
-    evaluator.cal_acc_no_dp()
+    evaluator.cal_acc_no_dp(sensitive_train_loader, sensitive_test_loader)
     
 
 
