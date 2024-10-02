@@ -7,13 +7,13 @@
 
 - [] recoding the intermediate results of methods with tqdm.
 
-- [] Add codes for no DP.
-
 - [] the hyper-parameters of classification methods for fashionmnist are unreasonable.
 
-- [] mnist for g-pate, dpgan, the acc is so low.
+- [] mnist for g-pate, the acc is so low. Besides, the g-pate is too slow; it seems like that algorithms dosen't use GPU.
 
-- [] dpsda errors. [KC: error still exists?]
+- [] dpsda errors. [KC: error still exists?] [Chen; Right]
+
+- [] the accuracy for cifar10 and 100 is low.
 
 
 ## 1. Contents

@@ -24,10 +24,10 @@ if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_dir', default="configs")
-    parser.add_argument('--method', default="DP-NTK")
+    parser.add_argument('--method', default="DP-MERF")
     parser.add_argument('--epsilon', default="1.0")
-    parser.add_argument('--data_name', default="mnist_28")
-    parser.add_argument('--exp_path', default="exp/dp-ntk/mnist_eps1.0-2024-09-13-04-28-50")
+    parser.add_argument('--data_name', default="fmnist_28")
+    parser.add_argument('--exp_path', default="exp/dp-merf/fmnist_28_eps1.0-2024-09-26-15-29-48")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)

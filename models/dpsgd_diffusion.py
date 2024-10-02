@@ -403,28 +403,28 @@ class DP_Diffusion(DPSynther):
             logging.info('Saving final checkpoint.')
         dist.barrier()
 
-        def sampler_final(x, y=None):
-            if self.sampler_fid.type == 'ddim':
-                return ddim_sampler(x, y, model, **self.sampler_fid)
-            elif self.sampler_fid.type == 'edm':
-                return edm_sampler(x, y, model, **self.sampler_fid)
-            else:
-                raise NotImplementedError
+        # def sampler_final(x, y=None):
+        #     if self.sampler_fid.type == 'ddim':
+        #         return ddim_sampler(x, y, model, **self.sampler_fid)
+        #     elif self.sampler_fid.type == 'edm':
+        #         return edm_sampler(x, y, model, **self.sampler_fid)
+        #     else:
+        #         raise NotImplementedError
 
-        model.eval()
-        with torch.no_grad():
-            ema.store(model.parameters())
-            ema.copy_to(model.parameters())
-            if self.global_rank == 0:
-                sample_random_image_batch(snapshot_sampling_shape, sampler_final, os.path.join(
-                                    sample_dir, 'final'), self.device, self.network.label_dim)
-            fid = compute_fid(config.final_fid_samples, self.global_size, fid_sampling_shape, sampler_final, inception_model,
-                            self.fid_stats, self.device, self.network.label_dim)
-            ema.restore(self.model.parameters())
+        # model.eval()
+        # with torch.no_grad():
+        #     ema.store(model.parameters())
+        #     ema.copy_to(model.parameters())
+        #     if self.global_rank == 0:
+        #         sample_random_image_batch(snapshot_sampling_shape, sampler_final, os.path.join(
+        #                             sample_dir, 'final'), self.device, self.network.label_dim)
+        #     fid = compute_fid(config.final_fid_samples, self.global_size, fid_sampling_shape, sampler_final, inception_model,
+        #                     self.fid_stats, self.device, self.network.label_dim)
+        #     ema.restore(self.model.parameters())
 
-        if self.global_rank == 0:
-            logging.info('Final FID %.6f' % (fid))
-        dist.barrier()
+        # if self.global_rank == 0:
+        #     logging.info('Final FID %.6f' % (fid))
+        # dist.barrier()
 
         self.ema = ema
 
@@ -438,6 +438,7 @@ class DP_Diffusion(DPSynther):
         sampling_shape = (config.batch_size, self.network.num_in_channels, self.network.image_size, self.network.image_size)
 
         model = DDP(self.model)
+        model.eval()
         self.ema.copy_to(model.parameters())
 
         def sampler_acc(x, y=None):
