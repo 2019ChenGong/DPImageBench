@@ -11,3 +11,5 @@ dataset
 models/pretrained_models
 models/DPSDA/improved-diffusion
 models/pretrained_models.zip
+
+*slurm*

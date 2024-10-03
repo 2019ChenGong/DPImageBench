@@ -68,8 +68,8 @@ train:
   batch_size: 64
   epoch: 1000
   non_private: False
-  sigma: 1000
-  sigma_thresh: 3000
+  sigma: 100.
+  sigma_thresh: 600.
   pca_sigma: 1.0
   step_size: 1e-4
   proj_mat: 1

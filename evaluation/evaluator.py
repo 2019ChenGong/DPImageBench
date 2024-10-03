@@ -44,8 +44,8 @@ class Evaluator(object):
         if self.device != 0 or sensitive_test_loader is None:
             return
         
-        # fid = self.cal_fid(synthetic_images)
-        fid = 0
+        fid = self.cal_fid(synthetic_images)
+        # fid = 0
         logging.info("The FID of synthetic images is {}".format(fid))
 
         acc_list = []
@@ -102,8 +102,11 @@ class Evaluator(object):
     
     def cal_acc(self, model_name, synthetic_images, synthetic_labels, sensitive_test_loader):
 
-        if self.config.setup.method in ["DP-MERF", "DP-NTK"]:
-            return mlp_acc(synthetic_images, synthetic_labels, sensitive_test_loader)
+        # if self.config.setup.method in ["DP-MERF", "DP-NTK"]:
+        #     return mlp_acc(synthetic_images, synthetic_labels, sensitive_test_loader)
+        # elif self.config.setup.method in ["DP-Kernel"]:
+        #     return dpkernel_acc(synthetic_images, synthetic_labels, sensitive_test_loader)
+        
         batch_size = 256
         lr = 1e-4
         max_epoch = 50
@@ -115,8 +118,6 @@ class Evaluator(object):
             model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes)
         elif model_name == "resnext":
             model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
-        # elif model_name == "densenet":
-        #     model = DenseNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], dropRate=0.3)
 
         model = torch.nn.DataParallel(model).to(self.device)
 
@@ -204,12 +205,20 @@ class Evaluator(object):
 
         for model_name in self.acc_models:
 
+            # if model_name == "wrn":
+            #     model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes, dropRate=0.3)
+            # elif model_name == "resnet":
+            #     model = ResNet(in_c=c, img_size=img_size, num_classes=num_classes)
+            # elif model_name == "resnext":
+            #     model = ResNeXt(in_c=c, img_size=img_size, num_classes=num_classes, dropRate=0.3)
+
             if model_name == "wrn":
-                model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes, dropRate=0.3)
+                model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes, depth=28, widen_factor=10, dropRate=0.3)
             elif model_name == "resnet":
-                model = ResNet(in_c=c, img_size=img_size, num_classes=num_classes)
+                model = ResNet(in_c=c, img_size=img_size, num_classes=num_classes, depth=56, block_name='BasicBlock')
             elif model_name == "resnext":
-                model = ResNeXt(in_c=c, img_size=img_size, num_classes=num_classes, dropRate=0.3)
+                model = ResNeXt(in_c=c, img_size=img_size, cardinality=32, depth=29, num_classes=num_classes, widen_factor=8, dropRate=0.3)
+
 
             criterion = nn.CrossEntropyLoss()
 
@@ -281,120 +290,120 @@ class Evaluator(object):
         logging.info(f"The average and std of accuracy of synthetic images are {acc_mean:.2f} and {acc_std:.2f}")
 
 
-def mlp_acc(synthetic_images, synthetic_labels, sensitive_test_loader):
-    x_tr = synthetic_images.reshape(synthetic_images.shape[0], -1)
-    y_tr = synthetic_labels.reshape(-1)
-    x_ts = []
-    y_ts = []
-    for x, y in sensitive_test_loader:
-        x = x.float() / 255.
-        y = torch.argmax(y, dim=1)
-        x_ts.append(x)
-        y_ts.append(y)
-    x_ts = torch.cat(x_ts).cpu().numpy()
-    x_ts = x_ts.reshape(x_ts.shape[0], -1)
-    y_ts = torch.cat(y_ts).cpu().numpy().reshape(-1)
+# def mlp_acc(synthetic_images, synthetic_labels, sensitive_test_loader):
+#     x_tr = synthetic_images.reshape(synthetic_images.shape[0], -1)
+#     y_tr = synthetic_labels.reshape(-1)
+#     x_ts = []
+#     y_ts = []
+#     for x, y in sensitive_test_loader:
+#         x = x.float() / 255.
+#         y = torch.argmax(y, dim=1)
+#         x_ts.append(x)
+#         y_ts.append(y)
+#     x_ts = torch.cat(x_ts).cpu().numpy()
+#     x_ts = x_ts.reshape(x_ts.shape[0], -1)
+#     y_ts = torch.cat(y_ts).cpu().numpy().reshape(-1)
 
-    model = neural_network.MLPClassifier()
-    model.fit(x_tr, y_tr)
-    y_pred = model.predict(x_ts)
-    acc = accuracy_score(y_pred, y_ts)
+#     model = neural_network.MLPClassifier()
+#     model.fit(x_tr, y_tr)
+#     y_pred = model.predict(x_ts)
+#     acc = accuracy_score(y_pred, y_ts)
 
-    return acc
+#     return acc
 
 
-def dpkernel_acc(synthetic_images, synthetic_labels, sensitive_test_loader):
-    def NNfit(model, train_loader, lr=0.01, num_epochs=5, data_mode='real'):
-        optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-6)
-        loss_func = nn.CrossEntropyLoss()
-        model.train()
-        for epoch in range(num_epochs):
-            correct = 0
-            total = 0
-            for batch_idx, data_true in enumerate(train_loader):
-                X, y_true = data_true
-                X = X.view(X.size(0), -1)
-                optimizer.zero_grad()
-                y_pred = model(X)
-                loss = loss_func(y_pred, y_true.to(torch.long))
-                loss.backward()
-                optimizer.step()
-                # Total correct predictions
-                predicted = torch.max(y_pred.data, 1)[1]
-                correct += (predicted == y_true.to(torch.long)).sum()
-                total += X.size(0)
-                # print(correct)
-            print('Epoch : {} \tLoss: {:.6f}\t Accuracy:{:.3f}%'.format(
-                epoch, loss.item(), float(correct * 100) / total)
-            )
-        return model
+# def dpkernel_acc(synthetic_images, synthetic_labels, sensitive_test_loader):
+#     def NNfit(model, train_loader, lr=0.01, num_epochs=5, data_mode='real'):
+#         optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-6)
+#         loss_func = nn.CrossEntropyLoss()
+#         model.train()
+#         for epoch in range(num_epochs):
+#             correct = 0
+#             total = 0
+#             for batch_idx, data_true in enumerate(train_loader):
+#                 X, y_true = data_true
+#                 X = X.view(X.size(0), -1)
+#                 optimizer.zero_grad()
+#                 y_pred = model(X)
+#                 loss = loss_func(y_pred, y_true.to(torch.long))
+#                 loss.backward()
+#                 optimizer.step()
+#                 # Total correct predictions
+#                 predicted = torch.max(y_pred.data, 1)[1]
+#                 correct += (predicted == y_true.to(torch.long)).sum()
+#                 total += X.size(0)
+#                 # print(correct)
+#             print('Epoch : {} \tLoss: {:.6f}\t Accuracy:{:.3f}%'.format(
+#                 epoch, loss.item(), float(correct * 100) / total)
+#             )
+#         return model
 
-    def evalNN(model, test_loader, data_mode='real', dataset='mnist'):
-        model.eval()
-        correct = 0
-        total = 0
+#     def evalNN(model, test_loader, data_mode='real', dataset='mnist'):
+#         model.eval()
+#         correct = 0
+#         total = 0
 
-        for batch_idx, data in enumerate(test_loader):
-            X, y_true = data
-            X = X.view(X.size(0), -1)
-            X = X.float() / 255.
-            y_true = torch.argmax(y_true, dim=1)
+#         for batch_idx, data in enumerate(test_loader):
+#             X, y_true = data
+#             X = X.view(X.size(0), -1)
+#             X = X.float() / 255.
+#             y_true = torch.argmax(y_true, dim=1)
 
-            y_pred = model(X)
-            # Total correct predictions
-            predicted = torch.max(y_pred.data, 1)[1]
-            correct += (predicted == y_true.to(torch.long)).sum()
-            total += X.size(0)
+#             y_pred = model(X)
+#             # Total correct predictions
+#             predicted = torch.max(y_pred.data, 1)[1]
+#             correct += (predicted == y_true.to(torch.long)).sum()
+#             total += X.size(0)
 
-        return float(correct * 100) / total
+#         return float(correct * 100) / total
 
-    class NNClassifier(nn.Module):
-        def __init__(self, input_shape, type='MLP', data_mode='real', n_class=10):
-            super(NNClassifier, self).__init__()
+#     class NNClassifier(nn.Module):
+#         def __init__(self, input_shape, type='MLP', data_mode='real', n_class=10):
+#             super(NNClassifier, self).__init__()
 
-            self.input_shape = input_shape
-            self.input_channel, h, w = input_shape
-            self.input_dim = self.input_channel * h * w
-            self.type = type
-            self.data_mode = data_mode
-            self.output_dim = n_class
+#             self.input_shape = input_shape
+#             self.input_channel, h, w = input_shape
+#             self.input_dim = self.input_channel * h * w
+#             self.type = type
+#             self.data_mode = data_mode
+#             self.output_dim = n_class
 
-            self.MLP = nn.Sequential(
-                nn.Linear(self.input_dim, 100),
-                nn.ReLU(),
-                nn.Linear(100, self.output_dim),
-                nn.Softmax()
-            )
-            self.flatten_dim = 64 * int(h / 4) * int(w / 4)
-            self.conv = nn.Sequential(
-                nn.Conv2d(self.input_channel, 32, kernel_size=3, stride = 2, padding=1),
-                nn.Dropout(p=0.5),
-                nn.ReLU(),
-                nn.Conv2d(32, 64, kernel_size=3, stride = 2, padding=1),
-                nn.Dropout(p=0.5),
-                nn.ReLU(),
-            )
+#             self.MLP = nn.Sequential(
+#                 nn.Linear(self.input_dim, 100),
+#                 nn.ReLU(),
+#                 nn.Linear(100, self.output_dim),
+#                 nn.Softmax()
+#             )
+#             self.flatten_dim = 64 * int(h / 4) * int(w / 4)
+#             self.conv = nn.Sequential(
+#                 nn.Conv2d(self.input_channel, 32, kernel_size=3, stride = 2, padding=1),
+#                 nn.Dropout(p=0.5),
+#                 nn.ReLU(),
+#                 nn.Conv2d(32, 64, kernel_size=3, stride = 2, padding=1),
+#                 nn.Dropout(p=0.5),
+#                 nn.ReLU(),
+#             )
 
-            self.linear = nn.Sequential(
-                nn.Linear(self.flatten_dim, self.output_dim),
-                nn.Softmax()
-            )
+#             self.linear = nn.Sequential(
+#                 nn.Linear(self.flatten_dim, self.output_dim),
+#                 nn.Softmax()
+#             )
 
-        def forward(self, x):
-            if self.type == 'MLP':
-                if self.data_mode == 'real':
-                    x = x.view(-1, self.input_dim)
-                x = self.MLP(x)
-            elif self.type == 'CNN':
-                if self.data_mode == 'syn':
-                    x = x.view(-1, *self.input_shape)
-                x = self.conv(x)
-                x = x.view(-1, self.flatten_dim)
-                x = self.linear(x)
-            return x
+#         def forward(self, x):
+#             if self.type == 'MLP':
+#                 if self.data_mode == 'real':
+#                     x = x.view(-1, self.input_dim)
+#                 x = self.MLP(x)
+#             elif self.type == 'CNN':
+#                 if self.data_mode == 'syn':
+#                     x = x.view(-1, *self.input_shape)
+#                 x = self.conv(x)
+#                 x = x.view(-1, self.flatten_dim)
+#                 x = self.linear(x)
+#             return x
     
-    num_classes = len(set(synthetic_labels))
-    train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images).float(), torch.from_numpy(synthetic_labels).long()), shuffle=True, batch_size=200, num_workers=2)
-    model = NNClassifier((synthetic_images.shape[1], synthetic_images.shape[2], synthetic_images.shape[3]), type='CNN', data_mode='syn', n_class=num_classes)
-    model = NNfit(model, train_loader, lr=0.001, num_epochs=5, data_mode='syn')
-    return evalNN(model, sensitive_test_loader, data_mode='syn')
+#     num_classes = len(set(synthetic_labels))
+#     train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images).float(), torch.from_numpy(synthetic_labels).long()), shuffle=True, batch_size=200, num_workers=2)
+#     model = NNClassifier((synthetic_images.shape[1], synthetic_images.shape[2], synthetic_images.shape[3]), type='CNN', data_mode='syn', n_class=num_classes)
+#     model = NNfit(model, train_loader, lr=0.001, num_epochs=5, data_mode='syn')
+#     return evalNN(model, sensitive_test_loader, data_mode='syn')

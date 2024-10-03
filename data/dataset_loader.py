@@ -12,10 +12,29 @@ from data.SpecificImagenet import SpecificClassImagenet
 from models.PrivImage import resnet
 
 def load_sensitive_data(config):    
-    sensitive_train_set = ImageFolderDataset(
+    # sensitive_train_set = ImageFolderDataset(
+    #         config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
+    
+    if config['sensitive_data']['name'] == 'cifar10' or config['sensitive_data']['name'] == 'cifar100':
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        transform_train = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        sensitive_train_set = ImageFolderDataset(
+            config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True, transform=transform_train)
+        sensitive_test_set = ImageFolderDataset(
+            config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True, transform=transform_test)
+    else:
+        sensitive_train_set = ImageFolderDataset(
             config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
-    sensitive_test_set = ImageFolderDataset(
-        config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
+        sensitive_test_set = ImageFolderDataset(
+            config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
 
     # if config.sensitive_data.name == "mnist":
     #     sensitive_train_set = torchvision.datasets.MNIST(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
