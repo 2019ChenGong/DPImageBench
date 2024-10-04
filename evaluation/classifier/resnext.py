@@ -78,7 +78,7 @@ class ResNeXt(nn.Module):
         self.stage_1 = self.block('stage_1', self.stages[0], self.stages[1], 1)
         self.stage_2 = self.block('stage_2', self.stages[1], self.stages[2], 2)
         self.stage_3 = self.block('stage_3', self.stages[2], self.stages[3], 2)
-        self.classifier = nn.Linear(1024, num_classes)
+        self.classifier = nn.Linear(256 * self.widen_factor, num_classes)
         init.kaiming_normal(self.classifier.weight)
 
         for key in self.state_dict():
@@ -117,7 +117,7 @@ class ResNeXt(nn.Module):
         x = self.stage_2.forward(x)
         x = self.stage_3.forward(x)
         x = F.avg_pool2d(x, self.img_size//4, 1)
-        x = x.view(-1, 1024)
+        x = x.view(x.size(0), -1)
         return self.classifier(x)
 
 def resnext(**kwargs):

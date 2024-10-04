@@ -13,7 +13,7 @@ def main(config):
 
     model = load_model(config)
 
-    sensitive_train_loader, sensitive_test_loader, public_train_loader = load_data(config)
+    sensitive_train_loader, sensitive_test_loader, public_train_loader, config = load_data(config)
 
     model.pretrain(public_train_loader, config.pretrain)
 

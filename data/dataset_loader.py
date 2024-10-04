@@ -15,25 +15,9 @@ def load_sensitive_data(config):
     # sensitive_train_set = ImageFolderDataset(
     #         config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
     
-    if config['sensitive_data']['name'] == 'cifar10' or config['sensitive_data']['name'] == 'cifar100':
-        transform_test = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ])
-        transform_train = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ])
-        sensitive_train_set = ImageFolderDataset(
-            config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True, transform=transform_train)
-        sensitive_test_set = ImageFolderDataset(
-            config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True, transform=transform_test)
-    else:
-        sensitive_train_set = ImageFolderDataset(
+    sensitive_train_set = ImageFolderDataset(
             config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
-        sensitive_test_set = ImageFolderDataset(
+    sensitive_test_set = ImageFolderDataset(
             config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
 
     # if config.sensitive_data.name == "mnist":
@@ -122,9 +106,11 @@ def semantic_query(sensitive_train_loader, config):
 
 def load_data(config):
     sensitive_train_loader, sensitive_test_loader = load_sensitive_data(config)
+    N = len(sensitive_train_loader.dataset)
+    config.train.dp.delta = 1 / (N * np.log(N))
 
     if config.public_data.name is None:
-        return sensitive_train_loader, sensitive_test_loader, None
+        return sensitive_train_loader, sensitive_test_loader, None, config
     else:
         trans = [
                 transforms.Resize(config.public_data.resolution),
@@ -150,6 +136,6 @@ def load_data(config):
     public_train_loader = torch.utils.data.DataLoader(dataset=public_train_set, shuffle=True, drop_last=False, batch_size=config.pretrain.batch_size)
 
     if config.sensitive_data.name is None:
-        return None, None, public_train_loader
+        return None, None, public_train_loader, config
 
-    return sensitive_train_loader, sensitive_test_loader, public_train_loader
+    return sensitive_train_loader, sensitive_test_loader, public_train_loader, config

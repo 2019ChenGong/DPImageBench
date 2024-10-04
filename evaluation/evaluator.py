@@ -189,10 +189,13 @@ class Evaluator(object):
     def cal_acc_no_dp(self, sensitive_train_loader, sensitive_test_loader):
         if self.device != 0 or sensitive_test_loader is None or sensitive_train_loader is None:
             return
-        batch_size = 256
+        
+        # self.acc_models = ["resnext"]
+
+        batch_size = 128
         lr = 1e-4
-        max_epoch = 50
-        criterion = nn.CrossEntropyLoss()
+        max_epoch = 200
+
 
         train_loader = DataLoader(sensitive_train_loader.dataset, batch_size=batch_size, shuffle=True)
         test_loader = sensitive_test_loader
@@ -205,6 +208,8 @@ class Evaluator(object):
 
         for model_name in self.acc_models:
 
+            logging.info(f'model type:{model_name}')
+
             # if model_name == "wrn":
             #     model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes, dropRate=0.3)
             # elif model_name == "resnet":
@@ -215,19 +220,21 @@ class Evaluator(object):
             if model_name == "wrn":
                 model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes, depth=28, widen_factor=10, dropRate=0.3)
             elif model_name == "resnet":
-                model = ResNet(in_c=c, img_size=img_size, num_classes=num_classes, depth=56, block_name='BasicBlock')
+                model = ResNet(in_c=c, img_size=img_size, num_classes=num_classes, depth=164, block_name='BasicBlock')
             elif model_name == "resnext":
-                model = ResNeXt(in_c=c, img_size=img_size, cardinality=32, depth=29, num_classes=num_classes, widen_factor=8, dropRate=0.3)
-
-
-            criterion = nn.CrossEntropyLoss()
+                # model = ResNeXt(in_c=c, img_size=img_size, cardinality=8, depth=28, num_classes=num_classes, widen_factor=10, dropRate=0.3)
+                model = ResNeXt(in_c=c, img_size=img_size, cardinality=32, num_classes=num_classes, widen_factor=10, dropRate=0.3)
 
             # Move model to device (GPU/CPU)
             model = model.to(self.device)
 
             # Define the loss function and optimizer
             criterion = nn.CrossEntropyLoss()
-            optimizer = optim.Adam(model.parameters(), lr=lr)
+
+            optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
+
+            # optimizer = optim.Adam(model.parameters(), lr=lr)
 
             # Training the model
             best_acc = 0.0
@@ -253,6 +260,8 @@ class Evaluator(object):
                     _, predicted = outputs.max(1)
                     total += labels.size(0)
                     correct += predicted.eq(labels).sum().item()
+
+                scheduler.step()
 
                 train_acc = 100. * correct / total
                 logging.info(f"Epoch [{epoch+1}/{max_epoch}], Loss: {running_loss / len(train_loader):.4f}, Train Accuracy: {train_acc:.2f}%")
