@@ -107,25 +107,36 @@ class Evaluator(object):
         # elif self.config.setup.method in ["DP-Kernel"]:
         #     return dpkernel_acc(synthetic_images, synthetic_labels, sensitive_test_loader)
         
-        batch_size = 256
-        lr = 1e-4
-        max_epoch = 50
+        batch_size = 126
+        max_epoch = 200
         num_classes = len(set(synthetic_labels))
         criterion = nn.CrossEntropyLoss()
-        if model_name == "wrn":
-            model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
-        elif model_name == "resnet":
-            model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes)
-        elif model_name == "resnext":
-            model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
+
+        if self.config['sensitive_data']['name'] == 'camelyon_32' or self.config['sensitive_data']['name'] == 'celeba_male_32':
+            if model_name == "wrn":
+                model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
+            elif model_name == "resnet":
+                model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes)
+            elif model_name == "resnext":
+                model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
+        else:
+            if model_name == "wrn":
+                model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, depth=28, widen_factor=10, dropRate=0.3)
+            elif model_name == "resnet":
+                model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, depth=164, block_name='BasicBlock')
+            elif model_name == "resnext":
+                model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], cardinality=8, depth=28, num_classes=num_classes, widen_factor=10, dropRate=0.3)
 
         model = torch.nn.DataParallel(model).to(self.device)
 
         ema = ExponentialMovingAverage(model.parameters(), 0.9999)
 
         # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-5, nesterov=True)
-        optimizer = optim.Adam(model.parameters(), lr=lr)
+        # optimizer = optim.Adam(model.parameters(), lr=lr)
         #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
+
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
 
         train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images).float(), torch.from_numpy(synthetic_labels).long()), shuffle=True, batch_size=batch_size, num_workers=2)
 
@@ -151,6 +162,9 @@ class Evaluator(object):
                 correct += predicted.eq(targets).sum().item()
                 
                 ema.update(model.parameters())
+
+            scheduler.step()
+
             train_acc = correct / total * 100
             train_loss = train_loss / total
             #scheduler.step()
@@ -190,8 +204,6 @@ class Evaluator(object):
         if self.device != 0 or sensitive_test_loader is None or sensitive_train_loader is None:
             return
         
-        # self.acc_models = ["resnext"]
-
         batch_size = 128
         lr = 1e-4
         max_epoch = 200
@@ -210,12 +222,6 @@ class Evaluator(object):
 
             logging.info(f'model type:{model_name}')
 
-            # if model_name == "wrn":
-            #     model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes, dropRate=0.3)
-            # elif model_name == "resnet":
-            #     model = ResNet(in_c=c, img_size=img_size, num_classes=num_classes)
-            # elif model_name == "resnext":
-            #     model = ResNeXt(in_c=c, img_size=img_size, num_classes=num_classes, dropRate=0.3)
 
             if model_name == "wrn":
                 model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes, depth=28, widen_factor=10, dropRate=0.3)
@@ -223,7 +229,7 @@ class Evaluator(object):
                 model = ResNet(in_c=c, img_size=img_size, num_classes=num_classes, depth=164, block_name='BasicBlock')
             elif model_name == "resnext":
                 # model = ResNeXt(in_c=c, img_size=img_size, cardinality=8, depth=28, num_classes=num_classes, widen_factor=10, dropRate=0.3)
-                model = ResNeXt(in_c=c, img_size=img_size, cardinality=32, num_classes=num_classes, widen_factor=10, dropRate=0.3)
+                model = ResNeXt(in_c=c, img_size=img_size, cardinality=8, depth=28, num_classes=num_classes, widen_factor=10, dropRate=0.3)
 
             # Move model to device (GPU/CPU)
             model = model.to(self.device)
@@ -233,8 +239,6 @@ class Evaluator(object):
 
             optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
-
-            # optimizer = optim.Adam(model.parameters(), lr=lr)
 
             # Training the model
             best_acc = 0.0

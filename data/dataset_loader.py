@@ -107,7 +107,7 @@ def semantic_query(sensitive_train_loader, config):
 def load_data(config):
     sensitive_train_loader, sensitive_test_loader = load_sensitive_data(config)
     N = len(sensitive_train_loader.dataset)
-    config.train.dp.delta = 1 / (N * np.log(N))
+    config.train.dp.delta = float(1.0 / (N * np.log(N)))
 
     if config.public_data.name is None:
         return sensitive_train_loader, sensitive_test_loader, None, config
