@@ -7,7 +7,8 @@
  ```
 conda create -n dpimagebench_cuda12.1 python=3.9
 conda activate dpimagebench_cuda12.1
-pip install torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 --index-url https://download.pytorch.org/whl/cu121
+pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
+conda install -y -c pytorch -c nvidia faiss-gpu=1.8.0
 git clone git@github.com:2019ChenGong/DPImageBench.git
 cd DPImageBench
 pip install -r requirements_cuda12.1.txt

@@ -10,7 +10,7 @@ from evaluation.evaluator import Evaluator
 
 def main(config):
     set_logger(open(config.setup.workdir, 'a'))
-    _, sensitive_test_loader, _ = load_data(config)
+    _, sensitive_test_loader, _ , _= load_data(config)
 
     syn = np.load(config.gen.log_dir)
     syn_data, syn_labels = syn["x"], syn["y"]
@@ -24,10 +24,10 @@ if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_dir', default="configs")
-    parser.add_argument('--method', default="DP-Kernel")
+    parser.add_argument('--method', default="PrivImage")
     parser.add_argument('--epsilon', default="1.0")
-    parser.add_argument('--data_name', default="fmnist_28")
-    parser.add_argument('--exp_path', default="exp/dp-kernel/fmnist_28_eps1.0-2024-09-26-15-23-23")
+    parser.add_argument('--data_name', default="mnist_28")
+    parser.add_argument('--exp_path', default="exp/privimage/mnist_28_eps1.0-2024-10-05-05-10-19")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)

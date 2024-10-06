@@ -44,8 +44,8 @@ class Evaluator(object):
         if self.device != 0 or sensitive_test_loader is None:
             return
         
-        fid = self.cal_fid(synthetic_images)
-        # fid = 0
+        # fid = self.cal_fid(synthetic_images)
+        fid = 0
         logging.info("The FID of synthetic images is {}".format(fid))
 
         acc_list = []
@@ -101,25 +101,26 @@ class Evaluator(object):
         return fd
     
     def cal_acc(self, model_name, synthetic_images, synthetic_labels, sensitive_test_loader):
-
-        # if self.config.setup.method in ["DP-MERF", "DP-NTK"]:
-        #     return mlp_acc(synthetic_images, synthetic_labels, sensitive_test_loader)
-        # elif self.config.setup.method in ["DP-Kernel"]:
-        #     return dpkernel_acc(synthetic_images, synthetic_labels, sensitive_test_loader)
-        
-        batch_size = 126
-        max_epoch = 200
+    
         num_classes = len(set(synthetic_labels))
         criterion = nn.CrossEntropyLoss()
+        lr = 1e-4
 
         if self.config['sensitive_data']['name'] == 'cifar10_32' or self.config['sensitive_data']['name'] == 'cifar100_32':
+            batch_size = 126
+            max_epoch = 200
             if model_name == "wrn":
                 model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, depth=28, widen_factor=10, dropRate=0.3)
             elif model_name == "resnet":
                 model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, depth=164, block_name='BasicBlock')
             elif model_name == "resnext":
                 model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], cardinality=8, depth=28, num_classes=num_classes, widen_factor=10, dropRate=0.3)
+
+            optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
         else:
+            batch_size = 256
+            max_epoch = 50
             if model_name == "wrn":
                 model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
             elif model_name == "resnet":
@@ -127,16 +128,20 @@ class Evaluator(object):
             elif model_name == "resnext":
                 model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
 
+            # optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4) 
+            optimizer = optim.Adam(model.parameters(), lr=lr)       
+            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=99999, gamma=0.2)
+
         model = torch.nn.DataParallel(model).to(self.device)
 
         ema = ExponentialMovingAverage(model.parameters(), 0.9999)
 
         # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-5, nesterov=True)
-        optimizer = optim.Adam(model.parameters(), lr=0.01)
+        # optimizer = optim.Adam(model.parameters(), lr=0.01)
         # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
 
         # optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
+        # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
 
         train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images).float(), torch.from_numpy(synthetic_labels).long()), shuffle=True, batch_size=batch_size, num_workers=2)
 
@@ -230,6 +235,9 @@ class Evaluator(object):
                     model = ResNet(in_c=c, img_size=img_size, num_classes=num_classes, depth=164, block_name='BasicBlock')
                 elif model_name == "resnext":
                     model = ResNeXt(in_c=c, img_size=img_size, cardinality=8, depth=28, num_classes=num_classes, widen_factor=10, dropRate=0.3)
+
+                optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+                scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
             else:
                 if model_name == "wrn":
                     model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes,  dropRate=0.3)
@@ -238,6 +246,11 @@ class Evaluator(object):
                 elif model_name == "resnext":
                     model = ResNeXt(in_c=c, img_size=img_size, num_classes=num_classes, dropRate=0.3)
 
+                
+                optimizer = optim.Adam(model.parameters(), lr=0.01)
+                # optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)        
+                scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
+
 
             # Move model to device (GPU/CPU)
             model = model.to(self.device)
@@ -245,9 +258,7 @@ class Evaluator(object):
             # Define the loss function and optimizer
             criterion = nn.CrossEntropyLoss()
 
-            optimizer = optim.Adam(model.parameters(), lr=0.01)
-            # optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
-            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
+            # optimizer = optim.Adam(model.parameters(), lr=0.01)
 
             # Training the model
             best_acc = 0.0

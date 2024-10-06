@@ -453,7 +453,7 @@ class DP_Diffusion(DPSynther):
             syn_data = []
             syn_labels = []
         for _ in range(config.data_num // (sampling_shape[0] * self.global_size) + 1):
-            x, y = generate_batch(sampler_acc, sampling_shape, self.device, self.sampler_acc.labels, self.network.label_dim)
+            x, y = generate_batch(sampler_acc, sampling_shape, self.device, self.network.label_dim, self.network.label_dim)
             dist.barrier()
             if self.global_rank == 0:
                 gather_x = [torch.zeros_like(x) for _ in range(self.global_size)]
