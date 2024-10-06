@@ -1,5 +1,6 @@
 import torch
 import pickle
+import copy
 import numpy as np
 from scipy import linalg
 from sklearn import linear_model, ensemble, naive_bayes, svm, tree, discriminant_analysis, neural_network
@@ -51,7 +52,7 @@ class Evaluator(object):
         acc_list = []
 
         for model_name in self.acc_models:
-            acc = self.cal_acc(model_name, synthetic_images, synthetic_labels, sensitive_test_loader)
+            acc = self.cal_acc_2(model_name, synthetic_images, synthetic_labels, sensitive_test_loader)
             logging.info("The best acc of synthetic images from {} is {}".format(model_name, acc))
 
             acc_list.append(acc)
@@ -107,7 +108,7 @@ class Evaluator(object):
         lr = 1e-4
 
         if self.config['sensitive_data']['name'] == 'cifar10_32' or self.config['sensitive_data']['name'] == 'cifar100_32':
-            batch_size = 126
+            batch_size = 128
             max_epoch = 200
             if model_name == "wrn":
                 model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, depth=28, widen_factor=10, dropRate=0.3)
@@ -129,7 +130,7 @@ class Evaluator(object):
                 model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
 
             # optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4) 
-            optimizer = optim.Adam(model.parameters(), lr=lr)       
+            optimizer = optim.Adam(model.parameters(), lr=0.01)       
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=99999, gamma=0.2)
 
         model = torch.nn.DataParallel(model).to(self.device)
@@ -204,6 +205,128 @@ class Evaluator(object):
 
         return best_acc
     
+    def cal_acc_2(self, model_name, synthetic_images, synthetic_labels, sensitive_test_loader):
+
+        synthetic_images_train, synthetic_images_val = synthetic_images[:55000], synthetic_images[55000:]
+        synthetic_labels_train, synthetic_labels_val = synthetic_labels[:55000], synthetic_labels[55000:]
+    
+        num_classes = len(set(synthetic_labels))
+        criterion = nn.CrossEntropyLoss()
+        lr = 1e-4
+
+        if self.config['sensitive_data']['name'] == 'cifar10' or self.config['sensitive_data']['name'] == 'cifar100':
+            batch_size = 126
+            max_epoch = 200
+            if model_name == "wrn":
+                model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, depth=28, widen_factor=10, dropRate=0.3)
+            elif model_name == "resnet":
+                model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, depth=164, block_name='BasicBlock')
+            elif model_name == "resnext":
+                model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], cardinality=8, depth=28, num_classes=num_classes, widen_factor=10, dropRate=0.3)
+
+            optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
+        else:
+            batch_size = 256
+            max_epoch = 50
+            if model_name == "wrn":
+                model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
+            elif model_name == "resnet":
+                model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes)
+            elif model_name == "resnext":
+                model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
+
+            # optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4) 
+            optimizer = optim.Adam(model.parameters(), lr=0.01)       
+            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=99999, gamma=0.2)
+
+        model = torch.nn.DataParallel(model).to(self.device)
+
+        ema = ExponentialMovingAverage(model.parameters(), 0.9999)
+
+        # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-5, nesterov=True)
+        # optimizer = optim.Adam(model.parameters(), lr=0.01)
+        # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
+
+        # optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+        # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
+
+        train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_train).float(), torch.from_numpy(synthetic_labels_train).long()), shuffle=True, batch_size=batch_size, num_workers=2)
+        val_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_val).float(), torch.from_numpy(synthetic_labels_val).long()), shuffle=True, batch_size=batch_size, num_workers=2)
+
+        best_acc = 0.
+
+        for epoch in range(max_epoch):
+            model.train()
+            train_loss = 0
+            test_loss = 0
+            total = 0
+            correct = 0
+            for _, (inputs, targets) in enumerate(train_loader):
+                inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
+                optimizer.zero_grad()
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
+                train_loss += loss.item()
+                loss.backward()
+                optimizer.step()
+
+                _, predicted = outputs.max(1)
+                total += targets.size(0)
+                correct += predicted.eq(targets).sum().item()
+                
+                ema.update(model.parameters())
+
+            scheduler.step()
+
+            train_acc = correct / total * 100
+            train_loss = train_loss / total
+            #scheduler.step()
+            model.eval()
+            ema.store(model.parameters())
+            ema.copy_to(model.parameters())
+            total = 0
+            correct = 0
+            with torch.no_grad():
+                for _, (inputs, targets) in enumerate(val_loader):
+
+                    inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
+                    outputs = model(inputs)
+                    loss = criterion(outputs, targets)
+                    test_loss += loss.item()
+
+                    _, predicted = outputs.max(1)
+                    total += targets.size(0)
+                    correct += predicted.eq(targets).sum().item()
+            
+            val_acc = correct / total * 100
+            val_loss = test_loss / total
+
+            if val_acc >= best_acc:
+                best_acc = val_acc
+                best_model = copy.deepcopy(model)
+
+            logging.info("Epoch: {} Train acc: {} Val acc: {} Train loss: {} Val loss: {}".format(epoch, train_acc, val_acc, train_loss, val_loss))
+            ema.restore(model.parameters())
+        
+        with torch.no_grad():
+            for _, (inputs, targets) in enumerate(sensitive_test_loader):
+                if len(targets.shape) == 2:
+                    inputs = inputs.to(torch.float32) / 255.
+                    targets = torch.argmax(targets, dim=1)
+
+                inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
+                outputs = best_model(inputs)
+                loss = criterion(outputs, targets)
+                test_loss += loss.item()
+
+                _, predicted = outputs.max(1)
+                total += targets.size(0)
+                correct += predicted.eq(targets).sum().item()
+        
+        test_acc = correct / total * 100
+
+        return test_acc
     
     def cal_acc_no_dp(self, sensitive_train_loader, sensitive_test_loader):
         if self.device != 0 or sensitive_test_loader is None or sensitive_train_loader is None:
@@ -227,7 +350,7 @@ class Evaluator(object):
 
             logging.info(f'model type:{model_name}')
 
-            if self.config['sensitive_data']['name'] == 'cifar10_32' or self.config['sensitive_data']['name'] == 'cifar100_32':
+            if self.config['sensitive_data']['name'] == 'cifar10' or self.config['sensitive_data']['name'] == 'cifar100':
 
                 if model_name == "wrn":
                     model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes, depth=28, widen_factor=10, dropRate=0.3)

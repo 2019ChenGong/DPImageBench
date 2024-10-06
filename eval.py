@@ -27,7 +27,7 @@ if __name__ == '__main__':
     parser.add_argument('--method', default="PrivImage")
     parser.add_argument('--epsilon', default="1.0")
     parser.add_argument('--data_name', default="mnist_28")
-    parser.add_argument('--exp_path', default="exp/privimage/mnist_28_eps1.0-2024-10-05-05-10-19")
+    parser.add_argument('--exp_path', default="exp/privimage/mnist_28_eps1.0-2024-10-03-08-19-26")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)
