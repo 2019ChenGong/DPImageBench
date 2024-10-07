@@ -3,11 +3,12 @@ import pickle
 import copy
 import numpy as np
 from scipy import linalg
-from sklearn import linear_model, ensemble, naive_bayes, svm, tree, discriminant_analysis, neural_network
-from sklearn.metrics import f1_score, accuracy_score, confusion_matrix
+from scipy.stats import entropy
 import logging
-import zipfile
-import os
+
+from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
+from fld.metrics.FLD import FLD
+from fld.metrics.PrecisionRecall import PrecisionRecall
 
 
 import torch
@@ -16,16 +17,12 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
-from torchvision import datasets, transforms
-
 import logging
 
 from evaluation.ema import ExponentialMovingAverage
 from evaluation.classifier.wrn import WideResNet
 from evaluation.classifier.resnet import ResNet
 from evaluation.classifier.resnext import ResNeXt
-from evaluation.classifier.densenet import DenseNet
-from data.preprocess_dataset import target_trans
 
 
 from models.DP_Diffusion.dnnlib.util import open_url
@@ -41,21 +38,25 @@ class Evaluator(object):
         self.config = config
         torch.cuda.empty_cache()
     
-    def eval(self, synthetic_images, synthetic_labels, sensitive_test_loader):
+    def eval(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader):
         if self.device != 0 or sensitive_test_loader is None:
             return
         
-        # fid = self.cal_fid(synthetic_images)
-        fid = 0
+        fid, is_mean = self.cal_fid_is(synthetic_images)
+        fld, p, r = self.fld_pr(synthetic_images, sensitive_train_loader, sensitive_test_loader)
+        # fid = is_mean = 0
         logging.info("The FID of synthetic images is {}".format(fid))
+        logging.info("The Inception Score of synthetic images is {}".format(is_mean))
+        logging.info("The Precision and Recall of synthetic images is {} and {}".format(p, r))
+        logging.info("The FLD of synthetic images is {}".format(fld))
 
         acc_list = []
 
         for model_name in self.acc_models:
-            acc, test_acc = self.cal_acc_2(model_name, synthetic_images, synthetic_labels, sensitive_test_loader)
-            logging.info("The best acc of synthetic images on val and test dataset from {} is {} and {}".format(model_name, acc, test_acc))
-
-            acc_list.append(acc)
+            acc, test_acc_on_val, test_acc_on_test = self.cal_acc_2(model_name, synthetic_images, synthetic_labels, sensitive_test_loader)
+            logging.info("The best acc of synthetic images on val and the corresponding acc on test dataset from {} is {} and {}".format(model_name, acc, test_acc_on_val))
+            logging.info("The best acc test dataset from {} is {}".format(model_name, test_acc_on_test))
+            acc_list.append(test_acc_on_val)
         
         acc_mean = np.array(acc_list).mean()
         acc_std = np.array(acc_list).std()
@@ -65,11 +66,12 @@ class Evaluator(object):
         logging.info(f"The average and std of accuracy of synthetic images are {acc_mean:.2f} and {acc_std:.2f}")
 
 
-    def cal_fid(self, synthetic_images, batch_size=500):
+    def cal_fid_is(self, synthetic_images, batch_size=500):
         with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
             inception_model = pickle.load(f).to(self.device)
 
         act = []
+        logit = []
         chunks = torch.chunk(torch.from_numpy(synthetic_images), len(synthetic_images) // batch_size)
         print('Starting to sample.')
         for batch in chunks:
@@ -82,12 +84,17 @@ class Evaluator(object):
                 batch = batch.unsqueeze(1).repeat(1, 3, 1, 1)
 
             with torch.no_grad():
-                pred = inception_model(batch.to(self.device), return_features=True).unsqueeze(-1).unsqueeze(-1)
+                pred = inception_model(batch.to(self.device), return_features=True)
+                output = inception_model.output(pred)
 
-            pred = pred.squeeze(3).squeeze(2).cpu().numpy()
+            pred = pred.cpu().numpy()
+            output = output.cpu().numpy()
             act.append(pred)
+            logit.append(output)
 
         act = np.concatenate(act, axis=0)
+        logit = np.concatenate(logit, axis=0)
+        
         mu = np.mean(act, axis=0)
         sigma = np.cov(act, rowvar=False)
 
@@ -99,7 +106,43 @@ class Evaluator(object):
         s, _ = linalg.sqrtm(np.dot(sigma, data_pools_sigma), disp=False)
         fd = np.real(m + np.trace(sigma + data_pools_sigma - s * 2))
 
-        return fd
+        logit = np.exp(logit) / np.sum(np.exp(logit), 1, keepdims=True)
+        is_mean, _ = compute_inception_score_from_logits(logit)
+
+        return fd, is_mean
+    
+    def fld_pr(self, synthetic_images, sensitive_train_loader, sensitive_test_loader):
+        feature_extractor = InceptionFeatureExtractor(save_path="dataset/{}_{}/".format(self.config.sensitive_data.name, self.config.sensitive_data.resolution))
+
+        gen_images = torch.from_numpy(synthetic_images)
+        if gen_images.shape[1] == 1:
+            gen_images = gen_images.repeat(1, 3, 1, 1)
+        gen_feat = feature_extractor.get_tensor_features(gen_images)
+
+        try:
+            train_feat = feature_extractor.get_tensor_features(torch.tensor([0]), name="train")
+            test_feat = feature_extractor.get_tensor_features(torch.tensor([0]), name="test")
+        except:
+            train_images = []
+            test_images = []
+            for x, _ in sensitive_train_loader:
+                train_images.append(x.float()/255.)
+            for x, _ in sensitive_test_loader:
+                test_images.append(x.float()/255.)
+            train_images = torch.cat(train_images)
+            test_images = torch.cat(test_images)
+            if train_images.shape[1] == 1:
+                train_images = train_images.repeat(1, 3, 1, 1)
+                test_images = test_images.repeat(1, 3, 1, 1)
+            
+            train_feat = feature_extractor.get_tensor_features(train_images, name="train")
+            test_feat = feature_extractor.get_tensor_features(test_images, name="test")
+
+        fld = FLD(eval_feat="train").compute_metric(train_feat, test_feat, gen_feat)
+        p = PrecisionRecall(mode="Precision").compute_metric(train_feat, None, gen_feat) # Default precision
+        r = PrecisionRecall(mode="Recall", num_neighbors=5).compute_metric(train_feat, None, gen_feat)
+
+        return fld, p, r
     
     def cal_acc(self, model_name, synthetic_images, synthetic_labels, sensitive_test_loader):
     
@@ -214,7 +257,7 @@ class Evaluator(object):
         criterion = nn.CrossEntropyLoss()
         lr = 1e-4
 
-        if self.config['sensitive_data']['name'] == 'cifar10' or self.config['sensitive_data']['name'] == 'cifar100':
+        if 'cifar' in self.config.sensitive_data.name:
             batch_size = 126
             max_epoch = 200
             if model_name == "wrn":
@@ -238,7 +281,7 @@ class Evaluator(object):
 
             # optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4) 
             optimizer = optim.Adam(model.parameters(), lr=0.01)       
-            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=99999, gamma=0.2)
+            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.2)
 
         model = torch.nn.DataParallel(model).to(self.device)
 
@@ -255,7 +298,8 @@ class Evaluator(object):
         val_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_val).float(), torch.from_numpy(synthetic_labels_val).long()), shuffle=True, batch_size=batch_size, num_workers=2)
 
         best_acc = 0.
-        best_test_acc = 0.
+        best_test_acc_on_val = 0.
+        best_test_acc_on_test = 0.
 
         for epoch in range(max_epoch):
             model.train()
@@ -300,7 +344,7 @@ class Evaluator(object):
 
                     _, predicted = outputs.max(1)
                     val_total += targets.size(0)
-                    correct += predicted.eq(targets).sum().item()
+                    val_correct += predicted.eq(targets).sum().item()
             
             val_acc = val_correct / val_total * 100
             val_loss = test_loss / val_total
@@ -321,7 +365,7 @@ class Evaluator(object):
                     test_loss += loss.item()
 
                     _, predicted = outputs.max(1)
-                    total += targets.size(0)
+                    test_total += targets.size(0)
                     test_correct += predicted.eq(targets).sum().item()
             
             test_acc = test_correct / test_total * 100
@@ -330,14 +374,18 @@ class Evaluator(object):
 
             if val_acc >= best_acc:
                 best_acc = val_acc
-                best_test_acc = test_acc
+                best_test_acc_on_val = test_acc
                 best_model = copy.deepcopy(model)
+
+            if test_acc >= best_test_acc_on_test:
+                best_test_acc_on_test = test_acc
+            
 
             # logging.info("Epoch: {} Train acc: {} Val acc: {} Train loss: {} Val loss: {}".format(epoch, train_acc, val_acc, train_loss, val_loss))
             ema.restore(model.parameters())
         
 
-        return best_acc, best_test_acc
+        return best_acc, best_test_acc_on_val, best_test_acc_on_test 
     
     def cal_acc_no_dp(self, sensitive_train_loader, sensitive_test_loader):
         if self.device != 0 or sensitive_test_loader is None or sensitive_train_loader is None:
@@ -361,7 +409,10 @@ class Evaluator(object):
 
             logging.info(f'model type:{model_name}')
 
-            if self.config['sensitive_data']['name'] == 'cifar10' or self.config['sensitive_data']['name'] == 'cifar100':
+            if 'cifar' in self.config.sensitive_data.name:
+
+                batch_size = 126
+                max_epoch = 200
 
                 if model_name == "wrn":
                     model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes, depth=28, widen_factor=10, dropRate=0.3)
@@ -373,6 +424,10 @@ class Evaluator(object):
                 optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
                 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
             else:
+                
+                batch_size = 126
+                max_epoch = 50
+
                 if model_name == "wrn":
                     model = WideResNet(in_c=c, img_size=img_size, num_classes=num_classes,  dropRate=0.3)
                 elif model_name == "resnet":
@@ -383,7 +438,7 @@ class Evaluator(object):
                 
                 optimizer = optim.Adam(model.parameters(), lr=0.01)
                 # optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)        
-                scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
+                scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.2)
 
 
             # Move model to device (GPU/CPU)
@@ -456,3 +511,12 @@ class Evaluator(object):
 
         logging.info(f"The average and std of accuracy of synthetic images are {acc_mean:.2f} and {acc_std:.2f}")
 
+
+def compute_inception_score_from_logits(logits, splits=1):
+    scores = []
+    for i in range(splits):
+        part = logits[(i * logits.shape[0] // splits):((i + 1) * logits.shape[0] // splits), :]
+        py = np.mean(part, axis=0)
+        kl = np.mean([entropy(part[i, :], py) for i in range(part.shape[0])])
+        scores.append(np.exp(kl))
+    return np.mean(scores), np.std(scores)

@@ -74,6 +74,15 @@ class DP_Promise(DPSynther):
             raise NotImplementedError
         
         self.ema = ExponentialMovingAverage(self.model.parameters(), decay=self.ema_rate)
+
+        if config.ckpt is not None:
+            state = torch.load(config.ckpt, map_location=self.device)
+            new_state_dict = {}
+            for k, v in state['model'].items():
+                new_state_dict[k[7:]] = v
+            logging.info(self.model.load_state_dict(new_state_dict, strict=True))
+            logging.info(self.ema.load_state_dict(state['ema']))
+            del state, new_state_dict
     
     def pretrain(self, public_dataloader, config):
         if public_dataloader is None:
@@ -322,9 +331,6 @@ class DP_Promise(DPSynther):
         pin_memory=True)
 
         model = DDP(self.model)
-        if config.ckpt is not None:
-            state = torch.load(config.ckpt, map_location=self.device)
-            logging.info(model.load_state_dict(state['model'], strict=True))
         ema = ExponentialMovingAverage(model.parameters(), decay=self.ema_rate)
 
         if config.optim1.optimizer == 'Adam':

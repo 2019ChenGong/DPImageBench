@@ -103,17 +103,19 @@ def set_logger(gfile_stream):
 
 def initialize_environment(config):
     config.setup.root_folder = "."
-    nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    config.setup.workdir = config.setup.workdir + '-' + nowTime
     config.pretrain.log_dir = config.setup.workdir + "/pretrain"
     config.train.log_dir = config.setup.workdir + "/train"
     config.gen.log_dir = config.setup.workdir + "/gen"
     if config.setup.global_rank == 0:
         workdir = os.path.join(config.setup.root_folder, config.setup.workdir)
-        make_dir(workdir)
-        gfile_stream = open(os.path.join(workdir, 'stdout.txt'), 'w')
-        set_logger(gfile_stream)
-        logging.info(config)
+        if os.path.exists(workdir):
+            gfile_stream = open(os.path.join(workdir, 'stdout.txt'), 'a')
+            set_logger(gfile_stream)
+        else:
+            make_dir(workdir)
+            gfile_stream = open(os.path.join(workdir, 'stdout.txt'), 'a')
+            set_logger(gfile_stream)
+            logging.info(config)
 
 
 def parse_config(opt, unknown):

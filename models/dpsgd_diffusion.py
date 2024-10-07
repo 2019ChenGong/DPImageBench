@@ -45,7 +45,7 @@ class DP_Diffusion(DPSynther):
         self.fid_stats = config.fid_stats
 
         self.config = config
-        self.device = device
+        self.device = 'cuda:%d' % self.local_rank
 
         if self.denoiser_name == 'edm':
             if self.denoiser_network == 'song':
@@ -75,6 +75,15 @@ class DP_Diffusion(DPSynther):
             raise NotImplementedError
         
         self.ema = ExponentialMovingAverage(self.model.parameters(), decay=self.ema_rate)
+
+        if config.ckpt is not None:
+            state = torch.load(config.ckpt, map_location=self.device)
+            new_state_dict = {}
+            for k, v in state['model'].items():
+                new_state_dict[k[7:]] = v
+            logging.info(self.model.load_state_dict(new_state_dict, strict=True))
+            logging.info(self.ema.load_state_dict(state['ema']))
+            del state, new_state_dict
         self.is_pretrain = True
     
     def pretrain(self, public_dataloader, config):
@@ -249,11 +258,7 @@ class DP_Diffusion(DPSynther):
                         logging.info('{} is frozen'.format(name))
 
         model = DPDDP(self.model)
-        if config.ckpt is not None:
-            state = torch.load(config.ckpt, map_location=self.device)
-            logging.info(model.load_state_dict(state['model'], strict=True))
-        ema = ExponentialMovingAverage(
-            model.parameters(), decay=self.ema_rate)
+        ema = ExponentialMovingAverage(model.parameters(), decay=self.ema_rate)
 
         if config.optim.optimizer == 'Adam':
             optimizer = torch.optim.Adam(model.parameters(), **config.optim.params)
@@ -431,7 +436,7 @@ class DP_Diffusion(DPSynther):
 
     def generate(self, config):
         logging.info("start to generate {} samples".format(config.data_num))
-        if self.global_rank == 0:
+        if self.global_rank == 0 and not os.path.exists(config.log_dir):
             make_dir(config.log_dir)
         dist.barrier()
 

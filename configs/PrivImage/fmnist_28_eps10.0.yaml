@@ -32,6 +32,7 @@ sensitive_data:
   fid_stats: dataset/fmnist/fid_stats_28.npz
 
 model:
+  ckpt: null
   denoiser_name: edm
   denoiser_network: song
   ema_rate: .999
@@ -103,7 +104,6 @@ pretrain:
     n_classes: 10
 
 train:
-  ckpt: null
   log_dir: null
   seed: 0
   batch_size: 4096

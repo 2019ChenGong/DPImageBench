@@ -109,8 +109,10 @@ def load_data(config):
     N = len(sensitive_train_loader.dataset)
     config.train.dp.delta = float(1.0 / (N * np.log(N)))
 
+    logging.info("delta is reset as {}".format(config.train.dp.delta))
+
     if config.public_data.name is None:
-        return sensitive_train_loader, sensitive_test_loader, None, config
+        public_train_loader = None
     else:
         trans = [
                 transforms.Resize(config.public_data.resolution),
@@ -133,9 +135,10 @@ def load_data(config):
         else:
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     
-    public_train_loader = torch.utils.data.DataLoader(dataset=public_train_set, shuffle=True, drop_last=False, batch_size=config.pretrain.batch_size)
+        public_train_loader = torch.utils.data.DataLoader(dataset=public_train_set, shuffle=True, drop_last=False, batch_size=config.pretrain.batch_size)
 
     if config.sensitive_data.name is None:
-        return None, None, public_train_loader, config
+        sensitive_train_loader = None
+        sensitive_test_loader = None
 
     return sensitive_train_loader, sensitive_test_loader, public_train_loader, config
