@@ -1,14 +1,17 @@
 import torch
-import pickle
+from PIL import Image
 import copy
 import numpy as np
 from scipy import linalg
 from scipy.stats import entropy
 import logging
 
+from pytorch_fid.inception import fid_inception_v3
 from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
 from fld.metrics.FLD import FLD
 from fld.metrics.PrecisionRecall import PrecisionRecall
+from fld.metrics.FID import FID
+import ImageReward as RM
 
 
 import torch
@@ -24,9 +27,7 @@ from evaluation.classifier.wrn import WideResNet
 from evaluation.classifier.resnet import ResNet
 from evaluation.classifier.resnext import ResNeXt
 
-
-from models.DP_Diffusion.dnnlib.util import open_url
-
+mnist_prompt = ["an image of hand-written 0", "an image of hand-written 1", "an image of hand-written 2", "an image of hand-written 3", "an image of hand-written 4", "an image of hand-written 5", "an image of hand-written 6", "an image of hand-written 7", "an image of hand-written 8", "an image of hand-written 9"]
 
 class Evaluator(object):
     def __init__(self, config):
@@ -42,13 +43,14 @@ class Evaluator(object):
         if self.device != 0 or sensitive_test_loader is None:
             return
         
-        fid, is_mean = self.cal_fid_is(synthetic_images)
-        fld, p, r = self.fld_pr(synthetic_images, sensitive_train_loader, sensitive_test_loader)
+        # fid, is_mean = self.visual_metric(synthetic_images)
+        fid, is_mean, fld, p, r, ir = self.visual_metric(synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader)
         # fid = is_mean = 0
         logging.info("The FID of synthetic images is {}".format(fid))
         logging.info("The Inception Score of synthetic images is {}".format(is_mean))
         logging.info("The Precision and Recall of synthetic images is {} and {}".format(p, r))
         logging.info("The FLD of synthetic images is {}".format(fld))
+        logging.info("The ImageReward of synthetic images is {}".format(ir))
 
         acc_list = []
 
@@ -61,63 +63,22 @@ class Evaluator(object):
         acc_mean = np.array(acc_list).mean()
         acc_std = np.array(acc_list).std()
 
-        logging.info(f"The best acc of accuracy of synthetic images from resnet, wrn, and resnext are {acc_list}.")
+        logging.info(f"The best acc of accuracy (using synthetic images as the validation set) of synthetic images from resnet, wrn, and resnext are {acc_list}.")
 
         logging.info(f"The average and std of accuracy of synthetic images are {acc_mean:.2f} and {acc_std:.2f}")
-
-
-    def cal_fid_is(self, synthetic_images, batch_size=500):
-        with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
-            inception_model = pickle.load(f).to(self.device)
-
-        act = []
-        logit = []
-        chunks = torch.chunk(torch.from_numpy(synthetic_images), len(synthetic_images) // batch_size)
-        print('Starting to sample.')
-        for batch in chunks:
-            batch = (batch * 255.).to(torch.uint8)
-
-            batch = batch.to(self.device)
-            if batch.shape[1] == 1:  # if image is gray scale
-                batch = batch.repeat(1, 3, 1, 1)
-            elif len(batch.shape) == 3:  # if image is gray scale
-                batch = batch.unsqueeze(1).repeat(1, 3, 1, 1)
-
-            with torch.no_grad():
-                pred = inception_model(batch.to(self.device), return_features=True)
-                output = inception_model.output(pred)
-
-            pred = pred.cpu().numpy()
-            output = output.cpu().numpy()
-            act.append(pred)
-            logit.append(output)
-
-        act = np.concatenate(act, axis=0)
-        logit = np.concatenate(logit, axis=0)
-        
-        mu = np.mean(act, axis=0)
-        sigma = np.cov(act, rowvar=False)
-
-        stats = np.load(self.sensitive_stats_path)
-        data_pools_mean = stats['mu']
-        data_pools_sigma = stats['sigma']
-
-        m = np.square(mu - data_pools_mean).sum()
-        s, _ = linalg.sqrtm(np.dot(sigma, data_pools_sigma), disp=False)
-        fd = np.real(m + np.trace(sigma + data_pools_sigma - s * 2))
-
-        logit = np.exp(logit) / np.sum(np.exp(logit), 1, keepdims=True)
-        is_mean, _ = compute_inception_score_from_logits(logit)
-
-        return fd, is_mean
     
-    def fld_pr(self, synthetic_images, sensitive_train_loader, sensitive_test_loader):
+    def visual_metric(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader):
         feature_extractor = InceptionFeatureExtractor(save_path="dataset/{}_{}/".format(self.config.sensitive_data.name, self.config.sensitive_data.resolution))
+        fc_layer = fid_inception_v3().fc
+        fc_layer.eval()
 
         gen_images = torch.from_numpy(synthetic_images)
         if gen_images.shape[1] == 1:
             gen_images = gen_images.repeat(1, 3, 1, 1)
         gen_feat = feature_extractor.get_tensor_features(gen_images)
+        with torch.no_grad():
+            gen_logit = fc_layer(gen_feat).detach().cpu().numpy()
+            gen_logit = np.exp(gen_logit) / np.sum(np.exp(gen_logit), 1, keepdims=True)
 
         try:
             train_feat = feature_extractor.get_tensor_features(torch.tensor([0]), name="train")
@@ -137,12 +98,29 @@ class Evaluator(object):
             
             train_feat = feature_extractor.get_tensor_features(train_images, name="train")
             test_feat = feature_extractor.get_tensor_features(test_images, name="test")
+        # print(train_feat.shape, test_feat.shape, gen_feat.shape)
 
+        num_classes = len(set(synthetic_labels))
+        rm_model = RM.load("ImageReward-v1.0")
+        ir = 0
+        with torch.no_grad():
+            for cls in range(num_classes):
+                imgs = (synthetic_images[synthetic_labels==cls] * 255.).astype('uint8')
+                imgs = np.transpose(imgs, (0, 2, 3, 1))
+                if imgs.shape[-1] == 1:
+                    imgs = np.repeat(imgs, 3, axis=-1)
+                imgs = [Image.fromarray(img) for img in imgs]
+                score = rm_model.score(mnist_prompt[cls], imgs)
+                ir += np.sum(score)
+        ir /= len(synthetic_images)
+
+        is_mean, _ = compute_inception_score_from_logits(gen_logit)
+        fid = FID().compute_metric(train_feat, None, gen_feat)
         fld = FLD(eval_feat="train").compute_metric(train_feat, test_feat, gen_feat)
         p = PrecisionRecall(mode="Precision").compute_metric(train_feat, None, gen_feat) # Default precision
         r = PrecisionRecall(mode="Recall", num_neighbors=5).compute_metric(train_feat, None, gen_feat)
 
-        return fld, p, r
+        return fid, is_mean, fld, p, r, ir
     
     def cal_acc(self, model_name, synthetic_images, synthetic_labels, sensitive_test_loader):
     
@@ -150,7 +128,7 @@ class Evaluator(object):
         criterion = nn.CrossEntropyLoss()
         lr = 1e-4
 
-        if self.config['sensitive_data']['name'] == 'cifar10_32' or self.config['sensitive_data']['name'] == 'cifar100_32':
+        if self.config['sensitive_data']['nam   e'] == 'cifar10_32' or self.config['sensitive_data']['name'] == 'cifar100_32':
             batch_size = 128
             max_epoch = 200
             if model_name == "wrn":
@@ -174,7 +152,7 @@ class Evaluator(object):
 
             # optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4) 
             optimizer = optim.Adam(model.parameters(), lr=0.01)       
-            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=99999, gamma=0.2)
+            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.2)
 
         model = torch.nn.DataParallel(model).to(self.device)
 
@@ -380,8 +358,6 @@ class Evaluator(object):
             if test_acc >= best_test_acc_on_test:
                 best_test_acc_on_test = test_acc
             
-
-            # logging.info("Epoch: {} Train acc: {} Val acc: {} Train loss: {} Val loss: {}".format(epoch, train_acc, val_acc, train_loss, val_loss))
             ema.restore(model.parameters())
         
 
@@ -508,7 +484,6 @@ class Evaluator(object):
         acc_std = np.array(acc_list).std()
 
         logging.info(f"The best acc of accuracy of synthetic images from resnet, wrn, and resnext are {acc_list}.")
-
         logging.info(f"The average and std of accuracy of synthetic images are {acc_mean:.2f} and {acc_std:.2f}")
 
 

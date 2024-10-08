@@ -217,8 +217,8 @@ class DP_Diffusion(DPSynther):
 
                 state['step'] += 1
                 state['ema'].update(model.parameters())
-
-            logging.info('Completed Epoch %d' % (epoch + 1))
+            if self.global_rank == 0:
+                logging.info('Completed Epoch %d' % (epoch + 1))
 
         if self.global_rank == 0:
             checkpoint_file = os.path.join(checkpoint_dir, 'final_checkpoint.pth')

@@ -24,10 +24,10 @@ if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_dir', default="configs")
-    parser.add_argument('--method', default="DPDM")
-    parser.add_argument('--epsilon', default="10.0")
+    parser.add_argument('--method', default="PrivImage")
+    parser.add_argument('--epsilon', default="1.0")
     parser.add_argument('--data_name', default="mnist_28")
-    parser.add_argument('--exp_path', default="exp/dpdm/mnist_28_eps10.0-2024-09-30-11-29-19")
+    parser.add_argument('--exp_path', default="exp/privimage/mnist_28_eps1.0-2024-10-07-03-48-21")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)

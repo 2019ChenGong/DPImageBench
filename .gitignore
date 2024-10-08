@@ -7,6 +7,7 @@
 exp
 debug.py
 
+bug_fig
 dataset
 models/pretrained_models
 models/DPSDA/improved-diffusion

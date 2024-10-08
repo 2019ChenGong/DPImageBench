@@ -100,7 +100,8 @@ def semantic_query(sensitive_train_loader, config):
     semantics_description = torch.topk(semantics_hist, k=config.public_data.selective.num_words, dim=1)
 
     cls_dict = {cls: list(semantics_description[1][cls].detach().cpu().numpy()) for cls in range(config.sensitive_data.n_classes)}
-    logging.info(cls_dict)
+    if config.setup.global_rank == 0:
+        logging.info(cls_dict)
     return cls_dict
 
 
@@ -109,7 +110,8 @@ def load_data(config):
     N = len(sensitive_train_loader.dataset)
     config.train.dp.delta = float(1.0 / (N * np.log(N)))
 
-    logging.info("delta is reset as {}".format(config.train.dp.delta))
+    if config.setup.global_rank == 0:
+        logging.info("delta is reset as {}".format(config.train.dp.delta))
 
     if config.public_data.name is None:
         public_train_loader = None
