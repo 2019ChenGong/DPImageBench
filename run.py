@@ -7,6 +7,7 @@ from models.model_loader import load_model
 from data.dataset_loader import load_data
 from utils.utils import initialize_environment, run, parse_config
 from evaluation.evaluator import Evaluator
+os.environ['MKL_NUM_THREADS'] = "1"
 
 def main(config):
 
@@ -46,7 +47,5 @@ if __name__ == '__main__':
         config.setup.workdir = "exp/{}/{}_eps{}-{}".format(str.lower(opt.method), opt.data_name, opt.epsilon, nowTime)
     else:
         config.setup.workdir = "exp/{}/{}-{}".format(str.lower(opt.method), opt.exp_description, nowTime)
-    
-    print(config.setup.workdir)
 
     run(main, config)

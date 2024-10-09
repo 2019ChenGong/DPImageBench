@@ -91,7 +91,9 @@ class DPGAN(DPSynther):
             logging.info('Starting training at step %d' % state['step'])
         dist.barrier()
 
-        dataset_loader = public_dataloader
+        # dataset_loader = public_dataloader
+        dataset_loader = torch.utils.data.DataLoader(
+        dataset=public_dataloader.dataset, batch_size=config.batch_size//self.global_size, sampler=DistributedSampler(public_dataloader.dataset), pin_memory=True, drop_last=True)
 
         with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
             inception_model = pickle.load(f).to(self.device)
@@ -158,7 +160,7 @@ class DPGAN(DPSynther):
                         if self.global_rank == 0:
                             make_dir(os.path.join(sample_dir, 'iter_%d' % state['step']))
                             save_img(samples, os.path.join(os.path.join(sample_dir, 'iter_%d' % state['step']), 'sample.png'))
-                    dist.barrier()
+
                     if state['step'] % config.fid_freq == 0 and state['step'] >= config.fid_threshold:
                         with torch.no_grad():
                             ema.store(G.parameters())

@@ -6,6 +6,7 @@ import argparse
 from data.dataset_loader import load_data
 from utils.utils import set_logger, parse_config
 from evaluation.evaluator import Evaluator
+os.environ['MKL_NUM_THREADS'] = "1"
 
 
 def main(config):

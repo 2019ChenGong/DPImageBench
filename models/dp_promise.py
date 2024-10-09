@@ -124,8 +124,7 @@ class DP_Promise(DPSynther):
         dist.barrier()
 
         dataset_loader = torch.utils.data.DataLoader(
-        dataset=public_dataloader.dataset, batch_size=config.batch_size//self.global_size, sampler=DistributedSampler(public_dataloader.dataset), num_workers=2,
-        pin_memory=True)
+        dataset=public_dataloader.dataset, batch_size=config.batch_size//self.global_size, sampler=DistributedSampler(public_dataloader.dataset), pin_memory=True, drop_last=True)
 
         if config.loss.version == 'edm':
             loss_fn = EDMLoss(**config.loss).get_loss

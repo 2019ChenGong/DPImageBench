@@ -102,6 +102,8 @@ def semantic_query(sensitive_train_loader, config):
     cls_dict = {cls: list(semantics_description[1][cls].detach().cpu().numpy()) for cls in range(config.sensitive_data.n_classes)}
     if config.setup.global_rank == 0:
         logging.info(cls_dict)
+    del model
+    torch.cuda.empty_cache()
     return cls_dict
 
 
@@ -137,7 +139,7 @@ def load_data(config):
         else:
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     
-        public_train_loader = torch.utils.data.DataLoader(dataset=public_train_set, shuffle=True, drop_last=False, batch_size=config.pretrain.batch_size)
+        public_train_loader = torch.utils.data.DataLoader(dataset=public_train_set, shuffle=True, drop_last=True, batch_size=config.pretrain.batch_size)
 
     if config.sensitive_data.name is None:
         sensitive_train_loader = None

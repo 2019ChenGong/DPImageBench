@@ -1,6 +1,7 @@
 
 
 def load_model(config, sess=None):
+    
     if config.setup.method == 'DP-MERF':
         from models.dp_merf import DP_MERF
         model = DP_MERF(config.model, config.setup.local_rank)

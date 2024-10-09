@@ -9,6 +9,8 @@ from torchvision.utils import make_grid
 from scipy import linalg
 from pathlib import Path
 import torchvision
+from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
+from fld.metrics.FID import FID
 
 from models.DP_Diffusion.dataset_tool import is_image_ext
 
@@ -85,10 +87,12 @@ def sample_random_image_batch(sampling_shape, sampler, path, device, n_classes=N
 
 def calculate_frechet_distance(mu1, sigma1, mu2, sigma2):
     m = np.square(mu1 - mu2).sum()
+    print(1)
     s, _ = linalg.sqrtm(np.dot(sigma1, sigma2), disp=False)
+    print(2)
     fd = np.real(m + np.trace(sigma1 + sigma2 - s * 2))
+    print(3)
     return fd
-
 
 def compute_fid(n_samples, n_gpus, sampling_shape, sampler, inception_model, stats_paths, device, n_classes=None):
     num_samples_per_gpu = int(np.ceil(n_samples / n_gpus))
@@ -126,8 +130,8 @@ def compute_fid(n_samples, n_gpus, sampling_shape, sampler, inception_model, sta
     stats = np.load(stats_paths)
     data_pools_mean = stats['mu']
     data_pools_sigma = stats['sigma']
-    fid = calculate_frechet_distance(data_pools_mean,
-                data_pools_sigma, all_pool_mean, all_pool_sigma)
+    fid = calculate_frechet_distance(data_pools_mean, data_pools_sigma, all_pool_mean, all_pool_sigma)
+    torch.cuda.empty_cache()
     return fid
 
 

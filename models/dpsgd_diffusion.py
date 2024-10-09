@@ -13,6 +13,7 @@ import tqdm
 from models.DP_Diffusion.model.ncsnpp import NCSNpp
 from models.DP_Diffusion.utils.util import set_seeds, make_dir, save_checkpoint, sample_random_image_batch, compute_fid
 from models.DP_Diffusion.dnnlib.util import open_url
+from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
 from models.DP_Diffusion.model.ema import ExponentialMovingAverage
 from models.DP_Diffusion.score_losses import EDMLoss, VPSDELoss, VESDELoss, VLoss
 from models.DP_Diffusion.denoiser import EDMDenoiser, VPSDEDenoiser, VESDEDenoiser, VDenoiser
@@ -82,7 +83,7 @@ class DP_Diffusion(DPSynther):
             for k, v in state['model'].items():
                 new_state_dict[k[7:]] = v
             logging.info(self.model.load_state_dict(new_state_dict, strict=True))
-            logging.info(self.ema.load_state_dict(state['ema']))
+            self.ema.load_state_dict(state['ema'])
             del state, new_state_dict
         self.is_pretrain = True
     
@@ -91,7 +92,6 @@ class DP_Diffusion(DPSynther):
             self.is_pretrain = False
             return
 
-        set_seeds(self.global_rank, config.seed)
         torch.cuda.device(self.local_rank)
         self.device = 'cuda:%d' % self.local_rank
 
@@ -127,8 +127,7 @@ class DP_Diffusion(DPSynther):
         dist.barrier()
 
         dataset_loader = torch.utils.data.DataLoader(
-        dataset=public_dataloader.dataset, batch_size=config.batch_size//self.global_size, sampler=DistributedSampler(public_dataloader.dataset), num_workers=2,
-        pin_memory=True)
+        dataset=public_dataloader.dataset, batch_size=config.batch_size//self.global_size, sampler=DistributedSampler(public_dataloader.dataset), pin_memory=True, drop_last=True)
 
         if config.loss.version == 'edm':
             loss_fn = EDMLoss(**config.loss).get_loss
@@ -158,7 +157,7 @@ class DP_Diffusion(DPSynther):
                             self.network.image_size, self.network.image_size)
 
         for epoch in range(config.n_epochs):
-            
+            dataset_loader.sampler.set_epoch(epoch)
             for _, (train_x, train_y) in enumerate(dataset_loader):
 
                 if state['step'] % config.snapshot_freq == 0 and state['step'] >= config.snapshot_threshold and self.global_rank == 0:
@@ -186,8 +185,8 @@ class DP_Diffusion(DPSynther):
 
                         if self.global_rank == 0:
                             logging.info('FID at iteration %d: %.6f' % (state['step'], fid))
-                    dist.barrier()
                     model.train()
+                dist.barrier()
 
                 if state['step'] % config.save_freq == 0 and state['step'] >= config.save_threshold and self.global_rank == 0:
                     checkpoint_file = os.path.join(
@@ -228,7 +227,9 @@ class DP_Diffusion(DPSynther):
 
         ema.copy_to(self.model.parameters())
         self.ema = ema
-        
+
+        del model
+        torch.cuda.empty_cache()
 
     def train(self, sensitive_dataloader, config):
         if sensitive_dataloader is None:
@@ -247,7 +248,6 @@ class DP_Diffusion(DPSynther):
             make_dir(sample_dir)
             make_dir(checkpoint_dir)
             make_dir(fid_dir)
-        dist.barrier()
 
         if config.partly_finetune:
             for name, param in self.model.named_parameters():
@@ -279,7 +279,7 @@ class DP_Diffusion(DPSynther):
         dist.barrier()
 
         privacy_engine = PrivacyEngine()
-        if config.dp.sdq is None or not self.is_pretrain:
+        if config.dp.sdq is None:
             account_history = None
             alpha_history = None
         else:
