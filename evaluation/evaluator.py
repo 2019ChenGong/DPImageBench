@@ -44,13 +44,13 @@ class Evaluator(object):
             return
         
         # fid, is_mean = self.visual_metric(synthetic_images)
-        fid, is_mean, fld, p, r, ir = self.visual_metric(synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader)
-        # fid = is_mean = 0
-        logging.info("The FID of synthetic images is {}".format(fid))
-        logging.info("The Inception Score of synthetic images is {}".format(is_mean))
-        logging.info("The Precision and Recall of synthetic images is {} and {}".format(p, r))
-        logging.info("The FLD of synthetic images is {}".format(fld))
-        logging.info("The ImageReward of synthetic images is {}".format(ir))
+        # fid, is_mean, fld, p, r, ir = self.visual_metric(synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader)
+        # # fid = is_mean = 0
+        # logging.info("The FID of synthetic images is {}".format(fid))
+        # logging.info("The Inception Score of synthetic images is {}".format(is_mean))
+        # logging.info("The Precision and Recall of synthetic images is {} and {}".format(p, r))
+        # logging.info("The FLD of synthetic images is {}".format(fld))
+        # logging.info("The ImageReward of synthetic images is {}".format(ir))
 
         acc_list = []
 

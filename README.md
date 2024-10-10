@@ -5,7 +5,7 @@
 
 ## Todo
 
-We can save the figure of bug into ./bug_fig/.
+We can save the figure of bug into ./bug_fig/. [Chen: OK]
 
 - [] recoding the intermediate results of methods with tqdm.
 
