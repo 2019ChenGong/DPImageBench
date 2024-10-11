@@ -27,7 +27,19 @@ from evaluation.classifier.wrn import WideResNet
 from evaluation.classifier.resnet import ResNet
 from evaluation.classifier.resnext import ResNeXt
 
-mnist_prompt = ["an image of hand-written 0", "an image of hand-written 1", "an image of hand-written 2", "an image of hand-written 3", "an image of hand-written 4", "an image of hand-written 5", "an image of hand-written 6", "an image of hand-written 7", "an image of hand-written 8", "an image of hand-written 9"]
+mnist_prompt = ["A grayscale image of a handwritten digit 0", "A grayscale image of a handwritten digit 1", "an image of hand-written 2", "an image of hand-written 3", "an image of hand-written 4", "an image of hand-written 5", "an image of hand-written 6", "an image of hand-written 7", "an image of hand-written 8", "an image of hand-written 9"]
+
+fmnist_prompt = ["A grayscale image of a T-shirt", "A grayscale image of a handwritten digit Trouser", "an image of hand-written Pullover", "an image of hand-written Dress", "an image of hand-written Coat", "an image of hand-written Sandal", "an image of hand-written Shirt", "an image of hand-written Sneaker", "an image of hand-written Bag", "an image of hand-written Ankle boot"]
+
+cifar10_prompt = ["An image of an airplane", "An image of an automobile", "An image of a bird", "An image of a cat", "An image of a deer", "An image of a dog", "An image of a frog", "An image of a horse", "An image of a ship", "An image of a truck"]
+
+eurosat_prompt = ["A remote sensing image of an industrial area", "A remote sensing image of a residential area", "A remote sensing image of an annual crop area", "A remote sensing image of a permanent crop area", "A remote sensing image of a river area", "A remote sensing image of a sea or lake area", "A remote sensing image of a herbaceous veg. area", "A remote sensing image of a highway area", "A remote sensing image of a pasture area", "A remote sensing image of a forest area"]
+
+cifar100_prompt = None
+
+celeba_male_prompt = ["an image of a female face", "an image of a male face"]
+
+camelyon_prompt = ["an image of hand-written 0", "an image of hand-written 1", "an image of hand-written 2", "an image of hand-written 3", "an image of hand-written 4", "an image of hand-written 5", "an image of hand-written 6", "an image of hand-written 7", "an image of hand-written 8", "an image of hand-written 9"]
 
 class Evaluator(object):
     def __init__(self, config):
@@ -103,6 +115,7 @@ class Evaluator(object):
         num_classes = len(set(synthetic_labels))
         rm_model = RM.load("ImageReward-v1.0")
         ir = 0
+        prompt = get_prompt(self.config.sensitive_data.name)
         with torch.no_grad():
             for cls in range(num_classes):
                 imgs = (synthetic_images[synthetic_labels==cls] * 255.).astype('uint8')
@@ -110,7 +123,7 @@ class Evaluator(object):
                 if imgs.shape[-1] == 1:
                     imgs = np.repeat(imgs, 3, axis=-1)
                 imgs = [Image.fromarray(img) for img in imgs]
-                score = rm_model.score(mnist_prompt[cls], imgs)
+                score = rm_model.score(prompt[cls], imgs)
                 ir += np.sum(score)
         ir /= len(synthetic_images)
 
@@ -272,8 +285,8 @@ class Evaluator(object):
         # optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
         # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
 
-        train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_train).float(), torch.from_numpy(synthetic_labels_train).long()), shuffle=True, batch_size=batch_size, num_workers=2)
-        val_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_val).float(), torch.from_numpy(synthetic_labels_val).long()), shuffle=True, batch_size=batch_size, num_workers=2)
+        train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_train).float(), torch.from_numpy(synthetic_labels_train).long()), shuffle=True, batch_size=batch_size)
+        val_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_val).float(), torch.from_numpy(synthetic_labels_val).long()), shuffle=True, batch_size=batch_size)
 
         best_acc = 0.
         best_test_acc_on_val = 0.
@@ -495,3 +508,48 @@ def compute_inception_score_from_logits(logits, splits=1):
         kl = np.mean([entropy(part[i, :], py) for i in range(part.shape[0])])
         scores.append(np.exp(kl))
     return np.mean(scores), np.std(scores)
+
+def get_prompt(data_name: str):
+    if data_name.startswith("mnist"):
+        return ["A grayscale image of a handwritten digit 0", "A grayscale image of a handwritten digit 1", "an image of hand-written 2", "an image of hand-written 3", "an image of hand-written 4", "an image of hand-written 5", "an image of hand-written 6", "an image of hand-written 7", "an image of hand-written 8", "an image of hand-written 9"]
+    elif data_name.startswith("fmnist"):
+        return ["A grayscale image of a T-shirt", "A grayscale image of a handwritten digit Trouser", "an image of hand-written Pullover", "an image of hand-written Dress", "an image of hand-written Coat", "an image of hand-written Sandal", "an image of hand-written Shirt", "an image of hand-written Sneaker", "an image of hand-written Bag", "an image of hand-written Ankle boot"]
+    elif data_name.startswith("cifar100"):
+        cifar100_y = '''Superclass	Classes
+        aquatic mammals	beaver, dolphin, otter, seal, whale
+        fish	aquarium fish, flatfish, ray, shark, trout
+        flowers	orchids, poppies, roses, sunflowers, tulips
+        food containers	bottles, bowls, cans, cups, plates
+        fruit and vegetables	apples, mushrooms, oranges, pears, sweet peppers
+        household electrical devices	clock, computer keyboard, lamp, telephone, television
+        household furniture	bed, chair, couch, table, wardrobe
+        insects	bee, beetle, butterfly, caterpillar, cockroach
+        large carnivores	bear, leopard, lion, tiger, wolf
+        large man-made outdoor things	bridge, castle, house, road, skyscraper
+        large natural outdoor scenes	cloud, forest, mountain, plain, sea
+        large omnivores and herbivores	camel, cattle, chimpanzee, elephant, kangaroo
+        medium-sized mammals	fox, porcupine, possum, raccoon, skunk
+        non-insect invertebrates	crab, lobster, snail, spider, worm
+        people	baby, boy, girl, man, woman
+        reptiles	crocodile, dinosaur, lizard, snake, turtle
+        small mammals	hamster, mouse, rabbit, shrew, squirrel
+        trees	maple, oak, palm, pine, willow
+        vehicles 1	bicycle, bus, motorcycle, pickup truck, train
+        vehicles 2	lawn-mower, rocket, streetcar, tank, tractor'''
+        class_lins = cifar100_y.split("\n")
+        prompt = []
+        for line in class_lins[1:]:
+            super_class, child_classes = line.split("\t")
+            for child_class in child_classes.split(", "):
+                prompt.append("An image of {}".format(child_class))
+        return prompt
+    elif data_name.startswith("cifar10"):
+        return ["An image of an airplane", "An image of an automobile", "An image of a bird", "An image of a cat", "An image of a deer", "An image of a dog", "An image of a frog", "An image of a horse", "An image of a ship", "An image of a truck"]
+    elif data_name.startwith("eurosat"):
+        return ["A remote sensing image of an industrial area", "A remote sensing image of a residential area", "A remote sensing image of an annual crop area", "A remote sensing image of a permanent crop area", "A remote sensing image of a river area", "A remote sensing image of a sea or lake area", "A remote sensing image of a herbaceous veg. area", "A remote sensing image of a highway area", "A remote sensing image of a pasture area", "A remote sensing image of a forest area"]
+    elif data_name.startswith("celeba_male"):
+        return ["An image of a female face", "An image of a male face"]
+    elif data_name.startswith("camelyon"):
+        return ["A normal lymph node image", "A lymph node histopathology image"]
+    else:
+        raise NotImplementedError

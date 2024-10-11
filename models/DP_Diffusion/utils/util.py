@@ -87,11 +87,8 @@ def sample_random_image_batch(sampling_shape, sampler, path, device, n_classes=N
 
 def calculate_frechet_distance(mu1, sigma1, mu2, sigma2):
     m = np.square(mu1 - mu2).sum()
-    print(1)
     s, _ = linalg.sqrtm(np.dot(sigma1, sigma2), disp=False)
-    print(2)
     fd = np.real(m + np.trace(sigma1 + sigma2 - s * 2))
-    print(3)
     return fd
 
 def compute_fid(n_samples, n_gpus, sampling_shape, sampler, inception_model, stats_paths, device, n_classes=None):
