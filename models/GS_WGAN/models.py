@@ -5,7 +5,7 @@ import torch.autograd as autograd
 import torch.nn.functional as F
 import functools
 
-from ops import SpectralNorm, one_hot_embedding, pixel_norm
+from models.GS_WGAN.ops import SpectralNorm, one_hot_embedding, pixel_norm
 
 IMG_W = IMG_H = 28  # image width and height
 IMG_C = 1  # image channel

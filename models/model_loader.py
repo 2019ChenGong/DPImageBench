@@ -11,6 +11,9 @@ def load_model(config, sess=None):
     elif config.setup.method == 'DP-Kernel':
         from models.dp_kernel import DP_Kernel
         model = DP_Kernel(config.model, config.setup.local_rank)
+    elif config.setup.method == 'GS-WGAN':
+        from models.gs_wgan import GS_WGAN
+        model = GS_WGAN(config.model, config.setup.local_rank)
     elif config.setup.method == 'DPSDA':
         from models.dpsda import DPSDA
         model = DPSDA(config.model, config.setup.local_rank)

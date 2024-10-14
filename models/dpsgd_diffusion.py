@@ -97,13 +97,11 @@ class DP_Diffusion(DPSynther):
 
         sample_dir = os.path.join(config.log_dir, 'samples')
         checkpoint_dir = os.path.join(config.log_dir, 'checkpoints')
-        fid_dir = os.path.join(config.log_dir, 'fid')
 
         if self.global_rank == 0:
             make_dir(config.log_dir)
             make_dir(sample_dir)
             make_dir(checkpoint_dir)
-            make_dir(fid_dir)
         dist.barrier()
 
         model = DDP(self.model)
@@ -241,13 +239,11 @@ class DP_Diffusion(DPSynther):
 
         sample_dir = os.path.join(config.log_dir, 'samples')
         checkpoint_dir = os.path.join(config.log_dir, 'checkpoints')
-        fid_dir = os.path.join(config.log_dir, 'fid')
 
         if self.global_rank == 0:
             make_dir(config.log_dir)
             make_dir(sample_dir)
             make_dir(checkpoint_dir)
-            make_dir(fid_dir)
 
         if config.partly_finetune:
             for name, param in self.model.named_parameters():
