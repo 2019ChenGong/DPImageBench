@@ -28,6 +28,8 @@ def get_noise_multiplier(epsilon, num_steps, delta, min_noise_multiplier=1e-1, m
         """Compute delta of Gaussian mechanism with shift mu or equivalently noise scale 1/mu"""
         if mu == 0:
             return 0
+        if np.isinf(np.exp(eps)):
+            return 0
         return scipy.stats.norm.cdf(-eps / mu + mu / 2) - np.exp(eps) * scipy.stats.norm.cdf(-eps / mu - mu / 2)
 
     def eps_Gaussian(delta, mu):
