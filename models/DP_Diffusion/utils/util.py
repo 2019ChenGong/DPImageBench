@@ -9,8 +9,8 @@ from torchvision.utils import make_grid
 from scipy import linalg
 from pathlib import Path
 import torchvision
-from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
-from fld.metrics.FID import FID
+# from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
+# from fld.metrics.FID import FID
 
 from models.DP_Diffusion.dataset_tool import is_image_ext
 

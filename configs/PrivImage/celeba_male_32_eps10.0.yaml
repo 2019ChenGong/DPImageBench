@@ -18,18 +18,18 @@ public_data:
   selective:
     ratio: 0.01
     num_words: 1
-    sigma: 484
+    sigma: 5300
     batch_size: 5000
     model_path: models/pretrained_models/imagenet_classifier_0.454_ckpt.pth
 
 sensitive_data:
-  name: cifar100
+  name: celeba_male_32
   num_channels: 3
   resolution: 32
-  n_classes: 100
-  train_path: dataset/cifar100/train_32.zip
-  test_path: dataset/cifar100/test_32.zip
-  fid_stats: dataset/cifar100/fid_stats_32.npz
+  n_classes: 2
+  train_path: dataset/celeba/train_32_Male.zip
+  test_path: dataset/celeba/test_32_Male.zip
+  fid_stats: dataset/celeba/fid_stats_32.npz
 
 model:
   ckpt: null
@@ -40,7 +40,7 @@ model:
     image_size: 32
     num_in_channels: 3
     num_out_channels: 3
-    label_dim: 100
+    label_dim: 2
     attn_resolutions:
     - 16
     ch_mult: [2, 4]
@@ -75,7 +75,7 @@ pretrain:
   log_dir: null
   seed: 0
   batch_size: 64
-  n_epochs: 40
+  n_epochs: 400
   log_freq: 100
   snapshot_freq: 2000
   snapshot_threshold: 1
@@ -95,7 +95,7 @@ pretrain:
     p_mean: -1.2
     p_std: 1.2
     n_noise_samples: 1
-    n_classes: 100
+    n_classes: 2
 
 train:
   log_dir: null
@@ -124,12 +124,12 @@ train:
     p_mean: -1.2
     p_std: 1.2
     n_noise_samples: 32
-    n_classes: 100
+    n_classes: 2
   dp:
     sdq: True
-    privacy_history: [[484, 1.0, 1]]
+    privacy_history: [[5300, 1.0, 1]]
     max_grad_norm: 1.0
-    delta: 1e-5
+    delta: 1e-6
     epsilon: 10.
     max_physical_batch_size: 8192
     n_splits: 64

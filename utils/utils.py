@@ -9,7 +9,7 @@ import torch.multiprocessing as mp
 
 from models.model_loader import load_model
 from data.dataset_loader import load_data
-from evaluation.evaluator import Evaluator
+# from evaluation.evaluator import Evaluator
 
 
 def make_dir(dir):
@@ -46,37 +46,48 @@ def run(func, config):
 
         for p in processes:
             p.join()
-    elif config.setup.run_type == "tfmp":
-        import tensorflow as tf
-        config.setup.local_rank = 0
-        config.setup.global_rank = 0
-        global FLAGS
-        FLAGS = config
-        tf.app.run(main=main_tf)
+    elif config.setup.run_type == "torchrun":
+        dist.init_process_group("nccl")
+        config.setup.local_rank = int(os.environ["LOCAL_RANK"])
+        config.model.local_rank = config.setup.local_rank
+        config.setup.global_rank = int(os.environ["RANK"])
+        config.model.global_rank = config.setup.global_rank
+        config.setup.global_size = dist.get_world_size()
+        config.model.global_size = config.setup.global_size
+        config.model.fid_stats = config.sensitive_data.fid_stats
+        func(config)
+
+    # elif config.setup.run_type == "tfmp":
+    #     import tensorflow as tf
+    #     config.setup.local_rank = 0
+    #     config.setup.global_rank = 0
+    #     global FLAGS
+    #     FLAGS = config
+    #     tf.app.run(main=main_tf)
     else:
         NotImplementedError('run_type {} is not yet implemented.'.format(config.setup.run_type))
 
 
-def main_tf(_):
-    import tensorflow as tf
-    global FLAGS
-    run_config = tf.ConfigProto()
-    run_config.gpu_options.allow_growth = True
-    with tf.Session(config=run_config) as sess:
-        initialize_environment(FLAGS)
+# def main_tf(_):
+#     import tensorflow as tf
+#     global FLAGS
+#     run_config = tf.ConfigProto()
+#     run_config.gpu_options.allow_growth = True
+#     with tf.Session(config=run_config) as sess:
+#         initialize_environment(FLAGS)
 
-        model = load_model(FLAGS, sess)
+#         model = load_model(FLAGS, sess)
 
-        sensitive_train_loader, sensitive_test_loader, public_train_loader = load_data(FLAGS)
+#         sensitive_train_loader, sensitive_test_loader, public_train_loader = load_data(FLAGS)
 
-        model.pretrain(public_train_loader, FLAGS.pretrain)
+#         model.pretrain(public_train_loader, FLAGS.pretrain)
 
-        model.train(sensitive_train_loader, FLAGS.train)
+#         model.train(sensitive_train_loader, FLAGS.train)
 
-        syn_data, syn_labels = model.generate(FLAGS.gen)
+#         syn_data, syn_labels = model.generate(FLAGS.gen)
 
-    evaluator = Evaluator(FLAGS)
-    evaluator.eval(syn_data, syn_labels, sensitive_test_loader)
+#     evaluator = Evaluator(FLAGS)
+#     evaluator.eval(syn_data, syn_labels, sensitive_test_loader)
 
 def setup(config, fn):
     os.environ['MASTER_ADDR'] = config.setup.master_address

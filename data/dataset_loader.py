@@ -75,7 +75,7 @@ def semantic_query(sensitive_train_loader, config):
     model = model.to(config.setup.local_rank)
     model.eval()
 
-    semantics_hist = torch.zeros((config.sensitive_data.n_classes, config.public_data.n_classes)).cuda()
+    semantics_hist = torch.zeros((config.sensitive_data.n_classes, config.public_data.n_classes)).to(config.setup.local_rank)
 
     for (x, y) in sensitive_loader:
         if len(y.shape) == 2:
@@ -95,6 +95,7 @@ def semantic_query(sensitive_train_loader, config):
             semantics_hist[cls, words] += 1
 
     sensitivity = np.sqrt(config.public_data.selective.num_words)
+    torch.manual_seed(0)
     semantics_hist = semantics_hist + torch.rand_like(semantics_hist) * sensitivity * config.public_data.selective.sigma
 
     semantics_description = torch.topk(semantics_hist, k=config.public_data.selective.num_words, dim=1)

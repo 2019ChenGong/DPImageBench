@@ -13,7 +13,7 @@ import tqdm
 from models.DP_Diffusion.model.ncsnpp import NCSNpp
 from models.DP_Diffusion.utils.util import set_seeds, make_dir, save_checkpoint, sample_random_image_batch, compute_fid
 from models.DP_Diffusion.dnnlib.util import open_url
-from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
+# from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
 from models.DP_Diffusion.model.ema import ExponentialMovingAverage
 from models.DP_Diffusion.score_losses import EDMLoss, VPSDELoss, VESDELoss, VLoss
 from models.DP_Diffusion.denoiser import EDMDenoiser, VPSDEDenoiser, VESDEDenoiser, VDenoiser
@@ -75,6 +75,7 @@ class DP_Diffusion(DPSynther):
         else:
             raise NotImplementedError
         
+        self.model = self.model.to(self.local_rank)
         self.ema = ExponentialMovingAverage(self.model.parameters(), decay=self.ema_rate)
 
         if config.ckpt is not None:
@@ -102,9 +103,8 @@ class DP_Diffusion(DPSynther):
             make_dir(config.log_dir)
             make_dir(sample_dir)
             make_dir(checkpoint_dir)
-        dist.barrier()
 
-        model = DDP(self.model)
+        model = DDP(self.model, device_ids=[self.local_rank])
         ema = ExponentialMovingAverage(model.parameters(), decay=self.ema_rate)
 
         if config.optim.optimizer == 'Adam':
@@ -272,7 +272,6 @@ class DP_Diffusion(DPSynther):
             logging.info('Number of trainable parameters in model: %d' % n_params)
             logging.info('Number of total epochs: %d' % config.n_epochs)
             logging.info('Starting training at step %d' % state['step'])
-        dist.barrier()
 
         privacy_engine = PrivacyEngine()
         if config.dp.sdq is None:

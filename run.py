@@ -6,7 +6,7 @@ import datetime
 from models.model_loader import load_model
 from data.dataset_loader import load_data
 from utils.utils import initialize_environment, run, parse_config
-from evaluation.evaluator import Evaluator
+# from evaluation.evaluator import Evaluator
 os.environ['MKL_NUM_THREADS'] = "1"
 
 def main(config):
