@@ -133,6 +133,7 @@ train:
     epsilon: 10.
     max_physical_batch_size: 8192
     n_splits: 64
+    alpha_num: 0
 
 gen:
   data_num: 60000
