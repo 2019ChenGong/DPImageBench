@@ -15,6 +15,7 @@ from models.DPSDA.dpsda.metrics import compute_fid
 from models.DPSDA.dpsda.dp_counter import dp_nn_histogram
 from models.DPSDA.dpsda.arg_utils import str2bool
 from models.DPSDA.apis import get_api_class_from_name
+import torch.nn.functional as F
 
 import logging
 
@@ -240,7 +241,7 @@ class DPSDA(DPSynther):
 
     def generate(self, config):
         os.mkdir(config.log_dir)
-        syn_data = self.samples
+        syn_data = F.interpolate(torch.from_numpy(self.samples), size=[config.resolution, config.resolution]).numpy()
         syn_labels = self.labels
 
         np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)

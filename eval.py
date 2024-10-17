@@ -26,10 +26,10 @@ if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_dir', default="configs")
-    parser.add_argument('--method', default="DPGAN")
+    parser.add_argument('--method', default="DPSDA")
     parser.add_argument('--epsilon', default="1.0")
-    parser.add_argument('--data_name', default="cifar10_32")
-    parser.add_argument('--exp_path', default="exp/dpgan/cifar10_32_eps1.0-2024-10-08-14-34-51")
+    parser.add_argument('--data_name', default="mnist_28")
+    parser.add_argument('--exp_path', default="exp/dpsda/mnist_28_eps1.0_tr10_vds00112233")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)

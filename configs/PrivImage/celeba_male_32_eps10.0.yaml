@@ -17,7 +17,7 @@ public_data:
   train_path: dataset/imagenet/imagenet_32
   selective:
     ratio: 0.01
-    num_words: 1
+    num_words: 5
     sigma: 5300
     batch_size: 5000
     model_path: models/pretrained_models/imagenet_classifier_0.454_ckpt.pth
@@ -101,7 +101,7 @@ train:
   log_dir: null
   seed: 0
   batch_size: 4096
-  n_epochs: 150
+  n_epochs: 100
   partly_finetune: False
   log_freq: 100
   snapshot_freq: 2000
@@ -127,6 +127,7 @@ train:
     n_classes: 2
   dp:
     sdq: True
+    alpha_num: 0
     privacy_history: [[5300, 1.0, 1]]
     max_grad_norm: 1.0
     delta: 1e-6

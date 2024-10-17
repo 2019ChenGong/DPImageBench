@@ -11,21 +11,21 @@ setup:
 
 public_data:
   name: imagenet
-  num_channels: 1
-  resolution: 28
+  num_channels: 3
+  resolution: 32
   n_classes: 1000
   train_path: dataset/imagenet/imagenet_32
   selective:
     ratio: 1.0
 
 sensitive_data:
-  name: mnist
-  num_channels: 1
-  resolution: 28
-  n_classes: 10
-  train_path: dataset/mnist/train_28.zip
-  test_path: dataset/mnist/test_28.zip
-  fid_stats: dataset/mnist/fid_stats_28.npz
+  name: cifar100
+  num_channels: 3
+  resolution: 32
+  n_classes: 100
+  train_path: dataset/cifar100/train_32.zip
+  test_path: dataset/cifar100/test_32.zip
+  fid_stats: dataset/cifar100/fid_stats_32.npz
 
 model:
   ckpt: null
@@ -33,13 +33,13 @@ model:
   denoiser_network: song
   ema_rate: .999
   network:
-    image_size: 28
-    num_in_channels: 1
-    num_out_channels: 1
-    label_dim: 10
+    image_size: 32
+    num_in_channels: 3
+    num_out_channels: 3
+    label_dim: 100
     attn_resolutions:
-    - 14
-    ch_mult: [2, 2]
+    - 16
+    ch_mult: [2, 4]
   sampler:
     type: ddim
     stochastic: False
@@ -51,26 +51,21 @@ model:
     snapshot_batch_size: 80
     fid_batch_size: 256
   sampler_fid:
-    type: edm
-    s_churn: 100
-    s_min: 0.05
-    s_max: 50
-    num_steps: 1000
+    type: ddim
+    stochastic: False
+    num_steps: 250
     tmin: .002
     tmax: 80.
     rho: 7.
     guid_scale: 0.
   sampler_acc:
-    type: edm
-    s_churn: 10
-    s_min: 0.1
-    s_max: 50
-    num_steps: 1000
+    type: ddim
+    stochastic: False
+    num_steps: 250
     tmin: .002
     tmax: 80.
     rho: 7.
     guid_scale: 0.
-    labels: 10
 
 pretrain:
   log_dir: null
@@ -96,7 +91,7 @@ pretrain:
     p_mean: -1.2
     p_std: 1.2
     n_noise_samples: 1
-    n_classes: 10
+    n_classes: 100
 
 train:
   log_dir: null
@@ -125,16 +120,14 @@ train:
     p_mean: -1.2
     p_std: 1.2
     n_noise_samples: 32
-    n_classes: 10
+    n_classes: 100
   dp:
     sdq: null
-    privacy_history: [[5, 0.1, 75]]
-    alpha_num: 0
     max_grad_norm: 1.0
     delta: 1e-5
-    epsilon: 1.
+    epsilon: 10.
     max_physical_batch_size: 8192
-    n_splits: 32
+    n_splits: 64
 
 gen:
   data_num: 60000

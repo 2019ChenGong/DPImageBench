@@ -19,13 +19,13 @@ public_data:
     ratio: 1.0
 
 sensitive_data:
-  name: mnist
+  name: fmnist
   num_channels: 1
   resolution: 28
   n_classes: 10
-  train_path: dataset/mnist/train_28.zip
-  test_path: dataset/mnist/test_28.zip
-  fid_stats: dataset/mnist/fid_stats_28.npz
+  train_path: dataset/fmnist/train_28.zip
+  test_path: dataset/fmnist/test_28.zip
+  fid_stats: dataset/fmnist/fid_stats_28.npz
 
 model:
   ckpt: null
@@ -52,18 +52,18 @@ model:
     fid_batch_size: 256
   sampler_fid:
     type: edm
-    s_churn: 100
-    s_min: 0.05
+    s_churn: 50
+    s_min: 0.025
     s_max: 50
     num_steps: 1000
     tmin: .002
     tmax: 80.
     rho: 7.
-    guid_scale: 0.
+    guid_scale: 1.
   sampler_acc:
     type: edm
     s_churn: 10
-    s_min: 0.1
+    s_min: 0.025
     s_max: 50
     num_steps: 1000
     tmin: .002
@@ -132,7 +132,7 @@ train:
     alpha_num: 0
     max_grad_norm: 1.0
     delta: 1e-5
-    epsilon: 1.
+    epsilon: 10.
     max_physical_batch_size: 8192
     n_splits: 32
 
