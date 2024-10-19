@@ -245,19 +245,32 @@ class DP_Diffusion(DPSynther):
             make_dir(sample_dir)
             make_dir(checkpoint_dir)
 
+        # if config.partly_finetune:
+        #     for name, param in self.model.named_parameters():
+        #         layer_idx = int(name.split('.')[2])
+        #         if layer_idx > 3 and 'NIN' not in name:
+        #             param.requires_grad = False
+        #             if self.global_rank == 0:
+        #                 logging.info('{} is frozen'.format(name))
+        
         if config.partly_finetune:
+            trainable_parameters = []
             for name, param in self.model.named_parameters():
                 layer_idx = int(name.split('.')[2])
                 if layer_idx > 3 and 'NIN' not in name:
                     param.requires_grad = False
                     if self.global_rank == 0:
                         logging.info('{} is frozen'.format(name))
+                else:
+                    trainable_parameters.append(param)
+        else:
+            trainable_parameters = self.model.parameters()
 
         model = DPDDP(self.model)
         ema = ExponentialMovingAverage(model.parameters(), decay=self.ema_rate)
 
         if config.optim.optimizer == 'Adam':
-            optimizer = torch.optim.Adam(model.parameters(), **config.optim.params)
+            optimizer = torch.optim.Adam(trainable_parameters, **config.optim.params)
         elif config.optim.optimizer == 'SGD':
             optimizer = torch.optim.SGD(model.parameters(), **config.optim.params)
         else:
@@ -267,7 +280,7 @@ class DP_Diffusion(DPSynther):
 
         if self.global_rank == 0:
             model_parameters = filter(
-                lambda p: p.requires_grad, model.parameters())
+                lambda p: p.requires_grad, trainable_parameters)
             n_params = sum([np.prod(p.size()) for p in model_parameters])
             logging.info('Number of trainable parameters in model: %d' % n_params)
             logging.info('Number of total epochs: %d' % config.n_epochs)

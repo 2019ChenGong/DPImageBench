@@ -2,6 +2,7 @@ import os
 import torch
 import torch.nn.functional as F
 import torchvision
+from torch.utils.data import random_split
 from torchvision import transforms
 import numpy as np
 import logging
@@ -19,37 +20,34 @@ def load_sensitive_data(config):
             config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
     sensitive_test_set = ImageFolderDataset(
             config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
+    
+    if config.sensitive_data.train_num != "all":
+        if "mnist" in config.sensitive_data.name:
+            train_size = 55000
+        elif "cifar" in config.sensitive_data.name:
+            train_size = 45000
+        elif "eurosat" in config.sensitive_data.name:
+            train_size = 21000
+        elif "celeba" in config.sensitive_data.name:
+            train_size = 162770
+        elif "camelyon" in config.sensitive_data.name:
+            train_size = 302436
+        else:
+            raise NotImplementedError
 
-    # if config.sensitive_data.name == "mnist":
-    #     sensitive_train_set = torchvision.datasets.MNIST(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
-    #     sensitive_test_set = torchvision.datasets.MNIST(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
-    # elif config.sensitive_data.name == "fmnist":
-    #     sensitive_train_set = torchvision.datasets.FashionMNIST(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
-    #     sensitive_test_set = torchvision.datasets.FashionMNIST(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
-    # elif config.sensitive_data.name == "cifar10":
-    #     sensitive_train_set = torchvision.datasets.CIFAR10(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
-    #     sensitive_test_set = torchvision.datasets.CIFAR10(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
-    # elif config.sensitive_data.name == "cifar100":
-    #     sensitive_train_set = torchvision.datasets.CIFAR100(root=config.sensitive_data.train_path, train=True, download=True, transform=transforms.ToTensor())
-    #     sensitive_test_set = torchvision.datasets.CIFAR100(root=config.sensitive_data.test_path, train=False, download=True, transform=transforms.ToTensor())
-    # elif config.sensitive_data.name == "celeba":
-    #     sensitive_train_set = ImageFolderDataset(
-    #         config.sensitive_data.train_path, config.sensitive_data.resolution, attr='Male', split='train', use_labels=True)
-    #     sensitive_test_set = ImageFolderDataset(
-    #         config.sensitive_data.test_path, config.sensitive_data.resolution, attr='Male', split='test', use_labels=True)
-    # elif config.sensitive_data.name == "camelyon":
-    #     sensitive_train_set = ImageFolderDataset(
-    #         config.sensitive_data.train_path, config.sensitive_data.resolution, split='train', use_labels=True)
-    #     sensitive_test_set = ImageFolderDataset(
-    #         config.sensitive_data.test_path, config.sensitive_data.resolution, split='test', use_labels=True)
-    # else:
-    #     raise NotImplementedError('{} is not yet implemented.'.format(config.sensitive_data.name))
+        val_size = len(sensitive_train_set) - train_size
+        torch.manual_seed(0)
+        sensitive_train_set, sensitive_val_set = random_split(sensitive_train_set, [train_size, val_size])
+        sensitive_val_loader = torch.utils.data.DataLoader(dataset=sensitive_val_set, shuffle=False, drop_last=False, batch_size=config.eval.batch_size)
+    else:
+        sensitive_val_set = None
+        sensitive_val_loader = None
     
 
     sensitive_train_loader = torch.utils.data.DataLoader(dataset=sensitive_train_set, shuffle=True, drop_last=False, batch_size=config.train.batch_size)
-    sensitive_test_loader = torch.utils.data.DataLoader(dataset=sensitive_test_set, shuffle=True, drop_last=False, batch_size=config.eval.batch_size)
+    sensitive_test_loader = torch.utils.data.DataLoader(dataset=sensitive_test_set, shuffle=False, drop_last=False, batch_size=config.eval.batch_size)
 
-    return sensitive_train_loader, sensitive_test_loader
+    return sensitive_train_loader, sensitive_val_loader, sensitive_test_loader
 
 
 def semantic_query(sensitive_train_loader, config):
@@ -97,10 +95,19 @@ def semantic_query(sensitive_train_loader, config):
     sensitivity = np.sqrt(config.public_data.selective.num_words)
     torch.manual_seed(0)
     semantics_hist = semantics_hist + torch.rand_like(semantics_hist) * sensitivity * config.public_data.selective.sigma
-
-    semantics_description = torch.topk(semantics_hist, k=config.public_data.selective.num_words, dim=1)
-
-    cls_dict = {cls: list(semantics_description[1][cls].detach().cpu().numpy()) for cls in range(config.sensitive_data.n_classes)}
+    
+    cls_dict = {}
+    for i in range(config.sensitive_data.n_classes):
+        semantics_hist_i = semantics_hist[i]
+        if i != 0:
+            semantics_hist_i[topk_mask] = -999
+        semantics_description_i = torch.topk(semantics_hist_i, k=config.public_data.selective.num_words)[1]
+        if i == 0:
+            topk_mask = semantics_description_i
+        else:
+            topk_mask = torch.cat([topk_mask, semantics_description_i])
+        cls_dict[i] = list(semantics_description_i.detach().cpu().numpy())
+            
     if config.setup.global_rank == 0:
         logging.info(cls_dict)
     del model
@@ -109,7 +116,7 @@ def semantic_query(sensitive_train_loader, config):
 
 
 def load_data(config):
-    sensitive_train_loader, sensitive_test_loader = load_sensitive_data(config)
+    sensitive_train_loader, sensitive_val_loader, sensitive_test_loader = load_sensitive_data(config)
     N = len(sensitive_train_loader.dataset)
     config.train.dp.delta = float(1.0 / (N * np.log(N)))
 
@@ -144,6 +151,7 @@ def load_data(config):
 
     if config.sensitive_data.name is None:
         sensitive_train_loader = None
+        sensitive_val_loader = None
         sensitive_test_loader = None
 
-    return sensitive_train_loader, sensitive_test_loader, public_train_loader, config
+    return sensitive_train_loader, sensitive_val_loader, sensitive_test_loader, public_train_loader, config

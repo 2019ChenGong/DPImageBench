@@ -9,8 +9,6 @@ We can save the figure of bug into ./bug_fig/. [Chen: OK]
 
 - [] recoding the intermediate results of methods with tqdm.
 
-- [] mnist for g-pate, the acc is so low. Besides, the g-pate is too slow; it seems like that algorithms dosen't use GPU [KC: g-pate needs to train 4000 discriminators serially at each step].
-
 - [] error in FLD for merf, camelyon_32. [KC: I think it is a bug in FLD code. See bug_fig/fld_bug.png]
 
 - [] The Precision and Recall of synthetic images is 0.0 and 0.0 in some cases, like dp-ntk celeba_male_32 1.0. [KC: It's becasue that the performance of dp-ntk is too poor. Please see bug_fig/zero_pr.png]

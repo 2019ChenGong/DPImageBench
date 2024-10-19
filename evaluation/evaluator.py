@@ -27,20 +27,6 @@ from evaluation.classifier.wrn import WideResNet
 from evaluation.classifier.resnet import ResNet
 from evaluation.classifier.resnext import ResNeXt
 
-mnist_prompt = ["A grayscale image of a handwritten digit 0", "A grayscale image of a handwritten digit 1", "an image of hand-written 2", "an image of hand-written 3", "an image of hand-written 4", "an image of hand-written 5", "an image of hand-written 6", "an image of hand-written 7", "an image of hand-written 8", "an image of hand-written 9"]
-
-fmnist_prompt = ["A grayscale image of a T-shirt", "A grayscale image of a handwritten digit Trouser", "an image of hand-written Pullover", "an image of hand-written Dress", "an image of hand-written Coat", "an image of hand-written Sandal", "an image of hand-written Shirt", "an image of hand-written Sneaker", "an image of hand-written Bag", "an image of hand-written Ankle boot"]
-
-cifar10_prompt = ["An image of an airplane", "An image of an automobile", "An image of a bird", "An image of a cat", "An image of a deer", "An image of a dog", "An image of a frog", "An image of a horse", "An image of a ship", "An image of a truck"]
-
-eurosat_prompt = ["A remote sensing image of an industrial area", "A remote sensing image of a residential area", "A remote sensing image of an annual crop area", "A remote sensing image of a permanent crop area", "A remote sensing image of a river area", "A remote sensing image of a sea or lake area", "A remote sensing image of a herbaceous veg. area", "A remote sensing image of a highway area", "A remote sensing image of a pasture area", "A remote sensing image of a forest area"]
-
-cifar100_prompt = None
-
-celeba_male_prompt = ["an image of a female face", "an image of a male face"]
-
-camelyon_prompt = ["an image of hand-written 0", "an image of hand-written 1", "an image of hand-written 2", "an image of hand-written 3", "an image of hand-written 4", "an image of hand-written 5", "an image of hand-written 6", "an image of hand-written 7", "an image of hand-written 8", "an image of hand-written 9"]
-
 class Evaluator(object):
     def __init__(self, config):
 
@@ -51,10 +37,13 @@ class Evaluator(object):
         self.config = config
         torch.cuda.empty_cache()
     
-    def eval(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader):
+    def eval(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader):
         if self.device != 0 or sensitive_test_loader is None:
             return
-        
+        if synthetic_images.shape[-1] != self.config.sensitive_data.resolution:
+            synthetic_images = F.interpolate(torch.from_numpy(synthetic_images), size=[self.config.sensitive_data.resolution, self.config.sensitive_data.resolution]).numpy()
+        if synthetic_images.shape[1] == 3 and self.config.sensitive_data.num_channels == 1:
+            synthetic_images = 0.299 * synthetic_images[:, 2:, ...] + 0.587 * synthetic_images[:, 1:2, ...] + 0.114 * synthetic_images[:, :1, ...]
         # fid, is_mean = self.visual_metric(synthetic_images)
         # fid, is_mean, fld, p, r, ir = self.visual_metric(synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader)
         # # fid = is_mean = 0
@@ -67,8 +56,12 @@ class Evaluator(object):
         acc_list = []
 
         for model_name in self.acc_models:
-            acc, test_acc_on_val, test_acc_on_test = self.cal_acc_2(model_name, synthetic_images, synthetic_labels, sensitive_test_loader)
-            logging.info("The best acc of synthetic images on val and the corresponding acc on test dataset from {} is {} and {}".format(model_name, acc, test_acc_on_val))
+            acc, test_acc_on_val, test_acc_on_test, best_noisy_acc, best_test_acc_on_noisy_val = self.cal_acc_2(model_name, synthetic_images, synthetic_labels, sensitive_val_loader, sensitive_test_loader)
+            if sensitive_val_loader is not None:
+                logging.info("The best acc of synthetic images on sensitive val and the corresponding acc on test dataset from {} is {} and {}".format(model_name, acc, test_acc_on_val))
+                logging.info("The best acc of synthetic images on noisy sensitive val and the corresponding acc on test dataset from {} is {} and {}".format(model_name, acc, test_acc_on_val))
+            else:
+                logging.info("The best acc of synthetic images on val and the corresponding acc on test dataset from {} is {} and {}".format(model_name, acc, test_acc_on_val))
             logging.info("The best acc test dataset from {} is {}".format(model_name, test_acc_on_test))
             acc_list.append(test_acc_on_val)
         
@@ -239,7 +232,7 @@ class Evaluator(object):
 
         return best_acc
     
-    def cal_acc_2(self, model_name, synthetic_images, synthetic_labels, sensitive_test_loader):
+    def cal_acc_2(self, model_name, synthetic_images, synthetic_labels, sensitive_val_loader, sensitive_test_loader):
 
         synthetic_images_train, synthetic_images_val = synthetic_images[:55000], synthetic_images[55000:]
         synthetic_labels_train, synthetic_labels_val = synthetic_labels[:55000], synthetic_labels[55000:]
@@ -286,9 +279,17 @@ class Evaluator(object):
         # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
 
         train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_train).float(), torch.from_numpy(synthetic_labels_train).long()), shuffle=True, batch_size=batch_size)
-        val_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_val).float(), torch.from_numpy(synthetic_labels_val).long()), shuffle=True, batch_size=batch_size)
+
+        if sensitive_val_loader is None:
+            val_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_val).float(), torch.from_numpy(synthetic_labels_val).long()), shuffle=True, batch_size=batch_size)
+            sensitive_val = False
+        else:
+            val_loader = sensitive_val_loader
+            sensitive_val = True
+            val_acc_list = []
 
         best_acc = 0.
+        best_noisy_correct = 0.
         best_test_acc_on_val = 0.
         best_test_acc_on_test = 0.
 
@@ -327,7 +328,9 @@ class Evaluator(object):
             
             with torch.no_grad():
                 for _, (inputs, targets) in enumerate(val_loader):
-
+                    if len(targets.shape) == 2:
+                        inputs = inputs.to(torch.float32) / 255.
+                        targets = torch.argmax(targets, dim=1)
                     inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
                     outputs = model(inputs)
                     loss = criterion(outputs, targets)
@@ -363,10 +366,19 @@ class Evaluator(object):
 
             logging.info("Epoch: {} Train acc: {} Val acc: {} Test acc{}; Train loss: {} Val loss: {}".format(epoch, train_acc, val_acc, test_acc, train_loss, val_loss))
 
+            if sensitive_val:
+                noisy_val_correct = val_correct + np.random.laplace(loc=0, scale=1/self.config.train.dp.epsilon)
+                if noisy_val_correct >= best_noisy_correct:
+                    best_noisy_correct = noisy_val_correct
+                    best_noisy_acc = noisy_val_correct / val_total * 100
+                    best_test_acc_on_noisy_val = test_acc
+            else:
+                best_noisy_acc = 0
+                best_test_acc_on_noisy_val = 0
+
             if val_acc >= best_acc:
                 best_acc = val_acc
                 best_test_acc_on_val = test_acc
-                best_model = copy.deepcopy(model)
 
             if test_acc >= best_test_acc_on_test:
                 best_test_acc_on_test = test_acc
@@ -374,7 +386,7 @@ class Evaluator(object):
             ema.restore(model.parameters())
         
 
-        return best_acc, best_test_acc_on_val, best_test_acc_on_test 
+        return best_acc, best_test_acc_on_val, best_test_acc_on_test, best_noisy_acc, best_test_acc_on_noisy_val
     
     def cal_acc_no_dp(self, sensitive_train_loader, sensitive_test_loader):
         if self.device != 0 or sensitive_test_loader is None or sensitive_train_loader is None:
