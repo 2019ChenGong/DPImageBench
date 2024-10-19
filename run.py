@@ -38,6 +38,7 @@ if __name__ == '__main__':
     parser.add_argument('--exp_description', '-ed', default="")
     parser.add_argument('--config_suffix', '-cs', default="")
     parser.add_argument('--resume_exp', '-re', default=None)
+    parser.add_argument('--config_suffix', '-cs', default="")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)
