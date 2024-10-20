@@ -134,7 +134,7 @@ class Evaluator(object):
         criterion = nn.CrossEntropyLoss()
         lr = 1e-4
 
-        if self.config['sensitive_data']['nam   e'] == 'cifar10_32' or self.config['sensitive_data']['name'] == 'cifar100_32':
+        if self.config['sensitive_data']['name'] == 'cifar10_32' or self.config['sensitive_data']['name'] == 'cifar100_32':
             batch_size = 128
             max_epoch = 200
             if model_name == "wrn":

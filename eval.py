@@ -40,15 +40,6 @@ if __name__ == '__main__':
     config.setup.global_rank = 0
     config.public_data.name = None
 
-    # if not hasattr(config.setup, "workdir"):
-    #     nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    # if opt.resume_exp is not None:
-    #     config.setup.workdir = "exp/{}/{}".format(str.lower(opt.method), opt.resume_exp)
-    # elif opt.exp_description == "":
-    #     config.setup.workdir = "exp/{}/{}_eps{}-{}".format(str.lower(opt.method), opt.data_name, opt.epsilon, nowTime)
-    # else:
-    #     config.setup.workdir = "exp/{}/{}-{}".format(str.lower(opt.method), opt.exp_description, nowTime)
-
     config.setup.workdir = os.path.join(opt.exp_path, 'stdout.txt')
     config.gen.log_dir = os.path.join(opt.exp_path, 'gen', 'gen.npz')
 
