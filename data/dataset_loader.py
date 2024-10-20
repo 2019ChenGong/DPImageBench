@@ -31,7 +31,7 @@ def load_sensitive_data(config):
         elif "celeba" in config.sensitive_data.name:
             train_size = 162770
         elif "camelyon" in config.sensitive_data.name:
-            train_size = 302436
+            train_size = 269538
         else:
             raise NotImplementedError
 

@@ -50,7 +50,7 @@
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method PrivImage --data_name cifar100_32 --epsilon 1.0  --exp_path exp/privimage/cifar100_32_eps1.0-2024-10-17-00-27-34 &
 
-CUDA_VISIBLE_DEVICES=2  python eval.py --method PrivImage --data_name mnist_28 --epsilon 10.0  --exp_path exp/privimage/mnist_28_eps10.0-2024-10-19-11-46-32 &
+# CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-LDM --data_name mnist_28 --epsilon 10.0  --exp_path exp/privimage/mnist_28_eps10.0-2024-10-19-11-46-32 &
 
 # CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-LDM --data_name mnist_28 --epsilon 1.0  --exp_path exp/dp-ldm/mnist_28_eps1.0-2024-10-19-00-08-31 &
 
@@ -62,10 +62,10 @@ CUDA_VISIBLE_DEVICES=2  python eval.py --method PrivImage --data_name mnist_28 -
 
 # CUDA_VISIBLE_DEVICES=1  python eval.py public_data.name=null --method DPGAN --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/dpgan/celeba_male_32_eps10.0-2024-10-08-12-09-30 &
 
-CUDA_VISIBLE_DEVICES=6  python eval.py --method DP-LDM --data_name fmnist_28 --epsilon 1.0  --exp_path exp/dp-ldm/fmnist_28_eps1.0-2024-10-19-16-56-37 &
+CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-MERF --data_name mnist_28 --epsilon 1.0  --exp_path exp/dp-merf/mnist_28_eps10.0trainval-2024-10-19-06-42-21 &
 
-# CUDA_VISIBLE_DEVICES=1  python eval.py --method DPSDA --data_name mnist_28 --epsilon 1.0  --exp_path exp/dpsda/mnist_28_eps10.0_th0_tr10_vds000111222333 &
+CUDA_VISIBLE_DEVICES=1  python eval.py --method DP-LDM --data_name fmnist_28 --epsilon 10.0  --exp_path exp/dp-ldm/fmnist_28_eps10.0-2024-10-19-17-35-19 &
 
-# CUDA_VISIBLE_DEVICES=2  python eval.py --method DPSDA --data_name mnist_28 --epsilon 1.0  --exp_path exp/dpsda/mnist_28_eps10.0_th2_tr10_vds00112233 &
+CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-LDM --data_name eurosat_32 --epsilon 10.0  --exp_path exp/dp-ldm/eurosat_32_eps10.0-2024-10-20-00-44-03 &
 
-# CUDA_VISIBLE_DEVICES=3  python eval.py --method DPSDA --data_name mnist_28 --epsilon 1.0  --exp_path exp/dpsda/mnist_28_eps10.0_th2.5_tr10_vds000111222333 &
+CUDA_VISIBLE_DEVICES=3  python eval.py --method DP-LDM --data_name cifar10_32 --epsilon 1.0  --exp_path exp/dp-ldm/cifar10_32_eps1.0-2024-10-19-22-37-57 &

@@ -91,6 +91,15 @@ def run(func, config):
 
 def setup(config, fn):
     os.environ['MASTER_ADDR'] = config.setup.master_address
+    import socket
+    def is_port_in_use(port):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            result = sock.connect_ex(('127.0.0.1', port))
+            return result == 0
+    port = config.setup.master_port
+    while is_port_in_use(port):
+        port += 1
+    config.setup.master_port = port
     os.environ['MASTER_PORT'] = '%d' % config.setup.master_port
     os.environ['OMP_NUM_THREADS'] = '%d' % config.setup.omp_n_threads
     torch.cuda.set_device(config.setup.local_rank)
