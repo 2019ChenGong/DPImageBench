@@ -50,7 +50,7 @@
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method PrivImage --data_name cifar100_32 --epsilon 1.0  --exp_path exp/privimage/cifar100_32_eps1.0-2024-10-17-00-27-34 &
 
-# CUDA_VISIBLE_DEVICES=1  python eval.py --method PrivImage --data_name cifar100_32 --epsilon 10.0  --exp_path exp/privimage/cifar100_32_eps10.0-2024-10-17-00-29-00 &
+CUDA_VISIBLE_DEVICES=2  python eval.py --method PrivImage --data_name mnist_28 --epsilon 10.0  --exp_path exp/privimage/mnist_28_eps10.0-2024-10-19-11-46-32 &
 
 # CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-LDM --data_name mnist_28 --epsilon 1.0  --exp_path exp/dp-ldm/mnist_28_eps1.0-2024-10-19-00-08-31 &
 
