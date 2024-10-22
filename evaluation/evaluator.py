@@ -239,7 +239,6 @@ class Evaluator(object):
     
         num_classes = len(set(synthetic_labels))
         criterion = nn.CrossEntropyLoss()
-        lr = 1e-4
 
         if 'cifar' in self.config.sensitive_data.name:
             batch_size = 126
@@ -339,7 +338,9 @@ class Evaluator(object):
                     _, predicted = outputs.max(1)
                     val_total += targets.size(0)
                     val_correct += predicted.eq(targets).sum().item()
+
             
+            # print(val_total)
             val_acc = val_correct / val_total * 100
             val_loss = test_loss / val_total
 

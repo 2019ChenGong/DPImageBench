@@ -289,9 +289,12 @@ def rbf_kernel_DP_loss_with_labels(X, Y, x_label, y_label, sigma_list, noise_mul
         f_Dxy_tilde = f_Dxy
     else:
         coeff =  math.sqrt(2 * len(sigma_list)) / N * noise_multiplier
-        mvn_Dxy = mvn(torch.zeros_like(f_Dxy), K * coeff)
-        f_Dxy_tilde = f_Dxy + mvn_Dxy.sample()
-        del mvn_Dxy
+        try:
+            mvn_Dxy = mvn(torch.zeros_like(f_Dxy), K * coeff)
+            f_Dxy_tilde = f_Dxy + mvn_Dxy.sample()
+            del mvn_Dxy
+        except:
+            f_Dxy_tilde = f_Dxy
     f_Dx_tilde = f_Dxy_tilde[:N] # [N]
     f_Dy_tilde = f_Dxy_tilde[N:] # [M]
     mmd_XX = torch.mean(f_Dx_tilde)

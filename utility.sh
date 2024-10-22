@@ -58,18 +58,25 @@
 
 # CUDA_VISIBLE_DEVICES=1  python eval.py --method DP-MERF sensitive_data.train_num=val --data_name camelyon_32 --epsilon 10.0  --exp_path exp/dp-merf/camelyon_32_eps10.0trainval-2024-10-20-06-32-32 &
 
-# CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-MERF sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 1.0  --exp_path exp/dp-merf/celeba_male_32_eps1.0trainval-2024-10-20-06-32-32 &
+CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-MERF sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 1.0  --exp_path exp/dp-merf/celeba_male_32_eps10.0trainval-2024-10-22-03-29-00 &
 
-# CUDA_VISIBLE_DEVICES=3  python eval.py --method DP-MERF sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/dp-merf/celeba_male_32_eps10.0trainval-2024-10-20-06-32-32 &
+CUDA_VISIBLE_DEVICES=3  python eval.py --method DP-MERF sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/dp-merf/celeba_male_32_eps1.0trainval-2024-10-22-03-29-00 &
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 1.0  --exp_path exp/dp-kernel/celeba_male_32_eps1.0trainval-2024-10-20-06-32-32 &
 
 # CUDA_VISIBLE_DEVICES=1  python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/dp-kernel/celeba_male_32_eps10.0trainval-2024-10-20-06-32-32 &
 
-CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name eurosat_32 --epsilon 1.0  --exp_path exp/dp-kernel/eurosat_32_eps1.0trainval-2024-10-20-09-39-26 &
+# CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name eurosat_32 --epsilon 1.0  --exp_path exp/dp-kernel/eurosat_32_eps1.0trainval-2024-10-20-09-39-26 &
 
-CUDA_VISIBLE_DEVICES=3  python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name eurosat_32 --epsilon 10.0  --exp_path exp/dp-kernel/eurosat_32_eps10.0trainval-2024-10-20-09-39-26 &
+# CUDA_VISIBLE_DEVICES=3  python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name eurosat_32 --epsilon 10.0  --exp_path exp/dp-kernel/eurosat_32_eps10.0trainval-2024-10-20-09-39-26 &
 
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-NTK sensitive_data.train_num=val --data_name mnist_28 --epsilon 1.0  --exp_path exp/dp-ntk/mnist_28_eps1.0trainval-2024-10-20-09-43-52 &
+
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method DP-NTK sensitive_data.train_num=val --data_name mnist_28 --epsilon 10.0  --exp_path exp/dp-ntk/mnist_28_eps10.0trainval-2024-10-20-09-43-52 &
+
+# CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-NTK sensitive_data.train_num=val --data_name fmnist_28 --epsilon 1.0  --exp_path exp/dp-ntk/fmnist_28_eps1.0trainval-2024-10-20-09-45-58 &
+
+# CUDA_VISIBLE_DEVICES=3  python eval.py --method DP-NTK sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path exp/dp-ntk/fmnist_28_eps10.0trainval-2024-10-20-09-45-58 &
 
 # CUDA_VISIBLE_DEVICES=4  python eval.py --method PDP-Diffusion --data_name cifar10_32 --epsilon 1.0  --exp_path exp/pdp-diffusion/cifar10_32_eps1.0_LZN-2024-10-20-06-28-03 &
 

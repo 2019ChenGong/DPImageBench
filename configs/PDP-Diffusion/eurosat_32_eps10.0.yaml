@@ -10,8 +10,8 @@ setup:
   workdir: exp/dpdm/eurosat_32_eps10.0
 public_data:
   name: imagenet
-  num_channels: 1
-  resolution: 28
+  num_channels: 3
+  resolution: 32
   n_classes: 1000
   train_path: dataset/imagenet/imagenet_32
   selective:

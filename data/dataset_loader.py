@@ -29,7 +29,7 @@ def load_sensitive_data(config):
         elif "eurosat" in config.sensitive_data.name:
             train_size = 21000
         elif "celeba" in config.sensitive_data.name:
-            train_size = 162770
+            train_size = 145064
         elif "camelyon" in config.sensitive_data.name:
             train_size = 269538
         else:
@@ -39,6 +39,7 @@ def load_sensitive_data(config):
         torch.manual_seed(0)
         sensitive_train_set, sensitive_val_set = random_split(sensitive_train_set, [train_size, val_size])
         sensitive_val_loader = torch.utils.data.DataLoader(dataset=sensitive_val_set, shuffle=False, drop_last=False, batch_size=config.eval.batch_size)
+        print(len(sensitive_train_set), len(sensitive_val_set))
     else:
         sensitive_val_set = None
         sensitive_val_loader = None
