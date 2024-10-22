@@ -26,13 +26,13 @@ if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_dir', default="configs")
-    parser.add_argument('--method', default="DPDM")
-    parser.add_argument('--epsilon', default="10.0")
-    parser.add_argument('--data_name', default="eurosat_32")
+    parser.add_argument('--method', '-m', default="DP-MERF")
+    parser.add_argument('--epsilon', '-e', default="10.0")
+    parser.add_argument('--data_name', '-dn', default="mnist_28")
     parser.add_argument('--config_suffix', '-cs', default="")
     parser.add_argument('--resume_exp', '-re', default=None)
     parser.add_argument('--exp_description', '-ed', default="")
-    parser.add_argument('--exp_path', default="exp/dpdm/eurosat_32_eps10.0-2024-10-10-14-39-52")
+    parser.add_argument('--exp_path', '-ep', default="exp/dp-merf/mnist_28_eps1.0trainval-2024-10-20-06-27-04")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)
@@ -44,3 +44,5 @@ if __name__ == '__main__':
     config.gen.log_dir = os.path.join(opt.exp_path, 'gen', 'gen.npz')
 
     main(config)
+
+    # python eval.py sensitive_data.train_num=val

@@ -23,5 +23,19 @@
 
 # CUDA_VISIBLE_DEVICES=0 python run.py public_data.name=null sensitive_data.train_num=val -m DP-Kernel -dn camelyon_32 -e 10.0 -ed trainval &
 # CUDA_VISIBLE_DEVICES=1 python run.py public_data.name=null sensitive_data.train_num=val -m DP-Kernel -dn camelyon_32 -e 1.0 -ed trainval &
-CUDA_VISIBLE_DEVICES=0 python run.py public_data.name=null sensitive_data.train_num=val -m DP-NTK -dn fmnist_28 -e 10.0 -ed trainval &
-CUDA_VISIBLE_DEVICES=1 python run.py public_data.name=null sensitive_data.train_num=val -m DP-NTK -dn fmnist_28 -e 1.0 -ed trainval &
+# CUDA_VISIBLE_DEVICES=0 python run.py public_data.name=null sensitive_data.train_num=val -m DP-NTK -dn fmnist_28 -e 10.0 -ed trainval &
+# CUDA_VISIBLE_DEVICES=1 python run.py public_data.name=null sensitive_data.train_num=val -m DP-NTK -dn fmnist_28 -e 1.0 -ed trainval &
+
+# python eval.py sensitive_data.train_num=val -m DP-MERF -dn mnist_28 -e 1.0 -ep exp/dp-merf/mnist_28_eps1.0trainval-2024-10-20-06-27-04 &
+# python eval.py sensitive_data.train_num=val -m DP-MERF -dn fmnist_28 -e 10.0 -ep exp/dp-merf/fmnist_28_eps10.0trainval-2024-10-20-06-27-04 &
+# python eval.py sensitive_data.train_num=val -m DP-MERF -dn fmnist_28 -e 1.0 -ep exp/dp-merf/fmnist_28_eps1.0trainval-2024-10-20-06-27-04 &
+# python eval.py sensitive_data.train_num=val -m DP-MERF -dn cifar10_32 -e 10.0 -ep exp/dp-merf/cifar10_32_eps10.0trainval-2024-10-20-06-27-04 &
+# python eval.py sensitive_data.train_num=val -m DP-MERF -dn cifar10_32 -e 1.0 -ep exp/dp-merf/cifar10_32_eps1.0trainval-2024-10-20-06-30-09 &
+# python eval.py sensitive_data.train_num=val -m DP-MERF -dn cifar100_32 -e 10.0 -ep exp/dp-merf/cifar100_32_eps10.0trainval-2024-10-20-06-30-09 &
+# python eval.py sensitive_data.train_num=val -m DP-MERF -dn cifar100_32 -e 1.0 -ep exp/dp-merf/cifar100_32_eps1.0trainval-2024-10-20-06-32-32 &
+python eval.py sensitive_data.train_num=val -m DP-MERF -dn eurosat_32 -e 10.0 -ep exp/dp-merf/eurosat_32_eps10.0trainval-2024-10-20-06-30-09 &
+python eval.py sensitive_data.train_num=val -m DP-MERF -dn eurosat_32 -e 1.0 -ep exp/dp-merf/eurosat_32_eps1.0trainval-2024-10-20-06-30-09 &
+python eval.py sensitive_data.train_num=val -m DP-MERF -dn celeba_male_32 -e 10.0 -ep exp/dp-merf/celeba_male_32_eps10.0trainval-2024-10-20-06-32-32 &
+python eval.py sensitive_data.train_num=val -m DP-MERF -dn celeba_male_32 -e 1.0 -ep exp/dp-merf/celeba_male_32_eps1.0trainval-2024-10-20-06-32-32 &
+python eval.py sensitive_data.train_num=val -m DP-MERF -dn camelyon_32 -e 10.0 -ep exp/dp-merf/camelyon_32_eps10.0trainval-2024-10-20-06-32-32 &
+python eval.py sensitive_data.train_num=val -m DP-MERF -dn camelyon_32 -e 1.0 -ep exp/dp-merf/camelyon_32_eps1.0trainval-2024-10-20-06-35-05 &
