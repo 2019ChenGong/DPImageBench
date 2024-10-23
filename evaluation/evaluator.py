@@ -233,6 +233,11 @@ class Evaluator(object):
         return best_acc
     
     def cal_acc_2(self, model_name, synthetic_images, synthetic_labels, sensitive_val_loader, sensitive_test_loader):
+        # Fixed seed for better reproducibility
+        rng = np.random.default_rng(seed=0)
+        indices = rng.permutation(len(synthetic_images))
+        synthetic_images = synthetic_images[indices]
+        synthetic_labels = synthetic_labels[indices]
 
         synthetic_images_train, synthetic_images_val = synthetic_images[:55000], synthetic_images[55000:]
         synthetic_labels_train, synthetic_labels_val = synthetic_labels[:55000], synthetic_labels[55000:]
