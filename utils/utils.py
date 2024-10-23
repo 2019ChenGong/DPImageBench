@@ -108,7 +108,7 @@ def setup(config, fn):
                             rank=config.setup.global_rank,
                             world_size=config.setup.global_size)
     fn(config)
-    dist.barrier()
+    # dist.barrier()
     dist.destroy_process_group()
 
 def set_logger(gfile_stream):

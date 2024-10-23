@@ -1,7 +1,7 @@
 setup:
   method: dpsgd-diffusion
   run_type: torchmp
-  n_gpus_per_node: 4
+  n_gpus_per_node: 3
   n_nodes: 1
   node_rank: 0
   master_address: 127.0.0.1
