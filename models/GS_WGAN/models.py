@@ -7,9 +7,6 @@ import functools
 
 from models.GS_WGAN.ops import SpectralNorm, one_hot_embedding, pixel_norm
 
-IMG_W = IMG_H = 28  # image width and height
-IMG_C = 1  # image channel
-
 
 class GBlock(nn.Module):
     def __init__(self, in_channels, out_channels,
@@ -45,17 +42,19 @@ class GBlock(nn.Module):
 
 
 class GeneratorDCGAN(nn.Module):
-    def __init__(self, z_dim=10, model_dim=64, num_classes=10, outact=nn.Sigmoid()):
+    def __init__(self, c=1, img_size=28, z_dim=10, model_dim=64, num_classes=10, outact=nn.Sigmoid()):
         super(GeneratorDCGAN, self).__init__()
 
         self.model_dim = model_dim
         self.z_dim = z_dim
         self.num_classes = num_classes
+        self.c = c
+        self.img_size = img_size
 
         fc = nn.Linear(z_dim + num_classes, 4 * 4 * 4 * model_dim)
         deconv1 = nn.ConvTranspose2d(4 * model_dim, 2 * model_dim, 5)
         deconv2 = nn.ConvTranspose2d(2 * model_dim, model_dim, 5)
-        deconv3 = nn.ConvTranspose2d(model_dim, IMG_C, 8, stride=2)
+        deconv3 = nn.ConvTranspose2d(model_dim, self.c, 8, stride=2)
 
         self.deconv1 = deconv1
         self.deconv2 = deconv2
@@ -73,7 +72,8 @@ class GeneratorDCGAN(nn.Module):
         output = pixel_norm(output)
 
         output = self.deconv1(output)
-        output = output[:, :, :7, :7]
+        if self.img_size == 28:
+            output = output[:, :, :7, :7]
         output = self.relu(output)
         output = pixel_norm(output)
 
@@ -83,22 +83,24 @@ class GeneratorDCGAN(nn.Module):
 
         output = self.deconv3(output)
         output = self.outact(output)
-        return output.view(-1, IMG_W * IMG_H)
+        return output.view(-1, self.img_size * self.img_size * self.c)
 
 
 class GeneratorResNet(nn.Module):
-    def __init__(self, z_dim=10, model_dim=64, num_classes=10, outact=nn.Sigmoid()):
+    def __init__(self, c=1, img_size=28, z_dim=10, model_dim=64, num_classes=10, outact=nn.Sigmoid()):
         super(GeneratorResNet, self).__init__()
 
         self.model_dim = model_dim
         self.z_dim = z_dim
         self.num_classes = num_classes
+        self.c = c
+        self.img_size = img_size
 
         fc = SpectralNorm(nn.Linear(z_dim + num_classes, 4 * 4 * 4 * model_dim))
         block1 = GBlock(model_dim * 4, model_dim * 4)
         block2 = GBlock(model_dim * 4, model_dim * 4)
         block3 = GBlock(model_dim * 4, model_dim * 4)
-        output = SpectralNorm(nn.Conv2d(model_dim * 4, IMG_C, kernel_size=3, padding=0))
+        output = SpectralNorm(nn.Conv2d(model_dim * 4, self.c, kernel_size=3, padding=int(self.c==3)))
 
         self.block1 = block1
         self.block2 = block2
@@ -119,26 +121,29 @@ class GeneratorResNet(nn.Module):
         output = self.block2(output)
         output = self.block3(output)
         output = self.outact(self.output(output))
-        output = output[:, :, :-2, :-2]
-        output = torch.reshape(output, [-1, IMG_H * IMG_W])
+        if self.img_size == 28:
+            output = output[:, :, :-2, :-2]
+        output = torch.reshape(output, [-1, self.img_size * self.img_size * self.c])
         return output
 
 
 class DiscriminatorDCGAN(nn.Module):
-    def __init__(self, model_dim=64, num_classes=10, if_SN=True):
+    def __init__(self, c=1, img_size=28, model_dim=64, num_classes=10, if_SN=True):
         super(DiscriminatorDCGAN, self).__init__()
 
         self.model_dim = model_dim
         self.num_classes = num_classes
+        self.c = c
+        self.img_size = img_size
 
         if if_SN:
-            self.conv1 = SpectralNorm(nn.Conv2d(1, model_dim, 5, stride=2, padding=2))
+            self.conv1 = SpectralNorm(nn.Conv2d(self.c, model_dim, 5, stride=2, padding=2))
             self.conv2 = SpectralNorm(nn.Conv2d(model_dim, model_dim * 2, 5, stride=2, padding=2))
             self.conv3 = SpectralNorm(nn.Conv2d(model_dim * 2, model_dim * 4, 5, stride=2, padding=2))
             self.linear = SpectralNorm(nn.Linear(4 * 4 * 4 * model_dim, 1))
             self.linear_y = SpectralNorm(nn.Embedding(num_classes, 4 * 4 * 4 * model_dim))
         else:
-            self.conv1 = nn.Conv2d(1, model_dim, 5, stride=2, padding=2)
+            self.conv1 = nn.Conv2d(self.c, model_dim, 5, stride=2, padding=2)
             self.conv2 = nn.Conv2d(model_dim, model_dim * 2, 5, stride=2, padding=2)
             self.conv3 = nn.Conv2d(model_dim * 2, model_dim * 4, 5, stride=2, padding=2)
             self.linear = nn.Linear(4 * 4 * 4 * model_dim, 1)
@@ -146,7 +151,7 @@ class DiscriminatorDCGAN(nn.Module):
         self.relu = nn.ReLU()
 
     def forward(self, input, y):
-        input = input.view(-1, 1, IMG_W, IMG_H)
+        input = input.view(-1, self.c, self.img_size, self.img_size)
         h = self.relu(self.conv1(input))
         h = self.relu(self.conv2(h))
         h = self.relu(self.conv3(h))

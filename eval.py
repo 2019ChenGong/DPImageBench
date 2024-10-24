@@ -28,11 +28,11 @@ if __name__ == '__main__':
     parser.add_argument('--config_dir', default="configs")
     parser.add_argument('--method', '-m', default="PDP-Diffusion")
     parser.add_argument('--epsilon', '-e', default="10.0")
-    parser.add_argument('--data_name', '-dn', default="eurosat_32")
+    parser.add_argument('--data_name', '-dn', default="mnist_28")
     parser.add_argument('--config_suffix', '-cs', default="")
     parser.add_argument('--resume_exp', '-re', default=None)
     parser.add_argument('--exp_description', '-ed', default="")
-    parser.add_argument('--exp_path', '-ep', default="/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/eurosat_32_eps10.0_LZN-2024-10-20-07-55-47")
+    parser.add_argument('--exp_path', '-ep', default="/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/mnist_28_eps10.0-2024-10-23-05-45-33")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)

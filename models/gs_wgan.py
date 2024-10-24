@@ -27,6 +27,8 @@ class GS_WGAN(DPSynther):
 
         self.num_discriminators = config.num_discriminators
         self.z_dim = config.z_dim
+        self.c = config.c
+        self.img_size =  config.img_size
         self.num_classes = config.num_classes
         self.model_dim = config.model_dim
         self.latent_type = config.latent_type
@@ -34,16 +36,16 @@ class GS_WGAN(DPSynther):
         self.ckpt = config.ckpt
 
         if self.gen_arch == 'DCGAN':
-            self.netG = GeneratorDCGAN(z_dim=self.z_dim, model_dim=self.model_dim, num_classes=self.num_classes)
+            self.netG = GeneratorDCGAN(c=self.c, img_size=self.img_size, z_dim=self.z_dim, model_dim=self.model_dim, num_classes=self.num_classes)
         elif self.gen_arch == 'ResNet':
-            self.netG = GeneratorResNet(z_dim=self.z_dim, model_dim=self.model_dim, num_classes=self.num_classes)
+            self.netG = GeneratorResNet(c=self.c, img_size=self.img_size, z_dim=self.z_dim, model_dim=self.model_dim, num_classes=self.num_classes)
         else:
             raise ValueError
         
         self.netGS = copy.deepcopy(self.netG)
         self.netD_list = []
         for i in range(self.num_discriminators):
-            netD = DiscriminatorDCGAN()
+            netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size)
             self.netD_list.append(netD)
         
         if self.ckpt is not None:
@@ -212,9 +214,10 @@ class GS_WGAN(DPSynther):
                                                                     D_cost.cpu().data,
                                                                     Wasserstein_D.cpu().data
                                                                     ))
+                logging.info('Step: {}, G_cost:{}, D_cost:{}, Wasserstein:{}'.format(iter, G_cost.cpu().data, D_cost.cpu().data, Wasserstein_D.cpu().data))
 
             if iter % config.vis_step == 0:
-                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, num_classes=10)
+                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=10)
 
             del label, fake, noisev, noise, G, G_cost, D_cost
             torch.cuda.empty_cache()
@@ -222,7 +225,7 @@ class GS_WGAN(DPSynther):
         ### save model
         torch.save(self.netG.state_dict(), os.path.join(config.log_dir, 'netG.pth'))
         torch.save(self.netGS.state_dict(), os.path.join(config.log_dir, 'netGS.pth'))
-        for netD_id in len(self.num_discriminators):
+        for netD_id in range(self.num_discriminators):
             os.mkdir(os.path.join(config.log_dir, 'netD_%d' % netD_id))
             torch.save(self.netD_list[netD_id].state_dict(), os.path.join(config.log_dir, 'netD_%d' % netD_id, 'netD.pth'))
 
@@ -380,13 +383,11 @@ class GS_WGAN(DPSynther):
             ### Results visualization
             ############################
             if iter < 5 or iter % config.print_step == 0:
-                print('G_cost:{}, D_cost:{}, Wasserstein:{}'.format(G_cost.cpu().data,
-                                                                    D_cost.cpu().data,
-                                                                    Wasserstein_D.cpu().data
-                                                                    ))
+                print('G_cost:{}, D_cost:{}, Wasserstein:{}'.format(G_cost.cpu().data, D_cost.cpu().data, Wasserstein_D.cpu().data))
+                logging.info('Step: {}, G_cost:{}, D_cost:{}, Wasserstein:{}'.format(iter, G_cost.cpu().data, D_cost.cpu().data, Wasserstein_D.cpu().data))
 
             if iter % config.vis_step == 0:
-                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, num_classes=10)
+                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=10)
 
             if iter % config.save_step == 0:
                 ### save model
@@ -404,18 +405,16 @@ class GS_WGAN(DPSynther):
         syn_data = []
         syn_labels = []
 
-        syn_data, syn_labels = save_gen_data(os.path.join(config.log_dir, 'gen_data.npz'), self.netGS, self.z_dim, self.device, latent_type=self.latent_type)
-        
-        syn_data = np.concatenate(syn_data) / 2 + 0.5
-        syn_labels = np.concatenate(syn_labels)
+        syn_data, syn_labels = save_gen_data(os.path.join(config.log_dir, 'gen_data.npz'), self.netGS, self.z_dim, self.device, latent_type=self.latent_type, c=self.c, img_size=self.img_size)
 
         np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
 
         show_images = []
-        for cls in range(self.n_class):
+        for cls in range(self.num_classes):
             show_images.append(syn_data[syn_labels==cls][:8])
         show_images = np.concatenate(show_images)
         torchvision.utils.save_image(torch.from_numpy(show_images), os.path.join(config.log_dir, 'sample.png'), padding=1, nrow=8)
+        logging.info("Generation Finished!")
         return syn_data, syn_labels
 
 

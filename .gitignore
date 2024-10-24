@@ -14,4 +14,7 @@ models/pretrained_models
 models/PE/improved-diffusion
 models/pretrained_models.zip
 
+core*
+debug
+
 *slurm*
