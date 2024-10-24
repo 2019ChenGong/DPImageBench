@@ -14,7 +14,7 @@ cd DPImageBench
 pip install -r requirements_cuda12.1.txt
 conda install mpi4py
 cd opacus; pip install -e .; cd ..
-cd models/DPSDA/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
+cd models/PE/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
  ```
 
 ## 2 Prepare Dataset

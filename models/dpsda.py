@@ -9,12 +9,12 @@ import torch
 import scipy.optimize
 from scipy.optimize import root_scalar
 import scipy.stats
-from models.DPSDA.dpsda.feature_extractor import extract_features
-from models.DPSDA.dpsda.metrics import make_fid_stats
-from models.DPSDA.dpsda.metrics import compute_fid
-from models.DPSDA.dpsda.dp_counter import dp_nn_histogram
-from models.DPSDA.dpsda.arg_utils import str2bool
-from models.DPSDA.apis import get_api_class_from_name
+from models.PE.pe.feature_extractor import extract_features
+from models.PE.pe.metrics import make_fid_stats
+from models.PE.pe.metrics import compute_fid
+from models.PE.pe.dp_counter import dp_nn_histogram
+from models.PE.pe.arg_utils import str2bool
+from models.PE.apis import get_api_class_from_name
 import torch.nn.functional as F
 
 import logging
@@ -53,7 +53,7 @@ def get_noise_multiplier(epsilon, num_steps, delta, min_noise_multiplier=1e-1, m
     return output.root
 
 
-class DPSDA(DPSynther):
+class PE(DPSynther):
     def __init__(self, config, device):
         super().__init__()
         api_class = get_api_class_from_name(config.api)

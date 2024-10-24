@@ -1,5 +1,5 @@
 setup:
-  method: DPSDA
+  method: PE
   run_type: normal
   n_gpus_per_node: 1
   n_nodes: 1
@@ -11,13 +11,13 @@ setup:
 public_data:
   name: null
 sensitive_data:
-  name: fmnist
-  num_channels: 1
-  resolution: 28
-  n_classes: 10
-  train_path: dataset/fmnist/train_28.zip
-  test_path: dataset/fmnist/test_28.zip
-  fid_stats: dataset/fmnist/fid_stats_28.npz
+  name: celeba_male_32
+  num_channels: 3
+  resolution: 32
+  n_classes: 2
+  train_path: dataset/celeba/train_32_Male.zip
+  test_path: dataset/celeba/test_32_Male.zip
+  fid_stats: dataset/celeba/fid_stats_32.npz
   train_num: all
 model:
   api: improved_diffusion
@@ -41,8 +41,8 @@ pretrain:
 train:
   batch_size: 2000
   feature_extractor_batch_size: 500
-  private_image_size: 28
-  private_num_classes: 10
+  private_image_size: 32
+  private_num_classes: 2
   num_samples_schedule:
   - 60000
   - 60000
@@ -68,15 +68,15 @@ train:
   nn_mode: L2
   count_threshold: 10.0
   log_dir: null
-  tmp_folder: dataset/fmnist/dpsda_tmp
+  tmp_folder: dataset/celeba/dpsda_tmp
   dp:
-    epsilon: 10.0
+    epsilon: 1.0
     delta: 1e-5
 gen:
   data_num: 60000
   batch_size: 1000
   log_dir: null
-  num_channels: 1
-  resolution: 28
+  num_channels: 3
+  resolution: 32
 eval:
   batch_size: 1000

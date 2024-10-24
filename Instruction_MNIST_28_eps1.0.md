@@ -17,7 +17,7 @@ git clone git@github.com:2019ChenGong/DPImageBench.git (***We may need to provid
 cd DPImageBench
 pip install -r requirements.txt
 cd opacus; pip install -e .; cd ..
-cd models/DPSDA/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
+cd models/PE/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
 cd models; gdown https://drive.google.com/uc?id=1yVTWzaSqJVDJy8CsZKtqDoBNeM6154D4; unzip pretrained_models.zip; cd ..
  ```
 
@@ -57,7 +57,7 @@ python run.py public_data.name=null setup.n_gpus_per_node=3 --method DP-Promise 
 python run.py public_data.name=null setup.n_gpus_per_node=3 --method DPDM --data_name mnist_28 --epsilon 1.0
 ```
 ```
-python run.py public_data.name=null --method DPSDA --data_name mnist_28 --epsilon 1.0
+python run.py public_data.name=null --method PE --data_name mnist_28 --epsilon 1.0
 ```
 ```
 python run.py public_data.name=null setup.n_gpus_per_node=3 --method PDP-Diffusion --data_name mnist_28 --epsilon 1.0

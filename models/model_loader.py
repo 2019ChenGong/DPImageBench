@@ -14,9 +14,9 @@ def load_model(config, sess=None):
     elif config.setup.method == 'GS-WGAN':
         from models.gs_wgan import GS_WGAN
         model = GS_WGAN(config.model, config.setup.local_rank)
-    elif config.setup.method == 'DPSDA':
-        from models.dpsda import DPSDA
-        model = DPSDA(config.model, config.setup.local_rank)
+    elif config.setup.method == 'PE':
+        from models.pe import PE
+        model = PE(config.model, config.setup.local_rank)
     elif config.setup.method == 'dpsgd-diffusion':
         from models.dpsgd_diffusion import DP_Diffusion
         model = DP_Diffusion(config.model, config.setup.local_rank)

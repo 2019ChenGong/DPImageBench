@@ -37,7 +37,7 @@ We list currently supported DP image synthesis methods as follows.
   | -------------- | ------------------------------------------------------------ |
   | DP-MERF            |  [\[AISTATS 2021\] DP-MERF: Differentially Private Mean Embeddings With Randomfeatures for Practical Privacy-Preserving Data Generation](https://proceedings.mlr.press/v130/harder21a.html) |
   | DP-Kernel        |  [\[NeuriPS 2023\] Functional Renyi Differential Privacy for Generative Modeling](https://proceedings.neurips.cc/paper_files/paper/2023/hash/2f9ee101e35b890d9eae79ee27bcd69a-Abstract-Conference.html) |
-  | DPSDA          |  [\[ICLR 2024\] Differentially Private Synthetic Data via Foundation Model {API}s 1: Images](https://openreview.net/forum?id=YEhQs8POIo) |
+  | PE          |  [\[ICLR 2024\] Differentially Private Synthetic Data via Foundation Model {API}s 1: Images](https://openreview.net/forum?id=YEhQs8POIo) |
   | G-PATE            |  [\[NeuriPS 2021\] G-PATE: Scalable Differentially Private Data Generator via Private Aggregation of Teacher Discriminators](https://proceedings.neurips.cc/paper_files/paper/2021/hash/171ae1bbb81475eb96287dd78565b38b-Abstract.html) |
   | DataLens            |  [\[CCS 2021\] DataLens: Scalable Privacy Preserving Training via Gradient Compression and Aggregation](https://dl.acm.org/doi/abs/10.1145/3460120.3484579) |
   | DP-GAN            |  [\[1802.06739\] Differentially Private Generative Adversarial Network (arxiv.org)](https://arxiv.org/abs/1802.06739) |
@@ -60,7 +60,7 @@ DPImageBench/
 │   ├── DP-MERF      
 │   ├── DP-NTK       
 │   ├── DP-Kernel
-│   ├── DPSDA            
+│   ├── PE            
 │   ├── G-PATE            
 │   ├── DP-GAN         
 │   ├── DPDM        
@@ -135,7 +135,7 @@ pip install torch==1.12.1+cu116 torchvision==0.13.1+cu116 torchaudio==0.12.1 --e
 pip install tensorflow-gpu==1.14.0
 pip install requirements.txt
 cd opacus; pip install -e .; cd ..
-cd models/DPSDA/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
+cd models/PE/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
 cd models; gdown https://drive.google.com/uc?id=1yVTWzaSqJVDJy8CsZKtqDoBNeM6154D4; unzip pretrained_models.zip; cd ..
  ```
 
@@ -155,7 +155,7 @@ cd DPImageBench
 python run.py --config configs/{model_name}/{dataset_name}_eps{epsilon}.yaml
  ```
 
-Available `model_name` are [`DP-NTK`, `DP-Kernel`, `DP-LDM`, `DP-MERF`, `DP-Promise`, `DPDM`, `DPSDA`, `G-PATE`, `PDP-Diffusion`, `PrivImage`].
+Available `model_name` are [`DP-NTK`, `DP-Kernel`, `DP-LDM`, `DP-MERF`, `DP-Promise`, `DPDM`, `PE`, `G-PATE`, `PDP-Diffusion`, `PrivImage`].
 
 Available `epsilon` is [`1.0`].
 

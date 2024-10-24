@@ -11,7 +11,7 @@ GS-WGAN
 bug_fig
 dataset
 models/pretrained_models
-models/DPSDA/improved-diffusion
+models/PE/improved-diffusion
 models/pretrained_models.zip
 
 *slurm*

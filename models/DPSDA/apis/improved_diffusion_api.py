@@ -4,7 +4,7 @@ from tqdm import tqdm
 import logging
 
 from .api import API
-from models.DPSDA.dpsda.arg_utils import str2bool
+from models.PE.pe.arg_utils import str2bool
 
 from .improved_diffusion.unet import create_model
 from improved_diffusion import dist_util
