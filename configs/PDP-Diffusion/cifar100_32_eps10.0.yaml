@@ -91,6 +91,7 @@ pretrain:
     p_std: 1.2
     n_noise_samples: 1
     n_classes: 100
+    label_unconditioning_prob: 1.0
 train:
   log_dir: null
   seed: 0

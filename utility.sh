@@ -67,13 +67,13 @@
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method DPDM sensitive_data.train_num=val --data_name cifar10_32 --epsilon 1.0  --exp_path exp/dpdm/cifar10_32_eps10.0trainval-2024-10-24-01-44-41 &
 
-CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-LDM --data_name celeba_male_32 --epsilon 1.0 sensitive_data.train_num=val --exp_path exp/dp-ldm/celeba_male_32_eps1.0unconditional_trainval-2024-10-25-23-46-09 &
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-LDM --data_name celeba_male_32 --epsilon 1.0 --exp_path exp/dp-ldm/celeba_male_32_eps1.0unconditional-2024-10-25-20-13-02 &
 
-CUDA_VISIBLE_DEVICES=1  python eval.py --method DP-LDM --data_name celeba_male_32 --epsilon 10.0  sensitive_data.train_num=val --exp_path exp/dp-ldm/celeba_male_32_eps10.0unconditional_trainval-2024-10-25-23-46-09 &
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method DP-LDM --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/dp-ldm/celeba_male_32_eps10.0unconditional-2024-10-25-20-11-00 &
 
-CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-LDM --data_name camelyon_32 --epsilon 1.0  sensitive_data.train_num=val  --exp_path exp/dp-ldm/camelyon_32_eps1.0unconditional_trainval-2024-10-26-00-35-06 &
+# CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-LDM --data_name cifar100_32 --epsilon 10.0  sensitive_data.train_num=val  --exp_path exp/dp-ldm/cifar100_32_eps10.0unconditional_trainval-2024-10-26-00-06-28 &
 
-CUDA_VISIBLE_DEVICES=3  python eval.py --method DP-LDM --data_name camelyon_32 --epsilon 10.0 sensitive_data.train_num=val  --exp_path exp/dp-ldm/camelyon_32_eps10.0unconditional_trainval-2024-10-25-23-46-23 &
+# CUDA_VISIBLE_DEVICES=3  python eval.py --method DP-LDM --data_name cifar100_32 --epsilon 1.0 sensitive_data.train_num=val  --exp_path exp/dp-ldm/camelyon_32_eps10.0unconditional_trainval-2024-10-25-23-46-23 &
 
 # CUDA_VISIBLE_DEVICES=3  python eval.py --method DP-LDM --data_name cifar100_32 --epsilon 10.0  --exp_path exp/dp-ldm/cifar100_32_eps10.0unconditional-2024-10-25-07-00-22 &
 
@@ -81,15 +81,20 @@ CUDA_VISIBLE_DEVICES=3  python eval.py --method DP-LDM --data_name camelyon_32 -
 
 # CUDA_VISIBLE_DEVICES=7  python eval.py --method DP-LDM --data_name mnist_28 --epsilon 1.0  --exp_path exp/dp-ldm/mnist_28_eps1.0unconditional-2024-10-24-22-05-50 &
 
-# CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-LDM --data_name fmnist_28 --epsilon 1.0  --exp_path exp/dp-ldm/fmnist_28_eps1.0unconditional-2024-10-24-21-39-14 &
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-LDM --data_name cifar100_32 --epsilon 1.0  --exp_path exp/dp-ldm/cifar100_32_eps1.0unconditional-2024-10-26-13-44-11 &
 
 # CUDA_VISIBLE_DEVICES=3  python eval.py --method DP-LDM --data_name fmnist_28 --epsilon 10.0  --exp_path exp/dp-ldm/fmnist_28_eps10.0unconditional-2024-10-24-20-59-35 &
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-LDM --data_name mnist_28 --epsilon 1.0  --exp_path exp/dp-ldm/mnist_28_eps10.0-2024-10-24-09-51-58 &
 
-# CUDA_VISIBLE_DEVICES=1  python eval.py --method DPDM sensitive_data.train_num=val --data_name cifar10_32 --epsilon 10.0  --exp_path exp/dpdm/cifar10_32_eps1.0trainval-2024-10-23-14-01-14 &
+CUDA_VISIBLE_DEVICES=0  python eval.py --method PrivImage sensitive_data.train_num=val --data_name mnist_28 --epsilon 10.0  --exp_path exp/privimage/mnist_28_eps10.0trainval-2024-10-27-10-13-22 &
 
-# CUDA_VISIBLE_DEVICES=2  python eval.py --method DPDM sensitive_data.train_num=val --data_name eurosat_32 --epsilon 1.0  --exp_path exp/dpdm/eurosat_32_eps1.0trainval-2024-10-24-13-38-47 &
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method PrivImage sensitive_data.train_num=val --data_name eurosat_32 --epsilon 10.0  --exp_path exp/privimage/eurosat_32_eps10.0trainval-2024-10-27-00-14-20 &
+
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method PDP-Diffusion --data_name mnist_28 --epsilon 10.0 sensitive_data.train_num=val  --exp_path exp/pdp-diffusion/mnist_28_eps10.0trainval-2024-10-27-10-13-22 &
+
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method PDP-Diffusion --data_name fmnist_28 --epsilon 1.0  --exp_path exp/pdp-diffusion/fmnist_28_eps1.0_LZN-2024-10-26-03-27-14 &
+
 
 # CUDA_VISIBLE_DEVICES=3  python eval.py --method DPDM sensitive_data.train_num=val --data_name eurosat_32 --epsilon 10.0  --exp_path exp/dpdm/eurosat_32_eps10.0trainval-2024-10-24-12-56-31 &
 
