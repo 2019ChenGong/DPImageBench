@@ -18,21 +18,22 @@ def main(config):
     syn_data, syn_labels = syn["x"], syn["y"]
 
     evaluator = Evaluator(config)
-    evaluator.eval(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
     
+    evaluator.eval(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
+    # evaluator.eval_fidelity(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
 
 
 if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_dir', default="configs")
-    parser.add_argument('--method', '-m', default="PrivImage")
+    parser.add_argument('--method', '-m', default="PDP-Diffusion")
     parser.add_argument('--epsilon', '-e', default="10.0")
     parser.add_argument('--data_name', '-dn', default="cifar10_32")
     parser.add_argument('--config_suffix', '-cs', default="")
     parser.add_argument('--resume_exp', '-re', default=None)
     parser.add_argument('--exp_description', '-ed', default="")
-    parser.add_argument('--exp_path', '-ep', default="/p/fzv6enresearch/DPImageBench/exp/privimage/cifar10_32_eps10.0unconditional-2024-10-25-02-15-03")
+    parser.add_argument('--exp_path', '-ep', default="/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/cifar10_32_eps10.0unconditional_ch1224_nf64-2024-10-27-23-09-00")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)

@@ -44,14 +44,6 @@ class Evaluator(object):
             synthetic_images = F.interpolate(torch.from_numpy(synthetic_images), size=[self.config.sensitive_data.resolution, self.config.sensitive_data.resolution]).numpy()
         if synthetic_images.shape[1] == 3 and self.config.sensitive_data.num_channels == 1:
             synthetic_images = 0.299 * synthetic_images[:, 2:, ...] + 0.587 * synthetic_images[:, 1:2, ...] + 0.114 * synthetic_images[:, :1, ...]
-        # fid, is_mean = self.visual_metric(synthetic_images)
-        # fid, is_mean, fld, p, r, ir = self.visual_metric(synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader)
-        # # fid = is_mean = 0
-        # logging.info("The FID of synthetic images is {}".format(fid))
-        # logging.info("The Inception Score of synthetic images is {}".format(is_mean))
-        # logging.info("The Precision and Recall of synthetic images is {} and {}".format(p, r))
-        # logging.info("The FLD of synthetic images is {}".format(fld))
-        # logging.info("The ImageReward of synthetic images is {}".format(ir))
 
         acc_list = []
 
@@ -71,6 +63,32 @@ class Evaluator(object):
         logging.info(f"The best acc of accuracy (using synthetic images as the validation set) of synthetic images from resnet, wrn, and resnext are {acc_list}.")
 
         logging.info(f"The average and std of accuracy of synthetic images are {acc_mean:.2f} and {acc_std:.2f}")
+
+        # fid, is_mean = self.visual_metric(synthetic_images)
+        fid, is_mean, fld, p, r, ir = self.visual_metric(synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader)
+        logging.info("The FID of synthetic images is {}".format(fid))
+        logging.info("The Inception Score of synthetic images is {}".format(is_mean))
+        logging.info("The Precision and Recall of synthetic images is {} and {}".format(p, r))
+        logging.info("The FLD of synthetic images is {}".format(fld))
+        logging.info("The ImageReward of synthetic images is {}".format(ir))
+
+    def eval_fidelity(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader):
+        if self.device != 0 or sensitive_test_loader is None:
+            return
+        if synthetic_images.shape[-1] != self.config.sensitive_data.resolution:
+            synthetic_images = F.interpolate(torch.from_numpy(synthetic_images), size=[self.config.sensitive_data.resolution, self.config.sensitive_data.resolution]).numpy()
+        if synthetic_images.shape[1] == 3 and self.config.sensitive_data.num_channels == 1:
+            synthetic_images = 0.299 * synthetic_images[:, 2:, ...] + 0.587 * synthetic_images[:, 1:2, ...] + 0.114 * synthetic_images[:, :1, ...]
+        
+        # fid, is_mean = self.visual_metric(synthetic_images)
+        fid, is_mean, fld, p, r, ir = self.visual_metric(synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader)
+        logging.info("The FID of synthetic images is {}".format(fid))
+        logging.info("The Inception Score of synthetic images is {}".format(is_mean))
+        logging.info("The Precision and Recall of synthetic images is {} and {}".format(p, r))
+        logging.info("The FLD of synthetic images is {}".format(fld))
+        logging.info("The ImageReward of synthetic images is {}".format(ir))
+
+        return fid, is_mean, p, r, fld, ir
     
     def visual_metric(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader):
         feature_extractor = InceptionFeatureExtractor(save_path="dataset/{}_{}/".format(self.config.sensitive_data.name, self.config.sensitive_data.resolution))
@@ -563,7 +581,7 @@ def get_prompt(data_name: str):
         return prompt
     elif data_name.startswith("cifar10"):
         return ["An image of an airplane", "An image of an automobile", "An image of a bird", "An image of a cat", "An image of a deer", "An image of a dog", "An image of a frog", "An image of a horse", "An image of a ship", "An image of a truck"]
-    elif data_name.startwith("eurosat"):
+    elif data_name.startswith("eurosat"):
         return ["A remote sensing image of an industrial area", "A remote sensing image of a residential area", "A remote sensing image of an annual crop area", "A remote sensing image of a permanent crop area", "A remote sensing image of a river area", "A remote sensing image of a sea or lake area", "A remote sensing image of a herbaceous veg. area", "A remote sensing image of a highway area", "A remote sensing image of a pasture area", "A remote sensing image of a forest area"]
     elif data_name.startswith("celeba_male"):
         return ["An image of a female face", "An image of a male face"]

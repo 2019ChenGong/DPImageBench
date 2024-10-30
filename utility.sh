@@ -87,13 +87,22 @@
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-LDM --data_name mnist_28 --epsilon 1.0  --exp_path exp/dp-ldm/mnist_28_eps10.0-2024-10-24-09-51-58 &
 
-CUDA_VISIBLE_DEVICES=0  python eval.py --method PrivImage sensitive_data.train_num=val --data_name mnist_28 --epsilon 10.0  --exp_path exp/privimage/mnist_28_eps10.0trainval-2024-10-27-10-13-22 &
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method PrivImage sensitive_data.train_num=val --data_name mnist_28 --epsilon 1.0  --exp_path exp/privimage/mnist_28_eps1.0trainval-2024-10-27-20-44-57 &
 
-# CUDA_VISIBLE_DEVICES=1  python eval.py --method PrivImage sensitive_data.train_num=val --data_name eurosat_32 --epsilon 10.0  --exp_path exp/privimage/eurosat_32_eps10.0trainval-2024-10-27-00-14-20 &
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method PrivImage sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/privimage/celeba_male_32_eps10.0trainval-2024-10-26-10-44-41 &
 
-# CUDA_VISIBLE_DEVICES=0  python eval.py --method PDP-Diffusion --data_name mnist_28 --epsilon 10.0 sensitive_data.train_num=val  --exp_path exp/pdp-diffusion/mnist_28_eps10.0trainval-2024-10-27-10-13-22 &
+# CUDA_VISIBLE_DEVICES=3  python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name eurosat_32 --epsilon 10.0  --exp_path exp/pdp-diffusion/eurosat_32_eps10.0_trainval_LZN-2024-10-28-02-54-55 &
 
-# CUDA_VISIBLE_DEVICES=1  python eval.py --method PDP-Diffusion --data_name fmnist_28 --epsilon 1.0  --exp_path exp/pdp-diffusion/fmnist_28_eps1.0_LZN-2024-10-26-03-27-14 &
+# CUDA_VISIBLE_DEVICES=3  python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name eurosat_32 --epsilon 10.0  --exp_path exp/pdp-diffusion/eurosat_32_eps10.0_trainval_LZN-2024-10-28-02-54-55 &
+
+
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method PDP-Diffusion --data_name cifar10_32 --epsilon 1.0 sensitive_data.train_num=val  --exp_path exp/pdp-diffusion/cifar10_32_eps1.0_trainval_LZN-2024-10-27-02-23-40 &
+
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method PDP-Diffusion --data_name cifar10_32 --epsilon 10.0 sensitive_data.train_num=val --exp_path exp/pdp-diffusion/cifar10_32_eps10.0_trainval_LZN-2024-10-27-02-23-55 &
+
+# CUDA_VISIBLE_DEVICES=2  python eval.py --method PDP-Diffusion --data_name cifar100_32 --epsilon 1.0 sensitive_data.train_num=val  --exp_path exp/pdp-diffusion/cifar100_32_eps1.0_trainval_LZN-2024-10-27-02-24-44 &
+
+# CUDA_VISIBLE_DEVICES=3  python eval.py --method PDP-Diffusion --data_name cifar100_32 --epsilon 10.0 sensitive_data.train_num=val  --exp_path exp/pdp-diffusion/cifar100_32_eps10.0_trainval_LZN-2024-10-27-02-24-11 &
 
 
 # CUDA_VISIBLE_DEVICES=3  python eval.py --method DPDM sensitive_data.train_num=val --data_name eurosat_32 --epsilon 10.0  --exp_path exp/dpdm/eurosat_32_eps10.0trainval-2024-10-24-12-56-31 &
@@ -115,3 +124,12 @@ CUDA_VISIBLE_DEVICES=0  python eval.py --method PrivImage sensitive_data.train_n
 # python run.py setup.n_gpus_per_node=3 --method DP-LDM --epsilon 1.0 -dn cifar100_32 -ed unconditional pretrain.loss.label_unconditioning_prob=1.0
 
 # CUDA_VISIBLE_DEVICES=7  python eval.py --method DP-LDM sensitive_data.train_num=val --data_name mnist_28 --epsilon 1.0  --exp_path exp/dp-ldm/mnist_28_eps1.0unconditionalval-2024-10-25-14-41-07 &
+
+
+CUDA_VISIBLE_DEVICES=0  python eval.py --method PE --data_name mnist_28 --epsilon 1.0  --exp_path exp/pe/mnist_28_eps1.0_th24_tr10_vds000011112222-2024-10-26-18-18-02 &
+
+CUDA_VISIBLE_DEVICES=1  python eval.py --method PE --data_name fmnist_28 --epsilon 1.0  --exp_path exp/pe/fmnist_28_eps1.0_th24_tr10_vds000011112222-2024-10-28-17-12-41 &
+
+CUDA_VISIBLE_DEVICES=2  python eval.py --method PE sensitive_data.train_num=val --data_name mnist_28 --epsilon 1.0  --exp_path exp/pe/mnist_28_eps1.0_trainval_th24_tr10_vds000011112222-2024-10-29-09-40-33 &
+
+CUDA_VISIBLE_DEVICES=3  python eval.py --method PE sensitive_data.train_num=val --data_name fmnist_28 --epsilon 1.0  --exp_path exp/pe/fmnist_28_eps1.0_trainval_th24_tr10_vds000011112222-2024-10-29-10-44-36 &
