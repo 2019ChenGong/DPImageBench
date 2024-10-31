@@ -10,6 +10,7 @@ import logging
 
 from data.stylegan3.dataset import ImageFolderDataset
 from data.SpecificImagenet import SpecificClassImagenet
+from data.SpecificPlaces365 import SpecificClassPlaces365
 from models.PrivImage import resnet
 
 def load_sensitive_data(config):    
@@ -63,7 +64,7 @@ def semantic_query(sensitive_train_loader, config):
     class MyClassifier(torch.nn.Module):
         def __init__(self):
             super(MyClassifier, self).__init__()
-            self.model = resnet.ResNet50(num_classes=1000)
+            self.model = resnet.ResNet50(num_classes=config.public_data.num_classes)
 
         def forward(self, x):
             return self.model(x)
@@ -143,12 +144,17 @@ def load_data(config):
                     specific_class = semantic_query(sensitive_train_loader, config)
             public_train_set = SpecificClassImagenet(root=config.public_data.train_path, specific_class=specific_class, transform=trans, split="train")
         elif config.public_data.name == "places365":
-            # TODO: we only have a classifier on imagenet. Besides, we cannot train the classifer on LAION.
-            public_train_set = torchvision.datasets.Places365(root=config.public_data.train_path, small=True, download=True, transform=trans)
+            download = (not os.path.exists(os.path.join(config.public_data.train_path, "data_256_standard")))
+            if config.public_data.selective.ratio == 1.0:
+                public_train_set = torchvision.datasets.Places365(root=config.public_data.train_path, small=True, download=download, transform=trans)
+            else:
+                specific_class = semantic_query(sensitive_train_loader, config)
+                public_train_set_ = torchvision.datasets.Places365(root=config.public_data.train_path, small=True, download=download, transform=trans)
+                public_train_set = SpecificClassPlaces365(public_train_set_, specific_class)
         else:
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     
-        public_train_loader = torch.utils.data.DataLoader(dataset=public_train_set, shuffle=True, drop_last=True, batch_size=config.pretrain.batch_size)
+        public_train_loader = torch.utils.data.DataLoader(dataset=public_train_set, shuffle=True, drop_last=True, batch_size=config.pretrain.batch_size, num_workers=16)
 
     if config.sensitive_data.name is None:
         sensitive_train_loader = None

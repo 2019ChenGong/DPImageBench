@@ -1,12 +1,27 @@
 import os
+import torch
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
 import matplotlib
+from data.stylegan3.dataset import ImageFolderDataset
+
 
 fontsize = 8
 # matplotlib.rcParams.update({'font.size': fontsize, 'font.family': 'Arial', 'font.weight': 'normal'})
 matplotlib.rcParams.update({'font.size': fontsize, 'font.weight': 'normal'})
+
+
+def sample_real_images(data_path):
+    dataset = ImageFolderDataset(data_path, use_labels=True)
+    dataloader = torch.utils.data.DataLoader(dataset=dataset, shuffle=True, batch_size=2000)
+    for x, y in dataloader:
+        x = x.to(torch.float32) / 255.
+        y = torch.argmax(y, dim=1)
+        break
+    x = x.numpy()
+    y = y.numpy()
+    return x, y
 
 
 def visualize_app_1():
@@ -18,7 +33,7 @@ def visualize_app_1():
     width_per_patch = img_size * column_per_dataset
     height_per_patch = img_size * row_per_method
 
-    fig = plt.figure(figsize=(11.5, 5.2))
+    fig = plt.figure(figsize=(4.5, 3))
     axs = fig.subplots(len(methods), len(datasets))
 
     gen_lists = [
@@ -120,7 +135,7 @@ def visualize_app_1():
 
             axs[method_idx, dataset_idx].imshow(img_patch)
         
-    fig.subplots_adjust(wspace=0.1, hspace=-0.1)
+    fig.subplots_adjust(wspace=0.1, hspace=0.1)
     fig.savefig("eps1_visual_1.png", bbox_inches='tight')
     fig.savefig("eps1_visual_1.pdf", bbox_inches='tight')
 
@@ -237,15 +252,15 @@ def visualize_app_2():
     
 
 def visualize_main():
-    column_per_dataset = 7
+    column_per_dataset = 6
     row_per_method = 2
     img_size = 32
     datasets = ["MNIST", "F-MNIST", "CIFAR-10", "CIFAR-100", "EuroSAT", "CelebA", "Camelyon"]
-    methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "DP-GAN", "DPDM", "PDP-Diffusion", "DP-LDM", "PrivImage"]
+    methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "DP-GAN", "DPDM", "PDP-Diffusion", "DP-LDM", "PrivImage", "Real"]
     width_per_patch = img_size * column_per_dataset
     height_per_patch = img_size * row_per_method
 
-    fig = plt.figure(figsize=(11.5, 5.2))
+    fig = plt.figure(figsize=(12, 6))
     axs = fig.subplots(len(methods), len(datasets))
 
     gen_lists = [
@@ -329,6 +344,15 @@ def visualize_main():
         "/p/fzv6enresearch/DPImageBench/exp/privimage/eurosat_32_eps10.0-2024-10-27-10-02-36/gen/gen.npz",
         "/p/fzv6enresearch/DPImageBench/exp/privimage/celeba_male_32_eps10.0-2024-10-17-01-49-13/gen/gen.npz",
         "/p/fzv6enresearch/DPImageBench/exp/privimage/camelyon_32_eps10.0-2024-10-18-07-00-29/gen/gen.npz"
+    ],
+    [
+        "/p/fzv6enresearch/DPImageBench/dataset/mnist/train_28.zip",
+        "/p/fzv6enresearch/DPImageBench/dataset/fmnist/train_28.zip",
+        "/p/fzv6enresearch/DPImageBench/dataset/cifar10/train_32.zip",
+        "/p/fzv6enresearch/DPImageBench/dataset/cifar100/train_32.zip",
+        "/p/fzv6enresearch/DPImageBench/dataset/eurosat/train_32.zip",
+        "/p/fzv6enresearch/DPImageBench/dataset/celeba/train_32_Male.zip",
+        "/p/fzv6enresearch/DPImageBench/dataset/camelyon/train_32.zip",
     ]]
 
     for method_idx in range(len(methods)):
@@ -336,7 +360,7 @@ def visualize_main():
             if method_idx == 0:
                 axs[method_idx, dataset_idx].set_title(datasets[dataset_idx])
             if dataset_idx == 0:
-                x = [-0.36, -0.36, -0.36, -0.36, -0.36, -0.36, -0.36, -0.36, -0.36]
+                x = [-0.36, -0.36, -0.36, -0.36, -0.36, -0.36, -0.36, -0.36, -0.36, -0.36]
                 axs[method_idx, dataset_idx].set_ylabel(methods[method_idx], rotation=0, fontsize=9)
                 axs[method_idx, dataset_idx].yaxis.set_label_coords(x[method_idx], 0.35)
             
@@ -347,8 +371,12 @@ def visualize_main():
             gen_path = gen_lists[method_idx][dataset_idx]
             if not os.path.exists(gen_path):
                 continue
-            syn = np.load(gen_path)
-            syn_data, syn_labels = syn["x"], syn["y"]
+
+            if methods[method_idx] == "Real":
+                syn_data, syn_labels = sample_real_images(gen_path)
+            else:
+                syn = np.load(gen_path)
+                syn_data, syn_labels = syn["x"], syn["y"]
             num_classes = len(set(list(syn_labels)))
 
             img_patch = []
@@ -382,11 +410,11 @@ def visualize_main():
     # plt.imshow(canvas)
     # fig.savefig("combined_image.png")
     # fig.align_ylabels(axs[:, 0])
-    fig.subplots_adjust(wspace=0.1, hspace=-0.1)
+    fig.subplots_adjust(wspace=0.03, hspace=0.)
     fig.savefig("eps10_visual.png", bbox_inches='tight')
     fig.savefig("eps10_visual.pdf", bbox_inches='tight')
 
 
-# visualize_main()
-visualize_app_1()
-visualize_app_2()
+visualize_main()
+# visualize_app_1()
+# visualize_app_2()

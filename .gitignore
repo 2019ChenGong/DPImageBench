@@ -8,6 +8,8 @@ exp
 debug.py
 
 GS-WGAN
+DP-LDM
+PRC-Watermark
 bug_fig
 dataset
 models/pretrained_models

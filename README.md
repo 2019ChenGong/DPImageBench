@@ -39,7 +39,6 @@ We list currently supported DP image synthesis methods as follows.
   | DP-Kernel        |  [\[NeuriPS 2023\] Functional Renyi Differential Privacy for Generative Modeling](https://proceedings.neurips.cc/paper_files/paper/2023/hash/2f9ee101e35b890d9eae79ee27bcd69a-Abstract-Conference.html) |
   | PE          |  [\[ICLR 2024\] Differentially Private Synthetic Data via Foundation Model {API}s 1: Images](https://openreview.net/forum?id=YEhQs8POIo) |
   | G-PATE            |  [\[NeuriPS 2021\] G-PATE: Scalable Differentially Private Data Generator via Private Aggregation of Teacher Discriminators](https://proceedings.neurips.cc/paper_files/paper/2021/hash/171ae1bbb81475eb96287dd78565b38b-Abstract.html) |
-  | DataLens            |  [\[CCS 2021\] DataLens: Scalable Privacy Preserving Training via Gradient Compression and Aggregation](https://dl.acm.org/doi/abs/10.1145/3460120.3484579) |
   | DP-GAN            |  [\[1802.06739\] Differentially Private Generative Adversarial Network (arxiv.org)](https://arxiv.org/abs/1802.06739) |
   | DPDM          |  [\[TMLR 2023\] Differentially Private Diffusion Models](https://openreview.net/forum?id=ZPpQk7FJXF) |
   | PDP-Diffusion       | [\[2302.13861\] Differentially Private Diffusion Models Generate Useful Synthetic Images (arxiv.org)](https://arxiv.org/abs/2305.15759) |
