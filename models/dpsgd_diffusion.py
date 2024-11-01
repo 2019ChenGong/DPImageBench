@@ -105,6 +105,7 @@ class DP_Diffusion(DPSynther):
             make_dir(checkpoint_dir)
 
         model = DDP(self.model, device_ids=[self.local_rank])
+        model.train()
         ema = ExponentialMovingAverage(model.parameters(), decay=self.ema_rate)
 
         if config.optim.optimizer == 'Adam':
@@ -267,6 +268,7 @@ class DP_Diffusion(DPSynther):
             trainable_parameters = self.model.parameters()
 
         model = DPDDP(self.model)
+        model.train()
         ema = ExponentialMovingAverage(model.parameters(), decay=self.ema_rate)
 
         if config.optim.optimizer == 'Adam':

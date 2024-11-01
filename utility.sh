@@ -132,6 +132,6 @@
 
 # CUDA_VISIBLE_DEVICES=2  python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 1.0  --exp_path exp/pdp-diffusion/celeba_male_32_eps1.0_trainval_LZN-2024-10-28-05-49-37 &
 
-CUDA_VISIBLE_DEVICES=1  python eval.py --method PE --data_name cifar10_32 --epsilon 1.0  --exp_path exp/pe/cifar10_32_eps1.0_th15_tr100_vds0246810-2024-10-29-06-15-02 &
+CUDA_VISIBLE_DEVICES=1  python eval.py --method PE --data_name mnist_28 --epsilon 10.0  --exp_path exp/pe/mnist_28_eps10.0_th3_tr10_vds000011112222-2024-10-28-17-12-21 &
 
-CUDA_VISIBLE_DEVICES=3  python eval.py --method PE --data_name cifar10_32 --epsilon 10.0  --exp_path exp/pe/cifar10_32_eps10.0_th2_tr100_vds0246810-2024-10-29-06-15-43 &
+# CUDA_VISIBLE_DEVICES=3  python eval.py --method PE --data_name cifar10_32 --epsilon 10.0  --exp_path exp/pe/cifar10_32_eps10.0_th2_tr100_vds0246810-2024-10-29-06-15-43 &

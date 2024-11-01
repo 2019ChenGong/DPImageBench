@@ -33,7 +33,7 @@ if __name__ == '__main__':
     parser.add_argument('--config_suffix', '-cs', default="")
     parser.add_argument('--resume_exp', '-re', default=None)
     parser.add_argument('--exp_description', '-ed', default="")
-    parser.add_argument('--exp_path', '-ep', default="/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/cifar10_32_eps10.0unconditional_ch1224_nf64-2024-10-27-23-09-00")
+    parser.add_argument('--exp_path', '-ep', default="/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/cifar10_32_eps10.0unconditional_trainval_ch1224_nf64_pre10-2024-10-30-12-56-47")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)

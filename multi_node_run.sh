@@ -37,6 +37,7 @@ CUDA_VISIBLE_DEVICES=1 python eval.py -m DPGAN -dn cifar10_32 -e 1.0 -ep /p/fzv6
 CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/cifar10_32_eps10.0trainval_eps5-2024-10-29-00-02-50 &
 CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/cifar10_32_eps10.0trainval_eps20-2024-10-29-00-57-50 &
 CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps10.0trainval_eps5-2024-10-29-00-02-50 &
+CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps10.0trainval_eps20-2024-10-29-00-57-21 &
 
 # python eval.py sensitive_data.trainnum=val -m DPDM -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps10.0trainval_eps15-2024-10-28-18-26-48 &
 # python eval.py sensitive_data.trainnum=val -m DPDM -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps10.0trainval_eps20-2024-10-29-01-09-20 &
