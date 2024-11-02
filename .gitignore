@@ -11,6 +11,7 @@ GS-WGAN
 DP-LDM
 DP-MEPF
 PRC-Watermark
+dp-promise
 bug_fig
 dataset
 models/pretrained_models

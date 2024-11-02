@@ -10,6 +10,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import random
 import numpy as np
 import logging
+import concurrent.futures
 
 import importlib
 opacus = importlib.import_module('opacus')
@@ -217,7 +218,7 @@ class GS_WGAN(DPSynther):
                 logging.info('Step: {}, G_cost:{}, D_cost:{}, Wasserstein:{}'.format(iter, G_cost.cpu().data, D_cost.cpu().data, Wasserstein_D.cpu().data))
 
             if iter % config.vis_step == 0:
-                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=10)
+                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.num_classes)
 
             del label, fake, noisev, noise, G, G_cost, D_cost
             torch.cuda.empty_cache()
@@ -229,11 +230,169 @@ class GS_WGAN(DPSynther):
             os.mkdir(os.path.join(config.log_dir, 'netD_%d' % netD_id))
             torch.save(self.netD_list[netD_id].state_dict(), os.path.join(config.log_dir, 'netD_%d' % netD_id, 'netD.pth'))
 
+    def warmup_one_discriminator(self):
+        print(11111)
+        ### Fix noise for visualization
+        if self.latent_type == 'normal':
+            fix_noise = torch.randn(10, self.z_dim)
+        elif self.latent_type == 'bernoulli':
+            p = 0.5
+            bernoulli = torch.distributions.Bernoulli(torch.tensor([p]))
+            fix_noise = bernoulli.sample((10, self.z_dim)).view(10, self.z_dim)
+        else:
+            raise NotImplementedError
+
+        trainset_size = int(len(trainset) / self.num_discriminators)
+
+        ### Training Loop
+        for idx, netD_id in enumerate(net_ids):
+
+            ### stop the process if finished
+            if netD_id >= self.num_discriminators:
+                logging.info('ID {} exceeds the num of discriminators'.format(netD_id))
+                return
+
+            ### Discriminator
+            netD = self.netD_list[netD_id]
+            optimizerD = optim.Adam(netD.parameters(), lr=1e-4, betas=(0.5, 0.9))
+
+            start = netD_id * trainset_size
+            end = (netD_id + 1) * trainset_size
+            indices = indices_full[start:end]
+            trainloader = data.DataLoader(trainset, batch_size=config.batchsize, drop_last=False,
+                                            num_workers=2, sampler=SubsetRandomSampler(indices))
+            input_data = inf_train_gen(trainloader)
+
+            ### Train (non-private) Generator for each Discriminator
+            netG = copy.deepcopy(self.netG)
+            optimizerG = optim.Adam(netG.parameters(), lr=1e-4, betas=(0.5, 0.9))
+
+            ### Save dir for each discriminator
+            save_subdir = os.path.join(config.log_dir, 'netD_%d' % netD_id)
+
+            if os.path.exists(os.path.join(save_subdir, 'netD.pth')):
+                logging.info("netD %d already pre-trained" % netD_id)
+            else:
+                mkdir(save_subdir)
+
+                for iter in range(config.iterations + 1):
+                    #########################
+                    ### Update D network
+                    #########################
+                    for p in netD.parameters():
+                        p.requires_grad = True
+
+                    for iter_d in range(config.critic_iters):
+                        real_data, real_y = next(input_data)
+                        if len(real_y.shape) == 2:
+                            real_data = real_data.to(torch.float32) / 255.
+                            real_y = torch.argmax(real_y, dim=1)
+
+                        batchsize = real_data.shape[0]
+                        real_data = real_data.view(batchsize, -1)
+                        real_data = real_data.to(self.device)
+                        real_y = real_y.to(self.device)
+                        real_data_v = autograd.Variable(real_data)
+
+                        ### train with real
+                        netD.zero_grad()
+                        D_real_score = netD(real_data_v, real_y)
+                        D_real = -D_real_score.mean()
+
+                        ### train with fake
+                        batchsize = real_data.shape[0]
+                        if latent_type == 'normal':
+                            noise = torch.randn(batchsize, self.z_dim).to(self.device)
+                        elif latent_type == 'bernoulli':
+                            noise = bernoulli.sample((batchsize, self.z_dim)).view(batchsize, self.z_dim).to(self.device)
+                        else:
+                            raise NotImplementedError
+                        noisev = autograd.Variable(noise)
+                        fake = autograd.Variable(netG(noisev, real_y).data)
+                        inputv = fake
+                        D_fake = netD(inputv, real_y)
+                        D_fake = D_fake.mean()
+
+                        ### train with gradient penalty
+                        gradient_penalty = netD.calc_gradient_penalty(real_data_v.data, fake.data, real_y, L_gp, self.device)
+                        D_cost = D_fake + D_real + gradient_penalty
+
+                        ### train with epsilon penalty
+                        logit_cost = L_epsilon * torch.pow(D_real_score, 2).mean()
+                        D_cost += logit_cost
+
+                        ### update
+                        D_cost.backward()
+                        Wasserstein_D = -D_real - D_fake
+                        optimizerD.step()
+
+                    ############################
+                    # Update G network
+                    ###########################
+                    for p in netD.parameters():
+                        p.requires_grad = False
+                    netG.zero_grad()
+
+                    if latent_type == 'normal':
+                        noise = torch.randn(batchsize, self.z_dim).to(self.device)
+                    elif latent_type == 'bernoulli':
+                        noise = bernoulli.sample((batchsize, self.z_dim)).view(batchsize, self.z_dim).to(self.device)
+                    else:
+                        raise NotImplementedError
+                    label = torch.randint(0, self.num_classes, [batchsize]).to(self.device)
+                    noisev = autograd.Variable(noise)
+                    fake = netG(noisev, label)
+                    G = netD(fake, label)
+                    G = - G.mean()
+
+                    ### update
+                    G.backward()
+                    G_cost = G
+                    optimizerG.step()
+
+                    ############################
+                    ### Results visualization
+                    ############################
+                    if iter < 5 or iter % config.print_step == 0:
+                        logging.info('G_cost:{}, D_cost:{}, Wasserstein:{}'.format(G_cost.cpu().data,
+                                                                            D_cost.cpu().data,
+                                                                            Wasserstein_D.cpu().data
+                                                                            ))
+                    if iter == config.iterations:
+                        generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.num_classes)
+
+                torch.save(netD.state_dict(), os.path.join(save_subdir, 'netD.pth'))
+
+    def warmup(self, sensitive_dataset, indices_full, trainset_size, config):
+
+        ### Set up optimizers
+        njobs = config.njobs
+        dis_per_job = self.num_discriminators // njobs
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            futures = [executor.submit(self.warmup_one_discriminator, sensitive_dataset, indices_full, [j+i*dis_per_job for j in range(dis_per_job)], config) for i in range(njobs)]
+            # futures = [executor.submit(ss) for i in range(njobs)]
+            
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    score = future.result()
+                    logging.info("jobs is finished")
+                except Exception as e:
+                    print(f'Error: {e}')
 
     def train(self, sensitive_dataloader, config):
         if sensitive_dataloader is None:
             return
         os.mkdir(config.log_dir)
+        load_dir = "/p/fzv6enresearch/DPImageBench/GS-WGAN/results/fashionmnist/pretrain/ResNet_default"
+        indices_full = np.load(os.path.join(load_dir, 'indices.npy'), allow_pickle=True)
+
+        # indices_full = np.arange(len(sensitive_dataloader.dataset))
+        # np.random.shuffle(indices_full)
+        # indices_full.dump(os.path.join(config.log_dir, 'indices.npy'))
+        trainset_size = int(len(sensitive_dataloader.dataset) / self.num_discriminators)
+        logging.info('Size of the dataset: {}'.format(trainset_size))
+
+        # self.warmup(sensitive_dataloader.dataset, indices_full, trainset_size, config.pretrain)
 
         self.noise_factor = get_noise_multiplier(target_epsilon=config.dp.epsilon, target_delta=config.dp.delta, sample_rate=1./self.num_discriminators, steps=config.iterations)
         global noise_multiplier
@@ -258,28 +417,25 @@ class GS_WGAN(DPSynther):
         netG = self.netG.to(self.device)
         netGS = self.netGS.to(self.device)
         for netD_id, netD in enumerate(self.netD_list):
-            netD.to(self.device)
+            self.netD_list[netD_id] = netD.to(self.device)
 
         ### Set up optimizers
         optimizerD_list = []
         for i in range(self.num_discriminators):
             netD = self.netD_list[i]
+            network_path = os.path.join(load_dir, 'netD_%d' % netD_id, 'netD.pth')
+            netD.load_state_dict(torch.load(network_path))
             optimizerD = optim.Adam(netD.parameters(), lr=1e-4, betas=(0.5, 0.9))
             optimizerD_list.append(optimizerD)
-        optimizerG = optim.Adam(self.netG.parameters(), lr=1e-4, betas=(0.5, 0.9))
-
-        indices_full = np.arange(len(sensitive_dataloader.dataset))
-        np.random.shuffle(indices_full)
-        indices_full.dump(os.path.join(config.log_dir, 'indices.npy'))
-        trainset_size = int(len(sensitive_dataloader.dataset) / self.num_discriminators)
-        logging.info('Size of the dataset: {}'.format(trainset_size))
+        optimizerG = optim.Adam(netG.parameters(), lr=1e-4, betas=(0.5, 0.9))
 
         input_pipelines = []
+        dataset = sensitive_dataloader.dataset
         for i in range(self.num_discriminators):
             start = i * trainset_size
             end = (i + 1) * trainset_size
             indices = indices_full[start:end]
-            trainloader = torch.utils.data.DataLoader(sensitive_dataloader.dataset, batch_size=config.batch_size, drop_last=False, sampler=SubsetRandomSampler(indices))
+            trainloader = torch.utils.data.DataLoader(dataset, batch_size=config.batch_size, drop_last=False, sampler=SubsetRandomSampler(indices))
             input_data = inf_train_gen(trainloader)
             input_pipelines.append(input_data)
 
