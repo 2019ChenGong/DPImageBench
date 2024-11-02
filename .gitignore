@@ -13,6 +13,7 @@ DP-MEPF
 PRC-Watermark
 dp-promise
 bug_fig
+imagenet*
 dataset
 models/pretrained_models
 models/PE/improved-diffusion

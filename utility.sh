@@ -132,10 +132,18 @@
 
 # CUDA_VISIBLE_DEVICES=2  python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 1.0  --exp_path exp/pdp-diffusion/celeba_male_32_eps1.0_trainval_LZN-2024-10-28-05-49-37 &
 
-# CUDA_VISIBLE_DEVICES=0  python eval.py --method PE --data_name cifar100_32 --epsilon 1.0  --exp_path exp/pe/cifar100_32_eps1.0_th15_tr100_vds0246810-2024-10-31-04-38-02 &
+CUDA_VISIBLE_DEVICES=2  python eval.py --method PE --data_name celeba_male_32 --epsilon 1.0  --exp_path exp/pe/celeba_male_32_eps1.0_th15_tr100_vds0246810-2024-11-01-02-24-57 &
 
-# CUDA_VISIBLE_DEVICES=4  python eval.py --method PE --data_name fmnist_28 --epsilon 10.0  --exp_path exp/pe/fmnist_28_eps10.0_th3_tr10_vds000011112222-2024-11-01-08-55-47 &
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method PE sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path exp/pe/fmnist_28_eps10.0_trainval_th3_tr10_vds000011112222-2024-11-01-17-19-07 &
 
-CUDA_VISIBLE_DEVICES=6  python eval.py --method PE --data_name cifar100_32 sensitive_data.train_num=val --epsilon 1.0  --exp_path exp/pe/cifar100_32_eps1.0_trainval_th15_tr100_vds0246810-2024-10-31-04-38-02 &
+# CUDA_VISIBLE_DEVICES=3  python eval.py --method PE --data_name camelyon_32 sensitive_data.train_num=val --epsilon 10.0  --exp_path exp/pe/camelyon_32_eps1.0_trainval_th30_tr10_vds00000111-2024-11-01-19-12-14 &
 
-CUDA_VISIBLE_DEVICES=7  python eval.py --method PE --data_name cifar100_32 sensitive_data.train_num=val --epsilon 10.0  --exp_path exp/pe/cifar100_32_eps10.0_trainval_th2_tr100_vds0246810-2024-10-31-04-37-59 &
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method PE --data_name cifar100_32 --epsilon 10.0  --exp_path exp/pe/cifar100_32_eps10.0_th2_tr100_vds0246810-2024-10-31-04-38-12 &
+
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name fmnist_28 --epsilon 1.0  --exp_path exp/gs-wgan/fmnist_28_eps1.0-2024-11-02-02-16-07 &
+
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method GS-WGAN --data_name fmnist_28 --epsilon 10.0  --exp_path exp/gs-wgan/fmnist_28_eps10.0-2024-11-02-01-59-08 &
+
+# CUDA_VISIBLE_DEVICES=3  python eval.py --method PE --data_name camelyon_32 sensitive_data.train_num=val --epsilon 10.0  --exp_path exp/pe/camelyon_32_eps1.0_trainval_th30_tr10_vds00000111-2024-11-01-19-12-14 &
+
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method PE --data_name cifar100_32 --epsilon 10.0  --exp_path exp/pe/cifar100_32_eps10.0_th2_tr100_vds0246810-2024-10-31-04-38-12 &

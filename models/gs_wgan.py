@@ -49,14 +49,14 @@ class GS_WGAN(DPSynther):
             netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size)
             self.netD_list.append(netD)
         
-        if self.ckpt is not None:
-            for netD_id in range(self.num_discriminators):
-                logging.info('Load NetD ', str(netD_id))
-                network_path = os.path.join(self.ckpt, 'netD_%d' % netD_id, 'netD.pth')
-                netD = self.netD_list[netD_id]
-                netD.load_state_dict(torch.load(network_path))
-            self.netG.load_state_dict(torch.load(os.path.join(self.ckpt, 'netG.pth')))
-            self.netGS.load_state_dict(torch.load(os.path.join(self.ckpt, 'netGS.pth')))
+        # if self.ckpt is not None:
+        #     for netD_id in range(self.num_discriminators):
+        #         logging.info('Load NetD ', str(netD_id))
+        #         network_path = os.path.join(self.ckpt, 'netD_%d' % netD_id, 'netD.pth')
+        #         netD = self.netD_list[netD_id]
+        #         netD.load_state_dict(torch.load(network_path))
+        #     self.netG.load_state_dict(torch.load(os.path.join(self.ckpt, 'netG.pth')))
+        #     self.netGS.load_state_dict(torch.load(os.path.join(self.ckpt, 'netGS.pth')))
 
         self.config = config
         self.device = device
@@ -383,7 +383,7 @@ class GS_WGAN(DPSynther):
         if sensitive_dataloader is None:
             return
         os.mkdir(config.log_dir)
-        load_dir = "/p/fzv6enresearch/DPImageBench/GS-WGAN/results/fashionmnist/pretrain/ResNet_default"
+        load_dir = self.ckpt
         indices_full = np.load(os.path.join(load_dir, 'indices.npy'), allow_pickle=True)
 
         # indices_full = np.arange(len(sensitive_dataloader.dataset))
