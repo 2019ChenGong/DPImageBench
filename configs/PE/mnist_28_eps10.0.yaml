@@ -26,15 +26,15 @@ model:
     model_image_size: 64
     num_channels: 192
     num_res_blocks: 3
-    learn_sigma: true
-    class_cond: true
+    learn_sigma: True
+    class_cond: True
     diffusion_steps: 4000
     noise_schedule: cosine
-    rescale_learned_sigmas: false
-    rescale_timesteps: false
-    use_ddim: true
+    rescale_learned_sigmas: False
+    rescale_timesteps: False
+    use_ddim: True
     timestep_respacing: 10
-    batch_size: 1000
+    batch_size: 2000
     model_path: models/pretrained_models/imagenet64_cond_270M_250K.pt
 pretrain:
   log_dir: null
@@ -43,30 +43,14 @@ train:
   feature_extractor_batch_size: 500
   private_image_size: 28
   private_num_classes: 10
-  num_samples_schedule:
-  - 60000
-  - 60000
-  - 60000
-  - 60000
-  - 60000
-  - 60000
-  - 60000
-  - 60000
-  variation_degree_schedule:
-  - 0
-  - 0
-  - 1
-  - 1
-  - 2
-  - 2
-  - 3
-  - 3
+  num_samples_schedule: [60000,60000,60000,60000,60000,60000,60000,60000,60000,60000,60000,60000]
+  variation_degree_schedule: [0,0,0,0,1,1,1,1,2,2,2,2]
   initial_prompt: null
   image_size: 64x64
-  lookahead_degree: 2
+  lookahead_degree: 8
   num_nearest_neighbor: 1
   nn_mode: L2
-  count_threshold: 10.0
+  count_threshold: 3.0
   log_dir: null
   tmp_folder: dataset/mnist/pe_tmp
   dp:
