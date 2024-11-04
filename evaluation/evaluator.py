@@ -34,6 +34,7 @@ class Evaluator(object):
 
         self.sensitive_stats_path = config.sensitive_data.fid_stats
         self.acc_models = ["resnet", "wrn", "resnext"]
+        # self.acc_models = ["wrn"]
         self.config = config
         torch.cuda.empty_cache()
     

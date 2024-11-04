@@ -27,28 +27,26 @@
 # CUDA_VISIBLE_DEVICES=2 python run.py -m GS-WGAN -dn celeba_male_32 -e 10.0 &
 # CUDA_VISIBLE_DEVICES=4 python run.py -m GS-WGAN -dn celeba_male_32 -e 1.0 &
 
-CUDA_VISIBLE_DEVICES=1 python eval.py -m DP-Kernel -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dp-kernel/cifar10_32_eps10.0trainval_eps20-2024-10-29-05-30-19 &
-CUDA_VISIBLE_DEVICES=1 python eval.py -m DP-MERF -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dp-merf/cifar10_32_eps10.0trainval_eps15-2024-10-29-00-07-10 &
-CUDA_VISIBLE_DEVICES=1 python eval.py -m DPDM -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/fmnist_28_eps1.0trainval_eps0.2-2024-10-29-01-51-05 &
-CUDA_VISIBLE_DEVICES=1 python eval.py -m DPDM -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/fmnist_28_eps10.0trainval_eps15-2024-10-28-16-18-48 &
-CUDA_VISIBLE_DEVICES=1 python eval.py -m DPDM -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps10.0trainval_eps5-2024-10-28-04-31-08 &
-CUDA_VISIBLE_DEVICES=1 python eval.py -m DPGAN -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpgan/cifar10_32_eps10.0trainval_eps5-2024-10-29-04-29-58 &
-CUDA_VISIBLE_DEVICES=1 python eval.py -m DPGAN -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpgan/cifar10_32_eps10.0trainval_eps15-2024-10-29-04-35-12 &
-CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/cifar10_32_eps10.0trainval_eps5-2024-10-29-00-02-50 &
-CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/cifar10_32_eps10.0trainval_eps20-2024-10-29-00-57-50 &
-CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps10.0trainval_eps5-2024-10-29-00-02-50 &
-CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps10.0trainval_eps20-2024-10-29-00-57-21 &
+# to eval
+# CUDA_VISIBLE_DEVICES=1 python eval.py -m DP-Kernel -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dp-kernel/cifar10_32_eps10.0trainval_eps20-2024-10-29-05-30-19 &
+# CUDA_VISIBLE_DEVICES=1 python eval.py -m DP-MERF -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dp-merf/cifar10_32_eps10.0trainval_eps15-2024-10-29-00-07-10 &
+# CUDA_VISIBLE_DEVICES=1 python eval.py -m DPDM -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/fmnist_28_eps1.0trainval_eps0.2-2024-10-29-01-51-05 &
+# CUDA_VISIBLE_DEVICES=1 python eval.py -m DPDM -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/fmnist_28_eps10.0trainval_eps15-2024-10-28-16-18-48 &
+# CUDA_VISIBLE_DEVICES=1 python eval.py -m DPDM -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps10.0trainval_eps5-2024-10-28-04-31-08 &
+# CUDA_VISIBLE_DEVICES=1 python eval.py -m DPGAN -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpgan/cifar10_32_eps10.0trainval_eps5-2024-10-29-04-29-58 &
+# CUDA_VISIBLE_DEVICES=1 python eval.py -m DPGAN -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpgan/cifar10_32_eps10.0trainval_eps15-2024-10-29-04-35-12 &
+# CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/cifar10_32_eps10.0trainval_eps5-2024-10-29-00-02-50 &
+# CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/cifar10_32_eps10.0trainval_eps20-2024-10-29-00-57-50 &
+# CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps10.0trainval_eps5-2024-10-29-00-02-50 &
+# CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps10.0trainval_eps20-2024-10-29-00-57-21 &
 
-# python eval.py sensitive_data.trainnum=val -m DPDM -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps10.0trainval_eps15-2024-10-28-18-26-48 &
-# python eval.py sensitive_data.trainnum=val -m DPDM -dn cifar10_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps10.0trainval_eps20-2024-10-29-01-09-20 &
-# python eval.py sensitive_data.trainnum=val -m DPDM -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/fmnist_28_eps1.0trainval_eps0.2-2024-10-29-01-51-05 &
-# python eval.py sensitive_data.trainnum=val -m DPDM -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/fmnist_28_eps10.0trainval_eps5-2024-10-28-04-31-05 &
-# python eval.py sensitive_data.trainnum=val -m DPDM -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/fmnist_28_eps10.0trainval_eps15-2024-10-28-16-18-48 &
-# python eval.py sensitive_data.trainnum=val -m DPDM -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dpdm/fmnist_28_eps10.0trainval_eps20-2024-10-28-20-01-37 &
+# CUDA_VISIBLE_DEVICES=0 python run.py public_data.name=null sensitive_data.train_num=val train.dp.epsilon=15 model.ckpt=/p/fzv6enresearch/DPImageBench/GS-WGAN/results/fashionmnist/pretrain/ResNet_default_trainval -m GS-WGAN -dn fmnist_28 -e 10.0 -ed trainval_eps15 &
+# CUDA_VISIBLE_DEVICES=1 python run.py public_data.name=null sensitive_data.train_num=val train.dp.epsilon=20 model.ckpt=/p/fzv6enresearch/DPImageBench/GS-WGAN/results/fashionmnist/pretrain/ResNet_default_trainval -m GS-WGAN -dn fmnist_28 -e 10.0 -ed trainval_eps20 &
 
 
-# python eval.py sensitive_data.train_num=val -m DP-LDM -dn cifar100_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/dp-ldm/cifar100_32_eps1.0unconditional_trainval-2024-10-26-00-55-37 &
-# python eval.py sensitive_data.train_num=val -m DP-LDM -dn cifar100_32 -e 10.0 -ep /p/fzv6enresearch/DPImageBench/exp/dp-ldm/cifar100_32_eps10.0unconditional_trainval-2024-10-26-00-06-28 &
+python eval.py sensitive_data.train_num=val -m GS-WGAN -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps5-2024-11-04-05-46-27 &
+python eval.py sensitive_data.train_num=val -m GS-WGAN -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps15-2024-11-04-05-48-12 &
+python eval.py sensitive_data.train_num=val -m GS-WGAN -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps20-2024-11-04-05-48-12 &
 
 # python run.py setup.n_gpus_per_node=4 public_data.name=null model.ckpt=/p/fzv6enresearch/DPImageBench/exp/dp-ldm/cifar10_32_eps10.0unconditional_ch1224_nf64-2024-10-27-03-33-17/pretrain/checkpoints/final_checkpoint.pth model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=64 train.dp.n_splits=128 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed unconditional_ch1224_nf64
 

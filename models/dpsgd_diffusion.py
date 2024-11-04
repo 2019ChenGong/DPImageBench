@@ -105,7 +105,6 @@ class DP_Diffusion(DPSynther):
             make_dir(checkpoint_dir)
 
         model = DDP(self.model, device_ids=[self.local_rank])
-        model.train()
         ema = ExponentialMovingAverage(model.parameters(), decay=self.ema_rate)
 
         if config.optim.optimizer == 'Adam':
@@ -231,6 +230,7 @@ class DP_Diffusion(DPSynther):
         torch.cuda.empty_cache()
 
     def train(self, sensitive_dataloader, config):
+        self.network.label_dim = 10
         if sensitive_dataloader is None:
             return
         
@@ -268,7 +268,6 @@ class DP_Diffusion(DPSynther):
             trainable_parameters = self.model.parameters()
 
         model = DPDDP(self.model)
-        model.train()
         ema = ExponentialMovingAverage(model.parameters(), decay=self.ema_rate)
 
         if config.optim.optimizer == 'Adam':
@@ -359,7 +358,7 @@ class DP_Diffusion(DPSynther):
                             ema.store(model.parameters())
                             ema.copy_to(model.parameters())
                             sample_random_image_batch(snapshot_sampling_shape, sampler, os.path.join(
-                                sample_dir, 'iter_%d' % state['step']), self.device, self.network.label_dim)
+                                sample_dir, 'iter_%d' % state['step']), self.device, 10)
                             ema.restore(model.parameters())
                         model.train()
 
@@ -445,6 +444,7 @@ class DP_Diffusion(DPSynther):
 
 
     def generate(self, config):
+        self.network.label_dim = 10
         logging.info("start to generate {} samples".format(config.data_num))
         if self.global_rank == 0 and not os.path.exists(config.log_dir):
             make_dir(config.log_dir)

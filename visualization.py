@@ -256,11 +256,11 @@ def visualize_main():
     row_per_method = 2
     img_size = 32
     datasets = ["MNIST", "F-MNIST", "CIFAR-10", "CIFAR-100", "EuroSAT", "CelebA", "Camelyon"]
-    methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "DP-GAN", "DPDM", "PDP-Diffusion", "DP-LDM", "PrivImage", "Real"]
+    methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "GS-WGAN", "DP-GAN", "DPDM", "PDP-Diffusion", "DP-LDM", "PrivImage", "Real"]
     width_per_patch = img_size * column_per_dataset
     height_per_patch = img_size * row_per_method
 
-    fig = plt.figure(figsize=(12, 6))
+    fig = plt.figure(figsize=(11.0, 6.0))
     axs = fig.subplots(len(methods), len(datasets))
 
     gen_lists = [
@@ -292,13 +292,22 @@ def visualize_main():
         "/p/fzv6enresearch/DPImageBench/exp/dp-kernel/camelyon_32_eps10.0-2024-10-06-23-55-05/gen/gen.npz"
     ],
     [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
+        "/p/fzv6enresearch/DPImageBench/exp/pe/mnist_28_eps10.0_trainval_th3_tr10_vds000011112222-2024-11-01-08-24-53/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/pe/fmnist_28_eps10.0_trainval_th3_tr10_vds000011112222-2024-11-01-17-19-07/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/pe/cifar10_32_eps10.0_trainval_th2_tr100_vds0246810-2024-10-30-17-42-57/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/pe/cifar100_32_eps10.0_trainval_th2_tr100_vds0246810-2024-10-31-04-37-59/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/pe/eurosat_32_eps10.0_trainval_th3_tr10_vds000011112222-2024-11-01-17-33-12/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/pe/celeba_male_32_eps10.0_th2_tr100_vds0246810-2024-11-01-05-10-39/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/pe/camelyon_32_eps10.0_trainval_th4_tr10_vds00000111-2024-11-01-21-44-46/gen/gen.npz",
+    ],
+    [
+        "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/mnist_28_eps10.0-2024-11-03-08-33-03/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0-2024-11-02-01-59-08/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/cifar10_32_eps10.0-2024-11-03-00-10-53/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/cifar100_32_eps10.0-2024-11-03-08-23-12/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/eurosat_32_eps10.0-2024-11-03-10-39-01/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/celeba_male_32_eps10.0-2024-11-04-00-56-19/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/camelyon_32_eps10.0-2024-11-03-22-16-47/gen/gen.npz",
     ],
     [
         "/p/fzv6enresearch/DPImageBench/exp/dpgan/mnist_28_eps10.0-2024-10-08-00-06-54/gen/gen.npz",
@@ -324,8 +333,8 @@ def visualize_main():
         "/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/cifar10_32_eps10.0_LZN-2024-10-26-00-08-47/gen/gen.npz",
         "/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/cifar100_32_eps10.0_LZN-2024-10-26-03-53-56/gen/gen.npz",
         "/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/eurosat_32_eps10.0Unconditional-2024-10-21-23-34-18/gen/gen.npz",
-        "",
-        ""
+        "/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/celeba_male_32_eps10.0_trainval_LZN-2024-10-28-05-49-50/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/camelyon_32_eps1.0_LZN-2024-10-28-21-49-21/gen/gen.npz"
     ],
     [
         "/p/fzv6enresearch/DPImageBench/exp/dp-ldm/mnist_28_eps10.0unconditional-2024-10-24-09-51-58/gen/gen.npz",
@@ -360,13 +369,11 @@ def visualize_main():
             if method_idx == 0:
                 axs[method_idx, dataset_idx].set_title(datasets[dataset_idx])
             if dataset_idx == 0:
-                x = [-0.36, -0.36, -0.36, -0.36, -0.36, -0.36, -0.36, -0.36, -0.36, -0.36]
-                axs[method_idx, dataset_idx].set_ylabel(methods[method_idx], rotation=0, fontsize=9)
-                axs[method_idx, dataset_idx].yaxis.set_label_coords(x[method_idx], 0.35)
+                axs[method_idx, dataset_idx].set_ylabel(methods[method_idx], rotation=0, fontsize=9, horizontalalignment='left')
+                axs[method_idx, dataset_idx].yaxis.set_label_coords(-0.76, 0.35)
             
             axs[method_idx, dataset_idx].set_xticks([])
             axs[method_idx, dataset_idx].set_yticks([])
-
 
             gen_path = gen_lists[method_idx][dataset_idx]
             if not os.path.exists(gen_path):
@@ -396,10 +403,10 @@ def visualize_main():
             if img_patch.shape[-1] == 1:
                 img_patch = np.concatenate([img_patch]*3, axis=-1)
             
-            # img_patch = (np.random.rand(32*row_per_method, 32*column_per_dataset) * 255.).astype('uint8')
             img_patch = Image.fromarray(img_patch)
             img_patch = img_patch.resize((width_per_patch, height_per_patch))
 
+            axs[method_idx, dataset_idx].imshow(img_patch)
             axs[method_idx, dataset_idx].imshow(img_patch)
 
 
@@ -410,7 +417,7 @@ def visualize_main():
     # plt.imshow(canvas)
     # fig.savefig("combined_image.png")
     # fig.align_ylabels(axs[:, 0])
-    fig.subplots_adjust(wspace=0.03, hspace=0.)
+    fig.subplots_adjust(wspace=0.005, hspace=0.055)  # reduce, increase
     fig.savefig("eps10_visual.png", bbox_inches='tight')
     fig.savefig("eps10_visual.pdf", bbox_inches='tight')
 

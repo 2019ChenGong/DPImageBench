@@ -105,9 +105,9 @@
 # CUDA_VISIBLE_DEVICES=3  python eval.py --method PDP-Diffusion --data_name cifar100_32 --epsilon 10.0 sensitive_data.train_num=val  --exp_path exp/pdp-diffusion/cifar100_32_eps10.0_trainval_LZN-2024-10-27-02-24-11 &
 
 
-# CUDA_VISIBLE_DEVICES=3  python eval.py --method DPDM sensitive_data.train_num=val --data_name eurosat_32 --epsilon 10.0  --exp_path exp/dpdm/eurosat_32_eps10.0trainval-2024-10-24-12-56-31 &
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method DPGAN --data_name cifar10_32 --epsilon 10.0  --exp_path exp/dpgan/cifar10_32_eps10.0pretrain_imagenet-2024-11-02-16-01-33 &
 
-# CUDA_VISIBLE_DEVICES=4  python eval.py --method DPGAN sensitive_data.train_num=val --data_name cifar10_32 --epsilon 1.0  --exp_path exp/dpgan/cifar10_32_eps1.0trainval-2024-10-22-21-23-15 &
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method DPGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path exp/dpgan/fmnist_28_eps10.0pretrain_places365-2024-11-03-03-49-18 &
 
 # CUDA_VISIBLE_DEVICES=5  python eval.py --method DPGAN sensitive_data.train_num=val --data_name cifar10_32 --epsilon 10.0  --exp_path exp/dpgan/cifar10_32_eps10.0trainval-2024-10-22-21-58-29 &
 
@@ -132,18 +132,18 @@
 
 # CUDA_VISIBLE_DEVICES=2  python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 1.0  --exp_path exp/pdp-diffusion/celeba_male_32_eps1.0_trainval_LZN-2024-10-28-05-49-37 &
 
-CUDA_VISIBLE_DEVICES=2  python eval.py --method PE --data_name celeba_male_32 --epsilon 1.0  --exp_path exp/pe/celeba_male_32_eps1.0_th15_tr100_vds0246810-2024-11-01-02-24-57 &
+# CUDA_VISIBLE_DEVICES=3  python eval.py --method PE --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/pe/celeba_male_32_eps10.0_th2_tr100_vds0246810-2024-11-01-05-10-39 &
 
-# CUDA_VISIBLE_DEVICES=1  python eval.py --method PE sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path exp/pe/fmnist_28_eps10.0_trainval_th3_tr10_vds000011112222-2024-11-01-17-19-07 &
-
-# CUDA_VISIBLE_DEVICES=3  python eval.py --method PE --data_name camelyon_32 sensitive_data.train_num=val --epsilon 10.0  --exp_path exp/pe/camelyon_32_eps1.0_trainval_th30_tr10_vds00000111-2024-11-01-19-12-14 &
-
-# CUDA_VISIBLE_DEVICES=1  python eval.py --method PE --data_name cifar100_32 --epsilon 10.0  --exp_path exp/pe/cifar100_32_eps10.0_th2_tr100_vds0246810-2024-10-31-04-38-12 &
-
-# CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name fmnist_28 --epsilon 1.0  --exp_path exp/gs-wgan/fmnist_28_eps1.0-2024-11-02-02-16-07 &
-
-# CUDA_VISIBLE_DEVICES=1  python eval.py --method GS-WGAN --data_name fmnist_28 --epsilon 10.0  --exp_path exp/gs-wgan/fmnist_28_eps10.0-2024-11-02-01-59-08 &
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method PE sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 1.0  --exp_path exp/pe/celeba_male_32_eps1.0_trainval_th15_tr100_vds0246810-2024-11-01-22-30-23 &
 
 # CUDA_VISIBLE_DEVICES=3  python eval.py --method PE --data_name camelyon_32 sensitive_data.train_num=val --epsilon 10.0  --exp_path exp/pe/camelyon_32_eps1.0_trainval_th30_tr10_vds00000111-2024-11-01-19-12-14 &
 
 # CUDA_VISIBLE_DEVICES=1  python eval.py --method PE --data_name cifar100_32 --epsilon 10.0  --exp_path exp/pe/cifar100_32_eps10.0_th2_tr100_vds0246810-2024-10-31-04-38-12 &
+
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name mnist_28 --epsilon 1.0 sensitive_data.train_num=val --exp_path exp/gs-wgan/mnist_28_eps1.0trainval-2024-11-04-00-43-53 &
+
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method GS-WGAN --data_name mnist_28 --epsilon 10.0 sensitive_data.train_num=val --exp_path exp/gs-wgan/mnist_28_eps10.0trainval-2024-11-04-00-43-53 &
+
+# CUDA_VISIBLE_DEVICES=2  python eval.py --method GS-WGAN --data_name fmnist_28 --epsilon 1.0 sensitive_data.train_num=val  --exp_path exp/gs-wgan/fmnist_28_eps1.0trainval-2024-11-04-02-02-39 &
+
+CUDA_VISIBLE_DEVICES=1  python eval.py --method GS-WGAN --data_name eurosat_32 --epsilon 1.0 sensitive_data.train_num=val --exp_path exp/gs-wgan/eurosat_32_eps1.0trainval-2024-11-04-00-33-21 &

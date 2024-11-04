@@ -46,7 +46,7 @@ class GS_WGAN(DPSynther):
         self.netGS = copy.deepcopy(self.netG)
         self.netD_list = []
         for i in range(self.num_discriminators):
-            netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size)
+            netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.num_classes)
             self.netD_list.append(netD)
         
         # if self.ckpt is not None:
@@ -133,7 +133,6 @@ class GS_WGAN(DPSynther):
                     real_y = torch.argmax(real_y, dim=1)
                 if config.label_random:
                     real_y = real_y % self.num_classes
-                
                 batchsize = real_data.shape[0]
                 real_data = real_data.view(batchsize, -1)
                 real_data = real_data.to(self.device)
@@ -385,10 +384,10 @@ class GS_WGAN(DPSynther):
         os.mkdir(config.log_dir)
         load_dir = self.ckpt
         indices_full = np.load(os.path.join(load_dir, 'indices.npy'), allow_pickle=True)
-
-        # indices_full = np.arange(len(sensitive_dataloader.dataset))
-        # np.random.shuffle(indices_full)
-        # indices_full.dump(os.path.join(config.log_dir, 'indices.npy'))
+        if len(indices_full) != len(sensitive_dataloader.dataset):
+            indices_full = np.arange(len(sensitive_dataloader.dataset))
+            np.random.shuffle(indices_full)
+            indices_full.dump(os.path.join(config.log_dir, 'indices.npy'))
         trainset_size = int(len(sensitive_dataloader.dataset) / self.num_discriminators)
         logging.info('Size of the dataset: {}'.format(trainset_size))
 
@@ -543,7 +542,7 @@ class GS_WGAN(DPSynther):
                 logging.info('Step: {}, G_cost:{}, D_cost:{}, Wasserstein:{}'.format(iter, G_cost.cpu().data, D_cost.cpu().data, Wasserstein_D.cpu().data))
 
             if iter % config.vis_step == 0:
-                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=10)
+                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.num_classes)
 
             if iter % config.save_step == 0:
                 ### save model
@@ -561,7 +560,7 @@ class GS_WGAN(DPSynther):
         syn_data = []
         syn_labels = []
 
-        syn_data, syn_labels = save_gen_data(os.path.join(config.log_dir, 'gen_data.npz'), self.netGS, self.z_dim, self.device, latent_type=self.latent_type, c=self.c, img_size=self.img_size)
+        syn_data, syn_labels = save_gen_data(os.path.join(config.log_dir, 'gen_data.npz'), self.netGS, self.z_dim, self.device, latent_type=self.latent_type, c=self.c, img_size=self.img_size, num_classes=self.num_classes, num_samples_per_class=config.data_num//self.num_classes)
 
         np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
 

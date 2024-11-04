@@ -108,4 +108,4 @@ CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-MERF sensitive_data.train_num
 
 # CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-LDM sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/dp-ldm/celeba_male_32_eps10.0unconditional_trainval-2024-10-25-23-46-09 &
 
-CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name mnist_28 --epsilon 10.0  --exp_path exp/gs-wgan/mnist_28_eps10.0-2024-10-28-04-43-28 &
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name mnist_28 --epsilon 10.0  --exp_path exp/gs-wgan/mnist_28_eps10.0-2024-10-28-04-43-28 &
