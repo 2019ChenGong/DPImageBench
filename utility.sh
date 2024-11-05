@@ -140,10 +140,10 @@
 
 # CUDA_VISIBLE_DEVICES=1  python eval.py --method PE --data_name cifar100_32 --epsilon 10.0  --exp_path exp/pe/cifar100_32_eps10.0_th2_tr100_vds0246810-2024-10-31-04-38-12 &
 
-# CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name mnist_28 --epsilon 1.0 sensitive_data.train_num=val --exp_path exp/gs-wgan/mnist_28_eps1.0trainval-2024-11-04-00-43-53 &
+CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name cifar10_32 sensitive_data.train_num=val --epsilon 1.0 --exp_path exp/gs-wgan/cifar10_32_eps1.0trainval-2024-11-04-22-47-20 &
 
-# CUDA_VISIBLE_DEVICES=1  python eval.py --method GS-WGAN --data_name mnist_28 --epsilon 10.0 sensitive_data.train_num=val --exp_path exp/gs-wgan/mnist_28_eps10.0trainval-2024-11-04-00-43-53 &
+CUDA_VISIBLE_DEVICES=1  python eval.py --method GS-WGAN --data_name cifar10_32 sensitive_data.train_num=val --epsilon 10.0 --exp_path exp/gs-wgan/cifar10_32_eps10.0trainval-2024-11-04-22-47-20 &
 
-# CUDA_VISIBLE_DEVICES=2  python eval.py --method GS-WGAN --data_name fmnist_28 --epsilon 1.0 sensitive_data.train_num=val  --exp_path exp/gs-wgan/fmnist_28_eps1.0trainval-2024-11-04-02-02-39 &
+CUDA_VISIBLE_DEVICES=2  python eval.py --method GS-WGAN --data_name celeba_male_32 sensitive_data.train_num=val --epsilon 1.0  --exp_path exp/gs-wgan/celeba_male_32_eps1.0trainval-2024-11-04-21-49-24 &
 
-CUDA_VISIBLE_DEVICES=1  python eval.py --method GS-WGAN --data_name eurosat_32 --epsilon 1.0 sensitive_data.train_num=val --exp_path exp/gs-wgan/eurosat_32_eps1.0trainval-2024-11-04-00-33-21 &
+CUDA_VISIBLE_DEVICES=3  python eval.py --method GS-WGAN --data_name celeba_male_32 sensitive_data.train_num=val --epsilon 10.0 --exp_path exp/gs-wgan/celeba_male_32_eps10.0trainval_step5w-2024-11-04-21-58-52 &

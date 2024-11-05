@@ -26,11 +26,15 @@ sensitive_data:
   test_path: dataset/fmnist/test_28.zip
   fid_stats: dataset/fmnist/fid_stats_28.npz
 model:
-  z_dim: 5
-  h_dim: '200'
   num_class: 10
-  n_channels: 16,8,1
-  kernel_sizes: 5,5
+  img_size: 28
+  Generator:
+    z_dim: 60
+    g_shared_dim: 128
+    g_conv_dim: 41
+    attn_g_loc:
+    - 2
+    apply_attn: true
   n_feat: 784
   d_rff: 10000
   rff_sigma: '105'

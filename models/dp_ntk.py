@@ -14,6 +14,7 @@ from opacus.accountants.utils import get_noise_multiplier
 from models.synthesizer import DPSynther
 from models.DP_NTK.dp_ntk_mean_emb1 import calc_mean_emb1
 from models.DP_NTK.ntk import *
+from models.DP_GAN.generator import Generator
 
 class DP_NTK(DPSynther):
     def __init__(self, config, device):
@@ -27,11 +28,6 @@ class DP_NTK(DPSynther):
         self.input_dim = self.img_size * self.img_size * self.c
         self.n_classes = config.n_classes
 
-        self.z_dim = config.z_dim
-        self.h_dim = config.h_dim
-        self.n_channels = config.n_channels
-        self.kernel_sizes = config.kernel_sizes
-
         if config.model_ntk == 'fc_1l':
             self.model_ntk = NTK(input_size=self.input_dim, hidden_size_1=self.ntk_width, output_size=self.n_classes)
         elif config.model_ntk == 'fc_2l':
@@ -44,8 +40,12 @@ class DP_NTK(DPSynther):
         self.model_ntk.to(device)
         self.model_ntk.eval()
 
-        self.model_gen = ConvCondGen(self.z_dim, self.h_dim, self.n_classes, self.n_channels, self.c, self.kernel_sizes, self.input_dim).to(device)
+        self.model_gen = Generator(img_size=self.img_size, num_classes=self.n_classes, **config.Generator).to(device)
         self.model_gen.train()
+
+        model_parameters = filter(lambda p: p.requires_grad, self.model_gen.parameters())
+        n_params = sum([np.prod(p.size()) for p in model_parameters])
+        logging.info('Number of trainable parameters in model: %d' % n_params)
     
     def pretrain(self, public_dataloader, config):
         if public_dataloader is None:
@@ -73,10 +73,9 @@ class DP_NTK(DPSynther):
             optimizer.zero_grad()  # zero the parameter gradients
 
             """ synthetic data """
-            gen_code, gen_labels = self.model_gen.get_code(config.batch_size, self.device)
-            gen_code = gen_code.to(self.device)
-            gen_samples = self.model_gen(gen_code.detach())
-            _, gen_labels_numerical = torch.max(gen_labels, dim=1)
+            gen_labels_numerical = torch.randint(self.n_classes, (config.batch_size,)).to(self.device)
+            z = torch.randn(gen_batch_size, gen.z_dim).to(device)
+            gen_samples = gen(z, gen_labels_numerical).reshape(gen_batch_size, -1)
 
             """ synthetic data mean_emb init """
             mean_emb2 = torch.zeros((d, self.n_classes), device=self.device)
@@ -147,10 +146,9 @@ class DP_NTK(DPSynther):
             optimizer.zero_grad()  # zero the parameter gradients
 
             """ synthetic data """
-            gen_code, gen_labels = self.model_gen.get_code(config.batch_size, self.device)
-            gen_code = gen_code.to(self.device)
-            gen_samples = self.model_gen(gen_code.detach())
-            _, gen_labels_numerical = torch.max(gen_labels, dim=1)
+            gen_labels_numerical = torch.randint(self.n_classes, (config.batch_size,)).to(self.device)
+            z = torch.randn(config.batch_size, self.model_gen.z_dim).to(self.device)
+            gen_samples = self.model_gen(z, gen_labels_numerical).reshape(config.batch_size, -1)
 
             """ synthetic data mean_emb init """
             mean_emb2 = torch.zeros((d, self.n_classes), device=self.device)
@@ -276,8 +274,9 @@ def synthesize_mnist_with_uniform_labels(gen, device, gen_batch_size=1000, n_dat
 
     with torch.no_grad():
         for idx in range(n_iterations):
-            gen_code, gen_labels = gen.get_code(gen_batch_size, device, labels=ordered_labels)
-            gen_samples = gen(gen_code)
+            y = ordered_labels.view(-1)
+            z = torch.randn(gen_batch_size, gen.z_dim).to(device)
+            gen_samples = gen(z, y).reshape(gen_batch_size, -1)
             data_list.append(gen_samples)
     return torch.cat(data_list, dim=0).cpu().numpy(), torch.cat(labels_list, dim=0).cpu().numpy()
 

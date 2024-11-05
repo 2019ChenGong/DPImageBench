@@ -52,7 +52,7 @@
 
 # CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-MERF sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/dp-merf/celeba_male_32_eps10.0trainval-2024-10-22-03-29-00 &
 
-CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-MERF sensitive_data.train_num=val --data_name camelyon_32 --epsilon 10.0  --exp_path exp/dp-merf/camelyon_32_eps10.0trainval-2024-10-20-06-32-32 &
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-MERF sensitive_data.train_num=val --data_name camelyon_32 --epsilon 10.0  --exp_path exp/dp-merf/camelyon_32_eps10.0trainval-2024-10-20-06-32-32 &
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-NTK sensitive_data.train_num=val --data_name mnist_28 --epsilon 10.0  --exp_path exp/dp-ntk/mnist_28_eps10.0trainval-2024-10-20-09-43-52 &
 
@@ -104,8 +104,8 @@ CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-MERF sensitive_data.train_num
 
 # CUDA_VISIBLE_DEVICES=1  python eval.py --method DP-LDM sensitive_data.train_num=val --data_name cifar100_32 --epsilon 10.0  --exp_path exp/dp-ldm/cifar100_32_eps10.0unconditional_trainval-2024-10-26-00-06-28 &
 
-# CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-LDM sensitive_data.train_num=val --data_name eurosat_32 --epsilon 10.0  --exp_path exp/dp-ldm/eurosat_32_eps10.0unconditionalval-2024-10-25-21-10-37 &
+CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/gs-wgan/celeba_male_32_eps10.0trainval_step5w-2024-11-04-21-58-52 &
 
-# CUDA_VISIBLE_DEVICES=2  python eval.py --method DP-LDM sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/dp-ldm/celeba_male_32_eps10.0unconditional_trainval-2024-10-25-23-46-09 &
+CUDA_VISIBLE_DEVICES=1  python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name camelyon_32 --epsilon 10.0  --exp_path exp/gs-wgan/camelyon_32_eps10.0trainval-2024-11-04-21-49-24 &
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name mnist_28 --epsilon 10.0  --exp_path exp/gs-wgan/mnist_28_eps10.0-2024-10-28-04-43-28 &

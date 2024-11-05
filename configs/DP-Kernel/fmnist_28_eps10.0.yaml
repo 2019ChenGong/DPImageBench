@@ -26,11 +26,15 @@ sensitive_data:
   fid_stats: dataset/fmnist/fid_stats_28.npz
   train_num: all
 model:
-  image_size: 32
-  nc: 1
-  nz: 10
-  ngf: 64
+  image_size: 28
   n_class: 10
+  Generator:
+    z_dim: 60
+    g_shared_dim: 128
+    g_conv_dim: 41
+    attn_g_loc:
+    - 2
+    apply_attn: true
   sigma_list:
   - 1
   - 2

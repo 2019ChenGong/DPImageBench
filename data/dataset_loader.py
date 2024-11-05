@@ -64,7 +64,7 @@ def semantic_query(sensitive_train_loader, config):
     class MyClassifier(torch.nn.Module):
         def __init__(self):
             super(MyClassifier, self).__init__()
-            self.model = resnet.ResNet50(num_classes=config.public_data.num_classes)
+            self.model = resnet.ResNet50(num_classes=config.public_data.n_classes)
 
         def forward(self, x):
             return self.model(x)
@@ -77,26 +77,27 @@ def semantic_query(sensitive_train_loader, config):
 
     semantics_hist = torch.zeros((config.sensitive_data.n_classes, config.public_data.n_classes)).to(config.setup.local_rank)
 
-    for (x, y) in sensitive_loader:
-        if len(y.shape) == 2:
-            x = x.to(torch.float32) / 255.
-            y = torch.argmax(y, dim=1)
-        if x.shape[-1] != 32:
-            x = F.interpolate(x, size=[32, 32])
-        if x.shape[1] == 1:
-            x = x.repeat(1, 3, 1, 1)
-        x = x.to(config.setup.local_rank) * 2. - 1.
-        y = y.to(config.setup.local_rank).long()
-        out = model(x)
-        words_idx = torch.topk(out, k=config.public_data.selective.num_words, dim=1)[1]
-        for i in range(x.shape[0]):
-            cls = y[i]
-            words = words_idx[i]
-            semantics_hist[cls, words] += 1
+    with torch.no_grad():
+        for (x, y) in sensitive_loader:
+            if len(y.shape) == 2:
+                x = x.to(torch.float32) / 255.
+                y = torch.argmax(y, dim=1)
+            if x.shape[-1] != 32:
+                x = F.interpolate(x, size=[32, 32])
+            if x.shape[1] == 1:
+                x = x.repeat(1, 3, 1, 1)
+            x = x.to(config.setup.local_rank) * 2. - 1.
+            y = y.to(config.setup.local_rank).long()
+            out = model(x)
+            words_idx = torch.topk(out, k=config.public_data.selective.num_words, dim=1)[1]
+            for i in range(x.shape[0]):
+                cls = y[i]
+                words = words_idx[i]
+                semantics_hist[cls, words] += 1
 
     sensitivity = np.sqrt(config.public_data.selective.num_words)
     torch.manual_seed(0)
-    semantics_hist = semantics_hist + torch.rand_like(semantics_hist) * sensitivity * config.public_data.selective.sigma
+    semantics_hist = semantics_hist + torch.randn_like(semantics_hist) * sensitivity * config.public_data.selective.sigma
     
     cls_dict = {}
     for i in range(config.sensitive_data.n_classes):

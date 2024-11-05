@@ -13,7 +13,7 @@ import importlib
 opacus = importlib.import_module('opacus')
 from opacus.accountants.utils import get_noise_multiplier
 
-
+from models.DP_GAN.generator import Generator
 from models.synthesizer import DPSynther
 
 class DP_Kernel(DPSynther):
@@ -21,17 +21,18 @@ class DP_Kernel(DPSynther):
         super().__init__()
 
         self.image_size = config.image_size
-        self.nc = config.nc
-        self.nz = config.nz
-        self.ngf = config.ngf
+        self.nz = config.Generator.z_dim
         self.n_class = config.n_class
         self.sigma_list = config.sigma_list
         self.config = config
         self.device = device
 
-        G_decoder = CondDecoder(self.image_size, self.nc, k=self.nz, ngf=self.ngf, num_classes=self.n_class)
+        G_decoder =  Generator(img_size=self.image_size, num_classes=self.n_class, **config.Generator).to(device)
         self.gen = CNetG(G_decoder).to(device)
-        self.gen.apply(weights_init)
+
+        model_parameters = filter(lambda p: p.requires_grad, self.gen.parameters())
+        n_params = sum([np.prod(p.size()) for p in model_parameters])
+        logging.info('Number of trainable parameters in model: %d' % n_params)
     
     def pretrain(self, public_dataloader, config):
         if public_dataloader is None:
@@ -106,8 +107,6 @@ class DP_Kernel(DPSynther):
                 if len(label.shape) == 2:
                     x = x.to(torch.float32) / 255.
                     label = torch.argmax(label, dim=1)
-                if x.shape[1] == 1:
-                    x = F.interpolate(x, size=[32, 32])
 
                 x = x.to(self.device) * 2 - 1
                 label = label.to(self.device)
@@ -181,75 +180,6 @@ class CNetG(nn.Module):
     def forward(self, input, label):
         output = self.decoder(input, label)
         return output
-
-class CondDecoder(nn.Module):
-    def __init__(self, isize, nc, k=100, ngf=64, num_classes=10):
-        super(CondDecoder, self).__init__()
-        assert isize % 16 == 0, "isize has to be a multiple of 16"
-
-        cngf, tisize = ngf // 2, 4
-        while tisize != isize:
-            cngf = cngf * 2
-            tisize = tisize * 2
-
-        self.k = k
-        self.num_class = num_classes
-        self.decoder_input = nn.Linear(k + num_classes, k)
-
-        modules = []
-        modules.append(
-            nn.Sequential(
-                nn.ConvTranspose2d(k, cngf, 4, 1, 0, bias=False),
-                nn.BatchNorm2d(cngf),
-                nn.ReLU(True)
-            )
-        )
-
-        csize = 4
-        while csize < isize // 2:
-            modules.append(
-                nn.Sequential(
-                    nn.Conv2d(cngf, cngf, kernel_size=3, padding=1, bias=False),
-                    nn.BatchNorm2d(cngf),
-                    nn.ReLU(True),
-                    nn.ConvTranspose2d(cngf, cngf // 2, 4, 2, 1, bias=False),
-                    nn.BatchNorm2d(cngf // 2),
-                    nn.ReLU(True)
-                )
-            )
-            cngf = cngf // 2
-            csize = csize * 2
-
-        modules.append(
-            nn.Sequential(
-                nn.Conv2d(cngf, cngf, kernel_size=3, padding=1, bias=False),
-                nn.BatchNorm2d(cngf),
-                nn.ReLU(True),
-                nn.ConvTranspose2d(cngf, nc, 4, 2, 1, bias=False),
-                nn.Tanh()
-            )
-        )
-
-        self.main = nn.Sequential(*modules)
-
-    def forward(self, z, label):
-        label = torch.nn.functional.one_hot(label, self.num_class).float()
-        input = torch.cat([z, label], dim=1)
-        output = self.decoder_input(input)
-        output = output.view(-1, self.k, 1, 1)
-        output = self.main(output)
-        return output
-
-def weights_init(m):
-    classname = m.__class__.__name__
-    if classname.find('Conv') != -1:
-        m.weight.data.normal_(0.0, 0.02)
-    elif classname.find('BatchNorm') != -1:
-        m.weight.data.normal_(1.0, 0.02)
-        m.bias.data.fill_(0)
-    elif classname.find('Linear') != -1:
-        m.weight.data.normal_(0.0, 0.1)
-        m.bias.data.fill_(0)
 
 
 def rbf_kernel_DP_loss_with_labels(X, Y, x_label, y_label, sigma_list, noise_multiplier):

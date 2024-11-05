@@ -3,6 +3,7 @@ import os
 import torch
 from torch import nn
 from torch.optim.lr_scheduler import StepLR
+import torch.nn.functional as F
 import torchvision
 import numpy as np
 import logging
@@ -14,26 +15,28 @@ from opacus.accountants.utils import get_noise_multiplier
 
 from models.synthesizer import DPSynther
 from models.DP_MERF.rff_mmd_approx import get_rff_losses
+from models.DP_GAN.generator import Generator
 
 class DP_MERF(DPSynther):
     def __init__(self, config, device):
         super().__init__()
 
         self.config = config
-        self.z_dim = config.z_dim
-        self.h_dim = config.h_dim
+        self.z_dim = config.Generator.z_dim
         self.num_class = config.num_class
-        self.n_channels = config.n_channels
-        self.kernel_sizes = config.kernel_sizes
+        self.img_size = config.img_size
         self.device = device
-        # self.gen = CondDecoder(isize=32, nc=3, k=100).to(device)
 
         self.n_feat = config.n_feat
         self.d_rff = config.d_rff
         self.rff_sigma = config.rff_sigma
         self.mmd_type = config.mmd_type
 
-        self.gen = ConvCondGen(self.z_dim, self.h_dim, self.num_class, self.n_channels, self.kernel_sizes, self.n_feat).to(device)
+        self.gen = Generator(img_size=self.img_size, num_classes=self.num_class, **config.Generator).to(device)
+
+        model_parameters = filter(lambda p: p.requires_grad, self.gen.parameters())
+        n_params = sum([np.prod(p.size()) for p in model_parameters])
+        logging.info('Number of trainable parameters in model: %d' % n_params)
     def pretrain(self, public_dataloader, config):
         if public_dataloader is None:
             return
@@ -99,57 +102,6 @@ class DP_MERF(DPSynther):
         return syn_data, syn_labels
 
 
-class ConvCondGen(nn.Module):
-    def __init__(self, d_code, d_hid, n_labels, nc_str, ks_str, n_feats, use_sigmoid=True, batch_norm=True):
-        super(ConvCondGen, self).__init__()
-        self.nc = [int(k) for k in nc_str.split(',')]
-        self.ks = [int(k) for k in ks_str.split(',')]  # kernel sizes
-        d_hid = [int(k) for k in d_hid.split(',')]
-        assert len(self.nc) == 3 and len(self.ks) == 2
-        self.hw = int(np.sqrt(n_feats // self.nc[-1])) // 4
-        self.reshape_size = self.nc[0]*self.hw**2
-        self.fc1 = nn.Linear(d_code + n_labels, d_hid[0])
-        self.fc2 = nn.Linear(d_hid[0], self.reshape_size)
-        self.bn1 = nn.BatchNorm1d(d_hid[0]) if batch_norm else None
-        self.bn2 = nn.BatchNorm1d(self.reshape_size) if batch_norm else None
-        self.conv1 = nn.Conv2d(self.nc[0], self.nc[1], kernel_size=self.ks[0], stride=1, padding=(self.ks[0]-1)//2)
-        self.conv2 = nn.Conv2d(self.nc[1], self.nc[2], kernel_size=self.ks[1], stride=1, padding=(self.ks[1]-1)//2)
-        self.upsamp = nn.UpsamplingBilinear2d(scale_factor=2)
-        self.relu = nn.ReLU()
-        self.sigmoid = nn.Sigmoid()
-        self.use_sigmoid = use_sigmoid
-        self.d_code = d_code
-        self.n_labels = n_labels
-
-    def forward(self, x):
-        x = self.fc1(x)
-        x = self.bn1(x) if self.bn1 is not None else x
-        x = self.fc2(self.relu(x))
-        x = self.bn2(x) if self.bn2 is not None else x
-        # print(x.shape)
-        x = x.reshape(x.shape[0], self.nc[0], self.hw, self.hw)
-        x = self.upsamp(x)
-        x = self.relu(self.conv1(x))
-        x = self.upsamp(x)
-        x = self.conv2(x)
-        x = x.reshape(x.shape[0], -1)
-        if self.use_sigmoid:
-            x = self.sigmoid(x)
-        return x
-    def get_code(self, batch_size, device, return_labels=True, labels=None):
-        if labels is None:  # sample labels
-            labels = torch.randint(self.n_labels, (batch_size, 1), device=device)
-        code = torch.randn(batch_size, self.d_code, device=device)
-        gen_one_hots = torch.zeros(batch_size, self.n_labels, device=device)
-        gen_one_hots.scatter_(1, labels, 1)
-        code = torch.cat([code, gen_one_hots.to(torch.float32)], dim=1)
-        # print(code.shape)
-        if return_labels:
-            return code, gen_one_hots
-        else:
-            return code
-
-
 def synthesize_mnist_with_uniform_labels(gen, device, gen_batch_size=1000, n_data=60000, n_labels=10):
     gen.eval()
     assert n_data % gen_batch_size == 0
@@ -162,8 +114,9 @@ def synthesize_mnist_with_uniform_labels(gen, device, gen_batch_size=1000, n_dat
 
     with torch.no_grad():
         for idx in range(n_iterations):
-            gen_code, gen_labels = gen.get_code(gen_batch_size, device, labels=ordered_labels)
-            gen_samples = gen(gen_code)
+            y = ordered_labels.view(-1)
+            z = torch.randn(gen_batch_size, gen.z_dim).to(device)
+            gen_samples = gen(z, y).reshape(gen_batch_size, -1)
             data_list.append(gen_samples)
     return torch.cat(data_list, dim=0).cpu().numpy(), torch.cat(labels_list, dim=0).cpu().numpy()
 
@@ -171,8 +124,11 @@ def synthesize_mnist_with_uniform_labels(gen, device, gen_batch_size=1000, n_dat
 def train_single_release(gen, device, optimizer, epoch, rff_mmd_loss, log_interval, batch_size, n_data):
     n_iter = n_data // batch_size
     for batch_idx in range(n_iter):
-        gen_code, gen_labels = gen.get_code(batch_size, device)
-        loss = rff_mmd_loss(gen(gen_code), gen_labels)
+        y = torch.randint(gen.num_classes, (batch_size,)).to(device)
+        z = torch.randn(batch_size, gen.z_dim).to(device)
+        gen_one_hots = F.one_hot(y, num_classes=gen.num_classes)
+        gen_samples = gen(z, y).reshape(batch_size, -1)
+        loss = rff_mmd_loss(gen_samples, gen_one_hots)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

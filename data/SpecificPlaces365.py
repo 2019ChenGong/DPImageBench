@@ -4,15 +4,17 @@ from torch.utils.data import Dataset, DataLoader
 
 class SpecificClassPlaces365(Dataset):
     def __init__(self, original_dataset, specific_class):
+        print(specific_class)
         self.original_dataset = original_dataset
         self.targets = []
         self.indices = []
         selected_classes = []
         public_to_sensitive = {}
         for sensitive_cls in specific_class:
-            selected_classes.append(specific_class[sensitive_cls])
-            for public_cls in specific_class[sensitive_cls].numpy():
+            for public_cls in specific_class[sensitive_cls]:
+                selected_classes.append(public_cls)
                 public_to_sensitive[int(public_cls)] = int(sensitive_cls)
+        print(selected_classes)
         for i, label in enumerate(original_dataset.targets):
             if label in selected_classes:
                 self.targets.append(public_to_sensitive[label])
