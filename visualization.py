@@ -306,8 +306,8 @@ def visualize_main():
         "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/cifar10_32_eps10.0-2024-11-03-00-10-53/gen/gen.npz",
         "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/cifar100_32_eps10.0-2024-11-03-08-23-12/gen/gen.npz",
         "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/eurosat_32_eps10.0-2024-11-03-10-39-01/gen/gen.npz",
-        "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/celeba_male_32_eps10.0-2024-11-04-00-56-19/gen/gen.npz",
-        "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/camelyon_32_eps10.0-2024-11-03-22-16-47/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/celeba_male_32_eps10.0trainval_step5w-2024-11-04-21-58-52/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/gs-wgan/camelyon_32_eps10.0trainval-2024-11-04-21-49-24/gen/gen.npz",
     ],
     [
         "/p/fzv6enresearch/DPImageBench/exp/dpgan/mnist_28_eps10.0-2024-10-08-00-06-54/gen/gen.npz",

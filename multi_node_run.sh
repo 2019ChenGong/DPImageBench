@@ -40,13 +40,18 @@
 # CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps10.0trainval_eps5-2024-10-29-00-02-50 &
 # CUDA_VISIBLE_DEVICES=1 python eval.py -m PrivImage -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps10.0trainval_eps20-2024-10-29-00-57-21 &
 
-# CUDA_VISIBLE_DEVICES=0 python run.py public_data.name=null sensitive_data.train_num=val train.dp.epsilon=15 model.ckpt=/p/fzv6enresearch/DPImageBench/GS-WGAN/results/fashionmnist/pretrain/ResNet_default_trainval -m GS-WGAN -dn fmnist_28 -e 10.0 -ed trainval_eps15 &
-# CUDA_VISIBLE_DEVICES=1 python run.py public_data.name=null sensitive_data.train_num=val train.dp.epsilon=20 model.ckpt=/p/fzv6enresearch/DPImageBench/GS-WGAN/results/fashionmnist/pretrain/ResNet_default_trainval -m GS-WGAN -dn fmnist_28 -e 10.0 -ed trainval_eps20 &
+# CUDA_VISIBLE_DEVICES=0 python run.py public_data.name=null sensitive_data.train_num=val model.ckpt=/p/fzv6enresearch/DPImageBench/GS-WGAN/results/cifar10/pretrain/ResNet_default_trainval train.dp.epsilon=0.2 -m GS-WGAN -dn cifar10_32 -e 10.0 -ed trainval_eps0.2 &
+# CUDA_VISIBLE_DEVICES=1 python run.py public_data.name=null sensitive_data.train_num=val model.ckpt=/p/fzv6enresearch/DPImageBench/GS-WGAN/results/cifar10/pretrain/ResNet_default_trainval train.dp.epsilon=5 -m GS-WGAN -dn cifar10_32 -e 10.0 -ed trainval_eps5 &
+# CUDA_VISIBLE_DEVICES=2 python run.py public_data.name=null sensitive_data.train_num=val model.ckpt=/p/fzv6enresearch/DPImageBench/GS-WGAN/results/cifar10/pretrain/ResNet_default_trainval train.dp.epsilon=15 -m GS-WGAN -dn cifar10_32 -e 10.0 -ed trainval_eps15 &
+# CUDA_VISIBLE_DEVICES=3 python run.py public_data.name=null sensitive_data.train_num=val model.ckpt=/p/fzv6enresearch/DPImageBench/GS-WGAN/results/cifar10/pretrain/ResNet_default_trainval train.dp.epsilon=20 -m GS-WGAN -dn cifar10_32 -e 10.0 -ed trainval_eps20 &
+# CUDA_VISIBLE_DEVICES=2 python run.py public_data.name=null sensitive_data.train_num=val model.ckpt=/p/fzv6enresearch/DPImageBench/GS-WGAN/results/camelyon/pretrain/ResNet_default_trainval -m GS-WGAN -dn camelyon_32 -e 10.0 -ed trainval &
+# CUDA_VISIBLE_DEVICES=3 python run.py public_data.name=null sensitive_data.train_num=val model.ckpt=/p/fzv6enresearch/DPImageBench/GS-WGAN/results/camelyon/pretrain/ResNet_default_trainval -m GS-WGAN -dn camelyon_32 -e 1.0 -ed trainval &
 
 
-python eval.py sensitive_data.train_num=val -m GS-WGAN -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps5-2024-11-04-05-46-27 &
-python eval.py sensitive_data.train_num=val -m GS-WGAN -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps15-2024-11-04-05-48-12 &
-python eval.py sensitive_data.train_num=val -m GS-WGAN -dn fmnist_28 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps20-2024-11-04-05-48-12 &
+python eval.py sensitive_data.train_num=val -m GS-WGAN -dn celeba_male_32 -e 10.0 -ep /p/fzv6enresearch/DPImageBench/exp/gs-wgan/celeba_male_32_eps1.0trainval-2024-11-04-21-49-24 &
+python eval.py sensitive_data.train_num=val -m GS-WGAN -dn celeba_male_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/gs-wgan/celeba_male_32_eps10.0trainval_step5w-2024-11-04-21-58-52 &
+# python eval.py sensitive_data.train_num=val -m GS-WGAN -dn camelyon_32 -e 10.0 -ep /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps20-2024-11-04-05-48-12 &
+# python eval.py sensitive_data.train_num=val -m GS-WGAN -dn camelyon_32 -e 1.0 -ep /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps20-2024-11-04-05-48-12 &
 
 # python run.py setup.n_gpus_per_node=4 public_data.name=null model.ckpt=/p/fzv6enresearch/DPImageBench/exp/dp-ldm/cifar10_32_eps10.0unconditional_ch1224_nf64-2024-10-27-03-33-17/pretrain/checkpoints/final_checkpoint.pth model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=64 train.dp.n_splits=128 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed unconditional_ch1224_nf64
 
