@@ -7,7 +7,7 @@ from diffusers import StableDiffusionPipeline
 from diffusers import StableDiffusionImg2ImgPipeline
 
 from .api import API
-from dpsda.pytorch_utils import dev
+from pe.pytorch_utils import dev
 
 
 def _round_to_uint8(image):

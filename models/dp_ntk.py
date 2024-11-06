@@ -145,28 +145,17 @@ class DP_NTK(DPSynther):
             running_loss = 0.0
             optimizer.zero_grad()  # zero the parameter gradients
 
+            # for accu_step in range(config.dp.n_splits):
             """ synthetic data """
-            gen_labels_numerical = torch.randint(self.n_classes, (config.batch_size,)).to(self.device)
-            z = torch.randn(config.batch_size, self.model_gen.z_dim).to(self.device)
-            gen_samples = self.model_gen(z, gen_labels_numerical).reshape(config.batch_size, -1)
+            batch_size = config.batch_size // config.dp.n_splits
+            gen_labels_numerical = torch.randint(self.n_classes, (batch_size,)).to(self.device)
+            z = torch.randn(batch_size, self.model_gen.z_dim).to(self.device)
+            gen_samples = self.model_gen(z, gen_labels_numerical).reshape(batch_size, -1)
 
             """ synthetic data mean_emb init """
             mean_emb2 = torch.zeros((d, self.n_classes), device=self.device)
             for idx in range(gen_samples.shape[0]):
                 """ manually set the weight if needed """
-                # model_ntk.fc1.weight = torch.nn.Parameter(output_weights[gen_labels_numerical[idx], :][None, :])
-                # mean_v_samp = torch.Tensor([]).to(self.device)  # sample mean vector init
-                # f_x = self.model_ntk(gen_samples[idx][None, :])
-
-                # """ get NTK features """
-                # f_idx_grad = torch.autograd.grad(f_x, self.model_ntk.parameters(),
-                #                                 grad_outputs=torch.ones_like(f_x), create_graph=True)
-                # print(f_idx_grad[0].shape)
-
-                # for g in f_idx_grad:
-                #     mean_v_samp = torch.cat((mean_v_samp, g.flatten()))
-                # mean_v_samp = mean_v_samp[:-1]
-
                 f_x = self.model_ntk(gen_samples[idx][None, :])
 
                 """ get NTK features """
@@ -178,7 +167,7 @@ class DP_NTK(DPSynther):
                 mean_emb2[:, gen_labels_numerical[idx]] += mean_v_samp / torch.linalg.vector_norm(mean_v_samp)
 
             """ average by batch size """
-            mean_emb2 = mean_emb2 / config.batch_size
+            mean_emb2 = mean_emb2 / batch_size
 
             """ calculate loss """
             # loss = (self.noisy_mean_emb - mean_emb2).sum()

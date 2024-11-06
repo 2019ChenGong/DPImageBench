@@ -19,6 +19,12 @@ models/pretrained_models
 models/PE/improved-diffusion
 models/pretrained_models.zip
 
+models_old/pretrained_models
+models_old/PE/improved-diffusion
+models_old/pretrained_models.zip
+
+
+
 core*
 debug
 

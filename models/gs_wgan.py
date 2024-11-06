@@ -19,6 +19,7 @@ from opacus.accountants.utils import get_noise_multiplier
 from models.GS_WGAN.models import *
 from models.GS_WGAN.utils import *
 from models.GS_WGAN.ops import exp_mov_avg
+from models.DP_GAN.generator import Generator
 
 from models.synthesizer import DPSynther
 
@@ -27,21 +28,14 @@ class GS_WGAN(DPSynther):
         super().__init__()
 
         self.num_discriminators = config.num_discriminators
-        self.z_dim = config.z_dim
+        self.z_dim = config.Generator.z_dim
         self.c = config.c
         self.img_size =  config.img_size
         self.num_classes = config.num_classes
-        self.model_dim = config.model_dim
         self.latent_type = config.latent_type
-        self.gen_arch = config.gen_arch
         self.ckpt = config.ckpt
 
-        if self.gen_arch == 'DCGAN':
-            self.netG = GeneratorDCGAN(c=self.c, img_size=self.img_size, z_dim=self.z_dim, model_dim=self.model_dim, num_classes=self.num_classes)
-        elif self.gen_arch == 'ResNet':
-            self.netG = GeneratorResNet(c=self.c, img_size=self.img_size, z_dim=self.z_dim, model_dim=self.model_dim, num_classes=self.num_classes)
-        else:
-            raise ValueError
+        self.netG = Generator(img_size=self.img_size, num_classes=self.num_classes, **config.Generator)
         
         self.netGS = copy.deepcopy(self.netG)
         self.netD_list = []
@@ -49,14 +43,9 @@ class GS_WGAN(DPSynther):
             netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.num_classes)
             self.netD_list.append(netD)
         
-        # if self.ckpt is not None:
-        #     for netD_id in range(self.num_discriminators):
-        #         logging.info('Load NetD ', str(netD_id))
-        #         network_path = os.path.join(self.ckpt, 'netD_%d' % netD_id, 'netD.pth')
-        #         netD = self.netD_list[netD_id]
-        #         netD.load_state_dict(torch.load(network_path))
-        #     self.netG.load_state_dict(torch.load(os.path.join(self.ckpt, 'netG.pth')))
-        #     self.netGS.load_state_dict(torch.load(os.path.join(self.ckpt, 'netGS.pth')))
+        model_parameters = filter(lambda p: p.requires_grad, self.netG.parameters())
+        n_params = sum([np.prod(p.size()) for p in model_parameters])
+        logging.info('Number of trainable parameters in model: %d' % n_params)
 
         self.config = config
         self.device = device
