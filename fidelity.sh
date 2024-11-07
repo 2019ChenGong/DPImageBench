@@ -106,6 +106,8 @@
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/gs-wgan/celeba_male_32_eps10.0trainval_step5w-2024-11-04-21-58-52 &
 
-CUDA_VISIBLE_DEVICES=2  python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name camelyon_32 --epsilon 10.0  --exp_path exp/gs-wgan/camelyon_32_eps10.0trainval-2024-11-04-21-49-24 &
+# CUDA_VISIBLE_DEVICES=2  python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name camelyon_32 --epsilon 10.0  --exp_path exp/gs-wgan/camelyon_32_eps10.0trainval-2024-11-04-21-49-24 &
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name mnist_28 --epsilon 10.0  --exp_path exp/gs-wgan/mnist_28_eps10.0-2024-10-28-04-43-28 &
+
+CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-MERF sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/dp-merf/celeba_male_32_eps10.0trainval-2024-10-22-03-29-00 &

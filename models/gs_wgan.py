@@ -470,7 +470,7 @@ class GS_WGAN(DPSynther):
                 else:
                     raise NotImplementedError
                 noisev = autograd.Variable(noise)
-                fake = autograd.Variable(netG(noisev, real_y.to(self.device)).data)
+                fake = autograd.Variable(netG(noisev, real_y.to(self.device)).view(batchsize, -1).data)
                 inputv = fake.to(self.device)
                 D_fake = netD(inputv, real_y.to(self.device))
                 D_fake = D_fake.mean()
@@ -509,7 +509,7 @@ class GS_WGAN(DPSynther):
                 raise NotImplementedError
             label = torch.randint(0, self.num_classes, [batchsize]).to(self.device)
             noisev = autograd.Variable(noise)
-            fake = netG(noisev, label)
+            fake = netG(noisev, label).view(batchsize, -1)
             fake = fake.to(self.device)
             label = label.to(self.device)
             G = netD(fake, label)

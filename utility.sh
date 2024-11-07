@@ -126,9 +126,9 @@
 # CUDA_VISIBLE_DEVICES=7  python eval.py --method DP-LDM sensitive_data.train_num=val --data_name mnist_28 --epsilon 1.0  --exp_path exp/dp-ldm/mnist_28_eps1.0unconditionalval-2024-10-25-14-41-07 &
 
 
-# CUDA_VISIBLE_DEVICES=0  python eval.py --method PDP-Diffusion --data_name camelyon_32 --epsilon 1.0  --exp_path exp/pdp-diffusion/camelyon_32_eps1.0_LZN-2024-10-28-21-49-21 &
+CUDA_VISIBLE_DEVICES=0  python eval.py --method PDP-Diffusion --data_name fmnist_28 --epsilon 10.0 sensitive_data.train_num=val  --exp_path exp/pdp-diffusion/fmnist_28_eps10.0condi_LZN-2024-10-20-02-40-36 &
 
-# CUDA_VISIBLE_DEVICES=1  python eval.py --method PDP-Diffusion --data_name camelyon_32 --epsilon 10.0  --exp_path exp/pdp-diffusion/camelyon_32_eps10.0_LZN-2024-10-28-20-58-06 &
+CUDA_VISIBLE_DEVICES=1  python eval.py --method PDP-Diffusion --data_name cifar10_32 --epsilon 10.0 sensitive_data.train_num=val  --exp_path exp/pdp-diffusion/cifar10_32_eps10.0condi_LZN-2024-10-20-06-25-51 &
 
 # CUDA_VISIBLE_DEVICES=2  python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 1.0  --exp_path exp/pdp-diffusion/celeba_male_32_eps1.0_trainval_LZN-2024-10-28-05-49-37 &
 
@@ -140,10 +140,12 @@
 
 # CUDA_VISIBLE_DEVICES=1  python eval.py --method PE --data_name cifar100_32 --epsilon 10.0  --exp_path exp/pe/cifar100_32_eps10.0_th2_tr100_vds0246810-2024-10-31-04-38-12 &
 
-CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name cifar10_32 sensitive_data.train_num=val --epsilon 1.0 --exp_path exp/gs-wgan/cifar10_32_eps1.0trainval-2024-11-04-22-47-20 &
+# CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name cifar10_32 sensitive_data.train_num=val --epsilon 1.0 --exp_path exp/gs-wgan/cifar10_32_eps1.0trainval-2024-11-04-22-47-20 &
 
-CUDA_VISIBLE_DEVICES=1  python eval.py --method GS-WGAN --data_name cifar10_32 sensitive_data.train_num=val --epsilon 10.0 --exp_path exp/gs-wgan/cifar10_32_eps10.0trainval-2024-11-04-22-47-20 &
+# CUDA_VISIBLE_DEVICES=1  python eval.py --method GS-WGAN --data_name cifar10_32 sensitive_data.train_num=val --epsilon 10.0 --exp_path exp/gs-wgan/cifar10_32_eps10.0trainval-2024-11-04-22-47-20 &
 
-CUDA_VISIBLE_DEVICES=2  python eval.py --method GS-WGAN --data_name celeba_male_32 sensitive_data.train_num=val --epsilon 1.0  --exp_path exp/gs-wgan/celeba_male_32_eps1.0trainval-2024-11-04-21-49-24 &
+# CUDA_VISIBLE_DEVICES=2  python eval.py --method GS-WGAN --data_name celeba_male_32 sensitive_data.train_num=val --epsilon 1.0  --exp_path exp/gs-wgan/celeba_male_32_eps1.0trainval-2024-11-04-21-49-24 &
 
-CUDA_VISIBLE_DEVICES=3  python eval.py --method GS-WGAN --data_name celeba_male_32 sensitive_data.train_num=val --epsilon 10.0 --exp_path exp/gs-wgan/celeba_male_32_eps10.0trainval_step5w-2024-11-04-21-58-52 &
+# CUDA_VISIBLE_DEVICES=3  python eval.py --method GS-WGAN --data_name celeba_male_32 sensitive_data.train_num=val --epsilon 10.0 --exp_path exp/gs-wgan/celeba_male_32_eps10.0trainval_step5w-2024-11-04-21-58-52 &
+
+CUDA_VISIBLE_DEVICES=0  python run.py --method DP-MERF sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0 pretrain.loss.label_unconditioning_prob=1.0 -ed unconditional_imagenet_trainval &
