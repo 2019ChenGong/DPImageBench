@@ -116,7 +116,7 @@ def synthesize_mnist_with_uniform_labels(gen, device, gen_batch_size=1000, n_dat
         for idx in range(n_iterations):
             y = ordered_labels.view(-1)
             z = torch.randn(gen_batch_size, gen.z_dim).to(device)
-            gen_samples = gen(z, y).reshape(gen_batch_size, -1)
+            gen_samples = gen(z, y).reshape(gen_batch_size, -1) / 2 + 0.5
             data_list.append(gen_samples)
     return torch.cat(data_list, dim=0).cpu().numpy(), torch.cat(labels_list, dim=0).cpu().numpy()
 
@@ -127,7 +127,7 @@ def train_single_release(gen, device, optimizer, epoch, rff_mmd_loss, log_interv
         y = torch.randint(gen.num_classes, (batch_size,)).to(device)
         z = torch.randn(batch_size, gen.z_dim).to(device)
         gen_one_hots = F.one_hot(y, num_classes=gen.num_classes)
-        gen_samples = gen(z, y).reshape(batch_size, -1)
+        gen_samples = gen(z, y).reshape(batch_size, -1) / 2 + 0.5
         loss = rff_mmd_loss(gen_samples, gen_one_hots)
         optimizer.zero_grad()
         loss.backward()

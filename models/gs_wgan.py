@@ -449,6 +449,7 @@ class GS_WGAN(DPSynther):
                 if len(real_y.shape) == 2:
                     real_data = real_data.to(torch.float32) / 255.
                     real_y = torch.argmax(real_y, dim=1)
+                real_data = real_data * 2 - 1
                 
                 batchsize = real_data.shape[0]
                 real_data = real_data.view(batchsize, -1)

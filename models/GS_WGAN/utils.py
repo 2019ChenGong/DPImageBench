@@ -37,7 +37,7 @@ def generate_image(iter, netG, fix_noise, save_dir, device, num_classes=10,
     sample_list = []
     for class_id in range(num_classes):
         label = torch.full((nrows,), class_id).to(device)
-        sample = netG(noise, label)
+        sample = netG(noise, label) / 2 + 0.5
         sample = sample.view(batchsize, c, img_size, img_size)
         sample = sample.cpu().data.numpy()
         sample_list.append(sample)
@@ -73,7 +73,7 @@ def save_gen_data(path, netG, z_dim, device, latent_type='bernoulli', img_size=2
                 noise = torch.randn(bs, z_dim).to(device)
             else:
                 raise NotImplementedError
-            samples = netG(noise, label)
+            samples = netG(noise, label) / 2 + 0.5
             samples = samples.view(bs, c, img_size, img_size).cpu()
             data_x.append(copy.deepcopy(samples.cpu()))
             data_y.append(copy.deepcopy(label.cpu()))

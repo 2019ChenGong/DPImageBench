@@ -42,12 +42,14 @@ model:
 pretrain:
   log_dir: null
   n_iter: 4000
-  batch_size: 5000
+  batch_size: 2500
   lr: 1e-2
   lr_decay: 0.9
   scheduler_interval: 2001
   log_interval: 100
   label_random: true
+  n_splits: 1
+
 train:
   ckpt: null
   n_iter: 2000
@@ -57,10 +59,10 @@ train:
   scheduler_interval: 2001
   log_interval: 100
   log_dir: null
+  n_splits: 1
   dp:
     epsilon: 10.0
     delta: 1e-5
-    n_splits: 2
 gen:
   data_num: 60000
   batch_size: 1000

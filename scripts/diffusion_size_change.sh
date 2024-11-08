@@ -1,3 +1,43 @@
+# DPDM
+
+# 140G 11.1M
+python run.py setup.n_gpus_per_node=3 public_data.name=null sensitive_data.train_num=val model.network.attn_resolutions=[16,8] model.network.ch_mult=[1,2,3] model.network.nf=64 train.dp.n_splits=64 -m DPDM -dn cifar10_32 -e 10.0 -ed trainval_ch123_nf64
+
+# 120G 19.6M
+python run.py setup.n_gpus_per_node=3 public_data.name=null sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=64 train.dp.n_splits=128 -m DPDM -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf64
+
+# 120G 44.2M
+python run.py setup.n_gpus_per_node=3 public_data.name=null sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=96 train.dp.n_splits=256 -m DPDM -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf96
+
+# 120G 78.5M
+python run.py setup.n_gpus_per_node=3 public_data.name=null sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=512 -m DPDM -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf128
+
+# PDP-Diffusion
+
+# 140G 11.1M
+python run.py setup.n_gpus_per_node=4 sensitive_data.train_num=val model.network.attn_resolutions=[16,8] model.network.ch_mult=[1,2,3] model.network.nf=64 train.dp.n_splits=100 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed trainval_ch123_nf64
+
+# 120G 19.6M
+python run.py setup.n_gpus_per_node=4 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=64 train.dp.n_splits=200 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf64
+
+# 120G 44.2M
+python run.py setup.n_gpus_per_node=4 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=96 train.dp.n_splits=300 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf96
+
+# 120G 78.5M
+python run.py setup.n_gpus_per_node=4 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=600 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf128
+
+# PrivImage
+# 140G 11.1M
+python run.py setup.n_gpus_per_node=4 sensitive_data.train_num=val model.network.attn_resolutions=[16,8] model.network.ch_mult=[1,2,3] model.network.nf=64 train.dp.n_splits=100 -m PrivImage -dn cifar10_32 -e 10.0 -ed trainval_ch123_nf64
+
+# 120G 19.6M
+python run.py setup.n_gpus_per_node=4 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=64 train.dp.n_splits=200 -m PrivImage -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf64
+
+# 120G 44.2M
+python run.py setup.n_gpus_per_node=4 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=96 train.dp.n_splits=300 -m PrivImage -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf96
+
+# 120G 78.5M
+python run.py setup.n_gpus_per_node=4 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=600 -m PrivImage -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf128
 
 
 # DP-LDM

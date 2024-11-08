@@ -110,4 +110,103 @@
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method GS-WGAN --data_name mnist_28 --epsilon 10.0  --exp_path exp/gs-wgan/mnist_28_eps10.0-2024-10-28-04-43-28 &
 
-CUDA_VISIBLE_DEVICES=0  python eval.py --method DP-MERF sensitive_data.train_num=val --data_name celeba_male_32 --epsilon 10.0  --exp_path exp/dp-merf/celeba_male_32_eps10.0trainval-2024-10-22-03-29-00 &
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-kernel/fmnist_28_eps1.0trainval_eps0.2-2024-10-29-05-30-19
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-kernel/fmnist_28_eps1.0trainval-2024-10-20-06-44-57
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-kernel/fmnist_28_eps10.0trainval_eps5-2024-10-29-05-30-19
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-kernel/fmnist_28_eps10.0trainval_eps15-2024-10-29-05-30-19
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-kernel/fmnist_28_eps10.0trainval_eps20-2024-10-29-05-30-19
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-LDM sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ldm/fmnist_28_eps1.0unconditional_trainval_eps0.2-2024-10-29-07-32-19
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-LDM sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ldm/fmnist_28_eps1.0unconditional_trainval-2024-10-25-21-06-37
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-LDM sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ldm/fmnist_28_eps10.0unconditional_trainval_eps5-2024-10-30-06-49-45
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-LDM sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ldm/fmnist_28_eps10.0unconditional_trainval_eps15-2024-10-29-07-32-49
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-LDM sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ldm/fmnist_28_eps10.0unconditional_trainval_eps20-2024-10-29-15-06-15
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-MERF sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-merf/fmnist_28_eps1.0trainval_eps0.2-2024-10-29-00-07-10
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-MERF sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-merf/fmnist_28_eps1.0trainval-2024-10-20-06-27-04
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-MERF sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-merf/fmnist_28_eps10.0trainval_eps5-2024-10-29-00-07-10
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-MERF sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-merf/fmnist_28_eps10.0trainval_eps15-2024-10-29-00-07-10
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-MERF sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-merf/fmnist_28_eps10.0trainval_eps20-2024-10-29-00-07-10
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-MERF sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-merf/fmnist_28_eps10.0trainval_eps20-2024-10-29-00-07-10
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-NTK sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ntk/fmnist_28_eps1.0trainval_eps0.2-2024-10-29-04-04-11
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-NTK sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ntk/fmnist_28_eps1.0trainval-2024-10-20-09-45-58
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-NTK sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ntk/fmnist_28_eps10.0trainval_eps5-2024-10-29-04-04-11
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-NTK sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ntk/fmnist_28_eps10.0trainval_eps15-2024-10-29-04-03-59
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-NTK sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ntk/fmnist_28_eps10.0trainval_eps20-2024-10-29-04-03-59
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DPDM sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dpdm/fmnist_28_eps1.0trainval_eps0.2-2024-10-29-01-51-05
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DPDM sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps1.0trainval-2024-10-23-14-01-14
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DPDM sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps10.0trainval_eps5-2024-10-28-04-31-08
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DPDM sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps10.0trainval_eps15-2024-10-28-18-26-48
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DPDM sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps10.0trainval_eps20-2024-10-29-01-09-20
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DPGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dpgan/fmnist_28_eps1.0trainval_eps0.2-2024-10-28-23-46-11
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DPGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dpgan/fmnist_28_eps1.0trainval-2024-10-22-15-52-27
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DPGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dpgan/fmnist_28_eps10.0trainval_eps5-2024-10-29-04-05-26
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DPGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dpgan/fmnist_28_eps10.0trainval_eps15-2024-10-29-04-30-41
+
+# CUDA_VISIBLE_DEVICES=0 python eval.py --method DPGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dpgan/fmnist_28_eps10.0trainval_eps20-2024-10-29-04-35-29
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps0.2-2024-11-04-05-46-27/
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps1.0trainval-2024-11-04-02-02-39
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps5-2024-11-04-05-46-27
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps15-2024-11-04-05-48-12
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_eps20-2024-11-04-05-48-12
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/fmnist_28_eps1.0_trainval_eps0.2_LZN-2024-11-06-23-49-45
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/fmnist_28_eps1.0_trainval_LZN-2024-10-26-21-08-00
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/fmnist_28_eps1.0_trainval_eps5_LZN-2024-11-06-23-50-04
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/fmnist_28_eps1.0_trainval_eps15_LZN-2024-11-06-23-49-40
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/fmnist_28_eps1.0_trainval_eps20_LZN-2024-11-06-23-49-58
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PE sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/pe/fmnist_28_eps0.2_trainval_th44_tr10_vds001-2024-11-03-22-47-07
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PE sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/pe/fmnist_28_eps5.0_trainval_th5_tr10_vds000011112222-2024-11-03-22-43-48
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PE sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/pe/fmnist_28_eps15.0_trainval_th2_tr10_vds000011112222-2024-11-04-01-33-32
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PE sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/pe/fmnist_28_eps20.0_trainval_th1.7_tr10_vds000011112222-2024-11-04-07-50-07/
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PrivImage sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps1.0trainval_eps0.2-2024-10-29-00-01-17
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PrivImage sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps1.0trainval-2024-10-27-11-27-50
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PrivImage sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps10.0trainval_eps5-2024-10-29-00-02-50
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PrivImage sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps10.0trainval_eps15-2024-10-29-00-02-50
+
+CUDA_VISIBLE_DEVICES=1 python eval.py --method PrivImage sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/privimage/fmnist_28_eps10.0trainval_eps20-2024-10-29-00-57-21
+

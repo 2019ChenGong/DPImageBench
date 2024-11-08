@@ -50,8 +50,6 @@ class DP_Kernel(DPSynther):
                 if len(label.shape) == 2:
                     x = x.to(torch.float32) / 255.
                     label = torch.argmax(label, dim=1)
-                if x.shape[1] == 1:
-                    x = F.interpolate(x, size=[32, 32])
                 if config.label_random:
                     label = label % self.n_class
                 x = x.to(self.device) * 2 - 1

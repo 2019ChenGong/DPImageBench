@@ -41,7 +41,7 @@ model:
   n_classes: 10
 pretrain:
   log_dir: null
-  n_iter: 2000
+  n_iter: 4000
   batch_size: 5000
   lr: 1e-2
   lr_decay: 0.9

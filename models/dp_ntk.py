@@ -73,36 +73,38 @@ class DP_NTK(DPSynther):
             optimizer.zero_grad()  # zero the parameter gradients
 
             """ synthetic data """
-            gen_labels_numerical = torch.randint(self.n_classes, (config.batch_size,)).to(self.device)
-            z = torch.randn(gen_batch_size, gen.z_dim).to(device)
-            gen_samples = gen(z, gen_labels_numerical).reshape(gen_batch_size, -1)
+            for accu_step in range(config.n_splits):
+                batch_size = config.batch_size // config.n_splits
+                gen_labels_numerical = torch.randint(self.n_classes, (batch_size,)).to(self.device)
+                z = torch.randn(batch_size, self.model_gen.z_dim).to(self.device)
+                gen_samples = self.model_gen(z, gen_labels_numerical).reshape(batch_size, -1) / 2 + 0.5
 
-            """ synthetic data mean_emb init """
-            mean_emb2 = torch.zeros((d, self.n_classes), device=self.device)
-            for idx in range(gen_samples.shape[0]):
-                """ manually set the weight if needed """
-                # model_ntk.fc1.weight = torch.nn.Parameter(output_weights[gen_labels_numerical[idx], :][None, :])
-                mean_v_samp = torch.Tensor([]).to(self.device)  # sample mean vector init
-                f_x = self.model_ntk(gen_samples[idx][None, :])
+                """ synthetic data mean_emb init """
+                mean_emb2 = torch.zeros((d, self.n_classes), device=self.device)
+                for idx in range(gen_samples.shape[0]):
+                    """ manually set the weight if needed """
+                    # model_ntk.fc1.weight = torch.nn.Parameter(output_weights[gen_labels_numerical[idx], :][None, :])
+                    mean_v_samp = torch.Tensor([]).to(self.device)  # sample mean vector init
+                    f_x = self.model_ntk(gen_samples[idx][None, :])
 
-                """ get NTK features """
-                f_idx_grad = torch.autograd.grad(f_x, self.model_ntk.parameters(),
-                                                grad_outputs=torch.ones_like(f_x), create_graph=True)
-                # f_idx_grad = torch.autograd.grad(f_x.sum(), self.model_ntk.parameters(), create_graph=True)
-                for g in f_idx_grad:
-                    mean_v_samp = torch.cat((mean_v_samp, g.flatten()))
-                # mean_v_samp = mean_v_samp[:-1]
+                    """ get NTK features """
+                    f_idx_grad = torch.autograd.grad(f_x, self.model_ntk.parameters(),
+                                                    grad_outputs=torch.ones_like(f_x), create_graph=True)
+                    # f_idx_grad = torch.autograd.grad(f_x.sum(), self.model_ntk.parameters(), create_graph=True)
+                    for g in f_idx_grad:
+                        mean_v_samp = torch.cat((mean_v_samp, g.flatten()))
+                    # mean_v_samp = mean_v_samp[:-1]
 
-                """ normalize the sample mean vector """
-                mean_emb2[:, gen_labels_numerical[idx]] += mean_v_samp / torch.linalg.vector_norm(mean_v_samp)
+                    """ normalize the sample mean vector """
+                    mean_emb2[:, gen_labels_numerical[idx]] += mean_v_samp / torch.linalg.vector_norm(mean_v_samp)
 
-            """ average by batch size """
-            mean_emb2 = mean_emb2 / config.batch_size
+                """ average by batch size """
+                mean_emb2 = mean_emb2 / batch_size
 
-            """ calculate loss """
-            # loss = (self.noisy_mean_emb - mean_emb2).sum()
-            loss = torch.norm(self.noisy_mean_emb - mean_emb2, p=2) ** 2
-            loss.backward()
+                """ calculate loss """
+                # loss = (self.noisy_mean_emb - mean_emb2).sum()
+                loss = torch.norm(self.noisy_mean_emb - mean_emb2, p=2) ** 2 / config.n_splits
+                loss.backward()
             optimizer.step()
 
             running_loss += loss.item()
@@ -145,34 +147,39 @@ class DP_NTK(DPSynther):
             running_loss = 0.0
             optimizer.zero_grad()  # zero the parameter gradients
 
-            # for accu_step in range(config.dp.n_splits):
             """ synthetic data """
-            batch_size = config.batch_size // config.dp.n_splits
-            gen_labels_numerical = torch.randint(self.n_classes, (batch_size,)).to(self.device)
-            z = torch.randn(batch_size, self.model_gen.z_dim).to(self.device)
-            gen_samples = self.model_gen(z, gen_labels_numerical).reshape(batch_size, -1)
+            for accu_step in range(config.n_splits):
+                batch_size = config.batch_size // config.n_splits
+                gen_labels_numerical = torch.randint(self.n_classes, (batch_size,)).to(self.device)
+                z = torch.randn(batch_size, self.model_gen.z_dim).to(self.device)
+                gen_samples = self.model_gen(z, gen_labels_numerical).reshape(batch_size, -1) / 2 + 0.5
 
-            """ synthetic data mean_emb init """
-            mean_emb2 = torch.zeros((d, self.n_classes), device=self.device)
-            for idx in range(gen_samples.shape[0]):
-                """ manually set the weight if needed """
-                f_x = self.model_ntk(gen_samples[idx][None, :])
+                """ synthetic data mean_emb init """
+                mean_emb2 = torch.zeros((d, self.n_classes), device=self.device)
+                for idx in range(gen_samples.shape[0]):
+                    """ manually set the weight if needed """
+                    # model_ntk.fc1.weight = torch.nn.Parameter(output_weights[gen_labels_numerical[idx], :][None, :])
+                    mean_v_samp = torch.Tensor([]).to(self.device)  # sample mean vector init
+                    f_x = self.model_ntk(gen_samples[idx][None, :])
 
-                """ get NTK features """
-                mean_v_samp = torch.autograd.grad(f_x, self.model_ntk.parameters(),
-                                                grad_outputs=torch.ones_like(f_x), create_graph=True)
-                mean_v_samp = torch.cat([v.flatten() for v in mean_v_samp])
+                    """ get NTK features """
+                    f_idx_grad = torch.autograd.grad(f_x, self.model_ntk.parameters(),
+                                                    grad_outputs=torch.ones_like(f_x), create_graph=True)
+                    # f_idx_grad = torch.autograd.grad(f_x.sum(), self.model_ntk.parameters(), create_graph=True)
+                    for g in f_idx_grad:
+                        mean_v_samp = torch.cat((mean_v_samp, g.flatten()))
+                    # mean_v_samp = mean_v_samp[:-1]
 
-                """ normalize the sample mean vector """
-                mean_emb2[:, gen_labels_numerical[idx]] += mean_v_samp / torch.linalg.vector_norm(mean_v_samp)
+                    """ normalize the sample mean vector """
+                    mean_emb2[:, gen_labels_numerical[idx]] += mean_v_samp / torch.linalg.vector_norm(mean_v_samp)
 
-            """ average by batch size """
-            mean_emb2 = mean_emb2 / batch_size
+                """ average by batch size """
+                mean_emb2 = mean_emb2 / batch_size
 
-            """ calculate loss """
-            # loss = (self.noisy_mean_emb - mean_emb2).sum()
-            loss = torch.norm(self.noisy_mean_emb - mean_emb2, p=2) ** 2
-            loss.backward()
+                """ calculate loss """
+                # loss = (self.noisy_mean_emb - mean_emb2).sum()
+                loss = torch.norm(self.noisy_mean_emb - mean_emb2, p=2) ** 2 / config.n_splits
+                loss.backward()
             optimizer.step()
 
             running_loss += loss.item()
@@ -200,57 +207,6 @@ class DP_NTK(DPSynther):
         return syn_data, syn_labels
 
 
-class ConvCondGen(nn.Module):
-    def __init__(self, d_code, d_hid, n_labels, nc_str, c, ks_str, n_feats, use_sigmoid=True, batch_norm=True):
-        super(ConvCondGen, self).__init__()
-        self.nc = [int(k) for k in nc_str.split(',')] + [c]
-        self.ks = [int(k) for k in ks_str.split(',')]  # kernel sizes
-        d_hid = [int(k) for k in d_hid.split(',')]
-        # assert len(self.nc) == 3 and len(self.ks) == 2
-        self.hw = int(np.sqrt(n_feats // self.nc[-1])) // 4
-        self.reshape_size = self.nc[0]*self.hw**2
-        self.fc1 = nn.Linear(d_code + n_labels, d_hid[0])
-        self.fc2 = nn.Linear(d_hid[0], self.reshape_size)
-        self.bn1 = nn.BatchNorm1d(d_hid[0]) if batch_norm else None
-        self.bn2 = nn.BatchNorm1d(self.reshape_size) if batch_norm else None
-        self.conv1 = nn.Conv2d(self.nc[0], self.nc[1], kernel_size=self.ks[0], stride=1, padding=(self.ks[0]-1)//2)
-        self.conv2 = nn.Conv2d(self.nc[1], self.nc[2], kernel_size=self.ks[1], stride=1, padding=(self.ks[1]-1)//2)
-        self.upsamp = nn.UpsamplingBilinear2d(scale_factor=2)
-        self.relu = nn.ReLU()
-        self.sigmoid = nn.Sigmoid()
-        self.use_sigmoid = use_sigmoid
-        self.d_code = d_code
-        self.n_labels = n_labels
-
-    def forward(self, x):
-        x = self.fc1(x)
-        x = self.bn1(x) if self.bn1 is not None else x
-        x = self.fc2(self.relu(x))
-        x = self.bn2(x) if self.bn2 is not None else x
-        # print(x.shape)
-        x = x.reshape(x.shape[0], self.nc[0], self.hw, self.hw)
-        x = self.upsamp(x)
-        x = self.relu(self.conv1(x))
-        x = self.upsamp(x)
-        x = self.conv2(x)
-        x = x.reshape(x.shape[0], -1)
-        if self.use_sigmoid:
-            x = self.sigmoid(x)
-        return x
-    def get_code(self, batch_size, device, return_labels=True, labels=None):
-        if labels is None:  # sample labels
-            labels = torch.randint(self.n_labels, (batch_size, 1), device=device)
-        code = torch.randn(batch_size, self.d_code, device=device)
-        gen_one_hots = torch.zeros(batch_size, self.n_labels, device=device)
-        gen_one_hots.scatter_(1, labels, 1)
-        code = torch.cat([code, gen_one_hots.to(torch.float32)], dim=1)
-        # print(code.shape)
-        if return_labels:
-            return code, gen_one_hots
-        else:
-            return code
-
-
 def synthesize_mnist_with_uniform_labels(gen, device, gen_batch_size=1000, n_data=60000, n_labels=10):
     gen.eval()
     assert n_data % gen_batch_size == 0
@@ -265,19 +221,6 @@ def synthesize_mnist_with_uniform_labels(gen, device, gen_batch_size=1000, n_dat
         for idx in range(n_iterations):
             y = ordered_labels.view(-1)
             z = torch.randn(gen_batch_size, gen.z_dim).to(device)
-            gen_samples = gen(z, y).reshape(gen_batch_size, -1)
+            gen_samples = gen(z, y).reshape(gen_batch_size, -1) / 2 + 0.5
             data_list.append(gen_samples)
     return torch.cat(data_list, dim=0).cpu().numpy(), torch.cat(labels_list, dim=0).cpu().numpy()
-
-
-def train_single_release(gen, device, optimizer, epoch, rff_mmd_loss, log_interval, batch_size, n_data):
-    n_iter = n_data // batch_size
-    for batch_idx in range(n_iter):
-        gen_code, gen_labels = gen.get_code(batch_size, device)
-        loss = rff_mmd_loss(gen(gen_code), gen_labels)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        if batch_idx % log_interval == 0:
-            logging.info('Train Epoch: {} [{}/{}]\tLoss: {:.6f}'.format(epoch, batch_idx * batch_size, n_data, loss.item()))

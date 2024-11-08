@@ -39,7 +39,7 @@ model:
 pretrain:
   log_dir: null
   n_iter: 4000
-  batch_size: 5000
+  batch_size: 2500
   lr: 1e-2
   lr_decay: 0.9
   scheduler_interval: 2001
@@ -48,7 +48,7 @@ pretrain:
 train:
   ckpt: null
   n_iter: 2000
-  batch_size: 5000
+  batch_size: 2500
   lr: 1e-2
   lr_decay: 0.9
   scheduler_interval: 2001

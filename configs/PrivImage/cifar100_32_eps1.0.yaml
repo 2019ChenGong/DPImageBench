@@ -17,7 +17,7 @@ public_data:
   selective:
     ratio: 0.01
     num_words: 1
-    sigma: 484
+    sigma: 50
     batch_size: 1000
     model_path: models/pretrained_models/imagenet_classifier_0.454_ckpt.pth
 sensitive_data:
@@ -126,7 +126,7 @@ train:
   dp:
     sdq: true
     privacy_history:
-    - - 484
+    - - 50
       - 1.0
       - 1
     max_grad_norm: 1.0

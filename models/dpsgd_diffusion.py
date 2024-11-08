@@ -76,6 +76,7 @@ class DP_Diffusion(DPSynther):
             raise NotImplementedError
         
         self.model = self.model.to(self.local_rank)
+        self.model.train()
         self.ema = ExponentialMovingAverage(self.model.parameters(), decay=self.ema_rate)
 
         if config.ckpt is not None:
@@ -280,8 +281,7 @@ class DP_Diffusion(DPSynther):
         state = dict(model=model, ema=ema, optimizer=optimizer, step=0)
 
         if self.global_rank == 0:
-            model_parameters = filter(
-                lambda p: p.requires_grad, trainable_parameters)
+            model_parameters = filter(lambda p: p.requires_grad, self.model.parameters())
             n_params = sum([np.prod(p.size()) for p in model_parameters])
             logging.info('Number of trainable parameters in model: %d' % n_params)
             logging.info('Number of total epochs: %d' % config.n_epochs)
