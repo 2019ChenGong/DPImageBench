@@ -106,8 +106,10 @@ class DPGAN(DPSynther):
                 if len(train_y.shape) == 2:
                     train_x = train_x.to(torch.float32) / 255.
                     train_y = torch.argmax(train_y, dim=1)
-                if config.label_random:
+                if config.cond:
                     train_y = train_y % self.num_classes
+                else:
+                    train_y = torch.zeros_like(train_y)
                 
                 real_images = train_x.to(self.device) * 2. - 1.
                 real_labels = train_y.to(self.device).long()
@@ -178,6 +180,8 @@ class DPGAN(DPSynther):
                     dist.barrier()
                     if state['step'] % config.log_freq == 0 and self.global_rank == 0:
                         logging.info('Loss D: %.4f, Loss G: %.4f, step: %d' %
+                                    (loss_D, loss_G, state['step'] + 1))
+                    print('Loss D: %.4f, Loss G: %.4f, step: %d' %
                                     (loss_D, loss_G, state['step'] + 1))
 
         if self.global_rank == 0:

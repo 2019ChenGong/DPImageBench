@@ -47,7 +47,7 @@ pretrain:
   lr_decay: 0.9
   scheduler_interval: 2001
   log_interval: 100
-  label_random: true
+  cond: true
   n_splits: 1
 
 train:

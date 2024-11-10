@@ -3,7 +3,7 @@ import torch as pt
 # from autodp import privacy_calibrator
 
 
-def calc_mean_emb1(model_ntk, sensitive_dataloader, n_classes, noise_factor, device, label_random=False):
+def calc_mean_emb1(model_ntk, sensitive_dataloader, n_classes, noise_factor, device, cond=True):
 
     """ initialize the variables"""
 
@@ -19,8 +19,10 @@ def calc_mean_emb1(model_ntk, sensitive_dataloader, n_classes, noise_factor, dev
         if len(labels.shape) == 2:
             data = data.to(pt.float32) / 255.
             labels = pt.argmax(labels, dim=1)
-        if label_random:
+        if cond:
             labels = labels % n_classes
+        else:
+            labels = pt.zeros_like(labels)
         data, y_train = data.to(device), labels.to(device)
         for i in range(data.shape[0]):
             """ manually set the weight if needed """

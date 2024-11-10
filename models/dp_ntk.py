@@ -53,7 +53,7 @@ class DP_NTK(DPSynther):
         os.mkdir(config.log_dir)
         # define loss function
 
-        self.noisy_mean_emb = calc_mean_emb1(self.model_ntk, public_dataloader, self.n_classes, 0., self.device, label_random=config.label_random)
+        self.noisy_mean_emb = calc_mean_emb1(self.model_ntk, public_dataloader, self.n_classes, 0., self.device, cond=config.cond)
 
         torch.save(self.noisy_mean_emb, os.path.join(config.log_dir, 'noisy_mean_emb.pt'))
 
@@ -75,7 +75,10 @@ class DP_NTK(DPSynther):
             """ synthetic data """
             for accu_step in range(config.n_splits):
                 batch_size = config.batch_size // config.n_splits
-                gen_labels_numerical = torch.randint(self.n_classes, (batch_size,)).to(self.device)
+                if config.cond:
+                    gen_labels_numerical = torch.randint(self.n_classes, (batch_size,)).to(self.device)
+                else:
+                    gen_labels_numerical = torch.zeros((batch_size,)).long().to(self.device)
                 z = torch.randn(batch_size, self.model_gen.z_dim).to(self.device)
                 gen_samples = self.model_gen(z, gen_labels_numerical).reshape(batch_size, -1) / 2 + 0.5
 

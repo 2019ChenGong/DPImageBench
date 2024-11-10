@@ -43,7 +43,7 @@ class DP_MERF(DPSynther):
         os.mkdir(config.log_dir)
         # define loss function
         n_data = len(public_dataloader.dataset)
-        sr_loss, mb_loss, _ = get_rff_losses(public_dataloader, self.n_feat, self.d_rff, self.rff_sigma, self.device, self.num_class, 0., self.mmd_type, label_random=config.label_random)
+        sr_loss, mb_loss, _ = get_rff_losses(public_dataloader, self.n_feat, self.d_rff, self.rff_sigma, self.device, self.num_class, 0., self.mmd_type, cond=config.cond)
 
         # rff_mmd_loss = get_rff_mmd_loss(n_feat, ar.d_rff, ar.rff_sigma, device, ar.n_labels, ar.noise_factor, ar.batch_size)
 
@@ -53,7 +53,7 @@ class DP_MERF(DPSynther):
 
         # training loop
         for epoch in range(1, config.epochs + 1):
-            train_single_release(self.gen, self.device, optimizer, epoch, sr_loss, config.log_interval, config.batch_size, n_data)
+            train_single_release(self.gen, self.device, optimizer, epoch, sr_loss, config.log_interval, config.batch_size, n_data, cond=config.cond)
             scheduler.step()
 
         # save trained model and data
@@ -121,10 +121,13 @@ def synthesize_mnist_with_uniform_labels(gen, device, gen_batch_size=1000, n_dat
     return torch.cat(data_list, dim=0).cpu().numpy(), torch.cat(labels_list, dim=0).cpu().numpy()
 
 
-def train_single_release(gen, device, optimizer, epoch, rff_mmd_loss, log_interval, batch_size, n_data):
+def train_single_release(gen, device, optimizer, epoch, rff_mmd_loss, log_interval, batch_size, n_data, cond=True):
     n_iter = n_data // batch_size
     for batch_idx in range(n_iter):
-        y = torch.randint(gen.num_classes, (batch_size,)).to(device)
+        if cond:
+            y = torch.randint(gen.num_classes, (batch_size,)).to(device)
+        else:
+            y = torch.zeros((batch_size,)).long().to(device)
         z = torch.randn(batch_size, gen.z_dim).to(device)
         gen_one_hots = F.one_hot(y, num_classes=gen.num_classes)
         gen_samples = gen(z, y).reshape(batch_size, -1) / 2 + 0.5

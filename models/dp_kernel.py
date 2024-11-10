@@ -50,8 +50,10 @@ class DP_Kernel(DPSynther):
                 if len(label.shape) == 2:
                     x = x.to(torch.float32) / 255.
                     label = torch.argmax(label, dim=1)
-                if config.label_random:
+                if config.cond:
                     label = label % self.n_class
+                else:
+                    label = torch.zeros_like(label)
                 x = x.to(self.device) * 2 - 1
                 label = label.to(self.device)
                 batch_size = x.size(0)
@@ -62,6 +64,7 @@ class DP_Kernel(DPSynther):
 
                 noise = torch.randn(batch_size, self.nz).to(self.device)
                 y = self.gen(noise, label=gen_labels)
+
                 label = F.one_hot(label, self.n_class).float()
                 gen_labels = F.one_hot(gen_labels, self.n_class).float()
 

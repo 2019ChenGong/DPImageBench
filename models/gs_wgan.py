@@ -72,45 +72,22 @@ class GS_WGAN(DPSynther):
 
         netG = self.netG.to(self.device)
         netGS = self.netGS.to(self.device)
-        for netD_id, netD in enumerate(self.netD_list):
-            netD.to(self.device)
 
         ### Set up optimizers
-        optimizerD_list = []
-        for i in range(self.num_discriminators):
-            netD = self.netD_list[i]
-            optimizerD = optim.Adam(netD.parameters(), lr=1e-4, betas=(0.5, 0.9))
-            optimizerD_list.append(optimizerD)
+        netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.num_classes).to(self.device)
+        optimizerD = optim.Adam(netD.parameters(), lr=1e-4, betas=(0.5, 0.9))
         optimizerG = optim.Adam(self.netG.parameters(), lr=1e-4, betas=(0.5, 0.9))
-
-        indices_full = np.arange(len(public_dataloader.dataset))
-        np.random.shuffle(indices_full)
-        indices_full.dump(os.path.join(config.log_dir, 'indices.npy'))
-        trainset_size = int(len(public_dataloader.dataset) / self.num_discriminators)
-        logging.info('Size of the dataset: {}'.format(trainset_size))
-
-        input_pipelines = []
-        for i in range(self.num_discriminators):
-            start = i * trainset_size
-            end = (i + 1) * trainset_size
-            indices = indices_full[start:end]
-            trainloader = torch.utils.data.DataLoader(public_dataloader.dataset, batch_size=config.batch_size, drop_last=False, sampler=SubsetRandomSampler(indices))
-            input_data = inf_train_gen(trainloader)
-            input_pipelines.append(input_data)
 
         ### Register hook
         global dynamic_hook_function
-        for netD in self.netD_list:
-            netD.conv1.register_backward_hook(master_hook_adder)
+        netD.conv1.register_backward_hook(master_hook_adder)
+
+        input_data = inf_train_gen(public_dataloader)
 
         for iter in range(config.iterations + 1):
             #########################
             ### Update D network
             #########################
-            netD_id = np.random.randint(self.num_discriminators, size=1)[0]
-            netD = self.netD_list[netD_id]
-            optimizerD = optimizerD_list[netD_id]
-            input_data = input_pipelines[netD_id]
 
             for p in netD.parameters():
                 p.requires_grad = True
@@ -120,8 +97,11 @@ class GS_WGAN(DPSynther):
                 if len(real_y.shape) == 2:
                     real_data = real_data.to(torch.float32) / 255.
                     real_y = torch.argmax(real_y, dim=1)
-                if config.label_random:
+                if config.cond:
                     real_y = real_y % self.num_classes
+                else:
+                    real_y = torch.zeros_like(real_y).long()
+                real_data = real_data * 2 - 1
                 batchsize = real_data.shape[0]
                 real_data = real_data.view(batchsize, -1)
                 real_data = real_data.to(self.device)
@@ -142,7 +122,7 @@ class GS_WGAN(DPSynther):
                 else:
                     raise NotImplementedError
                 noisev = autograd.Variable(noise)
-                fake = autograd.Variable(netG(noisev, real_y.to(self.device)).data)
+                fake = autograd.Variable(netG(noisev, real_y.to(self.device)).view(batchsize, -1).data)
                 inputv = fake.to(self.device)
                 D_fake = netD(inputv, real_y.to(self.device))
                 D_fake = D_fake.mean()
@@ -181,7 +161,7 @@ class GS_WGAN(DPSynther):
                 raise NotImplementedError
             label = torch.randint(0, self.num_classes, [batchsize]).to(self.device)
             noisev = autograd.Variable(noise)
-            fake = netG(noisev, label)
+            fake = netG(noisev, label).view(batchsize, -1)
             fake = fake.to(self.device)
             label = label.to(self.device)
             G = netD(fake, label)
@@ -214,9 +194,6 @@ class GS_WGAN(DPSynther):
         ### save model
         torch.save(self.netG.state_dict(), os.path.join(config.log_dir, 'netG.pth'))
         torch.save(self.netGS.state_dict(), os.path.join(config.log_dir, 'netGS.pth'))
-        for netD_id in range(self.num_discriminators):
-            os.mkdir(os.path.join(config.log_dir, 'netD_%d' % netD_id))
-            torch.save(self.netD_list[netD_id].state_dict(), os.path.join(config.log_dir, 'netD_%d' % netD_id, 'netD.pth'))
 
     def warmup_one_discriminator(self):
         print(11111)

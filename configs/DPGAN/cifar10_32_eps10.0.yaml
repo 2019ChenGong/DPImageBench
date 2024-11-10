@@ -54,7 +54,7 @@ pretrain:
   fid_freq: 200
   fid_samples: 5000
   fid_threshold: 1
-  label_random: true
+  cond: true
   optim:
     optimizer: Adam
     params:

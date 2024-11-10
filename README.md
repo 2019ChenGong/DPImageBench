@@ -9,9 +9,9 @@ We can save the figure of bug into ./bug_fig/. [Chen: OK]
 
 - [] recoding the intermediate results of methods with tqdm.
 
-- [] error in FLD for merf, camelyon_32. [KC: I think it is a bug in FLD code. See bug_fig/fld_bug.png]
+- [] setup.master_port=6026
 
-- [] The Precision and Recall of synthetic images is 0.0 and 0.0 in some cases, like dp-ntk celeba_male_32 1.0. [KC: It's becasue that the performance of dp-ntk is too poor. Please see bug_fig/zero_pr.png]
+- [] keep consistent cond and uncond for dm and gan
 
 
 ## 1. Contents

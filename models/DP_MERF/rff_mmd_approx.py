@@ -92,14 +92,14 @@ def get_rff_mmd_loss(d_enc, d_rff, rff_sigma, device, n_labels, noise_factor, ba
 
 
 def get_single_sigma_losses(train_loader, d_enc, d_rff, rff_sigma, device, n_labels, noise_factor, mmd_type,
-                            pca_vecs=None, label_random=False):
+                            pca_vecs=None, cond=True):
   assert d_rff % 2 == 0
   # w_freq = pt.tensor(np.random.randn(d_rff // 2, d_enc) / np.sqrt(rff_sigma)).to(pt.float32).to(device)
   minibatch_loss, w_freq = get_rff_mmd_loss(d_enc, d_rff, rff_sigma, device, n_labels, noise_factor,
                                             train_loader.batch_size, mmd_type)
 
   noisy_emb = noisy_dataset_embedding(train_loader, w_freq, d_rff, device, n_labels, noise_factor, mmd_type,
-                                      pca_vecs=pca_vecs, label_random=label_random)
+                                      pca_vecs=pca_vecs, cond=cond)
 
   def single_release_loss(gen_enc, gen_labels):
     gen_emb = data_label_embedding(gen_enc, gen_labels, w_freq, mmd_type)
@@ -109,7 +109,7 @@ def get_single_sigma_losses(train_loader, d_enc, d_rff, rff_sigma, device, n_lab
 
 
 def noisy_dataset_embedding(train_loader, w_freq, d_rff, device, n_labels, noise_factor, mmd_type, sum_frequency=25,
-                            pca_vecs=None, label_random=False):
+                            pca_vecs=None, cond=True):
   emb_acc = []
   n_data = 0
 
@@ -117,8 +117,10 @@ def noisy_dataset_embedding(train_loader, w_freq, d_rff, device, n_labels, noise
     if len(labels.shape) == 2:
       data = data.to(pt.float32) / 255.
       labels = pt.argmax(labels, dim=1)
-    if label_random:
+    if cond:
       labels = labels % n_labels
+    else:
+      labels = pt.zeros_like(labels)
     data, labels = data.to(device), labels.to(device)
     data = flat_data(data, labels, device, n_labels=n_labels, add_label=False)
 
@@ -177,7 +179,7 @@ def get_multi_sigma_losses(train_loader, d_enc, d_rff, rff_sigmas, device, n_lab
 
 
 def get_rff_losses(train_loader, d_enc, d_rff, rff_sigma, device, n_labels, noise_factor, mmd_type, pca_vecs=None,
-                   nested_losses=False, label_random=False):
+                   nested_losses=False, cond=True):
   assert mmd_type in {'sphere', 'r+r'}
   assert isinstance(rff_sigma, str)
   rff_sigma = [float(sig) for sig in rff_sigma.split(',')]
@@ -185,7 +187,7 @@ def get_rff_losses(train_loader, d_enc, d_rff, rff_sigma, device, n_labels, nois
     return get_nested_losses(train_loader, d_rff, rff_sigma, device, n_labels, noise_factor, mmd_type)
   elif len(rff_sigma) == 1:
     return get_single_sigma_losses(train_loader, d_enc, d_rff, rff_sigma[0], device, n_labels, noise_factor, mmd_type,
-                                   pca_vecs, label_random=label_random)
+                                   pca_vecs, cond=cond)
   else:
     return get_multi_sigma_losses(train_loader, d_enc, d_rff, rff_sigma, device, n_labels, noise_factor, mmd_type)
 
