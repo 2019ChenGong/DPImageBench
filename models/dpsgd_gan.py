@@ -181,8 +181,6 @@ class DPGAN(DPSynther):
                     if state['step'] % config.log_freq == 0 and self.global_rank == 0:
                         logging.info('Loss D: %.4f, Loss G: %.4f, step: %d' %
                                     (loss_D, loss_G, state['step'] + 1))
-                    print('Loss D: %.4f, Loss G: %.4f, step: %d' %
-                                    (loss_D, loss_G, state['step'] + 1))
 
         if self.global_rank == 0:
             checkpoint_file = os.path.join(checkpoint_dir, 'final_checkpoint.pth')

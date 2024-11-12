@@ -100,8 +100,8 @@ for idx in range(len(methods)):
     acc = accs[idx]
     axs[0, 0].plot(acc, label=method, lw=lw, markersize=5.5, color=colors[idx], marker=markers[idx])
     axs[0, 0].set_xticks([i for i in range(6)], eps)
-axs[0, 0].set_xlabel("Privacy Budget $\epsilon$", fontsize=13)
-axs[0, 0].set_ylabel("Acc (%)", fontsize=13)
+axs[0, 0].set_xlabel("Privacy Budget $\epsilon$", fontsize=12.5)
+axs[0, 0].set_ylabel("Acc (%)", fontsize=12.5)
 axs[0, 0].tick_params(axis='both', which='major', labelsize=11.5)
 
 
@@ -110,8 +110,8 @@ for idx in range(len(methods)):
     fid = fids[idx]
     axs[0, 1].plot(fid, label=method, lw=lw, markersize=5.5, color=colors[idx], marker=markers[idx])
     axs[0, 1].set_xticks([i for i in range(6)], eps)
-axs[0, 1].set_xlabel("Privacy Budget $\epsilon$", fontsize=13)
-axs[0, 1].set_ylabel("FID", fontsize=13)
+axs[0, 1].set_xlabel("Privacy Budget $\epsilon$", fontsize=12.5)
+axs[0, 1].set_ylabel("FID", fontsize=12.5)
 axs[0, 1].tick_params(axis='both', which='major', labelsize=11.5)
 
 for idx in range(len(methods)):
@@ -119,8 +119,8 @@ for idx in range(len(methods)):
     Is = iss[idx]
     axs[0, 2].plot(Is, label=method, lw=lw, markersize=5.5, color=colors[idx], marker=markers[idx])
     axs[0, 2].set_xticks([i for i in range(6)], eps)
-axs[0, 2].set_xlabel("Privacy Budget $\epsilon$", fontsize=13)
-axs[0, 2].set_ylabel("IS", fontsize=13)
+axs[0, 2].set_xlabel("Privacy Budget $\epsilon$", fontsize=12.5)
+axs[0, 2].set_ylabel("IS", fontsize=12.5)
 axs[0, 2].set_yticks([0.0,2.0,4.0,6.0,8.0]) 
 axs[0, 2].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 axs[0, 2].tick_params(axis='both', which='major', labelsize=11.5)
@@ -131,8 +131,8 @@ for idx in range(len(methods)):
     pr = precisions[idx]
     axs[1, 0].plot(pr, label=method, lw=lw, markersize=5.5, color=colors[idx], marker=markers[idx])
     axs[1, 0].set_xticks([i for i in range(6)], eps)
-axs[1, 0].set_xlabel("Privacy Budget $\epsilon$", fontsize=13)
-axs[1, 0].set_ylabel("Precision", fontsize=13)
+axs[1, 0].set_xlabel("Privacy Budget $\epsilon$", fontsize=12.5)
+axs[1, 0].set_ylabel("Precision", fontsize=12.5)
 axs[1, 0].tick_params(axis='both', which='major', labelsize=11.5)
 
 for idx in range(len(methods)):
@@ -140,8 +140,8 @@ for idx in range(len(methods)):
     re = recalls[idx]
     axs[1, 1].plot(re, label=method, lw=lw, markersize=5.5, color=colors[idx], marker=markers[idx])
     axs[1, 1].set_xticks([i for i in range(6)], eps)
-axs[1, 1].set_xlabel("Privacy Budget $\epsilon$", fontsize=13)
-axs[1, 1].set_ylabel("Recall", fontsize=13)
+axs[1, 1].set_xlabel("Privacy Budget $\epsilon$", fontsize=12.5)
+axs[1, 1].set_ylabel("Recall", fontsize=12.5)
 axs[1, 1].tick_params(axis='both', which='major', labelsize=11.5)
 
 for idx in range(len(methods)):
@@ -149,8 +149,8 @@ for idx in range(len(methods)):
     fld = flds[idx]
     axs[1, 2].plot(fld, label=method, lw=lw, markersize=5.5, color=colors[idx], marker=markers[idx])
     axs[1, 2].set_xticks([i for i in range(6)], eps)
-axs[1, 2].set_xlabel("Privacy Budget $\epsilon$", fontsize=13)
-axs[1, 2].set_ylabel("FLD", fontsize=13)
+axs[1, 2].set_xlabel("Privacy Budget $\epsilon$", fontsize=12.5)
+axs[1, 2].set_ylabel("FLD", fontsize=12.5)
 axs[1, 2].set_yticks([0.0,20,40,60,80])
 axs[1, 2].tick_params(axis='both', which='major', labelsize=11.5)
 

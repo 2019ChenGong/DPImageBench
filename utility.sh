@@ -117,14 +117,13 @@
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method PrivImage--data_name celeba_male_32 --epsilon 1.0  --exp_path exp/privimage/celeba_male_32_eps1.0-2024-10-17-02-16-40 &
 
-CUDA_VISIBLE_DEVICES=3,6,7 python run.py setup.n_gpus_per_node=3 --method DP-LDM public_data.name=places365 public_data.n_classes=365 public_data.train_path=dataset/places365 --epsilon 10.0 -dn cifar10_32 sensitive_data.train_num=val -ed pretrain_places365_unconditional pretrain.loss.label_unconditioning_prob=1.0
+# CUDA_VISIBLE_DEVICES=3,6,7 python run.py setup.n_gpus_per_node=3 --method DP-LDM public_data.name=places365 public_data.n_classes=365 public_data.train_path=dataset/places365 --epsilon 10.0 -dn cifar10_32 sensitive_data.train_num=val -ed pretrain_places365_unconditional pretrain.loss.label_unconditioning_prob=1.0
 
 # python run.py setup.n_gpus_per_node=4 --method DP-LDM --epsilon 1.0 -dn mnist_28 sensitive_data.train_num=val  -ed unconditional
 
 # python run.py setup.n_gpus_per_node=3 --method DP-LDM --epsilon 1.0 -dn cifar100_32 -ed unconditional pretrain.loss.label_unconditioning_prob=1.0
 
-# CUDA_VISIBLE_DEVICES=7  python eval.py --method DP-LDM sensitive_data.train_num=val --data_name mnist_28 --epsilon 1.0  --exp_path exp/dp-ldm/mnist_28_eps1.0unconditionalval-2024-10-25-14-41-07 &
-
+CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-LDM sensitive_data.train_num=val --data_name cifar10_32 --epsilon 10.0  --exp_path exp/dp-ldm/cifar10_32_eps10.0pretrain_places365_unconditional-2024-11-09-20-49-50 &
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method PDP-Diffusion --data_name fmnist_28 --epsilon 10.0 sensitive_data.train_num=val  --exp_path exp/pdp-diffusion/fmnist_28_eps10.0condi_LZN-2024-10-20-02-40-36 &
 

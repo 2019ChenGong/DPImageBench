@@ -141,8 +141,12 @@ def load_data(config):
             if config.public_data.selective.ratio == 1.0:
                 specific_class = None
             else:
-                with torch.no_grad():
-                    specific_class = semantic_query(sensitive_train_loader, config)
+                try:
+                    specific_class = torch.load(config.public_data.selective.semantic_path)
+                    logging.info(specific_class)
+                except:
+                    with torch.no_grad():
+                        specific_class = semantic_query(sensitive_train_loader, config)
             public_train_set = SpecificClassImagenet(root=config.public_data.train_path, specific_class=specific_class, transform=trans, split="train")
         elif config.public_data.name == "places365":
             download = (not os.path.exists(os.path.join(config.public_data.train_path, "data_256_standard")))
