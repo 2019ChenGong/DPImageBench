@@ -15,12 +15,13 @@ dp-promise
 bug_fig
 debug*
 imagenet*
-config_old
+configs_old
 models_old
 dataset
 models/pretrained_models
 models/PE/improved-diffusion
 models/pretrained_models.zip
+requirements_old.txt
 
 models_old/pretrained_models
 models_old/PE/improved-diffusion
