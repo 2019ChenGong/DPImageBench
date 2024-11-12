@@ -10,13 +10,14 @@ methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "GS-WGAN", "DP-GAN", "PDP-Diffusion
 
 def plot_con_uncon_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
     diff = data1 - data2
+    diff = diff[::-1]
     y = np.array([i for i in range(len(data1))])
 
-    ax.barh(y[diff<0], data1[::-1][diff<0], label=label1, color='#FC8002', zorder=1)
-    ax.barh(y[diff>=0], data1[::-1][diff>=0], color='#FC8002', zorder=2)
+    ax.barh(y[diff<0], data1[::-1][diff<0], label=label1, color='#FC8002', zorder=2)
+    ax.barh(y[diff>=0], data1[::-1][diff>=0], color='#FC8002', zorder=1)
 
-    ax.barh(y[diff<0], data2[::-1][diff<0], label=label2, color='#FABB6E', zorder=2)
-    ax.barh(y[diff>=0], data2[::-1][diff>=0], color='#FABB6E', zorder=1)
+    ax.barh(y[diff<0], data2[::-1][diff<0], label=label2, color='#FABB6E', zorder=1)
+    ax.barh(y[diff>=0], data2[::-1][diff>=0], color='#FABB6E', zorder=2)
     ax.legend(fontsize=11)
     if yticks:
         ax.set_yticks(range(len(data2)), methods[::-1], fontsize=12)
@@ -27,6 +28,7 @@ def plot_con_uncon_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
     ax.tick_params(axis='both', which='major', labelsize=12)
 
     x_max = np.where(data1>data2, data1, data2)
+    diff = diff[::-1]
     for i in range(len(diff)):
         improve = diff[i]
         x = max(data1[i], data2[i])
@@ -38,13 +40,14 @@ def plot_con_uncon_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
 
 def plot_pre_nonpre_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
     diff = data1 - data2
+    diff = diff[::-1]
     y = np.array([i for i in range(len(data1))])
 
-    ax.barh(y[diff<0], data1[::-1][diff<0], label=label1, color='#89CFE6', zorder=1)
-    ax.barh(y[diff>=0], data1[::-1][diff>=0], color='#89CFE6', zorder=2)
+    ax.barh(y[diff<0], data1[::-1][diff<0], label=label1, color='#89CFE6', zorder=2)
+    ax.barh(y[diff>=0], data1[::-1][diff>=0], color='#89CFE6', zorder=1)
 
-    ax.barh(y[diff<0], data2[::-1][diff<0], label=label2, color='#129ECC', zorder=2)
-    ax.barh(y[diff>=0], data2[::-1][diff>=0], color='#129ECC', zorder=1)
+    ax.barh(y[diff<0], data2[::-1][diff<0], label=label2, color='#129ECC', zorder=1)
+    ax.barh(y[diff>=0], data2[::-1][diff>=0], color='#129ECC', zorder=2)
     ax.legend(fontsize=11)
     if yticks:
         ax.set_yticks(range(len(data2)), methods[::-1], fontsize=12)
@@ -55,6 +58,7 @@ def plot_pre_nonpre_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
     ax.tick_params(axis='both', which='major', labelsize=12)
 
     x_max = np.where(data1>data2, data1, data2)
+    diff = diff[::-1]
     for i in range(len(diff)):
         improve = diff[i]
         x = max(data1[i], data2[i])

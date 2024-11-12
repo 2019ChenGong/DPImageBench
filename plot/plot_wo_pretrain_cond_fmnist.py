@@ -10,26 +10,30 @@ methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "GS-WGAN", "DP-GAN", "PDP-Diffusion
 
 def plot_one_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
     diff = data1 - data2
+    diff = diff[::-1]
     y = np.array([i for i in range(len(data1))])
 
-    ax.barh(y[diff<0], data1[::-1][diff<0], label=label1, color='#89CFE6', zorder=1)
-    ax.barh(y[diff>=0], data1[::-1][diff>=0], color='#89CFE6', zorder=2)
+    ax.barh(y[diff<0], data1[::-1][diff<0], label=label1, color='#FC8002', zorder=2)
+    ax.barh(y[diff>=0], data1[::-1][diff>=0], color='#FC8002', zorder=1)
 
-    ax.barh(y[diff<0], data2[::-1][diff<0], label=label2, color='#129ECC', zorder=2)
-    ax.barh(y[diff>=0], data2[::-1][diff>=0], color='#129ECC', zorder=1)
-    ax.legend()
+    ax.barh(y[diff<0], data2[::-1][diff<0], label=label2, color='#FABB6E', zorder=1)
+    ax.barh(y[diff>=0], data2[::-1][diff>=0], color='#FABB6E', zorder=2)
+    ax.legend(fontsize=11)
     if yticks:
-        ax.set_yticks(range(len(data2)), methods[::-1])
+        ax.set_yticks(range(len(data2)), methods[::-1], fontsize=12)
     else:
         ax.set_yticks([])
-    ax.set_xlabel(xlabel)
+    ax.set_xlabel(xlabel, fontsize=14)
+    ax.set_xticks([0.0,20.0,40.0,60.0,80.0]) 
+    ax.tick_params(axis='both', which='major', labelsize=12)
 
     x_max = np.where(data1>data2, data1, data2)
+    diff = diff[::-1]
     for i in range(len(diff)):
-        improve = diff[i] / data2[i] * 100
+        improve = diff[i]
         x = max(data1[i], data2[i])
         y = len(diff) - i - 1 - 0.12
-        improve = str(int(improve)) + '%'
+        improve = str(round(improve, 1))
         if improve[0] != '-':
             improve = '+' + improve
         ax.text(x, y, str(improve), fontsize=12)
