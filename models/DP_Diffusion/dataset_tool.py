@@ -1,11 +1,3 @@
-# Copyright (c) 2021, NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
-#
-# NVIDIA CORPORATION and its licensors retain all intellectual property
-# and proprietary rights in and to this software, related documentation
-# and any modifications thereto.  Any use, reproduction, disclosure or
-# distribution of this software and related documentation without an express
-# license agreement from NVIDIA CORPORATION is strictly prohibited.
-
 """Tool for creating ZIP/PNG based datasets."""
 
 import functools
@@ -515,6 +507,3 @@ def convert_dataset(
 
 if __name__ == "__main__":
     convert_dataset() # pylint: disable=no-value-for-parameter
-
-# python dataset_tool.py --source /p/fzv6enresearch/kecen/data/celeba-dataset.zip --dest /p/fzv6enresearch/kecen/data/celeba_64.zip --resolution=64x64 --transform=center-crop
-# python compute_fid_statistics.py --path /data_dir/cifar10.zip --file /data_dir/cifar10.npz
