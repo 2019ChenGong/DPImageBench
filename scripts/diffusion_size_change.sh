@@ -55,6 +55,6 @@ python run.py setup.n_gpus_per_node=4 pretrain.loss.label_unconditioning_prob=1.
 
 #  eval
 
-python run.py setup.n_gpus_per_node=4 public_data.name=null sensitive_data.name=null model.ckpt=/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/cifar10_32_eps10.0_trainval_ch1224_nf96_LZN-2024-11-09-18-05-14/train/checkpoints/final_checkpoint.pth model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=96 train.dp.n_splits=300 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf96
+python run.py setup.n_gpus_per_node=4 public_data.name=null sensitive_data.name=null model.ckpt=/exp/pdp-diffusion/cifar10_32_eps10.0_trainval_ch1224_nf96_LZN-2024-11-09-18-05-14/train/checkpoints/final_checkpoint.pth model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=96 train.dp.n_splits=300 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf96
 
-python run.py setup.n_gpus_per_node=3 public_data.name=null sensitive_data.name=null model.ckpt=/p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps10.0trainval_ch1224_nf128-2024-11-09-10-51-53/train/checkpoints/snapshot_checkpoint.pth model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=300 -m DPDM -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf96
+python run.py setup.n_gpus_per_node=3 public_data.name=null sensitive_data.name=null model.ckpt=/exp/dpdm/cifar10_32_eps10.0trainval_ch1224_nf128-2024-11-09-10-51-53/train/checkpoints/snapshot_checkpoint.pth model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=300 -m DPDM -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf96
