@@ -36,4 +36,7 @@ Instruction*
 core*
 debug
 
+fidelity.sh
+utility.sh
+
 *slurm*
