@@ -117,13 +117,13 @@ axs[0, 1].tick_params(axis='both', which='major', labelsize=11.5)
 for idx in range(len(methods)):
     method = methods[idx]
     Is = iss[idx]
-    axs[0, 2].plot(Is, label=method, lw=lw, markersize=5.5, color=colors[idx], marker=markers[idx])
-    axs[0, 2].set_xticks([i for i in range(6)], eps)
-axs[0, 2].set_xlabel("Privacy Budget $\epsilon$", fontsize=12.5)
-axs[0, 2].set_ylabel("IS", fontsize=12.5)
-axs[0, 2].set_yticks([0.0,2.0,4.0,6.0,8.0]) 
-axs[0, 2].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-axs[0, 2].tick_params(axis='both', which='major', labelsize=11.5)
+    axs[1, 2].plot(Is, label=method, lw=lw, markersize=5.5, color=colors[idx], marker=markers[idx])
+    axs[1, 2].set_xticks([i for i in range(6)], eps)
+axs[1, 2].set_xlabel("Privacy Budget $\epsilon$", fontsize=12.5)
+axs[1, 2].set_ylabel("IS", fontsize=12.5)
+axs[1, 2].set_yticks([0.0,2.0,4.0,6.0,8.0]) 
+axs[1, 2].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+axs[1, 2].tick_params(axis='both', which='major', labelsize=11.5)
 
 
 for idx in range(len(methods)):
@@ -147,12 +147,12 @@ axs[1, 1].tick_params(axis='both', which='major', labelsize=11.5)
 for idx in range(len(methods)):
     method = methods[idx]
     fld = flds[idx]
-    axs[1, 2].plot(fld, label=method, lw=lw, markersize=5.5, color=colors[idx], marker=markers[idx])
-    axs[1, 2].set_xticks([i for i in range(6)], eps)
-axs[1, 2].set_xlabel("Privacy Budget $\epsilon$", fontsize=12.5)
-axs[1, 2].set_ylabel("FLD", fontsize=12.5)
-axs[1, 2].set_yticks([0.0,20,40,60,80])
-axs[1, 2].tick_params(axis='both', which='major', labelsize=11.5)
+    axs[0, 2].plot(fld, label=method, lw=lw, markersize=5.5, color=colors[idx], marker=markers[idx])
+    axs[0, 2].set_xticks([i for i in range(6)], eps)
+axs[0, 2].set_xlabel("Privacy Budget $\epsilon$", fontsize=12.5)
+axs[0, 2].set_ylabel("FLD", fontsize=12.5)
+axs[0, 2].set_yticks([0.0,20,40,60,80])
+axs[0, 2].tick_params(axis='both', which='major', labelsize=11.5)
 
 axs[0, 0].grid(color='lightgrey', linewidth=1.0, zorder=0)
 axs[0, 1].grid(color='lightgrey', linewidth=1.0, zorder=0)

@@ -15,6 +15,8 @@ We can save the figure of bug into ./bug_fig/. [Chen: OK]
 
 - [] GSWGAN merge
 
+- [] use a bash to represent installation.
+
 
 ## 1. Contents
   - [1. Contents](#1-contents)
