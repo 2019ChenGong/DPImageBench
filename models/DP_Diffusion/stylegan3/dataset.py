@@ -247,16 +247,6 @@ class ImageFolderDataset(Dataset):
         return image
 
     def _load_raw_labels(self):
-        if 'celeba' in self._path:
-            import pandas as pd
-            label_csv = pd.read_csv("/p/fzv6enresearch/kecen/data/list_attr_celeba.csv")
-            label = np.array(label_csv[self.attr].to_list())
-            label[label==-1] = 0
-            if self.split == 'train':
-                label = label[:182637]
-            elif self.split == 'test':
-                label = label[182637:]
-            return label
 
         fname = 'dataset.json'
         if fname not in self._all_fnames:
