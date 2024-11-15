@@ -192,5 +192,5 @@ CUDA_VISIBLE_DEVICES=0 python eval.py --method GS-WGAN sensitive_data.train_num=
 
 CUDA_VISIBLE_DEVICES=0 python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0trainval_1.4M-2024-11-10-01-48-10
 
-CUDA_VISIBLE_DEVICES=0 python eval.py --method GS-WGAN sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/gs-wgan/fmnist_28_eps10.0unconditional_imagenet_trainval_1.4M-2024-11-10-01-48-59
+CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-LDM sensitive_data.train_num=val --data_name cifar10_32 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ldm/cifar10_32_eps10.0conditional_goldenIN1_trainval-2024-11-11-06-12-22
 

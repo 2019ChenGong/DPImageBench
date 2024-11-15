@@ -23,8 +23,8 @@ def main(config):
 
     syn_data, syn_labels = model.generate(config.gen)
 
-    # evaluator = Evaluator(config)
-    # evaluator.eval(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
+    evaluator = Evaluator(config)
+    evaluator.eval(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
     
 
 

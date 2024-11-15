@@ -34,10 +34,10 @@ python run.py setup.n_gpus_per_node=1 sensitive_data.train_num=val model.network
 python run.py setup.n_gpus_per_node=1 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=64 train.dp.n_splits=200 -m PrivImage -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf64
 
 # 120G 44.2M
-python run.py setup.n_gpus_per_node=4 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=96 train.dp.n_splits=300 -m PrivImage -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf96
+CUDA_VISIBLE_DEVICES=2,3 python run.py setup.n_gpus_per_node=2 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=96 train.dp.n_splits=300 -m PrivImage -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf96
 
 # 120G 78.5M
-python run.py setup.n_gpus_per_node=4 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=600 -m PrivImage -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf128
+CUDA_VISIBLE_DEVICES=2,3 python run.py setup.n_gpus_per_node=2 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=600 -m PrivImage -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf128
 
 
 # DP-LDM
@@ -53,3 +53,8 @@ python run.py setup.n_gpus_per_node=4 pretrain.loss.label_unconditioning_prob=1.
 # 120G 78.5M
 python run.py setup.n_gpus_per_node=4 pretrain.loss.label_unconditioning_prob=1.0 sensitive_data.train_num=val model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=600 -m DP-LDM -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf128
 
+#  eval
+
+python run.py setup.n_gpus_per_node=4 public_data.name=null sensitive_data.name=null model.ckpt=/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/cifar10_32_eps10.0_trainval_ch1224_nf96_LZN-2024-11-09-18-05-14/train/checkpoints/final_checkpoint.pth model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=96 train.dp.n_splits=300 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf96
+
+python run.py setup.n_gpus_per_node=3 public_data.name=null sensitive_data.name=null model.ckpt=/p/fzv6enresearch/DPImageBench/exp/dpdm/cifar10_32_eps10.0trainval_ch1224_nf128-2024-11-09-10-51-53/train/checkpoints/snapshot_checkpoint.pth model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=300 -m DPDM -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf96

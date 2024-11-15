@@ -10,7 +10,7 @@
 # CUDA_VISIBLE_DEVICES=1 python run.py setup.n_gpus_per_node=3 public_data.name=null train.dp.epsilon=20 -ed trainval_eps20 sensitive_data.train_num=val -m DP-MERF -dn cifar10_32 -e 10.0 &
 
 
-# CUDA_VISIBLE_DEVICES=0 python run.py setup.n_gpus_per_node=3 public_data.name=null train.dp.epsilon=0.2 -ed trainval_eps0.2 sensitive_data.train_num=val -m DP-NTK -dn fmnist_28 -e 1.0 &
+# CUDA_VISIBLE_DEVICES=0 python run.py setup.n_gpus_per_node=3 public_data.name=null train.n_splits=1 train.dp.epsilon=0.2 -ed trainval_eps0.2 sensitive_data.train_num=val -m DP-NTK -dn fmnist_28 -e 1.0 &
 # CUDA_VISIBLE_DEVICES=0 python run.py setup.n_gpus_per_node=3 public_data.name=null train.dp.epsilon=0.2 -ed trainval_eps0.2 sensitive_data.train_num=val -m DP-NTK -dn cifar10_32 -e 1.0 &
 # CUDA_VISIBLE_DEVICES=1 python run.py setup.n_gpus_per_node=3 public_data.name=null train.dp.epsilon=5 -ed trainval_eps5 sensitive_data.train_num=val -m DP-NTK -dn fmnist_28 -e 10.0 &
 # CUDA_VISIBLE_DEVICES=1 python run.py setup.n_gpus_per_node=3 public_data.name=null train.dp.epsilon=5 -ed trainval_eps5 sensitive_data.train_num=val -m DP-NTK -dn cifar10_32 -e 10.0 &

@@ -13,6 +13,8 @@ We can save the figure of bug into ./bug_fig/. [Chen: OK]
 
 - [] keep consistent cond and uncond for dm and gan
 
+- [] GSWGAN merge
+
 
 ## 1. Contents
   - [1. Contents](#1-contents)

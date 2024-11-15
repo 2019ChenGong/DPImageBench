@@ -22,12 +22,16 @@ models/pretrained_models
 models/PE/improved-diffusion
 models/pretrained_models.zip
 requirements_old.txt
+multi_node_run.sh
+golden_pretrain.sh
 
 models_old/pretrained_models
 models_old/PE/improved-diffusion
 models_old/pretrained_models.zip
 
+cifar10_32*
 
+Instruction*
 
 core*
 debug

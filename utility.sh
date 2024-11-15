@@ -123,7 +123,13 @@
 
 # python run.py setup.n_gpus_per_node=3 --method DP-LDM --epsilon 1.0 -dn cifar100_32 -ed unconditional pretrain.loss.label_unconditioning_prob=1.0
 
-CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-LDM sensitive_data.train_num=val --data_name cifar10_32 --epsilon 10.0  --exp_path exp/dp-ldm/cifar10_32_eps10.0pretrain_places365_unconditional-2024-11-09-20-49-50 &
+# python eval.py --method DP-NTK sensitive_data.train_num=val --data_name fmnist_28 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-ntk/fmnist_28_eps1.0trainval_eps0.2-2024-11-14-01-30-41
+
+# python eval.py --method PDP-Diffusion sensitive_data.train_num=val --data_name cifar10_32 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/cifar10_32_eps10.0trainval_ch1224_nf96-2024-11-13-09-58-42
+
+# CUDA_VISIBLE_DEVICES=3 python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name cifar10_32 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-kernel/cifar10_32_eps10.0conditional_randomIN1_trainval-2024-11-12-07-52-19
+
+# CUDA_VISIBLE_DEVICES=3 python eval.py --method DP-Kernel sensitive_data.train_num=val --data_name cifar10_32 --epsilon 10.0  --exp_path /p/fzv6enresearch/DPImageBench/exp/dp-kernel/cifar10_32_eps10.0conditional_randomIN3_trainval-2024-11-12-11-20-38
 
 # CUDA_VISIBLE_DEVICES=0  python eval.py --method PDP-Diffusion --data_name fmnist_28 --epsilon 10.0 sensitive_data.train_num=val  --exp_path exp/pdp-diffusion/fmnist_28_eps10.0condi_LZN-2024-10-20-02-40-36 &
 
@@ -147,3 +153,10 @@ CUDA_VISIBLE_DEVICES=0 python eval.py --method DP-LDM sensitive_data.train_num=v
 
 # CUDA_VISIBLE_DEVICES=3  python eval.py --method GS-WGAN --data_name celeba_male_32 sensitive_data.train_num=val --epsilon 10.0 --exp_path exp/gs-wgan/celeba_male_32_eps10.0trainval_step5w-2024-11-04-21-58-52 &
 
+CUDA_VISIBLE_DEVICES=0 python run.py setup.n_gpus_per_node=3 public_data.name=null train.n_splits=1 train.dp.epsilon=0.2 -ed trainval_eps0.2 sensitive_data.train_num=val -m DP-NTK -dn fmnist_28 -e 1.0 &
+
+CUDA_VISIBLE_DEVICES=1 python run.py setup.n_gpus_per_node=3 public_data.name=null train.n_splits=1 train.dp.epsilon=0.2 -ed eps0.2 -m DP-NTK -dn fmnist_28 -e 1.0 &
+
+CUDA_VISIBLE_DEVICES=2 python run.py setup.n_gpus_per_node=3 public_data.name=null train.n_splits=1 -ed trainval sensitive_data.train_num=val -m DP-NTK -dn fmnist_28 -e 1.0 &
+
+CUDA_VISIBLE_DEVICES=3 python run.py setup.n_gpus_per_node=3 public_data.name=null train.n_splits=1 -m DP-NTK -dn fmnist_28 -e 1.0 &
