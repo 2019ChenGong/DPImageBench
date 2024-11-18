@@ -20,7 +20,6 @@
 - 🎉 **(2024.11.19)** We're thrilled to announce the release of initial version of DPImageBench!
 
 ## Todo
-
 - [ ] recoding the intermediate results of methods with tqdm.
 
 - [ ] setup.master_port=6026
@@ -32,6 +31,8 @@
 - [ ] use a bash to represent installation.
 
 - [ ] End to end implementation for PrivImage
+
+- [ ] remove the unneccessary part for algorithms in models
 
 ## 2. Introduction
 
@@ -55,13 +56,12 @@ We list currently supported DP image synthesis methods as follows.
 
 ## 3. Repo Contents
 
-Below is the directory structure of the DPImageBench project, which encapsulates its three core functionalities within the watermark/, visualize/, and evaluation/ directories. To facilitate user understanding and demonstrate the toolkit's ease of use, we provide a variety of test cases. The test code can be found in the test/ directory.
+Below is the directory structure of the DPImageBench project, which organizes its two core functionalities within the `models/` and `evaluation/` directories. To enhance user understanding and showcase the toolkit's ease of use, we offer a variety of example scripts located in the `scripts/` directory.
 
 
 ```plaintext
 DPImageBench/
 ├── config/                     # Configuration files for various DP image synthesis algorithms
-│   ├──            
 │   ├── DP-MERF      
 │   ├── DP-NTK       
 │   ├── DP-Kernel
@@ -71,31 +71,35 @@ DPImageBench/
 │   ├── PDP-Diffusion      
 │   ├── DP-LDM   
 │   ├── GS-WGAN
-│   └── PDP-Diffusion         
+│   └── PDP-Diffusion   
+├── data/                       # Data Preparation for Our Benchmark
+│   ├── stylegan3
+│   ├── SpecificPlaces365.py
+│   ├── dataset_loader.py
+│   └── preprocess_dataset.py 
 ├── dataset/                    # Datasets studied in the project
-│   ├── camelyon/
-│   ├── celeba/
-│   ├── imagenet/
-│   ├── mnist/
-│   └── wmt16_de_en/
-├── evaluation/                 # Evaluation module of MarkLLM, including tools and pipelines
-│   ├── dataset.py              # Script for handling dataset operations within evaluations
-│   ├── examples/               # Scripts for automated evaluations using pipelines
-│   │   ├── assess_detectability.py  
-│   │   ├── assess_quality.py    
-│   │   └── assess_robustness.py   
-│   ├── pipelines/              # Pipelines for structured evaluation processes
-│   │   ├── detection.py    
-│   │   └── quality_analysis.py 
-│   └── tools/                  # Evaluation tools
-│       ├── oracle.py
-│       ├── success_rate_calculator.py  
-        ├── text_editor.py         
-│       └── text_quality_analyzer.py   
-├── exceptions/                 # Custom exception definitions for error handling
-│   └── exceptions.py
+├── dnnlib/ 
+├── docker/                     # docker file
+├── evaluation/                 # Evaluation module of DPImageBench, including utility and fidelity
+│   ├── classifier/             # Downstream tasks classification training algorithms
+│   │   ├── densenet.py  
+│   │   ├── resnet.py 
+│   │   ├── resnext.py 
+│   │   ├── wrn.py 
+│   ├── ema.py 
+│   └── evaluator.py 
+├── models/                     # Implementation framework for DP image synthesis algorithms
+│   ├── DP-MERF      
+│   ├── DP-NTK       
+│   ├── DP-Kernel
+│   ├── PE            
+│   ├── DP-GAN         
+│   ├── DPDM        
+│   ├── PDP-Diffusion      
+│   ├── DP-LDM   
+│   ├── GS-WGAN
+│   └── PDP-Diffusion  
 ├── font/                       # Fonts needed for visualization purposes
-├── MarkLLM_demo.ipynb          # Jupyter Notebook
 ├── test/                       # Test cases and examples for user testing
 │   ├── test_method.py      
 │   ├── test_pipeline.py    
@@ -110,20 +114,7 @@ DPImageBench/
 │   ├── font_settings.py    
 │   ├── legend_settings.py  
 │   ├── page_layout_settings.py 
-│   └── visualizer.py       
-├── watermark/                  # Implementation framework for watermark algorithms
-│   ├── auto_watermark.py       # AutoWatermark class
-│   ├── base.py                 # Base classes and functions for watermarking
-│   ├── ewd/                
-│   ├── exp/               
-│   ├── exp_edit/          
-│   ├── kgw/
-│   ├── its_edit/                 
-│   ├── sir/               
-│   ├── sweet/              
-│   ├── unigram/           
-│   ├── upv/                
-│   └── xsir/               
+│   └── visualizer.py                 
 ├── README.md                   # Main project documentation
 └── requirements.txt            # Dependencies required for the project
 ```
@@ -166,3 +157,6 @@ Available `epsilon` is [`1.0`].
 Available `dataset_name` is [`mnist_28`].
 
 So far, I have only implemented FID in our evaluation.
+
+## Acknowledgement
+ 

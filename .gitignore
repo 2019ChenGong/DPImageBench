@@ -4,7 +4,9 @@
 *.c
 *.cpp
 *.so
-exp
+exp/d*
+exp/g*
+exp/p*
 debug.py
 
 GS-WGAN
