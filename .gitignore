@@ -16,6 +16,8 @@ bug_fig
 debug*
 imagenet*
 configs_old
+configs/G-PATE 
+configs/DP-Promise
 models_old
 dataset
 models/pretrained_models

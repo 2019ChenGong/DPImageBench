@@ -3,21 +3,6 @@
 # DPImageBench: A Unified Benchmark for Differentially Private Image Synthesis Algorithms
 </div>
 
-## Todo
-
-We can save the figure of bug into ./bug_fig/. [Chen: OK]
-
-- [] recoding the intermediate results of methods with tqdm.
-
-- [] setup.master_port=6026
-
-- [] keep consistent cond and uncond for dm and gan
-
-- [] GSWGAN merge
-
-- [] use a bash to represent installation.
-
-
 ## 1. Contents
   - [1. Contents](#1-contents)
   - [2. Introduction](#2-introduction)
@@ -34,6 +19,19 @@ We can save the figure of bug into ./bug_fig/. [Chen: OK]
 ## Updates 
 - 🎉 **(2024.11.19)** We're thrilled to announce the release of initial version of DPImageBench!
 
+## Todo
+
+- [ ] recoding the intermediate results of methods with tqdm.
+
+- [ ] setup.master_port=6026
+
+- [ ] keep consistent cond and uncond for dm and gan
+
+- [ ] GSWGAN merge
+
+- [ ] use a bash to represent installation.
+
+- [ ] End to end implementation for PrivImage
 
 ## 2. Introduction
 
@@ -68,12 +66,11 @@ DPImageBench/
 │   ├── DP-NTK       
 │   ├── DP-Kernel
 │   ├── PE            
-│   ├── G-PATE            
 │   ├── DP-GAN         
 │   ├── DPDM        
 │   ├── PDP-Diffusion      
 │   ├── DP-LDM   
-│   ├── DP-Promise     
+│   ├── GS-WGAN
 │   └── PDP-Diffusion         
 ├── dataset/                    # Datasets studied in the project
 │   ├── camelyon/
