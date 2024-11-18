@@ -22,7 +22,9 @@ configs/G-PATE
 configs/DP-Promise
 models_old
 dataset
-models/pretrained_models
+models/pretrained_models/imagenet*
+models/pretrained_models/places365_classifier_0.992_ckpt.pth
+
 models/PE/improved-diffusion
 models/pretrained_models.zip
 requirements_old.txt
