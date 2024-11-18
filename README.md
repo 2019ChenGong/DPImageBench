@@ -40,14 +40,14 @@ We list currently supported DP image synthesis methods as follows.
   | Methods |  Link                                                         |
   | -------------- | ------------------------------------------------------------ |
   | DP-MERF            |  [\[AISTATS 2021\] DP-MERF: Differentially Private Mean Embeddings With Randomfeatures for Practical Privacy-Preserving Data Generation](https://proceedings.mlr.press/v130/harder21a.html) |
+  | DP-NTK            |  [\[AISTATS 2021\] DP-MERF: Differentially Private Mean Embeddings With Randomfeatures for Practical Privacy-Preserving Data Generation](https://proceedings.mlr.press/v130/harder21a.html) |
   | DP-Kernel        |  [\[NeuriPS 2023\] Functional Renyi Differential Privacy for Generative Modeling](https://proceedings.neurips.cc/paper_files/paper/2023/hash/2f9ee101e35b890d9eae79ee27bcd69a-Abstract-Conference.html) |
   | PE          |  [\[ICLR 2024\] Differentially Private Synthetic Data via Foundation Model {API}s 1: Images](https://openreview.net/forum?id=YEhQs8POIo) |
-  | G-PATE            |  [\[NeuriPS 2021\] G-PATE: Scalable Differentially Private Data Generator via Private Aggregation of Teacher Discriminators](https://proceedings.neurips.cc/paper_files/paper/2021/hash/171ae1bbb81475eb96287dd78565b38b-Abstract.html) |
+  | GS-WGAN            |  [\[NeuriPS 2020\] GS-WGAN: A Gradient-Sanitized Approach for Learning Differentially Private Generators](https://arxiv.org/pdf/2006.08265) |
   | DP-GAN            |  [\[1802.06739\] Differentially Private Generative Adversarial Network (arxiv.org)](https://arxiv.org/abs/1802.06739) |
   | DPDM          |  [\[TMLR 2023\] Differentially Private Diffusion Models](https://openreview.net/forum?id=ZPpQk7FJXF) |
   | PDP-Diffusion       | [\[2302.13861\] Differentially Private Diffusion Models Generate Useful Synthetic Images (arxiv.org)](https://arxiv.org/abs/2305.15759) |
-  | DP-LDM            | [\[2305.15759\] Differentially Private Latent Diffusion Models (arxiv.org)](https://arxiv.org/abs/2302.13861)            |
-  | DP-Promise       | [\[UESNIX Security 2024\] DP-promise: Differentially Private Diffusion Probabilistic Models for Image Synthesis](https://www.usenix.org/conference/usenixsecurity24/presentation/wang-haichen) |
+  | DP-LDM            | [\[TMLR 2024\] https://arxiv.org/abs/2305.15759](https://arxiv.org/abs/2302.13861)            |
   | PrivImage       | [\[UESNIX Security 2024\] PrivImage: Differentially Private Synthetic Image Generation using Diffusion Models with Semantic-Aware Pretraining](https://www.usenix.org/conference/usenixsecurity24/presentation/li-kecen) |
 
 

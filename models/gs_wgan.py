@@ -10,18 +10,27 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import random
 import numpy as np
 import logging
-import concurrent.futures
+import subprocess
+from concurrent.futures import ProcessPoolExecutor
 
 import importlib
 opacus = importlib.import_module('opacus')
 from opacus.accountants.utils import get_noise_multiplier
 
-from models.GS_WGAN.models import *
+from models.GS_WGAN.models_ import *
 from models.GS_WGAN.utils import *
 from models.GS_WGAN.ops import exp_mov_avg
 from models.DP_GAN.generator import Generator
 
 from models.synthesizer import DPSynther
+
+def warm_up(script):
+    try:
+        result = subprocess.run(['python'] + script, check=True, text=True, capture_output=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        print(f"error: {e.stderr}")
+        return e.stderr
 
 class GS_WGAN(DPSynther):
     def __init__(self, config, device):
@@ -194,162 +203,57 @@ class GS_WGAN(DPSynther):
         ### save model
         torch.save(self.netG.state_dict(), os.path.join(config.log_dir, 'netG.pth'))
         torch.save(self.netGS.state_dict(), os.path.join(config.log_dir, 'netGS.pth'))
-
-    def warmup_one_discriminator(self):
-        print(11111)
-        ### Fix noise for visualization
-        if self.latent_type == 'normal':
-            fix_noise = torch.randn(10, self.z_dim)
-        elif self.latent_type == 'bernoulli':
-            p = 0.5
-            bernoulli = torch.distributions.Bernoulli(torch.tensor([p]))
-            fix_noise = bernoulli.sample((10, self.z_dim)).view(10, self.z_dim)
-        else:
-            raise NotImplementedError
-
-        trainset_size = int(len(trainset) / self.num_discriminators)
-
-        ### Training Loop
-        for idx, netD_id in enumerate(net_ids):
-
-            ### stop the process if finished
-            if netD_id >= self.num_discriminators:
-                logging.info('ID {} exceeds the num of discriminators'.format(netD_id))
-                return
-
-            ### Discriminator
-            netD = self.netD_list[netD_id]
-            optimizerD = optim.Adam(netD.parameters(), lr=1e-4, betas=(0.5, 0.9))
-
-            start = netD_id * trainset_size
-            end = (netD_id + 1) * trainset_size
-            indices = indices_full[start:end]
-            trainloader = data.DataLoader(trainset, batch_size=config.batchsize, drop_last=False,
-                                            num_workers=2, sampler=SubsetRandomSampler(indices))
-            input_data = inf_train_gen(trainloader)
-
-            ### Train (non-private) Generator for each Discriminator
-            netG = copy.deepcopy(self.netG)
-            optimizerG = optim.Adam(netG.parameters(), lr=1e-4, betas=(0.5, 0.9))
-
-            ### Save dir for each discriminator
-            save_subdir = os.path.join(config.log_dir, 'netD_%d' % netD_id)
-
-            if os.path.exists(os.path.join(save_subdir, 'netD.pth')):
-                logging.info("netD %d already pre-trained" % netD_id)
-            else:
-                mkdir(save_subdir)
-
-                for iter in range(config.iterations + 1):
-                    #########################
-                    ### Update D network
-                    #########################
-                    for p in netD.parameters():
-                        p.requires_grad = True
-
-                    for iter_d in range(config.critic_iters):
-                        real_data, real_y = next(input_data)
-                        if len(real_y.shape) == 2:
-                            real_data = real_data.to(torch.float32) / 255.
-                            real_y = torch.argmax(real_y, dim=1)
-
-                        batchsize = real_data.shape[0]
-                        real_data = real_data.view(batchsize, -1)
-                        real_data = real_data.to(self.device)
-                        real_y = real_y.to(self.device)
-                        real_data_v = autograd.Variable(real_data)
-
-                        ### train with real
-                        netD.zero_grad()
-                        D_real_score = netD(real_data_v, real_y)
-                        D_real = -D_real_score.mean()
-
-                        ### train with fake
-                        batchsize = real_data.shape[0]
-                        if latent_type == 'normal':
-                            noise = torch.randn(batchsize, self.z_dim).to(self.device)
-                        elif latent_type == 'bernoulli':
-                            noise = bernoulli.sample((batchsize, self.z_dim)).view(batchsize, self.z_dim).to(self.device)
-                        else:
-                            raise NotImplementedError
-                        noisev = autograd.Variable(noise)
-                        fake = autograd.Variable(netG(noisev, real_y).data)
-                        inputv = fake
-                        D_fake = netD(inputv, real_y)
-                        D_fake = D_fake.mean()
-
-                        ### train with gradient penalty
-                        gradient_penalty = netD.calc_gradient_penalty(real_data_v.data, fake.data, real_y, L_gp, self.device)
-                        D_cost = D_fake + D_real + gradient_penalty
-
-                        ### train with epsilon penalty
-                        logit_cost = L_epsilon * torch.pow(D_real_score, 2).mean()
-                        D_cost += logit_cost
-
-                        ### update
-                        D_cost.backward()
-                        Wasserstein_D = -D_real - D_fake
-                        optimizerD.step()
-
-                    ############################
-                    # Update G network
-                    ###########################
-                    for p in netD.parameters():
-                        p.requires_grad = False
-                    netG.zero_grad()
-
-                    if latent_type == 'normal':
-                        noise = torch.randn(batchsize, self.z_dim).to(self.device)
-                    elif latent_type == 'bernoulli':
-                        noise = bernoulli.sample((batchsize, self.z_dim)).view(batchsize, self.z_dim).to(self.device)
-                    else:
-                        raise NotImplementedError
-                    label = torch.randint(0, self.num_classes, [batchsize]).to(self.device)
-                    noisev = autograd.Variable(noise)
-                    fake = netG(noisev, label)
-                    G = netD(fake, label)
-                    G = - G.mean()
-
-                    ### update
-                    G.backward()
-                    G_cost = G
-                    optimizerG.step()
-
-                    ############################
-                    ### Results visualization
-                    ############################
-                    if iter < 5 or iter % config.print_step == 0:
-                        logging.info('G_cost:{}, D_cost:{}, Wasserstein:{}'.format(G_cost.cpu().data,
-                                                                            D_cost.cpu().data,
-                                                                            Wasserstein_D.cpu().data
-                                                                            ))
-                    if iter == config.iterations:
-                        generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.num_classes)
-
-                torch.save(netD.state_dict(), os.path.join(save_subdir, 'netD.pth'))
-
-    def warmup(self, sensitive_dataset, indices_full, trainset_size, config):
-
-        ### Set up optimizers
-        njobs = config.njobs
-        dis_per_job = self.num_discriminators // njobs
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            futures = [executor.submit(self.warmup_one_discriminator, sensitive_dataset, indices_full, [j+i*dis_per_job for j in range(dis_per_job)], config) for i in range(njobs)]
-            # futures = [executor.submit(ss) for i in range(njobs)]
-            
-            for future in concurrent.futures.as_completed(futures):
+    
+    def warmup_training(self, config):
+        n_gpu = config.n_gpu
+        iters = str(config.iterations)
+        data_name = config.data_name
+        train_num = config.train_num
+        data_path = config.data_path
+        img_size = str(self.img_size)
+        c = str(self.c)
+        num_classes = str(self.num_classes)
+        log_dir = config.log_dir
+        ndis = str(self.num_discriminators)
+        dis_per_job=200 # number of discriminators to be trained for each process
+        njobs = self.num_discriminators // dis_per_job
+        scripts = []
+        for gpu_id in range(n_gpu):
+            meta_start = dis_per_job // n_gpu * gpu_id
+            for job_id in range(njobs):
+                start= (job_id * dis_per_job + meta_start)
+                end= (start + dis_per_job)
+                vals= [str(dis_id) for dis_id in range(start, end)]
+                script = ['models/GS_WGAN/pretrain.py', '-data', data_name, '--log_dir', log_dir, '--train_num', train_num, '-ndis', ndis, '-ids'] + vals + ['--img_size', img_size, '--c', c, '--num_classes', num_classes, '--gpu_id', str(gpu_id), '--data_path', data_path, '-piters', iters]
+                scripts.append(script)
+        
+        with ProcessPoolExecutor() as executor:
+            futures = [executor.submit(warm_up, script) for script in scripts]
+            for future in futures:
                 try:
-                    score = future.result()
-                    logging.info("jobs is finished")
+                    output = future.result()
+                    print(f"Output:\n{output}")
                 except Exception as e:
-                    print(f'Error: {e}')
+                    print(f"generated an exception: {e}")
+
+
 
     def train(self, sensitive_dataloader, config):
         if sensitive_dataloader is None:
             return
         os.mkdir(config.log_dir)
-        load_dir = self.ckpt
-        indices_full = np.load(os.path.join(load_dir, 'indices.npy'), allow_pickle=True)
+
+        if self.ckpt is None:
+            config.pretrain.log_dir = os.path.join(config.log_dir, 'warm_up')
+            os.mkdir(config.pretrain.log_dir)
+            indices_full = np.arange(len(sensitive_dataloader.dataset))
+            np.random.shuffle(indices_full)
+            indices_full.dump(os.path.join(config.pretrain.log_dir, 'indices.npy'))
+            self.warmup_training(config.pretrain)
+            load_dir = config.pretrain.log_dir
+        else:
+            load_dir = self.ckpt
+            indices_full = np.load(os.path.join(load_dir, 'indices.npy'), allow_pickle=True)
         if len(indices_full) != len(sensitive_dataloader.dataset):
             indices_full = np.arange(len(sensitive_dataloader.dataset))
             np.random.shuffle(indices_full)

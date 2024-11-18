@@ -13,7 +13,7 @@ def main(config):
 
     initialize_environment(config)
 
-    model = load_model(config)
+    model, config = load_model(config)
 
     sensitive_train_loader, sensitive_val_loader, sensitive_test_loader, public_train_loader, config = load_data(config)
 

@@ -167,7 +167,7 @@ class DP_Diffusion(DPSynther):
                         ema.store(model.parameters())
                         ema.copy_to(model.parameters())
                         sample_random_image_batch(snapshot_sampling_shape, sampler, os.path.join(
-                            sample_dir, 'iter_%d' % state['step']), self.device, self.network.label_dim)
+                            sample_dir, 'iter_%d' % state['step']), self.device, config.loss.n_classes)
                         ema.restore(model.parameters())
                     model.train()
 
@@ -179,7 +179,7 @@ class DP_Diffusion(DPSynther):
                     with torch.no_grad():
                         ema.store(model.parameters())
                         ema.copy_to(model.parameters())
-                        fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, self.network.label_dim)
+                        fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, config.loss.n_classes)
                         ema.restore(model.parameters())
 
                         if self.global_rank == 0:
@@ -199,7 +199,7 @@ class DP_Diffusion(DPSynther):
                     train_x = train_x.to(torch.float32) / 255.
                     train_y = torch.argmax(train_y, dim=1)
                 if config.label_random:
-                    train_y = train_y % self.network.label_dim
+                    train_y = train_y % config.loss.n_classes
                     # train_y = torch.randint(low=0, high=self.network.label_dim, size=(train_x.shape[0], ))
                 train_x, train_y = train_x.to(self.device) * 2. - 1., train_y.to(self.device)
                 # train_x, train_y = preprocess_data(train_x, train_y, config, self.device)
@@ -231,7 +231,7 @@ class DP_Diffusion(DPSynther):
         torch.cuda.empty_cache()
 
     def train(self, sensitive_dataloader, config):
-        self.network.label_dim = 10
+        # self.network.label_dim = 10
         if sensitive_dataloader is None:
             return
         
@@ -371,7 +371,7 @@ class DP_Diffusion(DPSynther):
                         with torch.no_grad():
                             ema.store(model.parameters())
                             ema.copy_to(model.parameters())
-                            fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, self.network.label_dim)
+                            fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, config.loss.n_classes)
                             ema.restore(model.parameters())
 
                             if self.global_rank == 0:
@@ -444,7 +444,7 @@ class DP_Diffusion(DPSynther):
 
 
     def generate(self, config):
-        self.network.label_dim = 10
+        # self.network.label_dim = 10
         logging.info("start to generate {} samples".format(config.data_num))
         if self.global_rank == 0 and not os.path.exists(config.log_dir):
             make_dir(config.log_dir)
@@ -468,7 +468,7 @@ class DP_Diffusion(DPSynther):
             syn_data = []
             syn_labels = []
         for _ in range(config.data_num // (sampling_shape[0] * self.global_size) + 1):
-            x, y = generate_batch(sampler_acc, sampling_shape, self.device, self.network.label_dim, self.network.label_dim)
+            x, y = generate_batch(sampler_acc, sampling_shape, self.device, config.n_classes, config.n_classes)
             dist.barrier()
             if self.global_rank == 0:
                 gather_x = [torch.zeros_like(x) for _ in range(self.global_size)]
@@ -491,7 +491,7 @@ class DP_Diffusion(DPSynther):
             np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
 
             show_images = []
-            for cls in range(self.network.label_dim):
+            for cls in range(config.n_classes):
                 show_images.append(syn_data[syn_labels==cls][:8])
             show_images = np.concatenate(show_images)
             torchvision.utils.save_image(torch.from_numpy(show_images), os.path.join(config.log_dir, 'sample.png'), padding=1, nrow=8)

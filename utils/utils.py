@@ -126,6 +126,7 @@ def initialize_environment(config):
     config.pretrain.log_dir = config.setup.workdir + "/pretrain"
     config.train.log_dir = config.setup.workdir + "/train"
     config.gen.log_dir = config.setup.workdir + "/gen"
+    config.gen.n_classes = config.sensitive_data.n_classes
     if config.setup.global_rank == 0:
         workdir = os.path.join(config.setup.root_folder, config.setup.workdir)
         if os.path.exists(workdir):

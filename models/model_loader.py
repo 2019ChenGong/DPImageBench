@@ -13,6 +13,10 @@ def load_model(config, sess=None):
         model = DP_Kernel(config.model, config.setup.local_rank)
     elif config.setup.method == 'GS-WGAN':
         from models.gs_wgan import GS_WGAN
+        config.train.pretrain['data_name'] = config.sensitive_data.name
+        config.train.pretrain['train_num'] = config.sensitive_data.train_num
+        config.train.pretrain['data_path'] = config.sensitive_data.train_path
+        config.train.pretrain['n_gpu'] = config.setup.n_gpus_per_node
         model = GS_WGAN(config.model, config.setup.local_rank)
     elif config.setup.method == 'PE':
         from models.pe import PE
@@ -34,5 +38,5 @@ def load_model(config, sess=None):
         model = DPGAN(config.model, config.setup.local_rank)
     else:
         raise NotImplementedError('{} is not yet implemented.'.format(config.setup.method))
-    
-    return model
+
+    return model, config
