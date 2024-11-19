@@ -49,6 +49,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Customize privacy budget
 
+- [ ] Checkpoint?
+
 ## 2. Introduction
 
 ### 2.1 Currently Supported Algorithms
@@ -179,6 +181,8 @@ dataset/
 ├── cifar10/ 
 ...
 ```
+
+### 4.3 Prepare Pretrained Models
 
 ### 4.3 Running
 
