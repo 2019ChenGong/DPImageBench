@@ -79,13 +79,14 @@ DPImageBench/
 │   └── preprocess_dataset.py 
 ├── dataset/                    # Datasets studied in the project
 ├── dnnlib/ 
-├── docker/                     # docker file
+├── docker/                     # Docker file
+├── exp/                        # The output of the training process and evaluation results.
 ├── evaluation/                 # Evaluation module of DPImageBench, including utility and fidelity
 │   ├── classifier/             # Downstream tasks classification training algorithms
 │   │   ├── densenet.py  
 │   │   ├── resnet.py 
 │   │   ├── resnext.py 
-│   │   ├── wrn.py 
+│   │   └── wrn.py 
 │   ├── ema.py 
 │   └── evaluator.py 
 ├── models/                     # Implementation framework for DP image synthesis algorithms
@@ -98,23 +99,18 @@ DPImageBench/
 │   ├── PDP-Diffusion      
 │   ├── DP-LDM   
 │   ├── GS-WGAN
-│   └── PDP-Diffusion  
-├── font/                       # Fonts needed for visualization purposes
-├── test/                       # Test cases and examples for user testing
+│   ├── PDP-Diffusion  
+│   ├── pretrained_models       # The pre-downloaed files for PE and PrivImage
+│   ├── model_loader.py           
+│   └── synthesizer.py  
+├── opacus/                     # Implementation of DPSGD
+├── plot/                       # Figures and plots in our paper
 │   ├── test_method.py      
 │   ├── test_pipeline.py    
 │   └── test_visualize.py   
+├── scripts/                    # Scripts for 
 ├── utils/                      # Helper classes and functions supporting various operations
-│   ├── openai_utils.py     
-│   ├── transformers_config.py 
-│   └── utils.py            
-├── visualize/                  # Visualization Solutions module of MarkLLM
-│   ├── color_scheme.py    
-│   ├── data_for_visualization.py  
-│   ├── font_settings.py    
-│   ├── legend_settings.py  
-│   ├── page_layout_settings.py 
-│   └── visualizer.py                 
+│   └── utils.py                     
 ├── README.md                   # Main project documentation
 └── requirements.txt            # Dependencies required for the project
 ```
