@@ -46,7 +46,9 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] models/dpsda.py -> pe?
 
-- [ ] using `val' as the default setting.
+- [ ] using 'val' as the default setting but use 'sen' to represent the original evaluation method, it seems like using 'sen' as the default setting now.
+
+- [ ] End to end implementation of data preparation. There two problems (1) lack of downloading for places365; (2) it seems like should run preprocess_dataset.py based on the sensitive dataset one by one. Can we just use one instruction?
 
 ## 2. Introduction
 
@@ -156,7 +158,10 @@ DPImageBench/
 
 ### 4.1 Install DPImageBench
 
+Clone repo and setup the environment:
+
  ```
+git clone git@github.com:2019ChenGong/DPImageBench.git
 conda create -n dpimagebench python=3.7
 conda activate dpimagebench
 pip install torch==1.12.1+cu116 torchvision==0.13.1+cu116 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu116
@@ -175,6 +180,16 @@ sh scripts/download_dataset.sh
 python preprocess_dataset.py; cd ..
  ```
 
+ After running, we can found the folder `dataset`:
+
+  ```plaintext
+dataset/                                  
+├── camelyon/       
+├── celeba/ 
+├── cifar10/ 
+...
+```
+
 ### 4.3 Running
 
  ```
@@ -189,7 +204,13 @@ Available `epsilon` is [`1.0`].
 
 Available `dataset_name` is [`mnist_28`].
 
-So far, I have only implemented FID in our evaluation.
+
+
+
+
+
+
+### 4.4 Results Checking
 
 ## Acknowledgement
  
