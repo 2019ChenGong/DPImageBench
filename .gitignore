@@ -24,9 +24,14 @@ models_old
 dataset
 models/pretrained_models/imagenet*
 models/pretrained_models/places365_classifier_0.992_ckpt.pth
-
 models/PE/improved-diffusion
 models/pretrained_models.zip
+models/DataLens
+models/G_PATE
+models/DP_Promise
+models/g_pate.py
+models/dp_promise.py
+
 requirements_old.txt
 multi_node_run.sh
 golden_pretrain.sh

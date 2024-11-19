@@ -8,7 +8,6 @@ from data.stylegan3.dataset import ImageFolderDataset
 
 
 fontsize = 8
-# matplotlib.rcParams.update({'font.size': fontsize, 'font.family': 'Arial', 'font.weight': 'normal'})
 matplotlib.rcParams.update({'font.size': fontsize, 'font.weight': 'normal'})
 
 
@@ -103,31 +102,6 @@ def visualize_app_1():
             
             axs[method_idx, dataset_idx].set_xticks([])
             axs[method_idx, dataset_idx].set_yticks([])
-
-
-            # gen_path = os.path.join(gen_lists[method_idx][dataset_idx], "gen", "gen.npz")
-            # if not os.path.exists(gen_path):
-            #     continue
-            # syn = np.load(gen_path)
-            # syn_data, syn_labels = syn["x"], syn["y"]
-            # num_classes = len(set(list(syn_labels)))
-
-            # img_patch = []
-            # if num_classes == 2:
-            #     for cls in range(2):
-            #         cls_img = syn_data[syn_labels==cls]
-            #         cls_img = cls_img[:column_per_dataset].transpose(1, 2, 0, 3).reshape(cls_img.shape[1], cls_img.shape[2], cls_img.shape[3] * column_per_dataset)
-            #         img_patch.append(cls_img)
-            #     img_patch = np.concatenate(img_patch, axis=1)
-            # else:
-            #     for cls in range(column_per_dataset):
-            #         cls_img = syn_data[syn_labels==cls]
-            #         cls_img = cls_img[:row_per_method].transpose(1, 0, 2, 3).reshape(cls_img.shape[1], cls_img.shape[2] * row_per_method, cls_img.shape[3])
-            #         img_patch.append(cls_img)
-            #     img_patch = np.concatenate(img_patch, axis=2)
-            # img_patch = (img_patch * 255.).astype('uint8').transpose(1, 2, 0)
-            # if img_patch.shape[-1] == 1:
-            #     img_patch = np.concatenate([img_patch]*3, axis=-1)
             
             img_patch = (np.random.rand(32*row_per_method, 32*column_per_dataset) * 255.).astype('uint8')
             img_patch = Image.fromarray(img_patch)
@@ -214,31 +188,6 @@ def visualize_app_2():
             
             ax.set_xticks([])
             ax.set_yticks([])
-
-
-            # gen_path = os.path.join(gen_lists[method_idx][dataset_idx], "gen", "gen.npz")
-            # if not os.path.exists(gen_path):
-            #     continue
-            # syn = np.load(gen_path)
-            # syn_data, syn_labels = syn["x"], syn["y"]
-            # num_classes = len(set(list(syn_labels)))
-
-            # img_patch = []
-            # if num_classes == 2:
-            #     for cls in range(2):
-            #         cls_img = syn_data[syn_labels==cls]
-            #         cls_img = cls_img[:column_per_dataset].transpose(1, 2, 0, 3).reshape(cls_img.shape[1], cls_img.shape[2], cls_img.shape[3] * column_per_dataset)
-            #         img_patch.append(cls_img)
-            #     img_patch = np.concatenate(img_patch, axis=1)
-            # else:
-            #     for cls in range(column_per_dataset):
-            #         cls_img = syn_data[syn_labels==cls]
-            #         cls_img = cls_img[:row_per_method].transpose(1, 0, 2, 3).reshape(cls_img.shape[1], cls_img.shape[2] * row_per_method, cls_img.shape[3])
-            #         img_patch.append(cls_img)
-            #     img_patch = np.concatenate(img_patch, axis=2)
-            # img_patch = (img_patch * 255.).astype('uint8').transpose(1, 2, 0)
-            # if img_patch.shape[-1] == 1:
-            #     img_patch = np.concatenate([img_patch]*3, axis=-1)
             
             img_patch = (np.random.rand(32*row_per_method, 32*column_per_dataset) * 255.).astype('uint8')
             img_patch = Image.fromarray(img_patch)
@@ -253,7 +202,7 @@ def visualize_app_2():
 
 def visualize_main():
     column_per_dataset = 6
-    row_per_method = 1
+    row_per_method = 2
     img_size = 32
     datasets = ["MNIST", "F-MNIST", "CIFAR-10", "CIFAR-100", "EuroSAT", "CelebA", "Camelyon"]
     methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "GS-WGAN", "DP-GAN", "DPDM", "PDP-Diffusion", "DP-LDM", "PrivImage", "Real"]
@@ -408,9 +357,6 @@ def visualize_main():
 
             axs[method_idx, dataset_idx].imshow(img_patch)
             axs[method_idx, dataset_idx].imshow(img_patch)
-
-
-            # break
         
 
     fig.subplots_adjust(wspace=0.01, hspace=0.08)

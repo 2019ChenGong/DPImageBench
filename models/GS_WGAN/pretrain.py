@@ -25,7 +25,7 @@ def parse_arguments():
                         help=' dataset name')
     parser.add_argument('--num_discriminators', '-ndis', type=int, default=1000, help='number of discriminators')
     parser.add_argument('--noise_multiplier', '-noise', type=float, default=0., help='noise multiplier')
-    parser.add_argument('--z_dim', '-zdim', type=int, default=10, help='latent code dimensionality')
+    parser.add_argument('--z_dim', '-zdim', type=int, default=60, help='latent code dimensionality')
     parser.add_argument('--c', type=int, default=1, help='latent code dimensionality')
     parser.add_argument('--img_size', type=int, default=28, help='latent code dimensionality')
     parser.add_argument('--num_classes', type=int, default=10, help='latent code dimensionality')
@@ -50,7 +50,7 @@ def parse_arguments():
     parser.add_argument('--load_dir', '-ldir', type=str, help='checkpoint dir (for loading pre-trained models)')
     parser.add_argument('--pretrain', action='store_true', default=False, help='if performing pre-training')
     parser.add_argument('--num_gpus', '-ngpus', type=int, default=1, help='number of gpus')
-    parser.add_argument('--gen_arch', '-gen', type=str, default='ResNet', choices=['DCGAN', 'ResNet', 'BigGAN'],
+    parser.add_argument('--gen_arch', '-gen', type=str, default='BigGAN', choices=['DCGAN', 'ResNet', 'BigGAN'],
                         help='generator architecture')
     parser.add_argument('--run', '-run', type=int, default=1, help='index number of run')
     parser.add_argument('--exp_name', '-name', type=str,
@@ -206,7 +206,7 @@ def main(args):
                     real_data = real_data.view(batchsize, -1)
                     real_data = real_data.to(device)
                     real_y = real_y.to(device)
-                    real_y = real_y % 10
+                    # real_y = real_y % 10
                     real_data_v = autograd.Variable(real_data)
 
                     ### train with real
@@ -223,7 +223,7 @@ def main(args):
                     else:
                         raise NotImplementedError
                     noisev = autograd.Variable(noise)
-                    fake = autograd.Variable(netG(noisev, real_y).data)
+                    fake = autograd.Variable(netG(noisev, real_y).view(batchsize, -1).data)
                     inputv = fake
                     D_fake = netD(inputv, real_y)
                     D_fake = D_fake.mean()
@@ -256,7 +256,7 @@ def main(args):
                     raise NotImplementedError
                 label = torch.randint(0, num_classes, [batchsize]).to(device)
                 noisev = autograd.Variable(noise)
-                fake = netG(noisev, label)
+                fake = netG(noisev, label).view(batchsize, -1)
                 G = netD(fake, label)
                 G = - G.mean()
 

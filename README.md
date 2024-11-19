@@ -3,12 +3,20 @@
 # DPImageBench: A Unified Benchmark for Differentially Private Image Synthesis Algorithms
 </div>
 
+DPImageBench is an open-source toolkit developed to facilitate the research and application of DP image synthesis. DPImageBench simplifies the access, understanding, and assessment of DP image synthesis, making it accessible to both researchers and the broader community.
+
+<div align=center>
+<img src="./plot/figures/eps10_visual.pdf" width = "600" alt="Synthetic images by algorithms in DPImageBench with epsilon=10" align=center />
+</div>
+
+<p align="center">Synthetic images from PrivImage on CIFAR-10 and CelebA32&64 with $\epsilon=10$.</p>
+
 ## 1. Contents
   - [1. Contents](#1-contents)
   - [2. Introduction](#2-introduction)
     - [2.1 Currently Supported Algorithms](#21-currently-supported-algorithms)
   - [3. Repo Contents](#3-repo-contents)
-  - [3. Get Start](#3-get-start)
+  - [4. Get Start](#4-get-start-on-dpimagebench)
     - [3.1 Installation](#31-installation)
     - [3.2 Dataset and Files Preparation](#32-dataset-and-files-preparation)
     - [3.3 Training](#33-training)
@@ -33,6 +41,10 @@
 - [ ] End to end implementation for PrivImage
 
 - [ ] remove the unneccessary part for algorithms in models
+
+- [ ] validation set
+
+- [ ] models/dpsda.py -> pe?
 
 ## 2. Introduction
 
@@ -90,32 +102,42 @@ DPImageBench/
 │   ├── ema.py 
 │   └── evaluator.py 
 ├── models/                     # Implementation framework for DP image synthesis algorithms
-│   ├── DP-MERF      
-│   ├── DP-NTK       
-│   ├── DP-Kernel
-│   ├── PE            
-│   ├── DP-GAN         
-│   ├── DPDM        
-│   ├── PDP-Diffusion      
-│   ├── DP-LDM   
-│   ├── GS-WGAN
-│   ├── PDP-Diffusion  
+│   ├── DP_Diffusion      
+│   ├── DP_GAN       
+│   ├── DP_MERF
+│   ├── DP_NTK          
+│   ├── GS_WGAN       
+│   ├── PE     
+│   ├── PrivImage
+│   ├── dpsgd_diffusion.py
+│   ├── dpsgd_gan.py
 │   ├── pretrained_models       # The pre-downloaed files for PE and PrivImage
 │   ├── model_loader.py           
 │   └── synthesizer.py  
 ├── opacus/                     # Implementation of DPSGD
 ├── plot/                       # Figures and plots in our paper
-│   ├── test_method.py      
-│   ├── test_pipeline.py    
-│   └── test_visualize.py   
-├── scripts/                    # Scripts for 
+│   ├── plot_eps_change.py                           # Plotting for Figure 5 and 10
+│   ├── plot_size_change.py                          # Plotting for Figure 6
+│   ├── plot_wo_pretrain_cond_cifar10.py             # Plotting for Figure 7
+│   ├── plot_wo_pretrain_cond_fmnist.py              # Plotting for Figure 9
+│   ├── plot_wo_pretrain_places_imagenet.py          # Plotting for Figure 4   
+│   └── visualization.py   
+├── scripts/                    # Scripts for using DPImageBench
+│   ├── diffusion_size_change.py                    
+│   ├── download_dataset.sh                          
+│   ├── eps_change.sh.                               
+│   ├── gan_size_change.sh                           
+│   ├── pdp_diffusion.sh                             
+│   └── test_classifier.py                           
+├── torch_utils/                # Helper classes and functions supporting various operations
+│   └── persistence.py                     
 ├── utils/                      # Helper classes and functions supporting various operations
 │   └── utils.py                     
 ├── README.md                   # Main project documentation
 └── requirements.txt            # Dependencies required for the project
 ```
 
-## 3. Get Start on DPImageBench
+## 4. Get Start on DPImageBench
 
 ### 3.1 Install DPImageBench
 
