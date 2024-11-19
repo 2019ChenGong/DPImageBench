@@ -34,7 +34,6 @@ class Evaluator(object):
 
         self.sensitive_stats_path = config.sensitive_data.fid_stats
         self.acc_models = ["resnet", "wrn", "resnext"]
-        # self.acc_models = ["wrn"]
         self.config = config
         torch.cuda.empty_cache()
     
@@ -61,8 +60,11 @@ class Evaluator(object):
         acc_mean = np.array(acc_list).mean()
         acc_std = np.array(acc_list).std()
 
-        logging.info(f"The best acc of accuracy (using synthetic images as the validation set) of synthetic images from resnet, wrn, and resnext are {acc_list}.")
-
+        if sensitive_val_loader is not None:
+            logging.info(f"The best acc of accuracy (adding noise to the results on the sensitive set of validation set) of synthetic images from resnet, wrn, and resnext are {acc_list}.")
+        else:
+            logging.info(f"The best acc of accuracy (using synthetic images as the validation set) of synthetic images from resnet, wrn, and resnext are {acc_list}.")
+        
         logging.info(f"The average and std of accuracy of synthetic images are {acc_mean:.2f} and {acc_std:.2f}")
 
         # fid, is_mean = self.visual_metric(synthetic_images)

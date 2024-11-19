@@ -43,10 +43,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] remove the unneccessary part for algorithms in models
 
-- [x] validation set
-
-- [x] models/dpsda.py -> pe?
-
 - [x] using 'val' as the default setting but use 'sen' to represent the original evaluation method, it seems like using 'sen' as the default setting now. [KC: All configs have a new attribute "eval.mode" with default value "val"]
 
 - [x] End to end implementation of data preparation. There two problems (1) lack of downloading for places365; (2) it seems like should run preprocess_dataset.py based on the sensitive dataset one by one. Can we just use one instruction? [KC: (1) downloading places365 is included in preprocess_dataset.py (2) by default, preprocess_dataset.py downloads and processes all needed datasets when --data_name is not specified.]
@@ -196,10 +192,19 @@ Available `epsilon` is [`1.0`].
 
 Available `dataset_name` is [`mnist_28`].
 
-
-
-
 ### 4.4 Results Checking
+
+After running the evaluation processing, we can find the following results.
+```
+INFO - evaluator.py - 2024-11-13 21:19:44,760 - The best acc test dataset from resnext is 59.31999999999999
+INFO - evaluator.py - 2024-11-13 21:19:44,813 - The best acc of accuracy (adding noise to the results on the sensitive set of validation set) of synthetic images from resnet, wrn, and resnext are [61.6, 64.36, 59.31999999999999].
+INFO - evaluator.py - 2024-11-13 21:19:44,813 - The average and std of accuracy of synthetic images are 61.76 and 2.06
+INFO - evaluator.py - 2024-11-13 21:50:27,195 - The FID of synthetic images is 21.644407353392182
+INFO - evaluator.py - 2024-11-13 21:50:27,200 - The Inception Score of synthetic images is 7.621163845062256
+INFO - evaluator.py - 2024-11-13 21:50:27,200 - The Precision and Recall of synthetic images is 0.5463906526565552 and 0.555840015411377
+INFO - evaluator.py - 2024-11-13 21:50:27,200 - The FLD of synthetic images is 7.258963584899902
+INFO - evaluator.py - 2024-11-13 21:50:27,200 - The ImageReward of synthetic images is -2.049745370597344
+```
 
 ## 5. Contacts
 If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
