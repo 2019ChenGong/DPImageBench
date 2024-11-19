@@ -9,14 +9,14 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 <img src="./plot/figures/eps10_visual.png" width = "1000" alt="Synthetic images by algorithms in DPImageBench with epsilon=10" align=center />
 </div>
 
-<p align="center">Synthetic images by algorithms in DPImageBench with $\epsilon=10$.</p>
+<p align="center">Synthetic images by algorithms in DPImageBench with $\epsilon=10$ .</p>
 
 ## 1. Contents
   - [1. Contents](#1-contents)
   - [2. Introduction](#2-introduction)
     - [2.1 Currently Supported Algorithms](#21-currently-supported-algorithms)
   - [3. Repo Contents](#3-repo-contents)
-  - [4. Get Start](#4-get-start-on-dpimagebench)
+  - [4. Quick Start](#4-quick-start)
     - [3.1 Installation](#31-installation)
     - [3.2 Dataset and Files Preparation](#32-dataset-and-files-preparation)
     - [3.3 Training](#33-training)
@@ -24,10 +24,10 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
   - [4. Contacts](#4-contacts)
   - [5. Acknowledgment](#5-acknowledgment)
 
-## Updates 
+### Updates 
 - 🎉 **(2024.11.19)** We're thrilled to announce the release of initial version of DPImageBench!
 
-## Todo
+### Todo
 - [ ] recoding the intermediate results of methods with tqdm.
 
 - [ ] setup.master_port=6026
@@ -45,6 +45,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 - [ ] validation set
 
 - [ ] models/dpsda.py -> pe?
+
+- [ ] using `val' as the default setting.
 
 ## 2. Introduction
 
@@ -65,6 +67,19 @@ We list currently supported DP image synthesis methods as follows.
   | DP-LDM            | [\[TMLR 2024\] Differentially Private Latent Diffusion Models (arxiv.org)](https://arxiv.org/abs/2302.13861)            |
   | PrivImage       | [\[UESNIX Security 2024\] PrivImage: Differentially Private Synthetic Image Generation using Diffusion Models with Semantic-Aware Pretraining](https://www.usenix.org/conference/usenixsecurity24/presentation/li-kecen) |
 
+### 2.2 Currently Supported Datasets
+We list the studied datasets as follows, which include seven sensitive datasets and two public datasets.
+  | Dataset | Usage   |
+  | ------- | --------------------- |
+  | ImageNet_ILSVRC2012             |  Pretraining dataset  |
+  | Places365             |  Pretraining dataset  |
+  | MNIST             |  Sensitive dataset  |
+  | FashionMNIST             |  Sensitive dataset  |
+  | CIFAR-10                   |  Sensitive dataset  |      
+  | CIFAR-100                   |  Sensitive dataset  |      
+  | EuroSAT             |  Sensitive dataset  |
+  | CelebA             |  Sensitive dataset  |
+  | Camelyon                   |  Sensitive dataset  |                                     |
 
 ## 3. Repo Contents
 
@@ -137,9 +152,9 @@ DPImageBench/
 └── requirements.txt            # Dependencies required for the project
 ```
 
-## 4. Get Start on DPImageBench
+## 4. Quick Start
 
-### 3.1 Install DPImageBench
+### 4.1 Install DPImageBench
 
  ```
 conda create -n dpimagebench python=3.7
@@ -152,7 +167,7 @@ cd models/PE/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
 cd models; gdown https://drive.google.com/uc?id=1yVTWzaSqJVDJy8CsZKtqDoBNeM6154D4; unzip pretrained_models.zip; cd ..
  ```
 
-### 3.2 Prepare Dataset
+### 4.2 Prepare Dataset
 
  ```
 mkdir dataset
@@ -160,7 +175,7 @@ sh scripts/download_dataset.sh
 python preprocess_dataset.py; cd ..
  ```
 
-### 3.3 Running
+### 4.3 Running
 
  ```
 conda activate dpimagebench
