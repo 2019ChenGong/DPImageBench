@@ -24,7 +24,6 @@ sensitive_data:
   train_path: dataset/mnist/train_28.zip
   test_path: dataset/mnist/test_28.zip
   fid_stats: dataset/mnist/fid_stats_28.npz
-  train_num: all
 model:
   ema_rate: 0.999
   img_size: 28
@@ -54,7 +53,6 @@ pretrain:
   fid_freq: 200
   fid_samples: 5000
   fid_threshold: 1
-  label_random: true
   optim:
     optimizer: Adam
     params:
@@ -103,3 +101,4 @@ gen:
   log_dir: null
 eval:
   batch_size: 1000
+  mode: val

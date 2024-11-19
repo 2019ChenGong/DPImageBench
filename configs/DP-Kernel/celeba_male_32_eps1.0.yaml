@@ -24,7 +24,6 @@ sensitive_data:
   train_path: dataset/celeba/train_32_Male.zip
   test_path: dataset/celeba/test_32_Male.zip
   fid_stats: dataset/celeba/fid_stats_32.npz
-  train_num: all
 model:
   image_size: 32
   nc: 3
@@ -42,7 +41,6 @@ pretrain:
   n_epochs: 1
   lr: 5e-5
   batch_size: 64
-  label_random: true
 train:
   ckpt: null
   max_iter: 200002
@@ -59,3 +57,4 @@ gen:
   log_dir: null
 eval:
   batch_size: 1000
+  mode: val

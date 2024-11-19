@@ -15,14 +15,15 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
   - [1. Contents](#1-contents)
   - [2. Introduction](#2-introduction)
     - [2.1 Currently Supported Algorithms](#21-currently-supported-algorithms)
+    - [2.2 Currently Supported Datasets](#22-currently-supported-datasets)
   - [3. Repo Contents](#3-repo-contents)
   - [4. Quick Start](#4-quick-start)
     - [3.1 Installation](#31-installation)
     - [3.2 Dataset and Files Preparation](#32-dataset-and-files-preparation)
     - [3.3 Training](#33-training)
     - [3.4 Inference](#34-inference)
-  - [4. Contacts](#4-contacts)
-  - [5. Acknowledgment](#5-acknowledgment)
+  - [5. Contacts](#5-contacts)
+  - [Acknowledgment](#acknowledgement)
 
 ### Updates 
 - 🎉 **(2024.11.19)** We're thrilled to announce the release of initial version of DPImageBench!
@@ -34,7 +35,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] keep consistent cond and uncond for dm and gan
 
-- [ ] GSWGAN merge
+- [x] GSWGAN merge
 
 - [ ] use a bash to represent installation.
 
@@ -42,13 +43,13 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] remove the unneccessary part for algorithms in models
 
-- [ ] validation set
+- [x] validation set
 
-- [ ] models/dpsda.py -> pe?
+- [x] models/dpsda.py -> pe?
 
-- [ ] using 'val' as the default setting but use 'sen' to represent the original evaluation method, it seems like using 'sen' as the default setting now.
+- [x] using 'val' as the default setting but use 'sen' to represent the original evaluation method, it seems like using 'sen' as the default setting now. [KC: All configs have a new attribute "eval.mode" with default value "val"]
 
-- [ ] End to end implementation of data preparation. There two problems (1) lack of downloading for places365; (2) it seems like should run preprocess_dataset.py based on the sensitive dataset one by one. Can we just use one instruction?
+- [x] End to end implementation of data preparation. There two problems (1) lack of downloading for places365; (2) it seems like should run preprocess_dataset.py based on the sensitive dataset one by one. Can we just use one instruction? [KC: (1) downloading places365 is included in preprocess_dataset.py (2) by default, preprocess_dataset.py downloads and processes all needed datasets when --data_name is not specified.]
 
 ## 2. Introduction
 
@@ -162,25 +163,16 @@ Clone repo and setup the environment:
 
  ```
 git clone git@github.com:2019ChenGong/DPImageBench.git
-conda create -n dpimagebench python=3.7
-conda activate dpimagebench
-pip install torch==1.12.1+cu116 torchvision==0.13.1+cu116 torchaudio==0.12.1 --extra-index-url https://download.pytorch.org/whl/cu116
-pip install tensorflow-gpu==1.14.0
-pip install requirements.txt
-cd opacus; pip install -e .; cd ..
-cd models/PE/improved-diffusion; pip install -e .; cd ..; cd ..; cd ..
-cd models; gdown https://drive.google.com/uc?id=1yVTWzaSqJVDJy8CsZKtqDoBNeM6154D4; unzip pretrained_models.zip; cd ..
+sh scripts/install.sh
  ```
 
 ### 4.2 Prepare Dataset
 
  ```
-mkdir dataset
-sh scripts/download_dataset.sh
-python preprocess_dataset.py; cd ..
+sh scripts/data_preparation.sh
  ```
 
- After running, we can found the folder `dataset`:
+After running, we can found the folder `dataset`:
 
   ```plaintext
 dataset/                                  
@@ -207,10 +199,11 @@ Available `dataset_name` is [`mnist_28`].
 
 
 
-
-
-
 ### 4.4 Results Checking
+
+## 5. Contacts
+If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
+
 
 ## Acknowledgement
  

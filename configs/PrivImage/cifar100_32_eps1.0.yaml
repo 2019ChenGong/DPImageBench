@@ -28,7 +28,6 @@ sensitive_data:
   train_path: dataset/cifar100/train_32.zip
   test_path: dataset/cifar100/test_32.zip
   fid_stats: dataset/cifar100/fid_stats_32.npz
-  train_num: all
 model:
   ckpt: null
   denoiser_name: edm
@@ -38,7 +37,7 @@ model:
     image_size: 32
     num_in_channels: 3
     num_out_channels: 3
-    label_dim: 100
+    label_dim: 1000
     attn_resolutions:
     - 16
     ch_mult:
@@ -83,7 +82,6 @@ pretrain:
   fid_freq: 2000
   fid_samples: 5000
   fid_threshold: 1
-  label_random: false
   optim:
     optimizer: Adam
     params:
@@ -141,3 +139,4 @@ gen:
   log_dir: null
 eval:
   batch_size: 1000
+  mode: val

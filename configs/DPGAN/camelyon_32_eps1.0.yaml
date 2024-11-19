@@ -24,7 +24,6 @@ sensitive_data:
   train_path: dataset/camelyon/train_32.zip
   test_path: dataset/camelyon/test_32.zip
   fid_stats: dataset/camelyon/fid_stats_32.npz
-  train_num: all
 model:
   ema_rate: 0.999
   img_size: 32
@@ -54,7 +53,6 @@ pretrain:
   fid_freq: 200
   fid_samples: 5000
   fid_threshold: 1
-  label_random: true
   optim:
     optimizer: Adam
     params:
@@ -103,3 +101,4 @@ gen:
   log_dir: null
 eval:
   batch_size: 1000
+  mode: val

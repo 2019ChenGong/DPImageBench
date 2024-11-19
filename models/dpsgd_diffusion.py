@@ -93,6 +93,11 @@ class DP_Diffusion(DPSynther):
         if public_dataloader is None:
             self.is_pretrain = False
             return
+        
+        if config.cond:
+            config.loss['label_unconditioning_prob'] = 0.1
+        else:
+            config.loss['label_unconditioning_prob'] = 1.0
 
         torch.cuda.device(self.local_rank)
         self.device = 'cuda:%d' % self.local_rank
@@ -200,10 +205,7 @@ class DP_Diffusion(DPSynther):
                     train_y = torch.argmax(train_y, dim=1)
                 if config.label_random:
                     train_y = train_y % config.loss.n_classes
-                    # train_y = torch.randint(low=0, high=self.network.label_dim, size=(train_x.shape[0], ))
                 train_x, train_y = train_x.to(self.device) * 2. - 1., train_y.to(self.device)
-                # train_x, train_y = preprocess_data(train_x, train_y, config, self.device)
-                # train_y = None
                 optimizer.zero_grad(set_to_none=True)
                 loss = torch.mean(loss_fn(model, train_x, train_y))
                 loss.backward()
@@ -231,7 +233,6 @@ class DP_Diffusion(DPSynther):
         torch.cuda.empty_cache()
 
     def train(self, sensitive_dataloader, config):
-        # self.network.label_dim = 10
         if sensitive_dataloader is None:
             return
         
@@ -417,34 +418,10 @@ class DP_Diffusion(DPSynther):
             logging.info('Saving final checkpoint.')
         dist.barrier()
 
-        # def sampler_final(x, y=None):
-        #     if self.sampler_fid.type == 'ddim':
-        #         return ddim_sampler(x, y, model, **self.sampler_fid)
-        #     elif self.sampler_fid.type == 'edm':
-        #         return edm_sampler(x, y, model, **self.sampler_fid)
-        #     else:
-        #         raise NotImplementedError
-
-        # model.eval()
-        # with torch.no_grad():
-        #     ema.store(model.parameters())
-        #     ema.copy_to(model.parameters())
-        #     if self.global_rank == 0:
-        #         sample_random_image_batch(snapshot_sampling_shape, sampler_final, os.path.join(
-        #                             sample_dir, 'final'), self.device, self.network.label_dim)
-        #     fid = compute_fid(config.final_fid_samples, self.global_size, fid_sampling_shape, sampler_final, inception_model,
-        #                     self.fid_stats, self.device, self.network.label_dim)
-        #     ema.restore(self.model.parameters())
-
-        # if self.global_rank == 0:
-        #     logging.info('Final FID %.6f' % (fid))
-        # dist.barrier()
-
         self.ema = ema
 
 
     def generate(self, config):
-        # self.network.label_dim = 10
         logging.info("start to generate {} samples".format(config.data_num))
         if self.global_rank == 0 and not os.path.exists(config.log_dir):
             make_dir(config.log_dir)

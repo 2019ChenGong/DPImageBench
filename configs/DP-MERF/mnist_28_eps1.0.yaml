@@ -21,7 +21,6 @@ sensitive_data:
   num_channels: 1
   resolution: 28
   n_classes: 10
-  train_num: all
   train_path: dataset/mnist/train_28.zip
   test_path: dataset/mnist/test_28.zip
   fid_stats: dataset/mnist/fid_stats_28.npz
@@ -42,7 +41,6 @@ pretrain:
   lr: 0.01
   lr_decay: 0.9
   log_interval: 10000
-  label_random: true
 train:
   ckpt: null
   epochs: 5
@@ -64,3 +62,4 @@ gen:
   resolution: 28
 eval:
   batch_size: 1000
+  mode: val

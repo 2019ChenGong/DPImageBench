@@ -21,7 +21,6 @@ sensitive_data:
   num_channels: 3
   resolution: 32
   n_classes: 10
-  train_num: all
   train_path: dataset/cifar10/train_32.zip
   test_path: dataset/cifar10/test_32.zip
   fid_stats: dataset/cifar10/fid_stats_32.npz
@@ -46,7 +45,6 @@ pretrain:
   lr: 0.01
   lr_decay: 0.9
   log_interval: 10000
-  label_random: true
 train:
   ckpt: null
   epochs: 5
@@ -68,3 +66,4 @@ gen:
   resolution: 32
 eval:
   batch_size: 1000
+  mode: val
