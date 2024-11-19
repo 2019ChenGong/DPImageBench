@@ -6,10 +6,10 @@
 DPImageBench is an open-source toolkit developed to facilitate the research and application of DP image synthesis. DPImageBench simplifies the access, understanding, and assessment of DP image synthesis, making it accessible to both researchers and the broader community.
 
 <div align=center>
-<img src="./plot/figures/eps10_visual.png" width = "600" alt="Synthetic images by algorithms in DPImageBench with epsilon=10" align=center />
+<img src="./plot/figures/eps10_visual.png" width = "1000" alt="Synthetic images by algorithms in DPImageBench with epsilon=10" align=center />
 </div>
 
-<p align="center">Synthetic images from PrivImage on CIFAR-10 and CelebA32&64 with $\epsilon=10$.</p>
+<p align="center">Synthetic images by algorithms in DPImageBench with $\epsilon=10$.</p>
 
 ## 1. Contents
   - [1. Contents](#1-contents)
