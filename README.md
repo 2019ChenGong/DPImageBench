@@ -182,6 +182,8 @@ dataset/
 
 ### 4.3 Running
 
+#### 4.3.1 Key hyper-paraeter introductions.
+
  ```
 conda activate dpimagebench
 cd DPImageBench
@@ -195,7 +197,7 @@ Available `epsilon` is [`1.0`].
 Available `dataset_name` is [`mnist_28`].
 
 ### 4.4 Results Explanation
-We can find the `stdout.txt` files in the result folder, which record the training and evaluation processes. After the evaluation, the results for each classifier training are available in `stdout.txt`.
+We can find the `stdout.txt` files in the result folder, which record the training and evaluation processes. We explain the file structure of outputs in `exp`[results]('./exp/README.md'). After the evaluation, the results for each classifier training are available in `stdout.txt`.
 
 In utility evaluation, after each classifier training, we can find,
 
