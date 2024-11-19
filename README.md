@@ -194,9 +194,22 @@ Available `dataset_name` is [`mnist_28`].
 
 ### 4.4 Results Checking
 
-After running the evaluation processing, we can find the following results.
+After running the evaluation process, we can find these results after the each classifier training:
 ```
-INFO - evaluator.py - 2024-11-13 21:19:44,760 - The best acc test dataset from resnext is 59.31999999999999
+INFO - evaluator.py - 2024-11-12 05:54:26,463 - The best acc of synthetic images on sensitive val and the corresponding acc on test dataset from wrn is 64.75999999999999 and 63.99
+INFO - evaluator.py - 2024-11-12 05:54:26,463 - The best acc of synthetic images on noisy sensitive val and the corresponding acc on test dataset from wrn is 64.75999999999999 and 63.99
+INFO - evaluator.py - 2024-11-12 05:54:26,463 - The best acc test dataset from wrn is 63.99
+```
+These results represent the best accuracy achieved by: (1) using the sensitive validation set, (2) adding noise to the validation results of the sensitive dataset, and (3) using the sensitive test set for classifier selection. 
+
+If synthetic images are used as the validation set (`model.eval = sen`), the results after each classifier training would be:
+```
+INFO - evaluator.py - 2024-10-24 06:45:11,042 - The best acc of synthetic images on val and the corresponding acc on test dataset from wrn is 88.175 and 96.22
+INFO - evaluator.py - 2024-10-24 06:45:11,042 - The best acc test dataset from wrn is 96.22
+```
+
+The following results can be found at the end of the log file:
+``` 
 INFO - evaluator.py - 2024-11-13 21:19:44,813 - The best acc of accuracy (adding noise to the results on the sensitive set of validation set) of synthetic images from resnet, wrn, and resnext are [61.6, 64.36, 59.31999999999999].
 INFO - evaluator.py - 2024-11-13 21:19:44,813 - The average and std of accuracy of synthetic images are 61.76 and 2.06
 INFO - evaluator.py - 2024-11-13 21:50:27,195 - The FID of synthetic images is 21.644407353392182
@@ -204,6 +217,10 @@ INFO - evaluator.py - 2024-11-13 21:50:27,200 - The Inception Score of synthetic
 INFO - evaluator.py - 2024-11-13 21:50:27,200 - The Precision and Recall of synthetic images is 0.5463906526565552 and 0.555840015411377
 INFO - evaluator.py - 2024-11-13 21:50:27,200 - The FLD of synthetic images is 7.258963584899902
 INFO - evaluator.py - 2024-11-13 21:50:27,200 - The ImageReward of synthetic images is -2.049745370597344
+```
+The first line shows the accuracy of the downstream task when noise is added to the validation results of the sensitive dataset for classifier selection. If synthetic images are used as the validation set (`model.eval = sen`), the first line would be:
+```
+INFO - evaluator.py - 2024-11-12 09:06:18,148 - The best acc of accuracy (using synthetic images as the validation set) of synthetic images from resnet, wrn, and resnext are [59.48, 63.99, 59.53000000000001].
 ```
 
 ## 5. Contacts

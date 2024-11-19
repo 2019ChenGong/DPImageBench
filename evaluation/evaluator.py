@@ -53,7 +53,7 @@ class Evaluator(object):
                 logging.info("The best acc of synthetic images on sensitive val and the corresponding acc on test dataset from {} is {} and {}".format(model_name, acc, test_acc_on_val))
                 logging.info("The best acc of synthetic images on noisy sensitive val and the corresponding acc on test dataset from {} is {} and {}".format(model_name, acc, test_acc_on_val))
             else:
-                logging.info("The best acc of synthetic images on val and the corresponding acc on test dataset from {} is {} and {}".format(model_name, acc, test_acc_on_val))
+                logging.info("The best acc of synthetic images on val (synthetic images) and the corresponding acc on test dataset from {} is {} and {}".format(model_name, acc, test_acc_on_val))
             logging.info("The best acc test dataset from {} is {}".format(model_name, test_acc_on_test))
             acc_list.append(test_acc_on_val)
         
