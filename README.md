@@ -222,7 +222,7 @@ The results are recorded in `exp/pdp-diffusion/<the-name-of-file>no-dp-mnist_28/
 
 #### Directly use the pretrained synthesizers.
 
-If users wish to fine-tune the synthesizers using pretrained models, they should: (1) set `public_data.name=null`, and (2) load the pretrained synthesizers through `model.ckpt`. For example, the pretrained synthesizer can be sourced from other algorithms. Readers can refer to the [file structure](./exp/README.md) for more details about loading pretrained models.
+If users wish to finetune the synthesizers using pretrained models, they should: (1) set `public_data.name=null`, and (2) load the pretrained synthesizers through `model.ckpt`. For example, the pretrained synthesizer can be sourced from other algorithms. Readers can refer to the [file structure](./exp/README.md) for more details about loading pretrained models.
 
 ```
 python run.py setup.n_gpus_per_node=3 public_data.name=null eval.mode=val \
@@ -233,6 +233,8 @@ python run.py setup.n_gpus_per_node=3 public_data.name=null eval.mode=val \
 
 #### For the implementation of the results reported in Figures 5, 6, and 9 (RQ2), the performance is analyzed by varying the epsilon and model size.
 
+If users wish to change the size of the synthesizer, the following parameters should be considered.
+
 - `train.dp.n_split`: the number of gradient accumulations. For example, if you set `batch_size` as 500, but your server only allows the max `batch_size` 250, you can set `train.dp.n_split` as 2.
 - Change the model size: For diffusion based model, `model.network.ch_mult` is a list of positive integers, which determines the model size. By default, `model.network.ch_mult` is [2,2]. You can increase the model size through increasing its depth and width. To increase the depth, you can extend this list by `model.network.ch_mult=[2,2,2]`. To increase the width, you can increase the integers in the list by `model.network.ch_mult=[4,4]`. For GAN based model, please change `model.Generator.g_conv_dim=100` to adjust the synthesizer size.
 
@@ -240,6 +242,42 @@ For example:
 
 
 #### For the implementation of the results reported in RQ3.
+
+Users can set the `pretrain.cond` and `public_data.name` to choose between conditional and unconditional pretraining or to enable or disable pretraining. `public_data.name=null` indicates that pretraining is excluded. If users wish to use Places365 or a pretraining dataset, please take note of the following key parameters.
+
+- `public_data.n_classes`: the number of categories for pretraining dataset (e.g., 365 for Places365).
+- `public_data.name`: [`null`, `imagenet`, `places365`].
+- `public_data.train_path`: the path to pretraining dataset.
+- `public_data.selective.model_path` (need it?): .
+
+We use ImageNet as the default pretraining dataset, and these parameters are configured accordingly.
+
+For example,
+
+(1) Using ImageNet to pretrain DPGAN using conditional pretraining.
+```
+python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsilon 10.0 eval.mode=val \
+ public_data.name=imagenet \
+ pretrain.cond=Ture \
+ --exp_description pretrain_imagenet_conditional 
+```
+
+(2) Using Places365 to pretrain DPGAN using conditional pretraining.
+```
+python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsilon 10.0 eval.mode=val \
+ public_data.name=places365 public_data.n_classes=365 public_data.train_path=dataset/places365 \
+ pretrain.cond=Ture \
+ --exp_description pretrain_places365_conditional 
+```
+
+(3) Using Places365 to pretrain DPGAN using unconditional pretraining.
+```
+python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsilon 10.0 eval.mode=val \
+ public_data.name=places365 public_data.n_classes=365 public_data.train_path=dataset/places365 \
+ pretrain.cond=False \
+ --exp_description pretrain_places365_unconditional 
+```
+
 
 
 
