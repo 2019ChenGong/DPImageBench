@@ -225,7 +225,9 @@ The results are recorded in `exp/pdp-diffusion/<the-name-of-file>no-dp-mnist_28/
 If users wish to fine-tune the synthesizers using pretrained models, they should: (1) set `public_data.name=null`, and (2) load the pretrained synthesizers through `model.ckpt`. For example, the pretrained synthesizer can be sourced from other algorithms. Readers can refer to the [file structure](./exp/README.md) for more details about loading pretrained models.
 
 ```
-python run.py setup.n_gpus_per_node=3 public_data.name=null eval.mode=val model.ckpt=./exp/pdp-diffusion/<the-name-of-scripts>/pretrain/checkpoints/final_checkpoint.pth --method PDP-Diffusion --dataset_name fmnist_28 --epsilon 10.0 --exp_description <any-notes>
+python run.py setup.n_gpus_per_node=3 public_data.name=null eval.mode=val \
+ model.ckpt=./exp/pdp-diffusion/<the-name-of-scripts>/pretrain/checkpoints/final_checkpoint.pth \
+ --method PDP-Diffusion --dataset_name fmnist_28 --epsilon 10.0 --exp_description <any-notes>
 ```
 
 
