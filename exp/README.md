@@ -39,11 +39,11 @@ We introduce the files as follows,
 
 - `./gen/gen.npz`: the synthetic images.
 - `./gen/sample.png`: the samples of synthetic images.
-- `./pretrain/checkpoints/final_checkpoint.pth`:
-- `./pretrain/checkpoints/snapshot_checkpoint.pth`:
-- `./pretrain/samples/iter_2000`:
-- `./train/checkpoints/final_checkpoint.pth`:
-- `./train/checkpoints/snapshot_checkpoint.pth`:
-- `./train/samples/iter_2000`:
-- `./stdout.txt`: recording the training and evaluation results.
+- `./pretrain/checkpoints/final_checkpoint.pth`: the parameters of synthsizer at the final epochs.
+- `./pretrain/checkpoints/snapshot_checkpoint.pth`: we store the synthesizer's parameters at the current epoch after each iteration, deleting the previous parameters to manage storage efficiently.
+- `./pretrain/samples/iter_2000`: the synthetic images under 2000 iterations for pretraining on public datasets.
+- `./train/checkpoints/final_checkpoint.pth`: the parameters of synthsizer at the final epochs.
+- `./train/checkpoints/snapshot_checkpoint.pth`: we store the synthesizer's parameters at the current epoch after each iteration, deleting the previous parameters to manage storage efficiently.
+- `./train/samples/iter_2000`: the synthetic images under 2000 iterations for training on sensitive datasets.
+- `./stdout.txt`: the file used to record the training and evaluation results.
 

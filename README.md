@@ -18,8 +18,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
     - [2.2 Currently Supported Datasets](#22-currently-supported-datasets)
   - [3. Repo Contents](#3-repo-contents)
   - [4. Quick Start](#4-quick-start)
-    - [3.1 Installation](#31-installation)
-    - [3.2 Dataset and Files Preparation](#32-dataset-and-files-preparation)
+    - [4.1 Install DPImageBench](#41-install-dpimagebench)
+    - [4.2 Prepare Dataset](#42-prepare-dataset)
     - [3.3 Training](#33-training)
     - [3.4 Inference](#34-inference)
   - [5. Customization](#5-customization)
@@ -44,7 +44,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [x] using 'val' as the default setting but use 'sen' to represent the original evaluation method, it seems like using 'sen' as the default setting now. [KC: All configs have a new attribute "eval.mode" with default value "val"]
 
-- [x] End to end implementation of data preparation. There two problems (1) lack of downloading for places365; (2) it seems like should run preprocess_dataset.py based on the sensitive dataset one by one. Can we just use one instruction? [KC: (1) downloading places365 is included in preprocess_dataset.py (2) by default, preprocess_dataset.py downloads and processes all needed datasets when --data_name is not specified.]
+- [ ] Change `sensitive_data.train_num=val` to new version `eval.mode`. 
 
 - [ ] Customize privacy budget
 
@@ -162,7 +162,7 @@ Clone repo and setup the environment:
 
  ```
 git clone git@github.com:2019ChenGong/DPImageBench.git
-sh scripts/install.sh
+sh install.sh
  ```
 
 ### 4.2 Prepare Dataset
@@ -183,20 +183,26 @@ dataset/
 
 ### 4.3 Prepare Pretrained Models
 
-### 4.3 Running
+The pretrained models are stored in the folder `/models/pretrained_models/`, including the pretrained synthesizers for PE and senmantic query function for PrivImage.
 
-#### 4.3.1 Key hyper-parameter introductions.
+### 4.4 Running
+
+#### 4.4.1 Key hyper-parameter introductions.
 
 We list the key hyper-parameters below, including their explanations and available options.
 
-Available `model_name` are [`DP-NTK`, `DP-Kernel`, `DP-LDM`, `DP-MERF`, `DP-Promise`, `DPDM`, `PE`, `G-PATE`, `PDP-Diffusion`, `PrivImage`].
-
-Available `epsilon` is [`1.0`, `10.0`].
-
-- `--dataset_name`: means the sensitive dataset, the option is [`mnist_28`, `fmnist_28`, `cifar10_32`, `cifar100_32`, `eurosat_32`, `celeba_male_32`, `camelyon_32`].
+- `--dataset_name`: means the sensitive dataset; the option is [`mnist_28`, `fmnist_28`, `cifar10_32`, `cifar100_32`, `eurosat_32`, `celeba_male_32`, `camelyon_32`].
+- `--method`: the method to train the DP image synthesizers; the option is [`DP-NTK`, `DP-Kernel`, `DP-MERF`, `DPGAN`, `DP-LDM`, `DPDM`, `PE`, `GS-WGAN`, `PDP-Diffusion`, `PrivImage`].
+- `--epsilon`: the privacy budget 10.0; the option is [`1.0`, `10.0`].
+- `--exp_description`: the notes for the name of result folders.
 - `setup.n_gpus_per_node`: means the number of GPUs to be used for training.
+- `pretrain.loss.label_unconditioning_prob`: specifies the probability of using conditional versus unconditional pretraining. The options are [`1.0`, `0.0`], where `1.0` indicates unconditional pretraining and `0.0` indicates conditional pretraining.
+- `public_data.name`: the name of pretraining dataset; the option is [`null`, `imagenet`, `places365`], which mean that without pretraining, using ImageNet dataset as pretraining dataset, and using Places365 as pretraining dataset. It is notice that DPImageBench uses ImageNet as default pretraining dataset. If users use Places365 as pretraining dataset, please add `public_data.n_classes=365 public_data.train_path=dataset/places365`.
+- `eval.mode`: .
+- `train.dp.n_split`: the number of gradient accumulations. For example, if you set `batch_size` as 500, but your GPU only allows 250, you can set `train.dp.n_split` as 2.
+- Change the model size: .
 
-#### 4.3.2 How to run.
+#### 4.4.2 How to run.
 
 ```
 conda activate dpimagebench
@@ -205,7 +211,7 @@ python run.py --config configs/{model_name}/{dataset_name}_eps{epsilon}.yaml
  ```
 
 
-### 4.4 Results Explanation
+### 4.5 Results Explanation
 We can find the `stdout.txt` files in the result folder, which record the training and evaluation processes. We explain the [file structure](./exp/README.md) of outputs in `exp`. After the evaluation, the results for each classifier training are available in `stdout.txt`.
 
 In utility evaluation, after each classifier training, we can find,
