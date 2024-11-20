@@ -140,8 +140,13 @@ def initialize_environment(config):
 
 
 def parse_config(opt, unknown):
-    config_path = os.path.join(opt.config_dir, opt.method, opt.data_name + "_eps" + str(opt.epsilon) + opt.config_suffix + ".yaml")
+    if opt.epsilon > 5:
+        config_epsilon = 10.0
+    else:
+        config_epsilon = 1.0
+    config_path = os.path.join(opt.config_dir, opt.method, opt.data_name + "_eps" + str(config_epsilon) + opt.config_suffix + ".yaml")
     configs = [OmegaConf.load(config_path)]
     cli = OmegaConf.from_dotlist(unknown)
     config = OmegaConf.merge(*configs, cli)
+    config.train.dp.epsilon = opt.epsilon
     return config

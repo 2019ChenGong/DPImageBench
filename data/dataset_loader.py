@@ -71,7 +71,10 @@ def semantic_query(sensitive_train_loader, config):
         
     model = MyClassifier()
 
-    load_weight(model, config.public_data.selective.model_path)
+    if config.public_data.selective.model_path is None:
+        pass
+    else:
+        load_weight(model, config.public_data.selective.model_path)
     model = model.to(config.setup.local_rank)
     model.eval()
 

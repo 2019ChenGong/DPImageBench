@@ -178,6 +178,8 @@ dataset/
 
 ### 4.3 Running
 
+The training and evaluatin codes are `run.py` and `eval.py`.
+
 #### 4.3.1 Key hyper-parameter introductions.
 
 We list the key hyper-parameters below, including their explanations and available options.
@@ -201,13 +203,19 @@ conda activate dpimagebench
 cd DPImageBench
 ```
 
+1. For the implementation of results reported in Table 5, 6, 7 (RQ1). We list an example as follows. Users can modify the configuration files in [configs](./configs) as their preference. 
 
-
-1. For the implementation of results reported in Table 5, 6, 7. We list an example as follows. Users can modify the configuration files in [configs](./configs) as their preference.
-
+We provide an example of training a synthesizer using the PDP-Diffusion method with 4 GPUs. The results reported in Table 6 were obtained by following the instructions provided. Additionally, the results (fidelity evaluations) reported in Table 7 were obtained using the default settings.
 ```
 python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --dataset_name mnist_28 --epsilon 10.0 
 ```
+The results reported in Table 5 were obtained by following the instructions below.
+```
+python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --dataset_name mnist_28 --epsilon 10.0 eval.mode=syn
+```
+We provide more examples in the `scripts/rq1.sh`, please refer to [scrips](scripts/rq1.sh).
+
+Besides, if users want to directly evaluate the synthetic images,
 
 
 - `train.dp.n_split`: the number of gradient accumulations. For example, if you set `batch_size` as 500, but your GPU only allows 250, you can set `train.dp.n_split` as 2.
@@ -227,7 +235,7 @@ INFO - evaluator.py - 2024-11-12 05:54:26,463 - The best acc test dataset from w
 ```
 These results represent the best accuracy achieved by: (1) using the sensitive validation set (63.99%), (2) adding noise to the validation results of the sensitive dataset (`model.eval = val`), and the accuracy is 63.87%, and (3) using the sensitive test set for classifier selection (64.12%). 
 
-If synthetic images are used as the validation set (`model.eval = sen`), the results after each classifier training would be:
+If synthetic images are used as the validation set (`model.eval = syn`), the results after each classifier training would be:
 ```
 INFO - evaluator.py - 2024-10-24 06:45:11,042 - The best acc of synthetic images on val (synthetic images) and the corresponding acc on test dataset from wrn is 63.175 and 56.22
 INFO - evaluator.py - 2024-10-24 06:45:11,042 - The best acc test dataset from wrn is 64.22
@@ -246,13 +254,15 @@ INFO - evaluator.py - 2024-11-13 21:50:27,200 - The ImageReward of synthetic ima
 ```
 The first line shows the accuracy of the downstream task when noise is added to the validation results of the sensitive dataset for classifier selection (`model.eval = val`), across three studied classification outcomes. 
 
-If synthetic images are used as the validation set (`model.eval = sen`), the first line would be:
+If synthetic images are used as the validation set (`model.eval = syn`), the first line would be:
 ```
-INFO - evaluator.py - 2024-11-12 09:06:18,148 - The best acc of accuracy (using synthetic images as the validation set) of synthetic images from resnet, wrn, and resnext are [59.48, 63.99, 59.53000000000001].
+INFO - evaluator.py - 2024-11-12 09:06:18,148 - The best acc of accuracy (using synthetic images as the validation set) of synthetic images from resnet, wrn, and resnext are [59.48, 63.99, 59.53].
 ```
 The synthetic images can be found at the `/exp/<algorithm_name>/<file_name>/gen/gen.npz`.
 
 ## 5. Customization
+
+This part introduces how to apply DPImageBench for your own sensitive dataset.
 
 ## 6. Contacts
 If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
