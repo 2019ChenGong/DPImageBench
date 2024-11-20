@@ -20,8 +20,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
   - [4. Quick Start](#4-quick-start)
     - [4.1 Install DPImageBench](#41-install-dpimagebench)
     - [4.2 Prepare Dataset](#42-prepare-dataset)
-    - [3.3 Training](#33-training)
-    - [3.4 Inference](#34-inference)
+    - [4.3 Running](#43-running)
+    - [4.4 Results Explanation](#44-results-explanation)
   - [5. Customization](#5-customization)
   - [6. Contacts](#6-contacts)
   - [Acknowledgment](#acknowledgement)
@@ -152,6 +152,8 @@ git clone git@github.com:2019ChenGong/DPImageBench.git
 sh install.sh
  ```
 
+We also provide the (Docker)[./docker/Dockerfile] file.
+
 ### 4.2 Prepare Dataset
 
  ```
@@ -278,10 +280,7 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsi
  --exp_description pretrain_places365_unconditional 
 ```
 
-
-
-
-### 4.3 Results Explanation
+### 4.4 Results Explanation
 We can find the `stdout.txt` files in the result folder, which record the training and evaluation processes. We explain the [file structure](./exp/README.md) of outputs in `exp`. After the evaluation, the results for each classifier training are available in `stdout.txt`.
 
 In utility evaluation, after each classifier training, we can find,
@@ -328,3 +327,4 @@ If you have any question about our work or this repository, please don't hesitat
 
 ## Acknowledgement
  
+ This project 
