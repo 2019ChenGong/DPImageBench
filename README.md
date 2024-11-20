@@ -181,13 +181,9 @@ dataset/
 ...
 ```
 
-### 4.3 Prepare Pretrained Models
+### 4.3 Running
 
-The pretrained models are stored in the folder `/models/pretrained_models/`, including the pretrained synthesizers for PE and senmantic query function for PrivImage.
-
-### 4.4 Running
-
-#### 4.4.1 Key hyper-parameter introductions.
+#### 4.3.1 Key hyper-parameter introductions.
 
 We list the key hyper-parameters below, including their explanations and available options.
 
@@ -202,7 +198,7 @@ We list the key hyper-parameters below, including their explanations and availab
 - `train.dp.n_split`: the number of gradient accumulations. For example, if you set `batch_size` as 500, but your GPU only allows 250, you can set `train.dp.n_split` as 2.
 - Change the model size: .
 
-#### 4.4.2 How to run.
+#### 4.3.2 How to run.
 
 ```
 conda activate dpimagebench
@@ -211,7 +207,7 @@ python run.py --config configs/{model_name}/{dataset_name}_eps{epsilon}.yaml
  ```
 
 
-### 4.5 Results Explanation
+### 4.3 Results Explanation
 We can find the `stdout.txt` files in the result folder, which record the training and evaluation processes. We explain the [file structure](./exp/README.md) of outputs in `exp`. After the evaluation, the results for each classifier training are available in `stdout.txt`.
 
 In utility evaluation, after each classifier training, we can find,

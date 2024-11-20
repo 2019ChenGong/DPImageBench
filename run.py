@@ -42,7 +42,6 @@ if __name__ == '__main__':
 
     config = parse_config(opt, unknown)
 
-    # if not hasattr(config.setup, "workdir"):
     nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
     if opt.resume_exp is not None:
         config.setup.workdir = "exp/{}/{}".format(str.lower(opt.method), opt.resume_exp)
