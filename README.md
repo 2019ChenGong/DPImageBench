@@ -194,8 +194,7 @@ Users should first activate the conda environment.
 conda activate dpimagebench
 cd DPImageBench
 ```
-
-**For the implementation of results reported in Table 5, 6, 7 (RQ1). **
+#### For the implementation of results reported in Table 5, 6, 7 (RQ1). **
 
 We list an example as follows. Users can modify the configuration files in [configs](./configs) as their preference. 
 
