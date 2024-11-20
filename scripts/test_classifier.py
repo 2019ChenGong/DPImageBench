@@ -24,7 +24,7 @@ if __name__ == '__main__':
     sys.path.append(os.getcwd())
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_dir', default="configs")
-    parser.add_argument('--method', '-m', default="G-PATE")
+    parser.add_argument('--method', '-m', default="DP-MERF")
     parser.add_argument('--epsilon', '-e', default="1.0")
     parser.add_argument('--data_name', '-dn', default="mnist_28")
     parser.add_argument('--exp_description', '-ed', default="")

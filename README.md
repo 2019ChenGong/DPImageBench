@@ -37,8 +37,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] remove the unneccessary part for algorithms in models
 
-- [x] Change `sensitive_data.train_num=val` to new version `eval.mode`. 
-
 - [ ] Customize privacy budget
 
 - [ ] n_split, unify the batchsize?
@@ -216,6 +214,10 @@ python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --dataset_name mnis
 We provide more examples in the `scripts/rq1.sh`, please refer to [scrips](scripts/rq1.sh).
 
 Besides, if users want to directly evaluate the synthetic images,
+```
+python eval.py --method PDP-Diffusion --data_name mnist_28 --epsilon 10.0 --exp_path exp/pdp-diffusion/<the-name-of-file>
+```
+The results are recorded in `exp/pdp-diffusion/<the-name-of-file>/stdout.txt`.
 
 
 - `train.dp.n_split`: the number of gradient accumulations. For example, if you set `batch_size` as 500, but your GPU only allows 250, you can set `train.dp.n_split` as 2.
