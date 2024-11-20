@@ -56,23 +56,16 @@ We list currently supported DP image synthesis methods as follows.
   | GS-WGAN            |  [\[NeuriPS 2020\] GS-WGAN: A Gradient-Sanitized Approach for Learning Differentially Private Generators](https://arxiv.org/pdf/2006.08265) |
   | DP-GAN            |  [\[1802.06739\] Differentially Private Generative Adversarial Network (arxiv.org)](https://arxiv.org/abs/1802.06739) |
   | DPDM          |  [\[TMLR 2023\] Differentially Private Diffusion Models](https://openreview.net/forum?id=ZPpQk7FJXF) |
-  | PDP-Diffusion       | [\[2302.13861\] Differentially Private Diffusion Models Generate Useful Synthetic Images (arxiv.org)](https://arxiv.org/abs/2305.15759) |
-  | DP-LDM            | [\[TMLR 2024\] Differentially Private Latent Diffusion Models (arxiv.org)](https://arxiv.org/abs/2302.13861)            |
+  | PDP-Diffusion       | [\[2302.13861\] Differentially Private Diffusion Models Generate Useful Synthetic Images (arxiv.org)](https://arxiv.org/abs/2302.13861) |
+  | DP-LDM            | [\[TMLR 2024\] Differentially Private Latent Diffusion Models (arxiv.org)](https://arxiv.org/abs/2305.15759)            |
   | PrivImage       | [\[UESNIX Security 2024\] PrivImage: Differentially Private Synthetic Image Generation using Diffusion Models with Semantic-Aware Pretraining](https://www.usenix.org/conference/usenixsecurity24/presentation/li-kecen) |
 
 ### 2.2 Currently Supported Datasets
 We list the studied datasets as follows, which include seven sensitive datasets and two public datasets.
-  | Dataset | Usage   |
+  | Usage |  Dataset  |
   | ------- | --------------------- |
-  | ImageNet_ILSVRC2012             |  Pretraining dataset  |
-  | Places365             |  Pretraining dataset  |
-  | MNIST             |  Sensitive dataset  |
-  | FashionMNIST             |  Sensitive dataset  |
-  | CIFAR-10                   |  Sensitive dataset  |      
-  | CIFAR-100                   |  Sensitive dataset  |      
-  | EuroSAT             |  Sensitive dataset  |
-  | CelebA             |  Sensitive dataset  |
-  | Camelyon                   |  Sensitive dataset  |                                     |
+  | Pretraining dataset | ImageNet_ILSVRC2012, Places365 |
+  | Sensitive dataset | MNIST, FashionMNIST, CIFAR-10, CIFAR-100, EuroSAT, CelebA, Camelyon |
 
 ## 3. Repo Contents
 
