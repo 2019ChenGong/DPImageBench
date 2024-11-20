@@ -202,11 +202,10 @@ def main(args):
                     if len(real_y.shape) == 2:
                         real_data = real_data.to(torch.float32) / 255.
                         real_y = torch.argmax(real_y, dim=1)
-                    real_data = real_data * 2 - 1
+                    # real_data = real_data * 2 - 1
                     real_data = real_data.view(batchsize, -1)
                     real_data = real_data.to(device)
                     real_y = real_y.to(device)
-                    # real_y = real_y % 10
                     real_data_v = autograd.Variable(real_data)
 
                     ### train with real

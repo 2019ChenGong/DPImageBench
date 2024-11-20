@@ -12,7 +12,7 @@ axs = fig.subplots(2, 3)
 
 methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "GS-WGAN", "DP-GAN", "DPDM", "PDP-Diffusion", "DP-LDM", "PrivImage"]
 eps = ['0.2', '1.0', '5.0', '10', '15', '20']
-colors= ['#A1A9D0', '#D76364','#B883D4','#9E9E9E','#05B9E2','#934B43','#B1CE46','#8E8BFE','#FEB2B4','#2F7FC1']
+colors= ['#A1A9D0', '#D76364','#B883D4','#9E9E9E','#05B9E2','#F1D77E','#B1CE46','#8E8BFE','#FEB2B4','#2F7FC1']
 markers=['o', 'v', 's', 'P', 'X', 'D', '^', '*', 'H', '>', '<']
 
 accs = [

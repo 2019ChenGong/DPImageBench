@@ -33,15 +33,13 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] setup.master_port=6026
 
-- [ ] End to end implementation for PrivImage
-
 - [ ] remove the unneccessary part for algorithms in models
-
-- [ ] Customize privacy budget
 
 - [ ] n_split, unify the batchsize?
 
-- [ ] I found that changing the generator of GS-WGAN intio ours affects the performance a lot.
+- [-] I found that changing the generator of GS-WGAN into ours affects the performance a lot. [Testing]
+
+- [ ] The model size in Biggan is different from DMs. 
 
 ## 2. Introduction
 
@@ -201,11 +199,13 @@ conda activate dpimagebench
 cd DPImageBench
 ```
 
-1. For the implementation of results reported in Table 5, 6, 7 (RQ1). We list an example as follows. Users can modify the configuration files in [configs](./configs) as their preference. 
+**For the implementation of results reported in Table 5, 6, 7 (RQ1). **
+
+We list an example as follows. Users can modify the configuration files in [configs](./configs) as their preference. 
 
 We provide an example of training a synthesizer using the PDP-Diffusion method with 4 GPUs. The results reported in Table 6 were obtained by following the instructions provided. Additionally, the results (fidelity evaluations) reported in Table 7 were obtained using the default settings.
 ```
-python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --dataset_name mnist_28 --epsilon 10.0 
+python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --dataset_name mnist_28 --epsilon 10.0 eval.mode=val
 ```
 The results reported in Table 5 were obtained by following the instructions below.
 ```
@@ -226,8 +226,8 @@ python ./scripts/test_classifier.py --method PDP-Diffusion --data_name mnist_28 
 The results are recorded in `exp/pdp-diffusion/<the-name-of-file>no-dp-mnist_28/stdout.txt`. This process is independent of `--method` and uses of `--epsilon`.
 
 
-- `train.dp.n_split`: the number of gradient accumulations. For example, if you set `batch_size` as 500, but your GPU only allows 250, you can set `train.dp.n_split` as 2.
-- Change the model size: .
+- `train.dp.n_split`: the number of gradient accumulations. For example, if you set `batch_size` as 500, but your server only allows the max `batch_size` 250, you can set `train.dp.n_split` as 2.
+- Change the model size: For diffusion based model, `model.network.ch_mult` is a list of positive integers, which determines the model size. By default, `model.network.ch_mult` is [2,2]. You can increase the model size through increasing its depth and width. To increase the depth, you can extend this list by `model.network.ch_mult=[2,2,2]`. To increase the width, you can increase the integers in the list by `model.network.ch_mult=[4,4]`.
 
 
 

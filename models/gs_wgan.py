@@ -44,7 +44,8 @@ class GS_WGAN(DPSynther):
         self.latent_type = config.latent_type
         self.ckpt = config.ckpt
 
-        self.netG = Generator(img_size=self.img_size, num_classes=self.num_classes, **config.Generator)
+        self.netG = Generator(img_size=self.img_size, num_classes=self.num_classes, out=nn.Sigmoid(), **config.Generator)
+        # self.netG = GeneratorResNet(c=self.c, img_size=self.img_size, z_dim=10, model_dim=64, num_classes=self.num_classes)
         
         self.netGS = copy.deepcopy(self.netG)
         self.netD_list = []
@@ -110,7 +111,7 @@ class GS_WGAN(DPSynther):
                     real_y = real_y % self.num_classes
                 else:
                     real_y = torch.zeros_like(real_y).long()
-                real_data = real_data * 2 - 1
+                # real_data = real_data * 2 - 1
                 batchsize = real_data.shape[0]
                 real_data = real_data.view(batchsize, -1)
                 real_data = real_data.to(self.device)
@@ -208,7 +209,7 @@ class GS_WGAN(DPSynther):
         n_gpu = config.n_gpu
         iters = str(config.iterations)
         data_name = config.data_name
-        train_num = config.train_num
+        train_num = config.eval_mode
         data_path = config.data_path
         img_size = str(self.img_size)
         c = str(self.c)
@@ -330,7 +331,7 @@ class GS_WGAN(DPSynther):
                 if len(real_y.shape) == 2:
                     real_data = real_data.to(torch.float32) / 255.
                     real_y = torch.argmax(real_y, dim=1)
-                real_data = real_data * 2 - 1
+                # real_data = real_data * 2 - 1
                 
                 batchsize = real_data.shape[0]
                 real_data = real_data.view(batchsize, -1)

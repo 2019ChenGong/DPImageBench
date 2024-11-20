@@ -140,7 +140,7 @@ def initialize_environment(config):
 
 
 def parse_config(opt, unknown):
-    if opt.epsilon > 5:
+    if float(opt.epsilon) > 5:
         config_epsilon = 10.0
     else:
         config_epsilon = 1.0
@@ -148,5 +148,5 @@ def parse_config(opt, unknown):
     configs = [OmegaConf.load(config_path)]
     cli = OmegaConf.from_dotlist(unknown)
     config = OmegaConf.merge(*configs, cli)
-    config.train.dp.epsilon = opt.epsilon
+    config.train.dp.epsilon = float(opt.epsilon)
     return config

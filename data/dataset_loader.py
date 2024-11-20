@@ -6,6 +6,7 @@ from torch.utils.data import random_split
 from torchvision import transforms
 import numpy as np
 import logging
+import torch.distributed as dist
 
 
 from data.stylegan3.dataset import ImageFolderDataset
@@ -71,12 +72,16 @@ def semantic_query(sensitive_train_loader, config):
             return self.model(x)
         
     model = MyClassifier()
+    model = model.to(config.setup.local_rank)
 
     if config.public_data.selective.model_path is None:
-        model = train_classifier(model, config)
+        if os.path.exists('models/pretrained_models/{}_classifier_ckpt.pth'.format(config.public_data.name)):
+            model_path = 'models/pretrained_models/{}_classifier_ckpt.pth'.format(config.public_data.name)
+        else:
+            model_path = train_classifier(model, config)
     else:
-        load_weight(model, config.public_data.selective.model_path)
-    model = model.to(config.setup.local_rank)
+        model_path = config.public_data.selective.model_path
+    load_weight(model, model_path)
     model.eval()
 
     semantics_hist = torch.zeros((config.sensitive_data.n_classes, config.public_data.n_classes)).to(config.setup.local_rank)

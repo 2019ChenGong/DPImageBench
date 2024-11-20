@@ -43,7 +43,7 @@ class GenBlock(nn.Module):
 
 
 class Generator(nn.Module):
-    def __init__(self, z_dim=80, g_shared_dim=128, img_size=32, g_conv_dim=96, apply_attn=True, attn_g_loc=[2], num_classes=10, g_init="ortho"):
+    def __init__(self, z_dim=80, g_shared_dim=128, img_size=32, g_conv_dim=96, apply_attn=True, attn_g_loc=[2], num_classes=10, g_init="ortho", out=nn.Tanh()):
         super(Generator, self).__init__()
         g_in_dims_collection = {
             "28": [g_conv_dim * 4, g_conv_dim * 4],
@@ -106,7 +106,7 @@ class Generator(nn.Module):
         self.bn4 = ops.batchnorm_2d(in_features=self.out_dims[-1])
         self.activation = MODULES.g_act_fn
         self.conv2d5 = MODULES.g_conv2d(in_channels=self.out_dims[-1], out_channels=3 if img_size != 28 else 1, kernel_size=3, stride=1, padding=1)
-        self.tanh = nn.Tanh()
+        self.tanh = out
 
         ops.init_weights(self.modules, g_init)
 
