@@ -17,7 +17,7 @@ exp/
 │           │   ├── gen.npz 
 │           │   └── sample.png 
 │           ├── pretrain  
-│           │   ├── checkooints  
+│           │   ├── checkpoints  
 │           │   │   ├── final_checkpoint.pth  
 │           │   │   └── snapshot_checkpoint.pth  
 │           │   └── samples 
@@ -36,4 +36,14 @@ exp/
 ```
 
 We introduce the files as follows,
+
+- `./gen/gen.npz`: the synthetic images.
+- `./gen/sample.png`: the samples of synthetic images.
+- `./pretrain/checkpoints/final_checkpoint.pth`:
+- `./pretrain/checkpoints/snapshot_checkpoint.pth`:
+- `./pretrain/samples/iter_2000`:
+- `./train/checkpoints/final_checkpoint.pth`:
+- `./train/checkpoints/snapshot_checkpoint.pth`:
+- `./train/samples/iter_2000`:
+- `./stdout.txt`: recording the training and evaluation results.
 

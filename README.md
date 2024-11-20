@@ -22,7 +22,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
     - [3.2 Dataset and Files Preparation](#32-dataset-and-files-preparation)
     - [3.3 Training](#33-training)
     - [3.4 Inference](#34-inference)
-  - [5. Contacts](#5-contacts)
+  - [5. Customization](#5-customization)
+  - [6. Contacts](#6-contacts)
   - [Acknowledgment](#acknowledgement)
 
 ### Updates 
@@ -34,8 +35,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 - [ ] setup.master_port=6026
 
 - [ ] keep consistent cond and uncond for dm and gan
-
-- [x] GSWGAN merge
 
 - [ ] use a bash to represent installation.
 
@@ -186,22 +185,28 @@ dataset/
 
 ### 4.3 Running
 
-#### 4.3.1 Key hyper-paraeter introductions.
+#### 4.3.1 Key hyper-parameter introductions.
 
- ```
+We list the key hyper-parameters below, including their explanations and available options.
+
+Available `model_name` are [`DP-NTK`, `DP-Kernel`, `DP-LDM`, `DP-MERF`, `DP-Promise`, `DPDM`, `PE`, `G-PATE`, `PDP-Diffusion`, `PrivImage`].
+
+Available `epsilon` is [`1.0`, `10.0`].
+
+- `--dataset_name`: means the sensitive dataset, the option is [`mnist_28`, `fmnist_28`, `cifar10_32`, `cifar100_32`, `eurosat_32`, `celeba_male_32`, `camelyon_32`].
+- `setup.n_gpus_per_node`: means the number of GPUs to be used for training.
+
+#### 4.3.2 How to run.
+
+```
 conda activate dpimagebench
 cd DPImageBench
 python run.py --config configs/{model_name}/{dataset_name}_eps{epsilon}.yaml
  ```
 
-Available `model_name` are [`DP-NTK`, `DP-Kernel`, `DP-LDM`, `DP-MERF`, `DP-Promise`, `DPDM`, `PE`, `G-PATE`, `PDP-Diffusion`, `PrivImage`].
-
-Available `epsilon` is [`1.0`].
-
-Available `dataset_name` is [`mnist_28`].
 
 ### 4.4 Results Explanation
-We can find the `stdout.txt` files in the result folder, which record the training and evaluation processes. We explain the file structure of outputs in `exp`[results](./exp/README.md). After the evaluation, the results for each classifier training are available in `stdout.txt`.
+We can find the `stdout.txt` files in the result folder, which record the training and evaluation processes. We explain the [file structure](./exp/README.md) of outputs in `exp`. After the evaluation, the results for each classifier training are available in `stdout.txt`.
 
 In utility evaluation, after each classifier training, we can find,
 
@@ -237,7 +242,9 @@ INFO - evaluator.py - 2024-11-12 09:06:18,148 - The best acc of accuracy (using 
 ```
 The synthetic images can be found at the `/exp/<algorithm_name>/<file_name>/gen/gen.npz`.
 
-## 5. Contacts
+## 5. Customization
+
+## 6. Contacts
 If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
 
 
