@@ -68,7 +68,7 @@ pretrain:
   log_dir: null
   seed: 0
   batch_size: 64
-  n_epochs: 1
+  n_epochs: 10
   log_freq: 100
   snapshot_freq: 2000
   snapshot_threshold: 1
@@ -88,7 +88,7 @@ pretrain:
     p_std: 1.2
     n_noise_samples: 1
     n_classes: 1000
-  cond: false
+  cond: true
 train:
   log_dir: null
   seed: 0

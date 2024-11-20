@@ -41,6 +41,7 @@ pretrain:
   n_epochs: 1
   lr: 5e-5
   batch_size: 60
+  cond: true
 train:
   ckpt: null
   max_iter: 200002

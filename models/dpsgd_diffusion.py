@@ -203,8 +203,6 @@ class DP_Diffusion(DPSynther):
                 if len(train_y.shape) == 2:
                     train_x = train_x.to(torch.float32) / 255.
                     train_y = torch.argmax(train_y, dim=1)
-                if config.label_random:
-                    train_y = train_y % config.loss.n_classes
                 train_x, train_y = train_x.to(self.device) * 2. - 1., train_y.to(self.device)
                 optimizer.zero_grad(set_to_none=True)
                 loss = torch.mean(loss_fn(model, train_x, train_y))

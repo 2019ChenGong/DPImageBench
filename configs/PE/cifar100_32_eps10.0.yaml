@@ -37,6 +37,7 @@ model:
     model_path: models/pretrained_models/imagenet64_cond_270M_250K.pt
 pretrain:
   log_dir: null
+  cond: true
 train:
   batch_size: 500
   feature_extractor_batch_size: 500

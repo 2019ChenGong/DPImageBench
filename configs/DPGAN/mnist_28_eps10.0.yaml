@@ -59,6 +59,7 @@ pretrain:
       d_lr: 5e-4
       g_lr: 2e-4
       beta1: 0.0
+  cond: true
 train:
   ckpt: null
   log_dir: null

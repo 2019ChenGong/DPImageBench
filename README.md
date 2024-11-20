@@ -30,25 +30,20 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 - 🎉 **(2024.11.19)** We're thrilled to announce the release of initial version of DPImageBench!
 
 ### Todo
-- [ ] recoding the intermediate results of methods with tqdm.
 
 - [ ] setup.master_port=6026
-
-- [ ] keep consistent cond and uncond for dm and gan
-
-- [ ] use a bash to represent installation.
 
 - [ ] End to end implementation for PrivImage
 
 - [ ] remove the unneccessary part for algorithms in models
 
-- [x] using 'val' as the default setting but use 'sen' to represent the original evaluation method, it seems like using 'sen' as the default setting now. [KC: All configs have a new attribute "eval.mode" with default value "val"]
-
-- [ ] Change `sensitive_data.train_num=val` to new version `eval.mode`. 
+- [x] Change `sensitive_data.train_num=val` to new version `eval.mode`. 
 
 - [ ] Customize privacy budget
 
-- [ ] Checkpoint?
+- [ ] n_split, unify the batchsize?
+
+- [ ] I found that changing the generator of GS-WGAN intio ours affects the performance a lot.
 
 ## 2. Introduction
 
@@ -192,19 +187,31 @@ We list the key hyper-parameters below, including their explanations and availab
 - `--epsilon`: the privacy budget 10.0; the option is [`1.0`, `10.0`].
 - `--exp_description`: the notes for the name of result folders.
 - `setup.n_gpus_per_node`: means the number of GPUs to be used for training.
-- `pretrain.loss.label_unconditioning_prob`: specifies the probability of using conditional versus unconditional pretraining. The options are [`1.0`, `0.0`], where `1.0` indicates unconditional pretraining and `0.0` indicates conditional pretraining.
+- `pretrain.cond`: specifies the mode of pretraining. The options are [`true`, `false`], where `true` indicates conditional pretraining and `false` indicates conditional pretraining.
 - `public_data.name`: the name of pretraining dataset; the option is [`null`, `imagenet`, `places365`], which mean that without pretraining, using ImageNet dataset as pretraining dataset, and using Places365 as pretraining dataset. It is notice that DPImageBench uses ImageNet as default pretraining dataset. If users use Places365 as pretraining dataset, please add `public_data.n_classes=365 public_data.train_path=dataset/places365`.
-- `eval.mode`: .
-- `train.dp.n_split`: the number of gradient accumulations. For example, if you set `batch_size` as 500, but your GPU only allows 250, you can set `train.dp.n_split` as 2.
-- Change the model size: .
+- `eval.mode`: the mode of evaluations; the option is [`val`, `syn`] which means that using part of sensitive images and directly using the synthetic images as the validation set for model selection, respectively. The default setting is `val`.
+
 
 #### 4.3.2 How to run.
+
+Users should first activate the conda environment.
 
 ```
 conda activate dpimagebench
 cd DPImageBench
-python run.py --config configs/{model_name}/{dataset_name}_eps{epsilon}.yaml
- ```
+```
+
+1. For the implementation of results reported in Table 5, 6, 7.
+
+```
+python run.py setup.n_gpus_per_node=4 -m PDP-Diffusion --dataset_name camelyon_32 -e 10.0 -ed unconditional_trainval pretrain.loss.label_unconditioning_prob=1.0 sensitive_data.train_num=val 
+
+```
+
+
+- `train.dp.n_split`: the number of gradient accumulations. For example, if you set `batch_size` as 500, but your GPU only allows 250, you can set `train.dp.n_split` as 2.
+- Change the model size: .
+
 
 
 ### 4.3 Results Explanation

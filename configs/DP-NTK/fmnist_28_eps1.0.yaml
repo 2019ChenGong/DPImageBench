@@ -46,6 +46,7 @@ pretrain:
   lr_decay: 0.9
   scheduler_interval: 2001
   log_interval: 100
+  cond: true
 train:
   ckpt: null
   n_iter: 2000

@@ -41,6 +41,7 @@ pretrain:
   lr: 0.01
   lr_decay: 0.9
   log_interval: 10000
+  cond: true
 train:
   ckpt: null
   epochs: 5
