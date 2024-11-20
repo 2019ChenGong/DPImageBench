@@ -41,6 +41,9 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] The model size in Biggan is different from DMs. 
 
+- [ ] Optimizing utils, torch_utils, dnnlib. 
+
+
 ## 2. Introduction
 
 ### 2.1 Currently Supported Algorithms
