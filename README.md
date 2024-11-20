@@ -201,11 +201,12 @@ conda activate dpimagebench
 cd DPImageBench
 ```
 
-1. For the implementation of results reported in Table 5, 6, 7.
+
+
+1. For the implementation of results reported in Table 5, 6, 7. We list an example as follows. Users can modify the configuration files in [configs](./configs) as their preference.
 
 ```
-python run.py setup.n_gpus_per_node=4 -m PDP-Diffusion --dataset_name camelyon_32 -e 10.0 -ed unconditional_trainval pretrain.loss.label_unconditioning_prob=1.0 sensitive_data.train_num=val 
-
+python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --dataset_name mnist_28 --epsilon 10.0 
 ```
 
 
