@@ -16,6 +16,7 @@ from torch.utils.data import random_split
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data.distributed import DistributedSampler
+import torch.distributed as dist
 
 from SpecificImagenet import SpecificClassImagenet
 from classifier_models import resnet
@@ -167,29 +168,58 @@ def main(args):
         scheduler.step()
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--model', type=str, default='resnet50')
-    parser.add_argument('--dataset', type=str, default='imagenet')
-    parser.add_argument('--img_size', type=int, default=32)
-
-    parser.add_argument('--epoch', type=int, default=500)
-    parser.add_argument('--lr', type=float, default=1e-2)
-    parser.add_argument('--batch_size', type=int, default=2048)
-    parser.add_argument('--val_batch_size', type=int, default=8192*2)
-
-    parser.add_argument('--num_workers', type=int, default=32)
-    parser.add_argument('--ddp', type=bool, default=False)
-
-    args = parser.parse_args()
-
-    main(args)
-
-
-def train_classifier(model):
+def train_classifier(model, config):
     img_size = 32
     epoch = 300
     lr = 1e-2
     batch_size = 2048
     val_batch_size = 8192
+
+    if config.public_data.name == "imagenet":
+        train_dataset = SpecificClassImagenet(root=config.public_data.train_path, split="train", transform=transforms.Compose(
+        [transforms.RandomHorizontalFlip(),
+         transforms.ToTensor(),
+         transforms.Normalize([0.5] * 3, [0.5] * 3)
+         ]))
+        val_dataset = SpecificClassImagenet(root=config.public_data.train_path, split="val", transform=transforms.Compose(
+        [transforms.ToTensor(),
+         transforms.Normalize([0.5] * 3, [0.5] * 3)
+         ]))
+    elif config.public_data.name == "places365":
+        download = (not os.path.exists(os.path.join(config.public_data.train_path, "data_256_standard")))
+        public_train_set_ = torchvision.datasets.Places365(root=config.public_data.train_path, small=True, download=download, transform=trans)
+
+        dataset = Places365(root=config.public_data.train_path, small=True, transform=transforms.Compose(
+        [
+        transforms.Resize(32),
+        transforms.ToTensor(),
+         transforms.Normalize([0.5] * 3, [0.5] * 3)
+         ]))
+        train_size = int(len(dataset) * 0.9)
+        val_size = len(dataset) - train_size
+        train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+    
+    model = DDP(model, device_ids=[rank], output_device=rank)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, num_workers=32, drop_last=True, sampler=DistributedSampler(train_dataset))
+    val_loader = DataLoader(val_dataset, batch_size=val_batch_size, num_workers=32, drop_last=False)
+
+    best_acc = 0
+    for epoch in range(args.epoch):
+        train_loader.sampler.set_epoch(epoch)
+        train_acc = train(model, train_loader, optimizer, rank)
+        if rank == 0:
+            print('Epoch: {} Train Acc: {}'.format(epoch, train_acc))
+            logger.info('Epoch: {} Train Acc: {}'.format(epoch, train_acc))
+
+            val_acc = test(model, val_loader, rank)
+            logger.info('Val Acc: {}'.format(val_acc))
+            print('Val Acc: {}'.format(val_acc))
+            if val_acc > best_acc:
+                logger.info('Saving..')
+                print('Saving..')
+                torch.save(model.state_dict(), '{}/weights/{:.3f}_ckpt.pth'.format(exp_name, val_acc))
+                best_acc = val_acc
+        scheduler.step()
+
+    dist.barriar()
     return model

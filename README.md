@@ -219,6 +219,12 @@ python eval.py --method PDP-Diffusion --data_name mnist_28 --epsilon 10.0 --exp_
 ```
 The results are recorded in `exp/pdp-diffusion/<the-name-of-file>/stdout.txt`.
 
+Test the classification algorithm on the sensitive images without DP.
+```
+python ./scripts/test_classifier.py --method PDP-Diffusion --data_name mnist_28 --epsilon 10.0  -ed no-dp-mnist_28
+```
+The results are recorded in `exp/pdp-diffusion/<the-name-of-file>no-dp-mnist_28/stdout.txt`. This process is independent of `--method` and uses of `--epsilon`.
+
 
 - `train.dp.n_split`: the number of gradient accumulations. For example, if you set `batch_size` as 500, but your GPU only allows 250, you can set `train.dp.n_split` as 2.
 - Change the model size: .

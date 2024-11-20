@@ -73,7 +73,7 @@ def semantic_query(sensitive_train_loader, config):
     model = MyClassifier()
 
     if config.public_data.selective.model_path is None:
-        model = train_classifier(model)
+        model = train_classifier(model, config)
     else:
         load_weight(model, config.public_data.selective.model_path)
     model = model.to(config.setup.local_rank)
@@ -155,27 +155,6 @@ def load_data(config):
             download = (not os.path.exists(os.path.join(config.public_data.train_path, "data_256_standard")))
             public_train_set_ = torchvision.datasets.Places365(root=config.public_data.train_path, small=True, download=download, transform=trans)
             public_train_set = SpecificClassPlaces365(public_train_set_, specific_class)
-        else:
-            raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
-        if config.public_data.name == "imagenet":
-            if config.public_data.selective.ratio == 1.0:
-                specific_class = None
-            else:
-                try:
-                    specific_class = torch.load(config.public_data.selective.semantic_path)
-                    logging.info(specific_class)
-                except:
-                    with torch.no_grad():
-                        specific_class = semantic_query(sensitive_train_loader, config)
-            public_train_set = SpecificClassImagenet(root=config.public_data.train_path, specific_class=specific_class, transform=trans, split="train")
-        elif config.public_data.name == "places365":
-            download = (not os.path.exists(os.path.join(config.public_data.train_path, "data_256_standard")))
-            if config.public_data.selective.ratio == 1.0:
-                public_train_set = torchvision.datasets.Places365(root=config.public_data.train_path, small=True, download=download, transform=trans)
-            else:
-                specific_class = semantic_query(sensitive_train_loader, config)
-                public_train_set_ = torchvision.datasets.Places365(root=config.public_data.train_path, small=True, download=download, transform=trans)
-                public_train_set = SpecificClassPlaces365(public_train_set_, specific_class)
         else:
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     

@@ -11,8 +11,6 @@ def main(config):
 
     initialize_environment(config)
 
-    # model = load_model(config)
-
     sensitive_train_loader, sensitive_test_loader, _, _ = load_data(config)
 
     evaluator = Evaluator(config)

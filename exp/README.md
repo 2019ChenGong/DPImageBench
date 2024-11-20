@@ -12,7 +12,7 @@ exp/
 ├── dpgan/ 
 ├── gs-wgan/ 
 ├── pdp-diffusion/ 
-│   └── mnist_28_eps1.0_LZN-2024-10-25-23-09-18/  
+│   └── mnist_28_eps1.0-2024-10-25-23-09-18/  
 │           ├── gen  
 │           │   ├── gen.npz 
 │           │   └── sample.png 
