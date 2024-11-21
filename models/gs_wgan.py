@@ -214,7 +214,6 @@ class GS_WGAN(DPSynther):
         gen_arch = "BigGAN"
         img_size = str(self.img_size)
         c = str(self.c)
-        num_classes = str(self.num_classes)
         log_dir = config.log_dir
         ndis = str(self.num_discriminators)
         dis_per_job=200 # number of discriminators to be trained for each process
@@ -226,7 +225,7 @@ class GS_WGAN(DPSynther):
                 start= (job_id * dis_per_job + meta_start)
                 end= (start + dis_per_job)
                 vals= [str(dis_id) for dis_id in range(start, end)]
-                script = ['models/GS_WGAN/pretrain.py', '-data', data_name, '--log_dir', log_dir, '--train_num', train_num, '-ndis', ndis, '-ids'] + vals + ['--img_size', img_size, '--c', c, '--num_classes', num_classes, '--gpu_id', str(gpu_id), '--data_path', data_path, '-piters', iters, '--gen_arch', gen_arch, '--z_dim', str(self.z_dim), '--latent_type', self.latent_type, '--model_dim', str(self.config.Generator.g_conv_dim)]
+                script = ['models/GS_WGAN/pretrain.py', '-data', data_name, '--log_dir', log_dir, '--train_num', train_num, '-ndis', ndis, '-ids'] + vals + ['--img_size', img_size, '--c', c, '--private_num_classes', str(self.private_num_classes), '--public_num_classes', str(self.public_num_classes), '--gpu_id', str(gpu_id), '--data_path', data_path, '-piters', iters, '--gen_arch', gen_arch, '--z_dim', str(self.z_dim), '--latent_type', self.latent_type, '--model_dim', str(self.config.Generator.g_conv_dim)]
                 scripts.append(script)
         
         with ProcessPoolExecutor() as executor:
@@ -391,7 +390,7 @@ class GS_WGAN(DPSynther):
                 noise = bernoulli.sample((batchsize, self.z_dim)).view(batchsize, self.z_dim).to(self.device)
             else:
                 raise NotImplementedError
-            label = torch.randint(0, self.num_classes, [batchsize]).to(self.device)
+            label = torch.randint(0, self.private_num_classes, [batchsize]).to(self.device)
             noisev = autograd.Variable(noise)
             fake = netG(noisev, label).view(batchsize, -1)
             fake = fake.to(self.device)
@@ -415,7 +414,7 @@ class GS_WGAN(DPSynther):
                 logging.info('Step: {}, G_cost:{}, D_cost:{}, Wasserstein:{}'.format(iter, G_cost.cpu().data, D_cost.cpu().data, Wasserstein_D.cpu().data))
 
             if iter % config.vis_step == 0:
-                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.num_classes)
+                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.private_num_classes)
 
             if iter % config.save_step == 0:
                 ### save model
@@ -433,12 +432,12 @@ class GS_WGAN(DPSynther):
         syn_data = []
         syn_labels = []
 
-        syn_data, syn_labels = save_gen_data(os.path.join(config.log_dir, 'gen_data.npz'), self.netGS, self.z_dim, self.device, latent_type=self.latent_type, c=self.c, img_size=self.img_size, num_classes=self.num_classes, num_samples_per_class=config.data_num//self.num_classes)
+        syn_data, syn_labels = save_gen_data(os.path.join(config.log_dir, 'gen_data.npz'), self.netGS, self.z_dim, self.device, latent_type=self.latent_type, c=self.c, img_size=self.img_size, num_classes=self.private_num_classes, num_samples_per_class=config.data_num//self.private_num_classes)
 
         np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
 
         show_images = []
-        for cls in range(self.num_classes):
+        for cls in range(self.private_num_classes):
             show_images.append(syn_data[syn_labels==cls][:8])
         show_images = np.concatenate(show_images)
         torchvision.utils.save_image(torch.from_numpy(show_images), os.path.join(config.log_dir, 'sample.png'), padding=1, nrow=8)

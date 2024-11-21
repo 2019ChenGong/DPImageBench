@@ -40,6 +40,8 @@ model:
   - 4
   - 8
   - 16
+  private_num_classes: 10
+  public_num_classes: 1000
 pretrain:
   log_dir: null
   n_epochs: 1

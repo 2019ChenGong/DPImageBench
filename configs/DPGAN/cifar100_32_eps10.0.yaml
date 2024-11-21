@@ -37,6 +37,8 @@ model:
     apply_attn: true
   Discriminator:
     d_conv_dim: 80
+  private_num_classes: 100
+  public_num_classes: 1000
 pretrain:
   log_dir: null
   seed: 0

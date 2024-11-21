@@ -28,7 +28,8 @@ def parse_arguments():
     parser.add_argument('--z_dim', '-zdim', type=int, default=60, help='latent code dimensionality')
     parser.add_argument('--c', type=int, default=1, help='latent code dimensionality')
     parser.add_argument('--img_size', type=int, default=28, help='latent code dimensionality')
-    parser.add_argument('--num_classes', type=int, default=10, help='latent code dimensionality')
+    parser.add_argument('--private_num_classes', type=int, default=10, help='latent code dimensionality')
+    parser.add_argument('--public_num_classes', type=int, default=10, help='latent code dimensionality')
     parser.add_argument('--log_dir', type=str)
     parser.add_argument('--gpu_id', type=str)
     parser.add_argument('--data_path', type=str)
@@ -76,7 +77,9 @@ def main(args):
     gen_arch = args.gen_arch
     c = args.c
     img_size = args.img_size
-    num_classes = args.num_classes
+    private_num_classes = args.private_num_classes
+    public_num_classes = args.public_num_classes
+    label_dim = max(private_num_classes, public_num_classes)
     train_num = args.train_num
     data_path = args.data_path
 
@@ -126,7 +129,7 @@ def main(args):
     ### Set up models
     netD_list = []
     for i in range(len(net_ids)):
-        netD = DiscriminatorDCGAN(c=c, img_size=img_size, num_classes=num_classes)
+        netD = DiscriminatorDCGAN(c=c, img_size=img_size, num_classes=label_dim)
         netD_list.append(netD)
     netD_list = [netD.to(device) for netD in netD_list]
 
@@ -174,11 +177,11 @@ def main(args):
 
         ### Train (non-private) Generator for each Discriminator
         if gen_arch == 'DCGAN':
-            netG = GeneratorDCGAN(c=c, img_size=img_size, z_dim=z_dim, model_dim=model_dim, num_classes=num_classes).to(device)
+            netG = GeneratorDCGAN(c=c, img_size=img_size, z_dim=z_dim, model_dim=model_dim, num_classes=label_dim).to(device)
         elif gen_arch == 'ResNet':
-            netG = GeneratorResNet(c=c, img_size=img_size, z_dim=z_dim, model_dim=model_dim, num_classes=num_classes).to(device)
+            netG = GeneratorResNet(c=c, img_size=img_size, z_dim=z_dim, model_dim=model_dim, num_classes=label_dim).to(device)
         elif gen_arch == 'BigGAN':
-            netG = Generator(z_dim=z_dim, img_size=img_size, num_classes=num_classes, g_conv_dim=model_dim, out=nn.Sigmoid())
+            netG = Generator(z_dim=z_dim, img_size=img_size, num_classes=label_dim, g_conv_dim=model_dim, out=nn.Sigmoid())
         optimizerG = optim.Adam(netG.parameters(), lr=1e-4, betas=(0.5, 0.9))
 
         ### Save dir for each discriminator
@@ -253,7 +256,7 @@ def main(args):
                     noise = bernoulli.sample((batchsize, z_dim)).view(batchsize, z_dim).to(device)
                 else:
                     raise NotImplementedError
-                label = torch.randint(0, num_classes, [batchsize]).to(device)
+                label = torch.randint(0, private_num_classes, [batchsize]).to(device)
                 noisev = autograd.Variable(noise)
                 fake = netG(noisev, label).view(batchsize, -1)
                 G = netD(fake, label)
@@ -273,7 +276,7 @@ def main(args):
                                                                         Wasserstein_D.cpu().data
                                                                         ))
                 if iter == args.pretrain_iterations:
-                    generate_image(iter, netG, fix_noise, save_subdir, device, c=c, img_size=img_size, num_classes=num_classes)
+                    generate_image(iter, netG, fix_noise, save_subdir, device, c=c, img_size=img_size, num_classes=private_num_classes)
 
             torch.save(netD.state_dict(), os.path.join(save_subdir, 'netD.pth'))
 

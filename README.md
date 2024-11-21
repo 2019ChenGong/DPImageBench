@@ -46,7 +46,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Optimizing utils, torch_utils, dnnlib.
 
-- [x] Customization sensitive dataset
+- [ ] Change the conditional pretraining of GAN-based methods.
 
 
 ## 2. Introduction
@@ -191,6 +191,9 @@ We list the key hyper-parameters below, including their explanations and availab
 - `pretrain.cond`: specifies the mode of pretraining. The options are [`true`, `false`], where `true` indicates conditional pretraining and `false` indicates conditional pretraining.
 - `public_data.name`: the name of pretraining dataset; the option is [`null`, `imagenet`, `places365`], which mean that without pretraining, using ImageNet dataset as pretraining dataset, and using Places365 as pretraining dataset. It is notice that DPImageBench uses ImageNet as default pretraining dataset. If users use Places365 as pretraining dataset, please add `public_data.n_classes=365 public_data.train_path=dataset/places365`.
 - `eval.mode`: the mode of evaluations; the option is [`val`, `syn`] which means that using part of sensitive images and directly using the synthetic images as the validation set for model selection, respectively. The default setting is `val`.
+- `setup.master_port`: a configuration parameter specifying the port number on the master node (or primary process) that other processes or nodes use to communicate within a distributed system.
+
+> It is a common issue that we can not run a distributed process under a `setup.master_port=6026`. If you intend to run multiple distributed processes on the same machine, please consider using a different `setup.master_port`, such as 6027.
 
 
 #### 4.3.2 How to run

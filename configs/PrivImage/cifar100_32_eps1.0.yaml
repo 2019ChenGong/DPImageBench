@@ -69,6 +69,8 @@ model:
     tmax: 80.0
     rho: 7.0
     guid_scale: 0.0
+  private_num_classes: 100
+  public_num_classes: 1000
 pretrain:
   log_dir: null
   seed: 0

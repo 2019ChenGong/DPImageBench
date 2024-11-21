@@ -35,6 +35,8 @@ model:
     timestep_respacing: 100
     batch_size: 2000
     model_path: models/pretrained_models/imagenet64_cond_270M_250K.pt
+  private_num_classes: 10
+  public_num_classes: 1000
 pretrain:
   log_dir: null
   cond: true
