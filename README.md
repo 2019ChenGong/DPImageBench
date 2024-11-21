@@ -21,7 +21,11 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
     - [4.1 Install DPImageBench](#41-install-dpimagebench)
     - [4.2 Prepare Dataset](#42-prepare-dataset)
     - [4.3 Running](#43-running)
+      - [4.3.1 Key hyper-parameter introductions](#431-key-hyper-parameter-introductions)
+      - [4.3.2 How to run](#432-how-to-run)
     - [4.4 Results Explanation](#44-results-explanation)
+     - [4.4.1 Results Structure](#441-results-structure)
+     - [4.4.2 Results Explanation](#442-results-explanation)
   - [5. Customization](#5-customization)
   - [6. Contacts](#6-contacts)
   - [Acknowledgment](#acknowledgement)
@@ -174,7 +178,7 @@ dataset/
 
 The training and evaluatin codes are `run.py` and `eval.py`.
 
-#### 4.3.1 Key hyper-parameter introductions.
+#### 4.3.1 Key hyper-parameter introductions
 
 We list the key hyper-parameters below, including their explanations and available options.
 
@@ -188,7 +192,7 @@ We list the key hyper-parameters below, including their explanations and availab
 - `eval.mode`: the mode of evaluations; the option is [`val`, `syn`] which means that using part of sensitive images and directly using the synthetic images as the validation set for model selection, respectively. The default setting is `val`.
 
 
-#### 4.3.2 How to run.
+#### 4.3.2 How to run
 
 Users should first activate the conda environment.
 
