@@ -412,7 +412,7 @@ test/
 Process your dataset using:
 
 ```
-cd data; python preprocess_dataset.py --data_name {name_of_your_dataset} --train_path {dir_of_train_folder} --test_path {dir_of_test_folder}
+cd data; python preprocess_dataset.py --data_name <name-of-your-dataset> --train_path <dir-of-train-folder> --test_path <dir-of-test-folder>
 ```
 
 ### 5.2 Training
@@ -420,12 +420,10 @@ cd data; python preprocess_dataset.py --data_name {name_of_your_dataset} --train
 For example, if your want to use PrivImage as your synthesizer with eps=10, you can run:
 
 ```
-python run.py --method PrivImage --epsilon 10.0 --data_name {name_of_your_dataset}
+python run.py setup.n_gpus_per_node=4 --method PrivImage --epsilon 10.0 --data_name <name-of-your-dataset>
 ```
 
-Other processes is the same.
-
-
+Other processes are the same.
 
 
 ## 6. Contacts
