@@ -37,14 +37,16 @@ class DPGAN(DPSynther):
 
         self.z_dim = config.Generator.z_dim
         self.img_size = config.img_size
-        self.num_classes = config.num_classes
+        self.private_num_classes = config.private_num_classes
+        self.public_num_classes = config.public_num_classes
+        label_dim = max(self.private_num_classes, self.public_num_classes)
 
         self.config = config
         self.device = device
 
-        self.G = Generator(img_size=self.img_size, num_classes=self.num_classes, **config.Generator).to(self.device)
-        self.D = Discriminator(img_size=self.img_size, num_classes=self.num_classes, **config.Discriminator).to(self.device)
-        self.D_copy = Discriminator(img_size=self.img_size, num_classes=self.num_classes, **config.Discriminator).to(self.device)
+        self.G = Generator(img_size=self.img_size, num_classes=label_dim, **config.Generator).to(self.device)
+        self.D = Discriminator(img_size=self.img_size, num_classes=label_dim, **config.Discriminator).to(self.device)
+        self.D_copy = Discriminator(img_size=self.img_size, num_classes=label_dim, **config.Discriminator).to(self.device)
         self.D_copy.eval()
         self.ema_G = ExponentialMovingAverage(self.G.parameters(), decay=self.ema_rate)
     
@@ -106,16 +108,14 @@ class DPGAN(DPSynther):
                 if len(train_y.shape) == 2:
                     train_x = train_x.to(torch.float32) / 255.
                     train_y = torch.argmax(train_y, dim=1)
-                if config.cond:
-                    train_y = train_y % self.num_classes
-                else:
+                if not config.cond:
                     train_y = torch.zeros_like(train_y)
                 
                 real_images = train_x.to(self.device) * 2. - 1.
                 real_labels = train_y.to(self.device).long()
                 batch_size = real_images.size(0)
 
-                fake_labels = torch.randint(0, self.num_classes, (batch_size, ), device=self.device)
+                fake_labels = torch.randint(0, self.public_num_classes, (batch_size, ), device=self.device)
                 noise = torch.randn((batch_size, 80), device=self.device)
                 fake_images = G(noise, fake_labels)
 
@@ -135,7 +135,7 @@ class DPGAN(DPSynther):
                     optimizerG.zero_grad()
                     batch_size = config.batch_size // self.global_size
                     optimizerD.zero_grad(set_to_none=True)
-                    fake_labels = torch.randint(0, self.num_classes, (batch_size, ), device=self.device)
+                    fake_labels = torch.randint(0, self.public_num_classes, (batch_size, ), device=self.device)
                     noise = torch.randn((batch_size, 80), device=self.device)
                     fake_images = G(noise, fake_labels)
                     output_g = self.D_copy(fake_images, fake_labels)
@@ -154,7 +154,7 @@ class DPGAN(DPSynther):
                         with torch.no_grad():
                             ema.store(G.parameters())
                             ema.copy_to(G.parameters())
-                            samples = sample_random_image_batch(G, snapshot_sampling_shape, self.device, self.num_classes)
+                            samples = sample_random_image_batch(G, snapshot_sampling_shape, self.device, self.public_num_classes)
                             ema.restore(G.parameters())
                         
                         if self.global_rank == 0:
@@ -165,7 +165,7 @@ class DPGAN(DPSynther):
                         with torch.no_grad():
                             ema.store(G.parameters())
                             ema.copy_to(G.parameters())
-                            fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, G, inception_model, self.fid_stats, self.device, self.num_classes)
+                            fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, G, inception_model, self.fid_stats, self.device, self.public_num_classes)
                             ema.restore(G.parameters())
 
                             if self.global_rank == 0:
@@ -287,7 +287,7 @@ class DPGAN(DPSynther):
                     real_labels = train_y.to(self.device).long()
                     batch_size = real_images.size(0)
 
-                    fake_labels = torch.randint(0, self.num_classes, (batch_size, ), device=self.device)
+                    fake_labels = torch.randint(0, self.private_num_classes, (batch_size, ), device=self.device)
                     noise = torch.randn((batch_size, 80), device=self.device)
                     fake_images = G(noise, fake_labels)
 
@@ -310,7 +310,7 @@ class DPGAN(DPSynther):
                             batch_size = config.batch_size // config.dp.n_splits // self.global_size
                             for _ in range(config.dp.n_splits):
                                 optimizerD.zero_grad(set_to_none=True)
-                                fake_labels = torch.randint(0, self.num_classes, (batch_size, ), device=self.device)
+                                fake_labels = torch.randint(0, self.private_num_classes, (batch_size, ), device=self.device)
                                 noise = torch.randn((batch_size, 80), device=self.device)
                                 fake_images = G(noise, fake_labels)
                                 output_g = self.D_copy(fake_images, fake_labels)
@@ -329,7 +329,7 @@ class DPGAN(DPSynther):
                                 with torch.no_grad():
                                     ema.store(G.parameters())
                                     ema.copy_to(G.parameters())
-                                    samples = sample_random_image_batch(G, snapshot_sampling_shape, self.device, self.num_classes)
+                                    samples = sample_random_image_batch(G, snapshot_sampling_shape, self.device, self.private_num_classes)
                                     ema.restore(G.parameters())
                                 
                                 if self.global_rank == 0:
@@ -340,7 +340,7 @@ class DPGAN(DPSynther):
                                 with torch.no_grad():
                                     ema.store(G.parameters())
                                     ema.copy_to(G.parameters())
-                                    fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, G, inception_model, self.fid_stats, self.device, self.num_classes)
+                                    fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, G, inception_model, self.fid_stats, self.device, self.private_num_classes)
                                     ema.restore(G.parameters())
 
                                     if self.global_rank == 0:
@@ -369,9 +369,9 @@ class DPGAN(DPSynther):
         with torch.no_grad():
             ema.store(G.parameters())
             ema.copy_to(G.parameters())
-            samples = sample_random_image_batch(G, snapshot_sampling_shape, self.device, self.num_classes)
+            samples = sample_random_image_batch(G, snapshot_sampling_shape, self.device, self.private_num_classes)
             fid = compute_fid(config.final_fid_samples, self.global_size, fid_sampling_shape, G, inception_model,
-                            self.fid_stats, self.device, self.num_classes)
+                            self.fid_stats, self.device, self.private_num_classes)
             ema.restore(G.parameters())
 
         if self.global_rank == 0:
@@ -402,7 +402,7 @@ class DPGAN(DPSynther):
             syn_data = []
             syn_labels = []
         for _ in range(config.data_num // (sampling_shape[0] * self.global_size) + 1):
-            x, y = generate_batch(G, sampling_shape, self.device, self.num_classes)
+            x, y = generate_batch(G, sampling_shape, self.device, self.private_num_classes)
             dist.barrier()
             if self.global_rank == 0:
                 gather_x = [torch.zeros_like(x) for _ in range(self.global_size)]
@@ -425,7 +425,7 @@ class DPGAN(DPSynther):
             np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
 
             show_images = []
-            for cls in range(self.num_classes):
+            for cls in range(self.private_num_classes):
                 show_images.append(syn_data[syn_labels==cls][:8])
             show_images = np.concatenate(show_images)
             torchvision.utils.save_image(torch.from_numpy(show_images), os.path.join(config.log_dir, 'sample.png'), padding=1, nrow=8)

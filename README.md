@@ -46,7 +46,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Optimizing utils, torch_utils, dnnlib.
 
-- [ ] Customization sensitive dataset
+- [x] Customization sensitive dataset
 
 
 ## 2. Introduction
@@ -438,7 +438,7 @@ cd data; python preprocess_dataset.py --data_name <name-of-your-dataset> --train
 For example, if your want to use PrivImage as your synthesizer with eps=10, you can run:
 
 ```
-python run.py setup.n_gpus_per_node=4 --method PrivImage --epsilon 10.0 --data_name <name-of-your-dataset>
+python run.py setup.n_gpus_per_node=4 --method PrivImage --epsilon 10.0 --data_name <name-of-your-dataset> sensitive_data.n_classes=<num_of_classes>
 ```
 
 Other processes are the same.

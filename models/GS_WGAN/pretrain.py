@@ -178,7 +178,7 @@ def main(args):
         elif gen_arch == 'ResNet':
             netG = GeneratorResNet(c=c, img_size=img_size, z_dim=z_dim, model_dim=model_dim, num_classes=num_classes).to(device)
         elif gen_arch == 'BigGAN':
-            netG = Generator(z_dim=z_dim, img_size=img_size, num_classes=num_classes, g_conv_dim=model_dim)
+            netG = Generator(z_dim=z_dim, img_size=img_size, num_classes=num_classes, g_conv_dim=model_dim, out=nn.Sigmoid())
         optimizerG = optim.Adam(netG.parameters(), lr=1e-4, betas=(0.5, 0.9))
 
         ### Save dir for each discriminator

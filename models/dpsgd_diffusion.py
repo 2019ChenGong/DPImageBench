@@ -48,6 +48,11 @@ class DP_Diffusion(DPSynther):
         self.config = config
         self.device = 'cuda:%d' % self.local_rank
 
+        self.private_num_classes = config.private_num_classes
+        self.public_num_classes = config.public_num_classes
+        label_dim = max(self.private_num_classes, self.public_num_classes)
+        self.network.label_dim = label_dim
+
         if self.denoiser_name == 'edm':
             if self.denoiser_network == 'song':
                 self.model = EDMDenoiser(
@@ -94,6 +99,7 @@ class DP_Diffusion(DPSynther):
             self.is_pretrain = False
             return
         
+        config.loss.n_classes = self.public_num_classes
         if config.cond:
             config.loss['label_unconditioning_prob'] = 0.1
         else:
@@ -172,7 +178,7 @@ class DP_Diffusion(DPSynther):
                         ema.store(model.parameters())
                         ema.copy_to(model.parameters())
                         sample_random_image_batch(snapshot_sampling_shape, sampler, os.path.join(
-                            sample_dir, 'iter_%d' % state['step']), self.device, config.loss.n_classes)
+                            sample_dir, 'iter_%d' % state['step']), self.device, self.public_num_classes)
                         ema.restore(model.parameters())
                     model.train()
 
@@ -184,7 +190,7 @@ class DP_Diffusion(DPSynther):
                     with torch.no_grad():
                         ema.store(model.parameters())
                         ema.copy_to(model.parameters())
-                        fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, config.loss.n_classes)
+                        fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, self.public_num_classes)
                         ema.restore(model.parameters())
 
                         if self.global_rank == 0:
@@ -237,6 +243,7 @@ class DP_Diffusion(DPSynther):
         set_seeds(self.global_rank, config.seed)
         torch.cuda.device(self.local_rank)
         self.device = 'cuda:%d' % self.local_rank
+        config.loss.n_classes = self.private_num_classes
 
         sample_dir = os.path.join(config.log_dir, 'samples')
         checkpoint_dir = os.path.join(config.log_dir, 'checkpoints')
@@ -357,7 +364,7 @@ class DP_Diffusion(DPSynther):
                             ema.store(model.parameters())
                             ema.copy_to(model.parameters())
                             sample_random_image_batch(snapshot_sampling_shape, sampler, os.path.join(
-                                sample_dir, 'iter_%d' % state['step']), self.device, 10)
+                                sample_dir, 'iter_%d' % state['step']), self.device, self.private_num_classes)
                             ema.restore(model.parameters())
                         model.train()
 
@@ -370,7 +377,7 @@ class DP_Diffusion(DPSynther):
                         with torch.no_grad():
                             ema.store(model.parameters())
                             ema.copy_to(model.parameters())
-                            fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, config.loss.n_classes)
+                            fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, self.private_num_classes)
                             ema.restore(model.parameters())
 
                             if self.global_rank == 0:
@@ -443,7 +450,7 @@ class DP_Diffusion(DPSynther):
             syn_data = []
             syn_labels = []
         for _ in range(config.data_num // (sampling_shape[0] * self.global_size) + 1):
-            x, y = generate_batch(sampler_acc, sampling_shape, self.device, config.n_classes, config.n_classes)
+            x, y = generate_batch(sampler_acc, sampling_shape, self.device, self.private_num_classes, self.private_num_classes)
             dist.barrier()
             if self.global_rank == 0:
                 gather_x = [torch.zeros_like(x) for _ in range(self.global_size)]
@@ -466,7 +473,7 @@ class DP_Diffusion(DPSynther):
             np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
 
             show_images = []
-            for cls in range(config.n_classes):
+            for cls in range(self.private_num_classes):
                 show_images.append(syn_data[syn_labels==cls][:8])
             show_images = np.concatenate(show_images)
             torchvision.utils.save_image(torch.from_numpy(show_images), os.path.join(config.log_dir, 'sample.png'), padding=1, nrow=8)

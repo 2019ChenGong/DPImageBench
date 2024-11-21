@@ -40,17 +40,19 @@ class GS_WGAN(DPSynther):
         self.z_dim = config.Generator.z_dim
         self.c = config.c
         self.img_size =  config.img_size
-        self.num_classes = config.num_classes
+        self.private_num_classes = config.private_num_classes
+        self.public_num_classes = config.public_num_classes
+        self.label_dim = max(self.private_num_classes, self.public_num_classes)
         self.latent_type = config.latent_type
         self.ckpt = config.ckpt
 
-        self.netG = Generator(img_size=self.img_size, num_classes=self.num_classes, out=nn.Sigmoid(), **config.Generator)
-        # self.netG = GeneratorResNet(c=self.c, img_size=self.img_size, z_dim=10, model_dim=64, num_classes=self.num_classes)
+        # self.netG = Generator(img_size=self.img_size, num_classes=label_dim, **config.Generator)
+        self.netG = GeneratorResNet(c=self.c, img_size=self.img_size, z_dim=self.z_dim, model_dim=config.Generator.g_conv_dim, num_classes=self.label_dim)
         
         self.netGS = copy.deepcopy(self.netG)
         self.netD_list = []
         for i in range(self.num_discriminators):
-            netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.num_classes)
+            netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.label_dim)
             self.netD_list.append(netD)
         
         model_parameters = filter(lambda p: p.requires_grad, self.netG.parameters())
@@ -84,7 +86,7 @@ class GS_WGAN(DPSynther):
         netGS = self.netGS.to(self.device)
 
         ### Set up optimizers
-        netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.num_classes).to(self.device)
+        netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.label_dim).to(self.device)
         optimizerD = optim.Adam(netD.parameters(), lr=1e-4, betas=(0.5, 0.9))
         optimizerG = optim.Adam(self.netG.parameters(), lr=1e-4, betas=(0.5, 0.9))
 
@@ -107,9 +109,7 @@ class GS_WGAN(DPSynther):
                 if len(real_y.shape) == 2:
                     real_data = real_data.to(torch.float32) / 255.
                     real_y = torch.argmax(real_y, dim=1)
-                if config.cond:
-                    real_y = real_y % self.num_classes
-                else:
+                if not config.cond:
                     real_y = torch.zeros_like(real_y).long()
                 # real_data = real_data * 2 - 1
                 batchsize = real_data.shape[0]
@@ -169,7 +169,7 @@ class GS_WGAN(DPSynther):
                 noise = bernoulli.sample((batchsize, self.z_dim)).view(batchsize, self.z_dim).to(self.device)
             else:
                 raise NotImplementedError
-            label = torch.randint(0, self.num_classes, [batchsize]).to(self.device)
+            label = torch.randint(0, self.public_num_classes, [batchsize]).to(self.device)
             noisev = autograd.Variable(noise)
             fake = netG(noisev, label).view(batchsize, -1)
             fake = fake.to(self.device)
@@ -196,7 +196,7 @@ class GS_WGAN(DPSynther):
                 logging.info('Step: {}, G_cost:{}, D_cost:{}, Wasserstein:{}'.format(iter, G_cost.cpu().data, D_cost.cpu().data, Wasserstein_D.cpu().data))
 
             if iter % config.vis_step == 0:
-                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.num_classes)
+                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.public_num_classes)
 
             del label, fake, noisev, noise, G, G_cost, D_cost
             torch.cuda.empty_cache()
@@ -211,6 +211,7 @@ class GS_WGAN(DPSynther):
         data_name = config.data_name
         train_num = config.eval_mode
         data_path = config.data_path
+        gen_arch = "BigGAN"
         img_size = str(self.img_size)
         c = str(self.c)
         num_classes = str(self.num_classes)
@@ -225,7 +226,7 @@ class GS_WGAN(DPSynther):
                 start= (job_id * dis_per_job + meta_start)
                 end= (start + dis_per_job)
                 vals= [str(dis_id) for dis_id in range(start, end)]
-                script = ['models/GS_WGAN/pretrain.py', '-data', data_name, '--log_dir', log_dir, '--train_num', train_num, '-ndis', ndis, '-ids'] + vals + ['--img_size', img_size, '--c', c, '--num_classes', num_classes, '--gpu_id', str(gpu_id), '--data_path', data_path, '-piters', iters]
+                script = ['models/GS_WGAN/pretrain.py', '-data', data_name, '--log_dir', log_dir, '--train_num', train_num, '-ndis', ndis, '-ids'] + vals + ['--img_size', img_size, '--c', c, '--num_classes', num_classes, '--gpu_id', str(gpu_id), '--data_path', data_path, '-piters', iters, '--gen_arch', gen_arch, '--z_dim', str(self.z_dim), '--latent_type', self.latent_type, '--model_dim', str(self.config.Generator.g_conv_dim)]
                 scripts.append(script)
         
         with ProcessPoolExecutor() as executor:

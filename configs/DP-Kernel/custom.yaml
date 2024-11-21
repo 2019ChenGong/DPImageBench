@@ -1,0 +1,65 @@
+setup:
+  method: DP-Kernel
+  run_type: normal
+  n_gpus_per_node: 1
+  n_nodes: 1
+  node_rank: 0
+  master_address: 127.0.0.1
+  master_port: 6025
+  omp_n_threads: 8
+  workdir: null
+public_data:
+  name: imagenet
+  num_channels: 3
+  resolution: 32
+  n_classes: 1000
+  train_path: dataset/imagenet/imagenet_32
+  selective:
+    ratio: 1.0
+sensitive_data:
+  name: null
+  num_channels: 3
+  resolution: 32
+  n_classes: 10
+  train_path: null
+  test_path: null
+  fid_stats: null
+model:
+  image_size: 32
+  n_class: 10
+  Generator:
+    z_dim: 60
+    g_shared_dim: 128
+    g_conv_dim: 60
+    attn_g_loc:
+    - 2
+    apply_attn: true
+  sigma_list:
+  - 1
+  - 2
+  - 4
+  - 8
+  - 16
+pretrain:
+  log_dir: null
+  n_epochs: 1
+  lr: 5e-5
+  batch_size: 60
+  cond: true
+train:
+  ckpt: null
+  max_iter: 200002
+  batch_size: 60
+  lr: 5e-5
+  vis_step: 10000
+  log_dir: null
+  dp:
+    epsilon: 10.0
+    delta: 1e-5
+gen:
+  data_num: 60000
+  batch_size: 1000
+  log_dir: null
+eval:
+  batch_size: 1000
+  mode: val

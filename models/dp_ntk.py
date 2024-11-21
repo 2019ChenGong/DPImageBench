@@ -26,12 +26,14 @@ class DP_NTK(DPSynther):
         self.c = config.c
         self.ntk_width = config.ntk_width
         self.input_dim = self.img_size * self.img_size * self.c
-        self.n_classes = config.n_classes
+        self.private_num_classes = config.private_num_classes
+        self.public_num_classes = config.public_num_classes
+        label_dim = max(self.private_num_classes, self.public_num_classes)
 
         if config.model_ntk == 'fc_1l':
-            self.model_ntk = NTK(input_size=self.input_dim, hidden_size_1=self.ntk_width, output_size=self.n_classes)
+            self.model_ntk = NTK(input_size=self.input_dim, hidden_size_1=self.ntk_width, output_size=label_dim)
         elif config.model_ntk == 'fc_2l':
-            self.model_ntk = NTK_TL(input_size=self.input_dim, hidden_size_1=self.ntk_width, hidden_size_2=config.ntk_width2, output_size=self.n_classes)
+            self.model_ntk = NTK_TL(input_size=self.input_dim, hidden_size_1=self.ntk_width, hidden_size_2=config.ntk_width2, output_size=label_dim)
         elif config.model_ntk == 'lenet5':
             self.model_ntk = LeNet5()
         else:
@@ -40,7 +42,7 @@ class DP_NTK(DPSynther):
         self.model_ntk.to(device)
         self.model_ntk.eval()
 
-        self.model_gen = Generator(img_size=self.img_size, num_classes=self.n_classes, **config.Generator).to(device)
+        self.model_gen = Generator(img_size=self.img_size, num_classes=label_dim, **config.Generator).to(device)
         self.model_gen.train()
 
         model_parameters = filter(lambda p: p.requires_grad, self.model_gen.parameters())
@@ -53,7 +55,7 @@ class DP_NTK(DPSynther):
         os.mkdir(config.log_dir)
         # define loss function
 
-        self.noisy_mean_emb = calc_mean_emb1(self.model_ntk, public_dataloader, self.n_classes, 0., self.device, cond=config.cond)
+        self.noisy_mean_emb = calc_mean_emb1(self.model_ntk, public_dataloader, self.public_num_classes, 0., self.device, cond=config.cond)
 
         torch.save(self.noisy_mean_emb, os.path.join(config.log_dir, 'noisy_mean_emb.pt'))
 
@@ -76,14 +78,14 @@ class DP_NTK(DPSynther):
             for accu_step in range(config.n_splits):
                 batch_size = config.batch_size // config.n_splits
                 if config.cond:
-                    gen_labels_numerical = torch.randint(self.n_classes, (batch_size,)).to(self.device)
+                    gen_labels_numerical = torch.randint(self.public_num_classes, (batch_size,)).to(self.device)
                 else:
                     gen_labels_numerical = torch.zeros((batch_size,)).long().to(self.device)
                 z = torch.randn(batch_size, self.model_gen.z_dim).to(self.device)
                 gen_samples = self.model_gen(z, gen_labels_numerical).reshape(batch_size, -1) / 2 + 0.5
 
                 """ synthetic data mean_emb init """
-                mean_emb2 = torch.zeros((d, self.n_classes), device=self.device)
+                mean_emb2 = torch.zeros((d, self.public_num_classes), device=self.device)
                 for idx in range(gen_samples.shape[0]):
                     """ manually set the weight if needed """
                     # model_ntk.fc1.weight = torch.nn.Parameter(output_weights[gen_labels_numerical[idx], :][None, :])
@@ -129,7 +131,7 @@ class DP_NTK(DPSynther):
 
         logging.info("The noise factor is {}".format(self.noise_factor))
 
-        self.noisy_mean_emb = calc_mean_emb1(self.model_ntk, sensitive_dataloader, self.n_classes, self.noise_factor, self.device)
+        self.noisy_mean_emb = calc_mean_emb1(self.model_ntk, sensitive_dataloader, self.private_num_classes, self.noise_factor, self.device)
         print(self.noisy_mean_emb.shape)
 
         torch.save(self.noisy_mean_emb, os.path.join(config.log_dir, 'noisy_mean_emb.pt'))
@@ -153,12 +155,12 @@ class DP_NTK(DPSynther):
             """ synthetic data """
             for accu_step in range(config.n_splits):
                 batch_size = config.batch_size // config.n_splits
-                gen_labels_numerical = torch.randint(self.n_classes, (batch_size,)).to(self.device)
+                gen_labels_numerical = torch.randint(self.private_num_classes, (batch_size,)).to(self.device)
                 z = torch.randn(batch_size, self.model_gen.z_dim).to(self.device)
                 gen_samples = self.model_gen(z, gen_labels_numerical).reshape(batch_size, -1) / 2 + 0.5
 
                 """ synthetic data mean_emb init """
-                mean_emb2 = torch.zeros((d, self.n_classes), device=self.device)
+                mean_emb2 = torch.zeros((d, self.private_num_classes), device=self.device)
                 for idx in range(gen_samples.shape[0]):
                     """ manually set the weight if needed """
                     # model_ntk.fc1.weight = torch.nn.Parameter(output_weights[gen_labels_numerical[idx], :][None, :])
@@ -197,13 +199,13 @@ class DP_NTK(DPSynther):
         os.mkdir(config.log_dir)
 
         """evaluate the model"""
-        syn_data, syn_labels = synthesize_mnist_with_uniform_labels(self.model_gen, self.device, gen_batch_size=config.batch_size, n_data=config.data_num, n_labels=self.n_classes)
+        syn_data, syn_labels = synthesize_mnist_with_uniform_labels(self.model_gen, self.device, gen_batch_size=config.batch_size, n_data=config.data_num, n_labels=self.private_num_classes)
         syn_data = syn_data.reshape(syn_data.shape[0], self.c, self.img_size, self.img_size)
         syn_labels = syn_labels.reshape(-1)
         np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
 
         show_images = []
-        for cls in range(self.n_classes):
+        for cls in range(self.private_num_classes):
             show_images.append(syn_data[syn_labels==cls][:8])
         show_images = np.concatenate(show_images)
         torchvision.utils.save_image(torch.from_numpy(show_images), os.path.join(config.log_dir, 'sample.png'), padding=1, nrow=8)

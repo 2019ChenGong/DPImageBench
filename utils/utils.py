@@ -145,8 +145,28 @@ def parse_config(opt, unknown):
     else:
         config_epsilon = 1.0
     config_path = os.path.join(opt.config_dir, opt.method, opt.data_name + "_eps" + str(config_epsilon) + opt.config_suffix + ".yaml")
-    configs = [OmegaConf.load(config_path)]
+    if not os.path.exists(config_path):
+        configs = [OmegaConf.load(os.path.join(opt.config_dir, opt.method, "custom.yaml"))]
+    else:
+        configs = [OmegaConf.load(config_path)]
     cli = OmegaConf.from_dotlist(unknown)
     config = OmegaConf.merge(*configs, cli)
     config.train.dp.epsilon = float(opt.epsilon)
+    if not os.path.exists(config_path):
+        config.sensitive_data.data_name = opt.data_name
+        config.sensitive_data.train_path = os.path.join("dataset", opt.data_name, "train_32.zip")
+        config.sensitive_data.test_path = os.path.join("dataset", opt.data_name, "test_32.zip")
+        config.sensitive_data.fid_stats = os.path.join("dataset", opt.data_name, "fid_stats_32.npz")
+        if opt.method in ["DP-Kernel"]:
+            config.model.n_class = config.sensitive_data.n_classes
+        elif opt.method in ["DP-MERF"]:
+            config.model.num_class = config.sensitive_data.n_classes
+        elif opt.method in ["DP-NTK"]:
+            config.model.n_classes = config.sensitive_data.n_classes
+        elif opt.method in ["DPGAN", "GS-WGAN"]:
+            config.model.num_classes = config.sensitive_data.n_classes
+        elif opt.method in ["DPDM", "DP-LDM", "PDP-Diffusion"]:
+            config.train.loss.n_classes = config.sensitive_data.n_classes
+        elif opt.method in ["PE"]:
+            config.train.private_num_classes = config.sensitive_data.n_classes
     return config

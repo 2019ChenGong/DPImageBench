@@ -22,12 +22,14 @@ class DP_Kernel(DPSynther):
 
         self.image_size = config.image_size
         self.nz = config.Generator.z_dim
-        self.n_class = config.n_class
+        self.private_num_classes = config.private_num_classes
+        self.public_num_classes = config.public_num_classes
+        label_dim = max(self.private_num_classes, self.public_num_classes)
         self.sigma_list = config.sigma_list
         self.config = config
         self.device = device
 
-        G_decoder =  Generator(img_size=self.image_size, num_classes=self.n_class, **config.Generator).to(device)
+        G_decoder =  Generator(img_size=self.image_size, num_classes=label_dim, **config.Generator).to(device)
         self.gen = CNetG(G_decoder).to(device)
 
         model_parameters = filter(lambda p: p.requires_grad, self.gen.parameters())
@@ -39,8 +41,8 @@ class DP_Kernel(DPSynther):
             return
         os.mkdir(config.log_dir)
 
-        fixed_noise = torch.randn(8 * self.n_class, self.nz).to(self.device)
-        fixed_label = torch.arange(self.n_class).repeat(8).to(self.device)
+        fixed_noise = torch.randn(8 * self.public_num_classes, self.nz).to(self.device)
+        fixed_label = torch.arange(self.public_num_classes).repeat(8).to(self.device)
 
         optimizer = torch.optim.RMSprop(self.gen.parameters(), lr=config.lr)
         for epoch in range(config.n_epochs):
@@ -50,23 +52,21 @@ class DP_Kernel(DPSynther):
                 if len(label.shape) == 2:
                     x = x.to(torch.float32) / 255.
                     label = torch.argmax(label, dim=1)
-                if config.cond:
-                    label = label % self.n_class
-                else:
+                if not config.cond:
                     label = torch.zeros_like(label)
                 x = x.to(self.device) * 2 - 1
                 label = label.to(self.device)
                 batch_size = x.size(0)
 
-                gen_labels = get_gen_labels(label, self.n_class)
+                gen_labels = get_gen_labels(label, self.public_num_classes)
 
                 optimizer.zero_grad()
 
                 noise = torch.randn(batch_size, self.nz).to(self.device)
                 y = self.gen(noise, label=gen_labels)
 
-                label = F.one_hot(label, self.n_class).float()
-                gen_labels = F.one_hot(gen_labels, self.n_class).float()
+                label = F.one_hot(label, self.public_num_classes).float()
+                gen_labels = F.one_hot(gen_labels, self.public_num_classes).float()
 
                 #### compute mmd loss using my implementation ####
                 DP_mmd_loss = rbf_kernel_DP_loss_with_labels(x.view(batch_size, -1), y.view(batch_size, -1), label, gen_labels, self.sigma_list, 0.)
@@ -95,8 +95,8 @@ class DP_Kernel(DPSynther):
 
         logging.info("The noise factor is {}".format(self.noise_factor))
 
-        fixed_noise = torch.randn(8 * self.n_class, self.nz).to(self.device)
-        fixed_label = torch.arange(self.n_class).repeat(8).to(self.device)
+        fixed_noise = torch.randn(8 * self.private_num_classes, self.nz).to(self.device)
+        fixed_label = torch.arange(self.private_num_classes).repeat(8).to(self.device)
 
         optimizer = torch.optim.RMSprop(self.gen.parameters(), lr=config.lr)
         noise_multiplier = self.noise_factor
@@ -113,14 +113,14 @@ class DP_Kernel(DPSynther):
                 label = label.to(self.device)
                 batch_size = x.size(0)
 
-                gen_labels = get_gen_labels(label, self.n_class)
+                gen_labels = get_gen_labels(label, self.private_num_classes)
 
                 optimizer.zero_grad()
 
                 noise = torch.randn(batch_size, self.nz).to(self.device)
                 y = self.gen(noise, label=gen_labels)
-                label = F.one_hot(label, self.n_class).float()
-                gen_labels = F.one_hot(gen_labels, self.n_class).float()
+                label = F.one_hot(label, self.private_num_classes).float()
+                gen_labels = F.one_hot(gen_labels, self.private_num_classes).float()
 
                 #### compute mmd loss using my implementation ####
                 DP_mmd_loss = rbf_kernel_DP_loss_with_labels(x.view(batch_size, -1), y.view(batch_size, -1), label, gen_labels, self.sigma_list, noise_multiplier)
@@ -152,7 +152,7 @@ class DP_Kernel(DPSynther):
         syn_labels = []
 
         for _ in range(int(config.data_num / config.batch_size)):
-            y = torch.randint(self.n_class, (config.batch_size,)).to(self.device)
+            y = torch.randint(self.private_num_classes, (config.batch_size,)).to(self.device)
             z = torch.randn(config.batch_size, self.nz).to(self.device)
             images = self.gen(z, y)
             if images.shape[1] == 1:
@@ -167,7 +167,7 @@ class DP_Kernel(DPSynther):
         np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
 
         show_images = []
-        for cls in range(self.n_class):
+        for cls in range(self.private_num_classes):
             show_images.append(syn_data[syn_labels==cls][:8])
         show_images = np.concatenate(show_images)
         torchvision.utils.save_image(torch.from_numpy(show_images), os.path.join(config.log_dir, 'sample.png'), padding=1, nrow=8)

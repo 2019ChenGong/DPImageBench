@@ -181,12 +181,14 @@ class ImageFolderDataset(Dataset):
         path,                   # Path to directory or zip.
         resolution      = None, # Ensure specific resolution, None = highest available.
         c = None,
+        n_classes = None,
         transform = None,
         **super_kwargs,         # Additional arguments for the Dataset base class.
     ):
         self._path = path
         self._zipfile = None
         self.c = c
+        self.n_classes = n_classes
         self.transform = transform
 
         if os.path.isdir(self._path):
