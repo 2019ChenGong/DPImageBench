@@ -31,23 +31,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
   - [6. Contacts](#6-contacts)
   - [Acknowledgment](#acknowledgement)
 
-### Updates 
-- 🎉 **(2024.11.19)** We're thrilled to announce the release of initial version of DPImageBench!
-
-### Todo
-
-- [ ] setup.master_port=6026
-
-- [ ] remove the unneccessary part for algorithms in models
-
-- [ ] n_split, unify the batchsize?
-
-- [-] I found that changing the generator of GS-WGAN into ours affects the performance a lot. [Testing]
-
-- [ ] Optimizing utils, torch_utils, dnnlib.
-
-- [x] Customization sensitive dataset
-
 
 ## 2. Introduction
 
