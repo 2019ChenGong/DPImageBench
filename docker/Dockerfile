@@ -6,7 +6,6 @@ RUN apt-get -y update
 RUN apt-get -y install git
 RUN apt-get -y install wget
 RUN apt-get -y install libopenmpi-dev
-RUN git clone git@github.com:2019ChenGong/DPImageBench.git
 RUN cd DPImageBench; pip install -r requirements_cuda12.1.txt
 RUN conda install -y -c pytorch -c nvidia faiss-gpu=1.8.0
 RUN conda install mpi4py
