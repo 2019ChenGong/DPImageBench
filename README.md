@@ -124,8 +124,8 @@ DPImageBench/
 │   ├── plot_size_change.py                          # Plotting for Figure 6
 │   ├── plot_wo_pretrain_cond_cifar10.py             # Plotting for Figure 7
 │   ├── plot_wo_pretrain_cond_fmnist.py              # Plotting for Figure 9
-│   ├── plot_wo_pretrain_places_imagenet.py          # Plotting for Figure 4   
-│   └── visualization.py   
+│   ├── plot_wo_pretrain_places_imagenet.py          # Plotting for Figure 8   
+│   └── visualization.py                             # Plotting for Figure 4 
 ├── scripts/                    # Scripts for using DPImageBench
 │   ├── diffusion_size_change.py                    
 │   ├── download_dataset.sh                          
@@ -369,9 +369,22 @@ INFO - evaluator.py - 2024-11-12 09:06:18,148 - The best acc of accuracy (using 
 ```
 The synthetic images can be found at the `/exp/<algorithm_name>/<file_name>/gen/gen.npz`.
 
+### 4.5 Results Visualization
+
+We provide the plotting codes for results visualization in the folder `plot` of DPImageBench.
+
+- `plot_eps_change.py`: plotting for Figure 5 and 10.
+- `plot_size_change.py`: plotting for Figure 6.
+- `plot_wo_pretrain_cond_cifar10.py`: plotting for Figure 7.
+- `plot_wo_pretrain_cond_fmnist.py`: plotting for Figure 9.
+- `plot_wo_pretrain_places_imagenet.py`: plotting for Figure 8.   
+- `visualization.py`: plotting for Figure 4. 
+
 ## 5. Customization
 
-This part introduces how to apply DPImageBench for your own sensitive dataset.
+This part introduces how to apply DPImageBench for your own sensitive dataset. 
+
+
 
 ## 6. Contacts
 If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
@@ -379,4 +392,5 @@ If you have any question about our work or this repository, please don't hesitat
 
 ## Acknowledgement
  
- This project 
+Part of code is borrowed from [DP-MERF](https://github.com/ParkLabML/DP-MERF), [DP-Kernel](https://github.com/antoninschrab/dpkernel), [DP-NTK](https://github.com/Justinyangjy/DP-NTK), [GS-WGAN](https://github.com/DingfanChen/Private-Set), [DPAGN](https://github.com/illidanlab/dpgan), [PE](https://github.com/microsoft/DPSDA), [DPDM](https://github.com/nv-tlabs/DPDM), [PrivImage](https://github.com/SunnierLee/DP-ImaGen). We have elaborate them on the Appendix B.1 of our paper.
+We sincerely thank them for their contributions to the community.
