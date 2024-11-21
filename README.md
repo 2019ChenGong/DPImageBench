@@ -23,12 +23,11 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
     - [4.3 Running](#43-running)
       - [4.3.1 Key hyper-parameter introductions](#431-key-hyper-parameter-introductions)
       - [4.3.2 How to run](#432-how-to-run)
-    - [4.4 Results Explanation](#44-results-explanation)
+    - [4.4 Results](#44-results)
      - [4.4.1 Results Structure](#441-results-structure)
      - [4.4.2 Results Explanation](#442-results-explanation)
+    - [4.5 Results Visualization](#45-results-visualization)
   - [5. Customization](#5-customization)
-   - [Data Preparation](#51-data-preparation)
-   - [Training](#52-training)
   - [6. Contacts](#6-contacts)
   - [Acknowledgment](#acknowledgement)
 
@@ -288,7 +287,7 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsi
  --exp_description pretrain_places365_unconditional 
 ```
 
-### 4.4 Results Explanation
+### 4.4 Results
 We can find the `stdout.txt` files in the result folder, which record the training and evaluation processes. The results for utility and fidelity evaluations are available in `stdout.txt`. The result folder name consists of `<data_name>_eps<epsilon><notes>-<starting-time>`, e.g., `mnist_28_eps1.0-2024-10-25-23-09-18`.
 
 
