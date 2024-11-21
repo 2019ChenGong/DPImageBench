@@ -273,6 +273,9 @@ def main(config):
         elif data_name == "places365":
             _ = torchvision.datasets.Places365(root=data_dir, small=True, download=True, transform=trans)
             return
+        elif config.train_path != '' and config.test_path != '':
+            sensitive_train_set = torchvision.datasets.ImageFolder(root=config.train_path, transform=transforms.ToTensor())
+            sensitive_test_set = torchvision.datasets.ImageFolder(root=config.test_path, transform=transforms.ToTensor())
         else:
             raise NotImplementedError('{} is not yet implemented.'.format(data_name))
 
@@ -292,7 +295,7 @@ def main(config):
             max_idx = min(config.max_image, len(sensitive_train_set))
         archive_root_dir, save_bytes, close_dest = open_dest(os.path.join(data_dir, train_name + '.zip'))
         data_save(sensitive_train_loader, max_idx, transform_image, archive_root_dir, save_bytes, close_dest)
-        
+
         if config.max_image is None:
             max_idx = len(sensitive_test_set)
         else:
@@ -315,5 +318,7 @@ if __name__ == '__main__':
     parser.add_argument('--transform', default="center-crop")
     parser.add_argument('--celeba_attr', default="Male")
     parser.add_argument('--max_image', default=None, type=int)
+    parser.add_argument('--train_path', default='')
+    parser.add_argument('--test_path', default='')
     config = parser.parse_args()
     main(config)
