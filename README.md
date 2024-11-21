@@ -44,8 +44,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [-] I found that changing the generator of GS-WGAN into ours affects the performance a lot. [Testing]
 
-- [ ] The model size in Biggan is different from DMs. 
-
 - [ ] Optimizing utils, torch_utils, dnnlib.
 
 - [ ] Customization sensitive dataset
