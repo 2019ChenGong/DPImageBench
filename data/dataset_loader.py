@@ -20,9 +20,9 @@ def load_sensitive_data(config):
     #         config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
     
     sensitive_train_set = ImageFolderDataset(
-            config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, n_classes=config.sensitive_data.n_classes, use_labels=True)
+            config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
     sensitive_test_set = ImageFolderDataset(
-            config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, n_classes=config.sensitive_data.n_classes, use_labels=True)
+            config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
     
     if config.eval.mode == "val":
         if "mnist" in config.sensitive_data.name:

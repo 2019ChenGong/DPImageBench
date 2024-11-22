@@ -7,6 +7,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.autograd as autograd
 
 from models.DP_GAN import ops
 from models.DP_GAN import misc
@@ -241,6 +242,36 @@ class Discriminator(nn.Module):
 
         self.MODULES.d_act_fn = nn.ReLU(inplace=True)
         return self.MODULES
+    
+    def calc_gradient_penalty(self, real_data, fake_data, y, L_gp, device):
+        '''
+        compute gradient penalty term
+        :param real_data:
+        :param fake_data:
+        :param y:
+        :param L_gp:
+        :param device:
+        :return:
+        '''
+
+        batchsize = real_data.shape[0]
+        real_data = real_data.to(device)
+        fake_data = fake_data.to(device)
+        y = y.to(device)
+        alpha = torch.rand(batchsize, 1, 1, 1)
+        alpha = alpha.to(device)
+
+        interpolates = alpha * real_data + ((1 - alpha) * fake_data)
+        interpolates = interpolates.to(device)
+        interpolates = autograd.Variable(interpolates, requires_grad=True)
+        disc_interpolates = self.forward(interpolates, y)
+
+        gradients = autograd.grad(outputs=disc_interpolates, inputs=interpolates,
+                                  grad_outputs=torch.ones(disc_interpolates.size()).to(device),
+                                  create_graph=True, retain_graph=True, only_inputs=True)[0]
+        gradients_norm = gradients.norm(2, dim=1)
+        gradient_penalty = ((gradients_norm - 1) ** 2).mean() * L_gp
+        return gradient_penalty
 
 
 if __name__ == "__main__":

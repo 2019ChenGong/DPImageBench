@@ -37,7 +37,7 @@ model:
     apply_attn: true
   img_size: 28
   num_classes: 10
-  latent_type: bernoulli
+  latent_type: normal
   private_num_classes: 10
   public_num_classes: 1000
 pretrain:
