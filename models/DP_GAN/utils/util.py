@@ -107,7 +107,6 @@ def compute_fid(n_samples, n_gpus, sampling_shape, G, inception_model, stats_pat
                 x = G(x)
 
             x = (x / 2. + .5).clip(0., 1.)
-            x = (x * 255.).to(torch.uint8)
             yield x
 
     act = get_activations(generator(num_samples_per_gpu),
@@ -156,12 +155,9 @@ def get_activations(dl, model, device, max_samples):
             batch = batch.repeat(1, 3, 1, 1)
         elif len(batch.shape) == 3:  # if image is gray scale
             batch = batch.unsqueeze(1).repeat(1, 3, 1, 1)
+        
+        pred = model.get_feature_batch(batch).cpu().numpy()
 
-        with torch.no_grad():
-            pred = model(batch.to(device),
-                         return_features=True).unsqueeze(-1).unsqueeze(-1)
-
-        pred = pred.squeeze(3).squeeze(2).cpu().numpy()
         pred_arr.append(pred)
         total_processed += pred.shape[0]
         if max_samples is not None and total_processed > max_samples:

@@ -12,8 +12,7 @@ import tqdm
 
 from models.DP_Diffusion.model.ncsnpp import NCSNpp
 from models.DP_Diffusion.utils.util import set_seeds, make_dir, save_checkpoint, sample_random_image_batch, compute_fid
-from models.DP_Diffusion.dnnlib.util import open_url
-# from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
+from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
 from models.DP_Diffusion.model.ema import ExponentialMovingAverage
 from models.DP_Diffusion.score_losses import EDMLoss, VPSDELoss, VESDELoss, VLoss
 from models.DP_Diffusion.denoiser import EDMDenoiser, VPSDEDenoiser, VESDEDenoiser, VDenoiser
@@ -150,8 +149,8 @@ class DP_Diffusion(DPSynther):
         else:
             raise NotImplementedError
 
-        with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
-            inception_model = pickle.load(f).to(self.device)
+        inception_model = InceptionFeatureExtractor()
+        inception_model.model = inception_model.model.to(self.device)
 
         def sampler(x, y=None):
             if self.sampler.type == 'ddim':
@@ -330,9 +329,9 @@ class DP_Diffusion(DPSynther):
             loss_fn = VLoss(**config.loss).get_loss
         else:
             raise NotImplementedError
-
-        with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
-            inception_model = pickle.load(f).to(self.device)
+        
+        inception_model = InceptionFeatureExtractor()
+        inception_model.model = inception_model.model.to(self.device)
 
         def sampler(x, y=None):
             if self.sampler.type == 'ddim':

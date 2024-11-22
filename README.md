@@ -36,15 +36,11 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [ ] remove the unneccessary part for algorithms in models
-
 - [ ] n_split, unify the batchsize?
 
 - [-] I found that changing the generator of GS-WGAN into ours affects the performance a lot. [Testing]
 
-- [ ] Optimizing utils, torch_utils, dnnlib.
-
-- [ ] Change the conditional pretraining of GAN-based methods.
+- [x] Change the conditional pretraining of GAN-based methods.
 
 
 ## 2. Introduction
@@ -97,7 +93,6 @@ DPImageBench/
 │   ├── dataset_loader.py
 │   └── preprocess_dataset.py 
 ├── dataset/                    # Datasets studied in the project
-├── dnnlib/ 
 ├── docker/                     # Docker file
 ├── exp/                        # The output of the training process and evaluation results.
 ├── evaluation/                 # Evaluation module of DPImageBench, including utility and fidelity
@@ -135,9 +130,7 @@ DPImageBench/
 │   ├── eps_change.sh.                               
 │   ├── gan_size_change.sh                           
 │   ├── pdp_diffusion.sh                             
-│   └── test_classifier.py                           
-├── torch_utils/                # Helper classes and functions supporting various operations
-│   └── persistence.py                     
+│   └── test_classifier.py                                            
 ├── utils/                      # Helper classes and functions supporting various operations
 │   └── utils.py                     
 ├── README.md                   # Main project documentation

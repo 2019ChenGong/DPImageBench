@@ -11,7 +11,7 @@ import torchvision
 
 from models.DP_Diffusion.model.ema import ExponentialMovingAverage
 from models.DP_GAN.utils.util import set_seeds, make_dir, save_checkpoint, sample_random_image_batch, compute_fid, generate_batch, save_img
-from models.DP_Diffusion.dnnlib.util import open_url
+from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
 
 from models.DP_GAN.generator import Generator
 from models.DP_GAN.discriminator import Discriminator
@@ -95,8 +95,8 @@ class DPGAN(DPSynther):
         dataset_loader = torch.utils.data.DataLoader(
         dataset=public_dataloader.dataset, batch_size=config.batch_size//self.global_size, sampler=DistributedSampler(public_dataloader.dataset), pin_memory=True, drop_last=True)
 
-        with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
-            inception_model = pickle.load(f).to(self.device)
+        inception_model = InceptionFeatureExtractor()
+        inception_model.model = inception_model.model.to(self.device)
         
         snapshot_sampling_shape = (config.snapshot_batch_size, self.z_dim)
         fid_sampling_shape = (config.fid_batch_size, self.z_dim)
@@ -263,8 +263,8 @@ class DPGAN(DPSynther):
             alpha_history=alpha_history,
         )
 
-        with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
-            inception_model = pickle.load(f).to(self.device)
+        inception_model = InceptionFeatureExtractor()
+        inception_model.model = inception_model.model.to(self.device)
         
         snapshot_sampling_shape = (config.snapshot_batch_size, self.z_dim)
         fid_sampling_shape = (config.fid_batch_size, self.z_dim)

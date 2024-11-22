@@ -130,8 +130,7 @@ def main(args):
     ### Set up models
     netD_list = []
     for i in range(len(net_ids)):
-        # netD = DiscriminatorDCGAN(c=c, img_size=img_size, num_classes=label_dim)
-        netD = Discriminator(img_size=img_size, num_classes=label_dim)
+        netD = DiscriminatorDCGAN(c=c, img_size=img_size, num_classes=label_dim)
         netD_list.append(netD)
     netD_list = [netD.to(device) for netD in netD_list]
 
@@ -207,8 +206,8 @@ def main(args):
                     if len(real_y.shape) == 2:
                         real_data = real_data.to(torch.float32) / 255.
                         real_y = torch.argmax(real_y, dim=1)
-                    real_data = real_data * 2 - 1
-                    # real_data = real_data.view(batchsize, -1)
+                    # real_data = real_data * 2 - 1
+                    real_data = real_data.view(batchsize, -1)
                     real_data = real_data.to(device)
                     real_y = real_y.to(device)
                     real_data_v = autograd.Variable(real_data)
@@ -228,7 +227,7 @@ def main(args):
                         raise NotImplementedError
                     noisev = autograd.Variable(noise)
                     fake = netG(noisev, real_y)
-                    # fake = fake.view(batchsize, -1)
+                    fake = fake.view(batchsize, -1)
                     fake = autograd.Variable(fake.data)
                     inputv = fake
                     D_fake = netD(inputv, real_y)
@@ -263,7 +262,7 @@ def main(args):
                 label = torch.randint(0, private_num_classes, [batchsize]).to(device)
                 noisev = autograd.Variable(noise)
                 fake = netG(noisev, label)
-                # fake = fake.view(batchsize, -1)
+                fake = fake.view(batchsize, -1)
                 G = netD(fake, label)
                 G = - G.mean()
 

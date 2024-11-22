@@ -22,10 +22,11 @@ import torch
 import torchvision
 from torchvision import transforms
 
+from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
+
 new_cwd = os.path.dirname(os.getcwd())
 sys.path.insert(0, new_cwd)
 from data.stylegan3.dataset import ImageFolderDataset
-from models.DP_Diffusion.dnnlib.util import open_url
 
 
 def error(msg):
@@ -193,12 +194,9 @@ def get_activations(dl, model, device, max_samples):
             batch = batch.repeat(1, 3, 1, 1)
         elif len(batch.shape) == 3:  # if image is gray scale
             batch = batch.unsqueeze(1).repeat(1, 3, 1, 1)
+        
+        pred = model.get_feature_batch(batch/255.).cpu().numpy()
 
-        with torch.no_grad():
-            pred = model(batch.to(device),
-                         return_features=True).unsqueeze(-1).unsqueeze(-1)
-
-        pred = pred.squeeze(3).squeeze(2).cpu().numpy()
         pred_arr.append(pred)
         total_processed += pred.shape[0]
         if max_samples is not None and total_processed > max_samples:
@@ -216,11 +214,11 @@ def fid_save(fid_path, dataset, batch_size):
 
     queue = torch.utils.data.DataLoader(
         dataset=dataset, batch_size=batch_size, pin_memory=True, num_workers=1)
+    
+    inception_model = InceptionFeatureExtractor()
+    inception_model.model = inception_model.model.to(device)
 
-    with open_url('https://api.ngc.nvidia.com/v2/models/nvidia/research/stylegan3/versions/1/files/metrics/inception-2015-12-05.pkl') as f:
-        model = pickle.load(f).to(device)
-
-    act = get_activations(queue, model, device=device, max_samples=None)
+    act = get_activations(queue, inception_model, device=device, max_samples=None)
     mu = np.mean(act, axis=0)
     sigma = np.cov(act, rowvar=False)
     np.savez(fid_path, mu=mu, sigma=sigma)

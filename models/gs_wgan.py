@@ -46,8 +46,8 @@ class GS_WGAN(DPSynther):
         self.latent_type = config.latent_type
         self.ckpt = config.ckpt
 
-        # self.netG = Generator(img_size=self.img_size, num_classes=label_dim, **config.Generator)
-        self.netG = GeneratorResNet(c=self.c, img_size=self.img_size, z_dim=self.z_dim, model_dim=config.Generator.g_conv_dim, num_classes=self.label_dim)
+        self.netG = Generator(img_size=self.img_size, num_classes=self.label_dim, out=nn.Sigmoid(), **config.Generator)
+        # self.netG = GeneratorResNet(c=self.c, img_size=self.img_size, z_dim=self.z_dim, model_dim=config.Generator.g_conv_dim, num_classes=self.label_dim)
         
         self.netGS = copy.deepcopy(self.netG)
         self.netD_list = []
@@ -216,11 +216,12 @@ class GS_WGAN(DPSynther):
         c = str(self.c)
         log_dir = config.log_dir
         ndis = str(self.num_discriminators)
-        dis_per_job=200 # number of discriminators to be trained for each process
+        dis_per_job=250 # number of discriminators to be trained for each process
         njobs = self.num_discriminators // dis_per_job
         scripts = []
         for gpu_id in range(n_gpu):
             meta_start = dis_per_job // n_gpu * gpu_id
+            print(gpu_id)
             for job_id in range(njobs):
                 start= (job_id * dis_per_job + meta_start)
                 end= (start + dis_per_job)
