@@ -7,6 +7,7 @@
 exp/d*
 exp/g*
 exp/p*
+exp/c*
 debug.py
 
 GS-WGAN
