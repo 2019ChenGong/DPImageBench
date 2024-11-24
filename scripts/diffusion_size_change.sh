@@ -30,7 +30,7 @@ python run.py setup.n_gpus_per_node=4 pretrain.loss.label_unconditioning_prob=1.
 # reproduce
 python run.py setup.n_gpus_per_node=3 eval.mode=val pretrain.batch_size=1024 pretrain.n_epochs=160 model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=600 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf128_repro
 
-python run.py setup.n_gpus_per_node=8 eval.mode=val public_data.name=null model.ckpt= train.n_epochs=60 train.dp.max_grad_norm=0.001 model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=300 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf128_repro
+python run.py setup.n_gpus_per_node=8 eval.mode=val public_data.name=null model.ckpt=/p/fzv6enresearch/DPImageBench/exp/pdp-diffusion/cifar10_32_eps10.0trainval_ch1224_nf128_repro-2024-11-22-23-31-27/pretrain/checkpoints/snapshot_checkpoint.pth train.n_epochs=60 train.dp.max_grad_norm=0.001 model.network.attn_resolutions=[16,8,4] model.network.ch_mult=[1,2,2,4] model.network.nf=128 train.dp.n_splits=600 -m PDP-Diffusion -dn cifar10_32 -e 10.0 -ed trainval_ch1224_nf128_repro
 
 # PrivImage
 # 140G 11.1M

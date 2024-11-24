@@ -13,3 +13,4 @@ tensorboard==1.14.0
 tqdm==4.66.5
 gdown==4.7.3
 git+https://github.com/marcojira/fld.git
+improved-diffusion@git+https://github.com/fjxmlzn/improved-diffusion.git@8f6677c3c47d1c1ad2e22ad2603eaec4cc639805

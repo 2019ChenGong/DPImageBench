@@ -10,6 +10,7 @@ exp/p*
 exp/c*
 debug.py
 
+DP-LDM
 GS-WGAN
 DP-LDM*
 DP-MEPF
