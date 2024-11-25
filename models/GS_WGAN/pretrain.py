@@ -130,7 +130,7 @@ def main(args):
     ### Set up models
     netD_list = []
     for i in range(len(net_ids)):
-        netD = DiscriminatorDCGAN(c=c, img_size=img_size, num_classes=label_dim)
+        netD = DiscriminatorDCGAN(c=c, img_size=img_size, num_classes=private_num_classes)
         netD_list.append(netD)
     netD_list = [netD.to(device) for netD in netD_list]
 

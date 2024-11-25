@@ -46,13 +46,13 @@ class GS_WGAN(DPSynther):
         self.latent_type = config.latent_type
         self.ckpt = config.ckpt
 
-        self.netG = Generator(img_size=self.img_size, num_classes=self.label_dim, out=nn.Sigmoid(), **config.Generator)
-        # self.netG = GeneratorResNet(c=self.c, img_size=self.img_size, z_dim=self.z_dim, model_dim=config.Generator.g_conv_dim, num_classes=self.label_dim)
+        # self.netG = Generator(img_size=self.img_size, num_classes=self.label_dim, out=nn.Sigmoid(), **config.Generator)
+        self.netG = GeneratorResNet(c=self.c, img_size=self.img_size, z_dim=self.z_dim, model_dim=config.Generator.g_conv_dim, num_classes=self.label_dim)
         
         self.netGS = copy.deepcopy(self.netG)
         self.netD_list = []
         for i in range(self.num_discriminators):
-            netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.label_dim)
+            netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.private_num_classes)
             self.netD_list.append(netD)
         
         model_parameters = filter(lambda p: p.requires_grad, self.netG.parameters())
@@ -86,7 +86,7 @@ class GS_WGAN(DPSynther):
         netGS = self.netGS.to(self.device)
 
         ### Set up optimizers
-        netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.label_dim).to(self.device)
+        netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.self.private_num_classes).to(self.device)
         optimizerD = optim.Adam(netD.parameters(), lr=1e-4, betas=(0.5, 0.9))
         optimizerG = optim.Adam(self.netG.parameters(), lr=1e-4, betas=(0.5, 0.9))
 
@@ -295,7 +295,7 @@ class GS_WGAN(DPSynther):
         for i in range(self.num_discriminators):
             netD = self.netD_list[i]
             network_path = os.path.join(load_dir, 'netD_%d' % netD_id, 'netD.pth')
-            netD.load_state_dict(torch.load(network_path))
+            # netD.load_state_dict(torch.load(network_path))
             optimizerD = optim.Adam(netD.parameters(), lr=1e-4, betas=(0.5, 0.9))
             optimizerD_list.append(optimizerD)
         optimizerG = optim.Adam(netG.parameters(), lr=1e-4, betas=(0.5, 0.9))
