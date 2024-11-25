@@ -40,6 +40,12 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [-] I found that changing the generator of GS-WGAN into ours affects the performance a lot. [Testing]
 
+- [ ] DP-LDM and DP-LoRA for stable diffusion framework.
+
+- [ ] PDP diffusion tune the hyper-parameters.
+
+- [x] edit the conditional pretraining.
+
 - [x] Change the conditional pretraining of GAN-based methods.
 
 
