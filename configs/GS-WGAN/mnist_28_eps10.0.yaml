@@ -29,7 +29,7 @@ model:
   num_discriminators: 1000
   c: 1
   Generator:
-    z_dim: 60
+    z_dim: 10
     g_shared_dim: 128
     g_conv_dim: 64
     attn_g_loc:

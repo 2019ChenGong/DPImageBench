@@ -44,6 +44,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] PDP diffusion tune the hyper-parameters.
 
+- [ ] should unconditional pretraining keep the same pretraining method with conditional pretraining.
+
 - [x] edit the conditional pretraining.
 
 - [x] Change the conditional pretraining of GAN-based methods.

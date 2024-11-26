@@ -211,7 +211,7 @@ class GS_WGAN(DPSynther):
         data_name = config.data_name
         train_num = config.eval_mode
         data_path = config.data_path
-        gen_arch = "BigGAN"
+        gen_arch = "ResNet"
         img_size = str(self.img_size)
         c = str(self.c)
         log_dir = config.log_dir
@@ -219,7 +219,12 @@ class GS_WGAN(DPSynther):
         dis_per_job=250 # number of discriminators to be trained for each process
         njobs = self.num_discriminators // dis_per_job
         scripts = []
-        for gpu_id in range(n_gpu):
+        cuda_visible_devices = os.environ.get("CUDA_VISIBLE_DEVICES")
+        if cuda_visible_devices is None:
+            gpu_ids = [i for i in range(n_gpu)]
+        else:
+            gpu_ids = cuda_visible_devices.split(',')
+        for gpu_id in gpu_ids:
             meta_start = dis_per_job // n_gpu * gpu_id
             print(gpu_id)
             for job_id in range(njobs):
