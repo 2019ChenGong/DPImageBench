@@ -38,18 +38,17 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] n_split, unify the batchsize?
 
-- [-] I found that changing the generator of GS-WGAN into ours affects the performance a lot. [Testing]
-
 - [ ] DP-LDM and DP-LoRA for stable diffusion framework.
 
 - [ ] PDP diffusion tune the hyper-parameters.
 
-- [ ] should unconditional pretraining keep the same pretraining method with conditional pretraining.
+- [ ] different resolutions.
 
-- [x] edit the conditional pretraining.
+- [ ] Hyper-pararmeter gradient norm, epoch.
 
-- [x] Change the conditional pretraining of GAN-based methods.
+- [ ] emnist as the pretraining dataset.
 
+- [ ] All method for conditional pretraining except dm method.
 
 ## 2. Introduction
 
@@ -67,7 +66,7 @@ We list currently supported DP image synthesis methods as follows.
   | DP-GAN            |  [\[1802.06739\] Differentially Private Generative Adversarial Network (arxiv.org)](https://arxiv.org/abs/1802.06739) |
   | DPDM          |  [\[TMLR 2023\] Differentially Private Diffusion Models](https://openreview.net/forum?id=ZPpQk7FJXF) |
   | PDP-Diffusion       | [\[2302.13861\] Differentially Private Diffusion Models Generate Useful Synthetic Images (arxiv.org)](https://arxiv.org/abs/2302.13861) |
-  | DP-LDM            | [\[TMLR 2024\] Differentially Private Latent Diffusion Models (arxiv.org)](https://arxiv.org/abs/2305.15759)            |
+  | DP-LDM            | [\[TMLR 2024\] Differentially Private Latent Diffusion Models](https://arxiv.org/abs/2305.15759) |
   | PrivImage       | [\[UESNIX Security 2024\] PrivImage: Differentially Private Synthetic Image Generation using Diffusion Models with Semantic-Aware Pretraining](https://www.usenix.org/conference/usenixsecurity24/presentation/li-kecen) |
 
 ### 2.2 Currently Supported Datasets
@@ -182,7 +181,7 @@ The training and evaluatin codes are `run.py` and `eval.py`.
 
 We list the key hyper-parameters below, including their explanations and available options.
 
-- `--dataset_name`: means the sensitive dataset; the option is [`mnist_28`, `fmnist_28`, `cifar10_32`, `cifar100_32`, `eurosat_32`, `celeba_male_32`, `camelyon_32`].
+- `--data_name`: means the sensitive dataset; the option is [`mnist_28`, `fmnist_28`, `cifar10_32`, `cifar100_32`, `eurosat_32`, `celeba_male_32`, `camelyon_32`].
 - `--method`: the method to train the DP image synthesizers; the option is [`DP-NTK`, `DP-Kernel`, `DP-MERF`, `DPGAN`, `DP-LDM`, `DPDM`, `PE`, `GS-WGAN`, `PDP-Diffusion`, `PrivImage`].
 - `--epsilon`: the privacy budget 10.0; the option is [`1.0`, `10.0`].
 - `--exp_description`: the notes for the name of result folders.
@@ -209,11 +208,11 @@ We list an example as follows. Users can modify the configuration files in [conf
 
 We provide an example of training a synthesizer using the PDP-Diffusion method with 4 GPUs. The results reported in Table 6 were obtained by following the instructions provided. Additionally, the results (fidelity evaluations) reported in Table 7 were obtained using the default settings.
 ```
-python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --dataset_name mnist_28 --epsilon 10.0 eval.mode=val
+python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --data_name mnist_28 --epsilon 10.0 eval.mode=val
 ```
 The results reported in Table 5 were obtained by following the instructions below.
 ```
-python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --dataset_name mnist_28 --epsilon 10.0 eval.mode=syn
+python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --data_name mnist_28 --epsilon 10.0 eval.mode=syn
 ```
 We provide more examples in the `scripts/rq1.sh`, please refer to [scrips](scripts/rq1.sh).
 
@@ -236,7 +235,7 @@ If users wish to finetune the synthesizers using pretrained models, they should:
 ```
 python run.py setup.n_gpus_per_node=3 public_data.name=null eval.mode=val \
  model.ckpt=./exp/pdp-diffusion/<the-name-of-scripts>/pretrain/checkpoints/final_checkpoint.pth \
- --method PDP-Diffusion --dataset_name fmnist_28 --epsilon 10.0 --exp_description <any-notes>
+ --method PDP-Diffusion --data_name fmnist_28 --epsilon 10.0 --exp_description <any-notes>
 ```
 
 

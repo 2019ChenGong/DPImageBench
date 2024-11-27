@@ -25,11 +25,14 @@ sensitive_data:
   test_path: dataset/eurosat/test_32.zip
   fid_stats: dataset/eurosat/fid_stats_32.npz
 model:
-  z_dim: 5
-  h_dim: '200'
-  num_class: 10
-  n_channels: 16,8,3
-  kernel_sizes: 5,5
+  img_size: 32
+  Generator:
+    z_dim: 60
+    g_shared_dim: 128
+    g_conv_dim: 60
+    attn_g_loc:
+    - 2
+    apply_attn: true
   n_feat: 3072
   d_rff: 10000
   rff_sigma: '105'
@@ -57,6 +60,7 @@ train:
   dp:
     epsilon: 1.0
     delta: 1e-5
+  n_splits: 1
 gen:
   data_num: 60000
   batch_size: 1000

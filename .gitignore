@@ -11,6 +11,7 @@ exp/c*
 debug.py
 
 DP-LDM
+DP-LDM_for_merge
 GS-WGAN
 DP-LDM*
 DP-MEPF

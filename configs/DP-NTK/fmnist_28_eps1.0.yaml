@@ -37,7 +37,6 @@ model:
     attn_g_loc:
     - 2
     apply_attn: true
-  n_classes: 10
   private_num_classes: 10
   public_num_classes: 1000
 pretrain:
@@ -61,6 +60,7 @@ train:
   dp:
     epsilon: 1.0
     delta: 1e-5
+  n_splits: 1
 gen:
   data_num: 60000
   batch_size: 1000

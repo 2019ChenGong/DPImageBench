@@ -300,7 +300,7 @@ class GS_WGAN(DPSynther):
         for i in range(self.num_discriminators):
             netD = self.netD_list[i]
             network_path = os.path.join(load_dir, 'netD_%d' % netD_id, 'netD.pth')
-            # netD.load_state_dict(torch.load(network_path))
+            netD.load_state_dict(torch.load(network_path))
             optimizerD = optim.Adam(netD.parameters(), lr=1e-4, betas=(0.5, 0.9))
             optimizerD_list.append(optimizerD)
         optimizerG = optim.Adam(netG.parameters(), lr=1e-4, betas=(0.5, 0.9))

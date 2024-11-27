@@ -70,8 +70,8 @@ model:
 pretrain:
   log_dir: null
   seed: 0
-  batch_size: 64
-  n_epochs: 10
+  batch_size: 1024
+  n_epochs: 160
   log_freq: 100
   snapshot_freq: 2000
   snapshot_threshold: 1
@@ -126,7 +126,7 @@ train:
     delta: 1e-5
     epsilon: 10.0
     max_physical_batch_size: 8192
-    n_splits: 64
+  n_splits: 64
 gen:
   data_num: 60000
   batch_size: 1000

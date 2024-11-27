@@ -27,11 +27,10 @@ sensitive_data:
 model:
   ema_rate: 0.999
   img_size: 32
-  num_classes: 100
   Generator:
     z_dim: 60
     g_shared_dim: 128
-    g_conv_dim: 96
+    g_conv_dim: 60
     attn_g_loc:
     - 2
     apply_attn: true
@@ -97,7 +96,7 @@ train:
     delta: 1e-5
     epsilon: 1.0
     max_physical_batch_size: 8192
-    n_splits: 32
+  n_splits: 32
 gen:
   data_num: 60000
   batch_size: 1000

@@ -27,12 +27,15 @@ sensitive_data:
 model:
   ckpt: null
   num_discriminators: 1000
-  gen_arch: ResNet
   c: 3
+  Generator:
+    z_dim: 10
+    g_shared_dim: 128
+    g_conv_dim: 64
+    attn_g_loc:
+    - 2
+    apply_attn: true
   img_size: 32
-  z_dim: 10
-  num_classes: 2
-  model_dim: 64
   latent_type: bernoulli
   private_num_classes: 2
   public_num_classes: 1000
@@ -74,6 +77,7 @@ train:
   dp:
     epsilon: 1.0
     delta: 1e-5
+  n_splits: 1
 gen:
   data_num: 60000
   batch_size: 1000

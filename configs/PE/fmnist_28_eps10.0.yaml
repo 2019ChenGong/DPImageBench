@@ -82,6 +82,7 @@ train:
   dp:
     epsilon: 10.0
     delta: 1e-5
+  n_splits: 1
 gen:
   data_num: 60000
   batch_size: 1000
