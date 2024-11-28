@@ -47,6 +47,7 @@ pretrain:
   lr: 5e-5
   batch_size: 60
   cond: true
+  n_splits: 8
 train:
   ckpt: null
   max_iter: 200002

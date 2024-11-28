@@ -42,13 +42,15 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] PDP diffusion tune the hyper-parameters.
 
-- [ ] different resolutions.
-
 - [ ] Hyper-pararmeter gradient norm, epoch.
 
 - [ ] emnist as the pretraining dataset.
 
-- [ ] All method for conditional pretraining except dm method.
+- [ ] Exp: different resolutions.
+
+- [ ] Exp: All method for conditional pretraining except dm method.
+
+- [ ] eps and model size changes
 
 ## 2. Introduction
 

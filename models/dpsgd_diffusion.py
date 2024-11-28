@@ -351,7 +351,7 @@ class DP_Diffusion(DPSynther):
                     data_loader=dataset_loader,
                     max_physical_batch_size=config.dp.max_physical_batch_size,
                     optimizer=optimizer,
-                    n_splits=config.dp.n_splits if config.dp.n_splits > 0 else None) as memory_safe_data_loader:
+                    n_splits=config.n_splits if config.n_splits > 0 else None) as memory_safe_data_loader:
 
                 for _, (train_x, train_y) in enumerate(memory_safe_data_loader):
                     if state['step'] % config.snapshot_freq == 0 and state['step'] >= config.snapshot_threshold and self.global_rank == 0:

@@ -275,7 +275,7 @@ class DPGAN(DPSynther):
                     data_loader=dataset_loader,
                     max_physical_batch_size=config.dp.max_physical_batch_size,
                     optimizer=optimizerD,
-                    n_splits=config.dp.n_splits if config.dp.n_splits > 0 else None) as memory_safe_data_loader:
+                    n_splits=config.n_splits if config.n_splits > 0 else None) as memory_safe_data_loader:
 
                 for _, (train_x, train_y) in enumerate(memory_safe_data_loader):
 
@@ -307,14 +307,14 @@ class DPGAN(DPSynther):
                             G.train()
                             self.D_copy.zero_grad()
                             optimizerG.zero_grad()
-                            batch_size = config.batch_size // config.dp.n_splits // self.global_size
-                            for _ in range(config.dp.n_splits):
+                            batch_size = config.batch_size // config.n_splits // self.global_size
+                            for _ in range(config.n_splits):
                                 optimizerD.zero_grad(set_to_none=True)
                                 fake_labels = torch.randint(0, self.private_num_classes, (batch_size, ), device=self.device)
                                 noise = torch.randn((batch_size, 80), device=self.device)
                                 fake_images = G(noise, fake_labels)
                                 output_g = self.D_copy(fake_images, fake_labels)
-                                loss_G = self.g_hinge(output_g) / config.dp.n_splits
+                                loss_G = self.g_hinge(output_g) / config.n_splits
                                 loss_G.backward()
                             optimizerG.step()
                             G.eval()

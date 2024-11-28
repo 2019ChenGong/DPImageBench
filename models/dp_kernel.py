@@ -41,8 +41,8 @@ class DP_Kernel(DPSynther):
             return
         os.mkdir(config.log_dir)
 
-        fixed_noise = torch.randn(8 * self.public_num_classes, self.nz).to(self.device)
-        fixed_label = torch.arange(self.public_num_classes).repeat(8).to(self.device)
+        fixed_noise = torch.randn(8 * 10, self.nz).to(self.device)
+        fixed_label = torch.arange(10).repeat(8).to(self.device)
 
         optimizer = torch.optim.RMSprop(self.gen.parameters(), lr=config.lr)
         for epoch in range(config.n_epochs):
