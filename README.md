@@ -50,7 +50,11 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Exp: All method for conditional pretraining except dm method.
 
-- [ ] eps and model size changes
+- [ ] Exp: eps and model size changes
+
+- [ ] Exp: the 
+
+- [ ] Exp: different pretraining methods about label embedding.
 
 ## 2. Introduction
 
@@ -281,7 +285,7 @@ Users can set the `pretrain.cond` and `public_data.name` to choose between condi
 - `public_data.name`: [`null`, `imagenet`, `places365`].
 - `public_data.train_path`: the path to pretraining dataset.
 
-We use ImageNet as the default pretraining dataset, and these parameters are configured accordingly.
+We use ImageNet as the default pretraining dataset, and these parameters are configured accordingly. We provide more implementation examples in the [scripts](./scripts/rq3.sh).
 
 For example,
 
