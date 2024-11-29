@@ -225,14 +225,14 @@ class GS_WGAN(DPSynther):
             gpu_ids = [i for i in range(n_gpu)]
         else:
             gpu_ids = cuda_visible_devices.split(',')
-        for gpu_id in gpu_ids:
-            meta_start = dis_per_job // int(n_gpu) * int(gpu_id)
-            print(gpu_id)
+        for gpu_id in range(len(gpu_ids)):
+            gpu = gpu_ids[gpu_id]
+            meta_start = dis_per_job // n_gpu * gpu_id
             for job_id in range(njobs):
                 start= (job_id * dis_per_job + meta_start)
                 end= (start + dis_per_job)
                 vals= [str(dis_id) for dis_id in range(start, end)]
-                script = ['models/GS_WGAN/pretrain.py', '-data', data_name, '--log_dir', log_dir, '--train_num', train_num, '-ndis', ndis, '-ids'] + vals + ['--img_size', img_size, '--c', c, '--private_num_classes', str(self.private_num_classes), '--public_num_classes', str(self.public_num_classes), '--gpu_id', str(gpu_id), '--data_path', data_path, '-piters', iters, '--gen_arch', gen_arch, '--z_dim', str(self.z_dim), '--latent_type', self.latent_type, '--model_dim', str(self.config.Generator.g_conv_dim)]
+                script = ['models/GS_WGAN/pretrain.py', '-data', data_name, '--log_dir', log_dir, '--train_num', train_num, '-ndis', ndis, '-ids'] + vals + ['--img_size', img_size, '--c', c, '--private_num_classes', str(self.private_num_classes), '--public_num_classes', str(self.public_num_classes), '--gpu_id', str(gpu), '--data_path', data_path, '-piters', iters, '--gen_arch', gen_arch, '--z_dim', str(self.z_dim), '--latent_type', self.latent_type, '--model_dim', str(self.config.Generator.g_conv_dim)]
                 scripts.append(script)
         
         with ProcessPoolExecutor() as executor:

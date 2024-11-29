@@ -98,7 +98,7 @@ class DP_Diffusion(DPSynther):
             self.is_pretrain = False
             return
         
-        config.loss.n_classes = self.public_num_classes
+        config.loss.n_classes = self.private_num_classes
         if config.cond:
             config.loss['label_unconditioning_prob'] = 0.1
         else:
@@ -177,7 +177,7 @@ class DP_Diffusion(DPSynther):
                         ema.store(model.parameters())
                         ema.copy_to(model.parameters())
                         sample_random_image_batch(snapshot_sampling_shape, sampler, os.path.join(
-                            sample_dir, 'iter_%d' % state['step']), self.device, self.public_num_classes)
+                            sample_dir, 'iter_%d' % state['step']), self.device, self.private_num_classes)
                         ema.restore(model.parameters())
                     model.train()
 
@@ -189,7 +189,7 @@ class DP_Diffusion(DPSynther):
                     with torch.no_grad():
                         ema.store(model.parameters())
                         ema.copy_to(model.parameters())
-                        fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, self.public_num_classes)
+                        fid = compute_fid(config.fid_samples, self.global_size, fid_sampling_shape, sampler, inception_model, self.fid_stats, self.device, self.private_num_classes)
                         ema.restore(model.parameters())
 
                         if self.global_rank == 0:

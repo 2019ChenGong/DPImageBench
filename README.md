@@ -46,13 +46,15 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] emnist as the pretraining dataset.
 
+- [ ] Can GS-WGAN have more intermediate results.
+
+- [ ] mutliple GPUs cifar10 and cifar100.
+
 - [ ] Exp: different resolutions.
 
 - [ ] Exp: All method for conditional pretraining except dm method.
 
 - [ ] Exp: eps and model size changes
-
-- [ ] Exp: the 
 
 - [ ] Exp: different pretraining methods about label embedding.
 
