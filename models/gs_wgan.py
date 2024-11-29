@@ -86,7 +86,7 @@ class GS_WGAN(DPSynther):
         netGS = self.netGS.to(self.device)
 
         ### Set up optimizers
-        netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.self.private_num_classes).to(self.device)
+        netD = DiscriminatorDCGAN(c=self.c, img_size=self.img_size, num_classes=self.private_num_classes).to(self.device)
         optimizerD = optim.Adam(netD.parameters(), lr=1e-4, betas=(0.5, 0.9))
         optimizerG = optim.Adam(self.netG.parameters(), lr=1e-4, betas=(0.5, 0.9))
 
@@ -111,6 +111,7 @@ class GS_WGAN(DPSynther):
                     real_y = torch.argmax(real_y, dim=1)
                 if not config.cond:
                     real_y = torch.zeros_like(real_y).long()
+                real_y = real_y % self.private_num_classes
                 # real_data = real_data * 2 - 1
                 batchsize = real_data.shape[0]
                 real_data = real_data.view(batchsize, -1)
@@ -169,7 +170,7 @@ class GS_WGAN(DPSynther):
                 noise = bernoulli.sample((batchsize, self.z_dim)).view(batchsize, self.z_dim).to(self.device)
             else:
                 raise NotImplementedError
-            label = torch.randint(0, self.public_num_classes, [batchsize]).to(self.device)
+            label = torch.randint(0, self.private_num_classes, [batchsize]).to(self.device)
             noisev = autograd.Variable(noise)
             fake = netG(noisev, label).view(batchsize, -1)
             fake = fake.to(self.device)
@@ -196,7 +197,7 @@ class GS_WGAN(DPSynther):
                 logging.info('Step: {}, G_cost:{}, D_cost:{}, Wasserstein:{}'.format(iter, G_cost.cpu().data, D_cost.cpu().data, Wasserstein_D.cpu().data))
 
             if iter % config.vis_step == 0:
-                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.public_num_classes)
+                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.private_num_classes)
 
             del label, fake, noisev, noise, G, G_cost, D_cost
             torch.cuda.empty_cache()
@@ -225,7 +226,7 @@ class GS_WGAN(DPSynther):
         else:
             gpu_ids = cuda_visible_devices.split(',')
         for gpu_id in gpu_ids:
-            meta_start = dis_per_job // n_gpu * gpu_id
+            meta_start = dis_per_job // int(n_gpu) * int(gpu_id)
             print(gpu_id)
             for job_id in range(njobs):
                 start= (job_id * dis_per_job + meta_start)
