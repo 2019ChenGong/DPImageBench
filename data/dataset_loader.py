@@ -159,7 +159,10 @@ def load_data(config):
         elif config.public_data.name == "places365":
             download = (not os.path.exists(os.path.join(config.public_data.train_path, "data_256_standard")))
             public_train_set_ = torchvision.datasets.Places365(root=config.public_data.train_path, small=True, download=download, transform=trans)
-            public_train_set = SpecificClassPlaces365(public_train_set_, specific_class)
+            if specific_class is None:
+                public_train_set = public_train_set_
+            else:
+                public_train_set = SpecificClassPlaces365(public_train_set_, specific_class)
         else:
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     

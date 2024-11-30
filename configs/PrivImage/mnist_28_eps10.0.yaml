@@ -19,7 +19,7 @@ public_data:
     num_words: 1
     sigma: 50
     batch_size: 1000
-    model_path: null
+    model_path: models/pretrained_models/imagenet_classifier_0.454_ckpt.pth
 sensitive_data:
   name: mnist
   num_channels: 1
