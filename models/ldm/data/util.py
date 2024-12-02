@@ -115,6 +115,73 @@ class DataModuleFromConfig(pl.LightningDataModule):
         return DataLoader(self.datasets["predict"], batch_size=self.batch_size,
                           num_workers=self.num_workers, worker_init_fn=init_fn)
 
+class DataModuleFromDataset(pl.LightningDataModule):
+    def __init__(self, batch_size, train=None, validation=None, test=None, predict=None,
+                 wrap=False, num_workers=None, shuffle_test_loader=False, use_worker_init_fn=False,
+                 shuffle_val_dataloader=False):
+        super().__init__()
+        self.batch_size = batch_size
+        self.num_workers = num_workers if num_workers is not None else batch_size * 2
+        self.use_worker_init_fn = use_worker_init_fn
+        self.datasets = dict()
+        if train is not None:
+            self.train_dataloader = self._train_dataloader
+            self.datasets["train"] = train
+        if validation is not None:
+            self.val_dataloader = partial(self._val_dataloader, shuffle=shuffle_val_dataloader)
+            self.datasets["val"] = validation
+        self.wrap = wrap
+
+    # def prepare_data(self):
+    #     for data_cfg in self.dataset_configs.values():
+    #         instantiate_from_config(data_cfg)
+
+    def setup(self, stage=None):
+        if self.wrap:
+            for k in self.datasets:
+                self.datasets[k] = WrappedDataset(self.datasets[k])
+
+    def _train_dataloader(self):
+        is_iterable_dataset = isinstance(self.datasets['train'], Txt2ImgIterableBaseDataset)
+        if is_iterable_dataset or self.use_worker_init_fn:
+            init_fn = worker_init_fn
+        else:
+            init_fn = None
+        return DataLoader(self.datasets["train"], batch_size=self.batch_size,
+                          num_workers=self.num_workers, shuffle=False if is_iterable_dataset else True,
+                          worker_init_fn=init_fn)
+
+    def _val_dataloader(self, shuffle=False):
+        if isinstance(self.datasets['validation'], Txt2ImgIterableBaseDataset) or self.use_worker_init_fn:
+            init_fn = worker_init_fn
+        else:
+            init_fn = None
+        return DataLoader(self.datasets["validation"],
+                          batch_size=self.batch_size,
+                          num_workers=self.num_workers,
+                          worker_init_fn=init_fn,
+                          shuffle=shuffle)
+
+    def _test_dataloader(self, shuffle=False):
+        is_iterable_dataset = isinstance(self.datasets['train'], Txt2ImgIterableBaseDataset)
+        if is_iterable_dataset or self.use_worker_init_fn:
+            init_fn = worker_init_fn
+        else:
+            init_fn = None
+
+        # do not shuffle dataloader for iterable dataset
+        shuffle = shuffle and (not is_iterable_dataset)
+
+        return DataLoader(self.datasets["test"], batch_size=self.batch_size,
+                          num_workers=self.num_workers, worker_init_fn=init_fn, shuffle=shuffle)
+
+    def _predict_dataloader(self, shuffle=False):
+        if isinstance(self.datasets['predict'], Txt2ImgIterableBaseDataset) or self.use_worker_init_fn:
+            init_fn = worker_init_fn
+        else:
+            init_fn = None
+        return DataLoader(self.datasets["predict"], batch_size=self.batch_size,
+                          num_workers=self.num_workers, worker_init_fn=init_fn)
 
 class VirtualBatchWrapper(pl.LightningDataModule):
     """Produces data loaders guaranteed to return batches below the given size.

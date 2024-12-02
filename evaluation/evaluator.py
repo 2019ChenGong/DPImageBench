@@ -149,110 +149,6 @@ class Evaluator(object):
 
         return fid, is_mean, fld, p, r, ir
     
-    def cal_acc(self, model_name, synthetic_images, synthetic_labels, sensitive_test_loader):
-    
-        num_classes = len(set(synthetic_labels))
-        criterion = nn.CrossEntropyLoss()
-        lr = 1e-4
-
-        if self.config['sensitive_data']['name'] == 'cifar10_32' or self.config['sensitive_data']['name'] == 'cifar100_32':
-            batch_size = 128
-            max_epoch = 200
-            if model_name == "wrn":
-                model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, depth=28, widen_factor=10, dropRate=0.3)
-            elif model_name == "resnet":
-                model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, depth=164, block_name='BasicBlock')
-            elif model_name == "resnext":
-                model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], cardinality=8, depth=28, num_classes=num_classes, widen_factor=10, dropRate=0.3)
-
-            optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
-            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
-        else:
-            batch_size = 256
-            max_epoch = 50
-            if model_name == "wrn":
-                model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
-            elif model_name == "resnet":
-                model = ResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes)
-            elif model_name == "resnext":
-                model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
-
-            # optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4) 
-            optimizer = optim.Adam(model.parameters(), lr=0.01)       
-            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.2)
-
-        model = torch.nn.DataParallel(model).to(self.device)
-
-        ema = ExponentialMovingAverage(model.parameters(), 0.9999)
-
-        # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-5, nesterov=True)
-        # optimizer = optim.Adam(model.parameters(), lr=0.01)
-        # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
-
-        # optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
-        # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
-
-        train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images).float(), torch.from_numpy(synthetic_labels).long()), shuffle=True, batch_size=batch_size, num_workers=2)
-
-        best_acc = 0.
-
-        for epoch in range(max_epoch):
-            model.train()
-            train_loss = 0
-            test_loss = 0
-            total = 0
-            correct = 0
-            for _, (inputs, targets) in enumerate(train_loader):
-                inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
-                optimizer.zero_grad()
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
-                train_loss += loss.item()
-                loss.backward()
-                optimizer.step()
-
-                _, predicted = outputs.max(1)
-                total += targets.size(0)
-                correct += predicted.eq(targets).sum().item()
-                
-                ema.update(model.parameters())
-
-            scheduler.step()
-
-            train_acc = correct / total * 100
-            train_loss = train_loss / total
-            #scheduler.step()
-            model.eval()
-            ema.store(model.parameters())
-            ema.copy_to(model.parameters())
-            total = 0
-            correct = 0
-            with torch.no_grad():
-                for _, (inputs, targets) in enumerate(sensitive_test_loader):
-                    if len(targets.shape) == 2:
-                        inputs = inputs.to(torch.float32) / 255.
-                        targets = torch.argmax(targets, dim=1)
-
-                    inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
-                    outputs = model(inputs)
-                    loss = criterion(outputs, targets)
-                    test_loss += loss.item()
-
-                    _, predicted = outputs.max(1)
-                    total += targets.size(0)
-                    correct += predicted.eq(targets).sum().item()
-            
-            test_acc = correct / total * 100
-            test_loss = test_loss / total
-
-            if test_acc >= best_acc:
-                best_acc = test_acc
-
-            logging.info("Epoch: {} Train acc: {} Test acc: {} Train loss: {} Test loss: {}".format(epoch, train_acc, test_acc, train_loss, test_loss))
-            ema.restore(model.parameters())
-
-        return best_acc
-    
     def cal_acc_2(self, model_name, synthetic_images, synthetic_labels, sensitive_val_loader, sensitive_test_loader):
         # Fixed seed for better reproducibility
         rng = np.random.default_rng(seed=0)
@@ -295,13 +191,6 @@ class Evaluator(object):
         model = torch.nn.DataParallel(model).to(self.device)
 
         ema = ExponentialMovingAverage(model.parameters(), 0.9999)
-
-        # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=1e-5, nesterov=True)
-        # optimizer = optim.Adam(model.parameters(), lr=0.01)
-        # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
-
-        # optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
-        # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
 
         train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_train).float(), torch.from_numpy(synthetic_labels_train).long()), shuffle=True, batch_size=batch_size)
 
