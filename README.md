@@ -40,15 +40,11 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] DP-LDM and DP-LoRA for stable diffusion framework.
 
-- [ ] PDP diffusion tune the hyper-parameters.
-
 - [ ] Hyper-pararmeter gradient norm, epoch.
 
 - [ ] emnist as the pretraining dataset.
 
 - [ ] Can GS-WGAN have more intermediate results.
-
-- [ ] mutliple GPUs cifar10 and cifar100.
 
 - [ ] Exp: different resolutions.
 
