@@ -181,6 +181,27 @@ dataset/
 
 The training and evaluatin codes are `run.py` and `eval.py`.
 
+The core codes of `run.py` are present as follows.
+
+```python
+def main(config):
+
+    initialize_environment(config)
+
+    model, config = load_model(config)
+
+    sensitive_train_loader, sensitive_val_loader, sensitive_test_loader, public_train_loader, config = load_data(config)
+
+    model.pretrain(public_train_loader, config.pretrain)
+
+    model.train(sensitive_train_loader, config.train)
+
+    syn_data, syn_labels = model.generate(config.gen)
+
+    evaluator = Evaluator(config)
+    evaluator.eval(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
+```
+
 #### 4.3.1 Key hyper-parameter introductions
 
 We list the key hyper-parameters below, including their explanations and available options.
@@ -195,6 +216,7 @@ We list the key hyper-parameters below, including their explanations and availab
 - `eval.mode`: the mode of evaluations; the option is [`val`, `syn`] which means that using part of sensitive images and directly using the synthetic images as the validation set for model selection, respectively. The default setting is `val`.
 - `setup.master_port`: a configuration parameter specifying the port number on the master node (or primary process) that other processes or nodes use to communicate within a distributed system.
 - `pretrain.n_epochs`: the number of epoch for pretraining.
+- `train.n_epochs`: the number of epoch for finetuning on sensitive datasets.
 
 > It is a common [issue](https://pytorch.org/docs/stable/distributed.html) that we can not run a distributed process under a `setup.master_port=6026`. If you intend to run multiple distributed processes on the same machine, please consider using a different `setup.master_port`, such as 6027.
 
