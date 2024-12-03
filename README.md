@@ -73,6 +73,7 @@ We list currently supported DP image synthesis methods as follows.
   | DPDM          |  [\[TMLR 2023\] Differentially Private Diffusion Models](https://openreview.net/forum?id=ZPpQk7FJXF) |
   | PDP-Diffusion       | [\[2302.13861\] Differentially Private Diffusion Models Generate Useful Synthetic Images (arxiv.org)](https://arxiv.org/abs/2302.13861) |
   | DP-LDM            | [\[TMLR 2024\] Differentially Private Latent Diffusion Models](https://arxiv.org/abs/2305.15759) |
+  | DP-LoRA           | [\[arXiv\] Differentially Private Fine-Tuning of Diffusion Models](https://arxiv.org/abs/2406.01355) |
   | PrivImage       | [\[UESNIX Security 2024\] PrivImage: Differentially Private Synthetic Image Generation using Diffusion Models with Semantic-Aware Pretraining](https://www.usenix.org/conference/usenixsecurity24/presentation/li-kecen) |
 
 ### 2.2 Currently Supported Datasets
@@ -497,10 +498,8 @@ python run.py setup.n_gpus_per_node=4 --method PrivImage --epsilon 10.0 --data_n
 
 Other processes are the same.
 
-
 ## 6. Contacts
 If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
-
 
 ## Acknowledgement
  
