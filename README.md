@@ -313,7 +313,6 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsi
  --exp_description 14M 
 ```
 
-
 #### For the implementation of the results reported in RQ3.
 
 Users can set the `pretrain.cond` and `public_data.name` to choose between conditional and unconditional pretraining or to enable or disable pretraining. `public_data.name=null` indicates that pretraining is excluded. If users wish to use Places365 or a pretraining dataset, please take note of the following key parameters.
@@ -354,10 +353,9 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \
 ```
 
 ### 4.4 Training Using Checkpoints
-DPImageBench also supports training synthesizers from the checkpoints. As mentioned in [results structure](#451-results-structure), we provide `snapshot_checkpoint.pth` to store the synthesizer's parameters at the current epoch after each iteration.
+DPImageBench also supports training synthesizers from the checkpoints. As mentioned in the [results structure](#451-results-structure), we provide `snapshot_checkpoint.pth` to store the synthesizer's parameters at the current epoch after each iteration.
 
-For pretraining using checkpoints. We
-
+For pretraining using checkpoints, we
 
 
 
