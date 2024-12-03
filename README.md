@@ -159,7 +159,7 @@ git clone git@github.com:2019ChenGong/DPImageBench.git
 sh install.sh
  ```
 
-We also provide the (Docker)[./docker/Dockerfile] file.
+We also provide the [Docker](./docker/Dockerfile) file.
 
 ### 4.2 Prepare Dataset
 
