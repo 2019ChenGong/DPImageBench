@@ -194,6 +194,7 @@ We list the key hyper-parameters below, including their explanations and availab
 - `public_data.name`: the name of pretraining dataset; the option is [`null`, `imagenet`, `places365`], which mean that without pretraining, using ImageNet dataset as pretraining dataset, and using Places365 as pretraining dataset. It is notice that DPImageBench uses ImageNet as default pretraining dataset. If users use Places365 as pretraining dataset, please add `public_data.n_classes=365 public_data.train_path=dataset/places365`.
 - `eval.mode`: the mode of evaluations; the option is [`val`, `syn`] which means that using part of sensitive images and directly using the synthetic images as the validation set for model selection, respectively. The default setting is `val`.
 - `setup.master_port`: a configuration parameter specifying the port number on the master node (or primary process) that other processes or nodes use to communicate within a distributed system.
+- `pretrain.n_epochs`: the number of epoch for pretraining.
 
 > It is a common [issue](https://pytorch.org/docs/stable/distributed.html) that we can not run a distributed process under a `setup.master_port=6026`. If you intend to run multiple distributed processes on the same machine, please consider using a different `setup.master_port`, such as 6027.
 
@@ -242,6 +243,19 @@ python run.py setup.n_gpus_per_node=3 public_data.name=null eval.mode=val \
  --method PDP-Diffusion --data_name fmnist_28 --epsilon 10.0 --exp_description <any-notes>
 ```
 
+####  Only pretraining the synthesizer on public datasets and without finetuning on the sensitive datasets. 
+
+Please set sensitive_data.name=null and eval.mode=sen. For example, to use ImageNet for pretraining:
+```
+CUDA_VISIBLE_DEVICES=0,1,2 python run.py \
+ sensitive_data.name=null eval.mode=sen \ 
+ setup.n_gpus_per_node=3 \ 
+ public_data.name=imagenet \ 
+ pretrain.cond=Ture --method PDP-Diffusion \
+ --data_name cifar10_32 --epsilon 10.0 \ 
+ --exp_description pretrain_imagenet32 pretrain.n_epochs=2
+```
+It is noted that the default resolution for pretraining is 28x28 when --data_name is set to `mnist_28` or `fmnist_28`, but 32x32 for other datasets.
 
 #### For the implementation of the results reported in Figures 5, 6, and 9 (RQ2), the performance is analyzed by varying the epsilon and model size.
 
@@ -289,7 +303,8 @@ For example,
 
 (1) Using ImageNet to pretrain DPGAN using conditional pretraining.
 ```
-python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsilon 10.0 eval.mode=val \
+python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \
+ --epsilon 10.0 eval.mode=val \
  public_data.name=imagenet \
  pretrain.cond=Ture \
  --exp_description pretrain_imagenet_conditional 
@@ -297,7 +312,8 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsi
 
 (2) Using Places365 to pretrain DPGAN using conditional pretraining.
 ```
-python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsilon 10.0 eval.mode=val \
+python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \ 
+ --epsilon 10.0 eval.mode=val \
  public_data.name=places365 public_data.n_classes=365 public_data.train_path=dataset/places365 \
  pretrain.cond=Ture \
  --exp_description pretrain_places365_conditional 
@@ -305,14 +321,19 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsi
 
 (3) Using Places365 to pretrain DPGAN using unconditional pretraining.
 ```shell
-python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsilon 10.0 eval.mode=val \
+python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \ 
+ --epsilon 10.0 eval.mode=val \
  public_data.name=places365 public_data.n_classes=365 public_data.train_path=dataset/places365 \
  pretrain.cond=False \
  --exp_description pretrain_places365_unconditional 
 ```
 
 ### 4.4 Training Using Checkpoints
-DPImageBench also supports training synthesizers from the checkpoints.
+DPImageBench also supports training synthesizers from the checkpoints. As mentioned in [results structure](#451-results-structure), we provide `snapshot_checkpoint.pth` to store the synthesizer's parameters at the current epoch after each iteration.
+
+For pretraining using checkpoints. We
+
+
 
 
 ### 4.5 Results
