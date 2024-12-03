@@ -22,6 +22,10 @@ def run(func, config):
     if config.setup.run_type == "normal":
         config.setup.local_rank = 0
         config.setup.global_rank = 0
+        config.setup.global_size = config.setup.n_nodes * config.setup.n_gpus_per_node
+        config.model.local_rank = config.setup.local_rank
+        config.model.global_rank = config.setup.global_rank
+        config.model.global_size = config.setup.global_size
         func(config)
     elif config.setup.run_type == "torchmp":
         try:

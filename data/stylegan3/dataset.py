@@ -115,14 +115,14 @@ class Dataset(torch.utils.data.Dataset):
         if self._xflip[idx]:
             assert image.ndim == 3 # CHW
             image = image[:, :, ::-1]
-        return image.copy(), self.get_label(idx)
+        return image.copy() / 255., self.get_label(idx)
 
     def get_label(self, idx):
         label = self._get_raw_labels()[self._raw_idx[idx]]
-        if label.dtype == np.int64:
-            onehot = np.zeros(self.label_shape, dtype=np.float32)
-            onehot[label] = 1
-            label = onehot
+        # if label.dtype == np.int64:
+        #     onehot = np.zeros(self.label_shape, dtype=np.float32)
+        #     onehot[label] = 1
+        #     label = onehot
         return label.copy()
 
     def get_details(self, idx):

@@ -195,7 +195,7 @@ def get_activations(dl, model, device, max_samples):
         elif len(batch.shape) == 3:  # if image is gray scale
             batch = batch.unsqueeze(1).repeat(1, 3, 1, 1)
         
-        pred = model.get_feature_batch(batch/255.).cpu().numpy()
+        pred = model.get_feature_batch(batch).cpu().numpy()
 
         pred_arr.append(pred)
         total_processed += pred.shape[0]

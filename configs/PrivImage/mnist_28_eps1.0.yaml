@@ -16,7 +16,7 @@ public_data:
   train_path: dataset/imagenet/imagenet_32
   selective:
     ratio: 0.01
-    num_words: 1
+    num_words: 5
     sigma: 50
     batch_size: 1000
     model_path: models/pretrained_models/imagenet_classifier_0.454_ckpt.pth

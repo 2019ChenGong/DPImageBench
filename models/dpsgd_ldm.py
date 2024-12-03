@@ -16,6 +16,11 @@ from models.ldm.privacy.myopacus import MyDPLightningDataModule
 from models.DP_Diffusion.utils.util import make_dir
 from models.synthesizer import DPSynther
 
+from models.ldm.callbacks.cuda import CUDACallback                         # noqa: F401
+from models.ldm.callbacks.image_logger import ImageLogger                  # noqa: F401
+from models.ldm.callbacks.setup import SetupCallback                       # noqa: F401
+from models.ldm.data.util import DataModuleFromConfig, WrappedDataset, WrappedDataset_ldm  # noqa: F401
+
 class DP_LDM(DPSynther):
     def __init__(self, config, device):
         super().__init__()
@@ -29,7 +34,6 @@ class DP_LDM(DPSynther):
         self.private_num_classes = config.private_num_classes
         self.public_num_classes = config.public_num_classes
         label_dim = max(self.private_num_classes, self.public_num_classes)
-        self.network.label_dim = label_dim
 
         if config.ckpt is not None:
             pass
@@ -42,17 +46,19 @@ class DP_LDM(DPSynther):
         if self.global_rank == 0:
             make_dir(config.log_dir)
         
-        data = DataModuleFromDataset(config.batch_size, public_dataloader.dataset, num_workers=16)
+        dataset = WrappedDataset_ldm(public_dataloader.dataset)
         
-        self.pretrain_autoencoder(data, config.autoencoder, config.log_dir)
-        self.pretrain_unet(data, config.unet, config.log_dir)
+        self.pretrain_autoencoder(dataset, config.autoencoder, config.log_dir)
+        self.pretrain_unet(dataset, config.unet, config.log_dir)
 
         torch.cuda.empty_cache()
     
-    def pretrain_autoencoder(self, data, config, logdir):
+    def pretrain_autoencoder(self, dataset, config, logdir):
+        data = DataModuleFromDataset(train=dataset, **config.data.params)
         self.running_flow(data, config, logdir)
 
-    def pretrain_unet(self, data, config, logdir):
+    def pretrain_unet(self, dataset, config, logdir):
+        data = DataModuleFromDataset(train=dataset, **config.data.params)
         self.running_flow(data, config, logdir)
 
     def train(self, sensitive_dataloader, config):
@@ -62,35 +68,32 @@ class DP_LDM(DPSynther):
         if self.global_rank == 0:
             make_dir(config.log_dir)
         
-        data = DataModuleFromDataset(config.batch_size, sensitive_dataloader.dataset, num_workers=0)
+        data = DataModuleFromDataset(WrappedDataset_ldm(sensitive_dataloader.dataset), **config.data.params)
         
-        self.running_flow(data, config, config.dir)
+        self.running_flow(data, config, config.log_dir)
 
     def running_flow(self, data, config, logdir):
         sys.path.append(os.getcwd())
 
-        parser = []
-        for k in config.parser:
-            parser.append('--' + k)
-            parser.append(str(config.parser[k]))
-
+        parser = argparse.ArgumentParser()
         parser = Trainer.add_argparse_args(parser)
-
         opt, unknown = parser.parse_known_args()
+        for k in config.parser:
+            setattr(opt, k, config.parser[k])
 
         ckptdir = os.path.join(logdir, "checkpoints")
         cfgdir = os.path.join(logdir, "configs")
         seed_everything(opt.seed)
 
         # init and save configs
-        configs = [OmegaConf.load(cfg) for cfg in opt.base]
         cli = OmegaConf.from_dotlist(unknown)
-        config = OmegaConf.merge(*configs, cli)
+        config = OmegaConf.merge(*[config], cli)
         lightning_config = config.pop("lightning", OmegaConf.create())
         # merge trainer cli with config
         trainer_config = lightning_config.get("trainer", OmegaConf.create())
         # default to ddp
         trainer_config["accelerator"] = trainer_config.get("accelerator", "ddp")
+        trainer_config["gpus"] = ",".join([str(i) for i in range(self.global_size)]) + ","
         for k in nondefault_trainer_args(opt):
             trainer_config[k] = getattr(opt, k)
         if "gpus" not in trainer_config:
@@ -110,19 +113,19 @@ class DP_LDM(DPSynther):
         trainer_kwargs = dict()
 
         # default logger configs
-        default_logger_cfgs = {
-            "testtube": {
-                "target": "pytorch_lightning.loggers.TestTubeLogger",
-                "params": {
-                    "name": "testtube",
-                    "save_dir": logdir,
-                }
-            },
-        }
-        default_logger_cfg = default_logger_cfgs["testtube"]
-        logger_cfg = lightning_config.get("logger", OmegaConf.create())
-        logger_cfg = OmegaConf.merge(default_logger_cfg, logger_cfg)
-        trainer_kwargs["logger"] = instantiate_from_config(logger_cfg)
+        # default_logger_cfgs = {
+        #     "testtube": {
+        #         "target": "pytorch_lightning.loggers.TestTubeLogger",
+        #         "params": {
+        #             "name": "testtube",
+        #             "save_dir": logdir,
+        #         }
+        #     },
+        # }
+        # default_logger_cfg = default_logger_cfgs["testtube"]
+        # logger_cfg = lightning_config.get("logger", OmegaConf.create())
+        # logger_cfg = OmegaConf.merge(default_logger_cfg, logger_cfg)
+        # trainer_kwargs["logger"] = instantiate_from_config(logger_cfg)
 
         # modelcheckpoint - use TrainResult/EvalResult(checkpoint_on=metric) to
         # specify which metric is used to determine best models
@@ -149,7 +152,7 @@ class DP_LDM(DPSynther):
         # add callback which sets up log directory
         default_callbacks_cfg = {
             "setup_callback": {
-                "target": "main.SetupCallback",
+                "target": "models.dpsgd_ldm.SetupCallback",
                 "params": {
                     "resume": opt.resume,
                     "now": "",
@@ -161,7 +164,7 @@ class DP_LDM(DPSynther):
                 }
             },
             "image_logger": {
-                "target": "main.ImageLogger",
+                "target": "models.dpsgd_ldm.ImageLogger",
                 "params": {
                     "batch_frequency": 750,
                     "max_images": 4,
@@ -176,7 +179,7 @@ class DP_LDM(DPSynther):
                 }
             },
             "cuda_callback": {
-                "target": "main.CUDACallback"
+                "target": "models.dpsgd_ldm.CUDACallback"
             },
         }
         if version.parse(pl.__version__) >= version.parse('1.4.0'):
@@ -294,6 +297,108 @@ class DP_LDM(DPSynther):
             return syn_data, syn_labels
         else:
             return None, None
+
+def get_parser(**parser_kwargs):
+    def str2bool(v):
+        if isinstance(v, bool):
+            return v
+        if v.lower() in ("yes", "true", "t", "y", "1"):
+            return True
+        elif v.lower() in ("no", "false", "f", "n", "0"):
+            return False
+        else:
+            raise argparse.ArgumentTypeError("Boolean value expected.")
+
+    parser = argparse.ArgumentParser(**parser_kwargs)
+    parser.add_argument(
+        "-n",
+        "--name",
+        type=str,
+        const=True,
+        default="",
+        nargs="?",
+        help="postfix for logdir",
+    )
+
+    parser.add_argument(
+        "-r",
+        "--resume",
+        type=str,
+        const=True,
+        default="",
+        nargs="?",
+        help="resume from logdir or checkpoint in logdir",
+    )
+    parser.add_argument(
+        "-b",
+        "--base",
+        nargs="*",
+        metavar="base_config.yaml",
+        help="paths to base configs. Loaded from left-to-right. "
+             "Parameters can be overwritten or added with command-line options of the form `--key value`.",
+        default=list(),
+    )
+    parser.add_argument(
+        "-t",
+        "--train",
+        type=str2bool,
+        const=True,
+        default=False,
+        nargs="?",
+        help="train",
+    )
+    parser.add_argument(
+        "--no-test",
+        type=str2bool,
+        const=True,
+        default=False,
+        nargs="?",
+        help="disable test",
+    )
+    parser.add_argument(
+        "-p",
+        "--project",
+        help="name of new or path to existing project"
+    )
+    parser.add_argument(
+        "-d",
+        "--debug",
+        type=str2bool,
+        nargs="?",
+        const=True,
+        default=False,
+        help="enable post-mortem debugging",
+    )
+    parser.add_argument(
+        "-s",
+        "--seed",
+        type=int,
+        default=23,
+        help="seed for seed_everything",
+    )
+    parser.add_argument(
+        "-f",
+        "--postfix",
+        type=str,
+        default="",
+        help="post-postfix for default name",
+    )
+    parser.add_argument(
+        "-l",
+        "--logdir",
+        type=str,
+        default="logs",
+        help="directory for logging dat shit",
+    )
+    parser.add_argument(
+        "--scale_lr",
+        type=str2bool,
+        nargs="?",
+        const=True,
+        default=True,
+        help="scale base-lr by ngpu * batch_size * n_accumulate",
+    )
+    return parser
 
 
 def nondefault_trainer_args(opt):

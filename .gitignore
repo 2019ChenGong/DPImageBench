@@ -51,6 +51,11 @@ Instruction*
 core*
 debug
 
+src
+taming
+lightning_logs
+images
+
 fidelity.sh
 utility.sh
 

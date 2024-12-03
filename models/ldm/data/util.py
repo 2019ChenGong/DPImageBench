@@ -4,9 +4,9 @@ import pytorch_lightning as pl
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-from ldm.data.base import Txt2ImgIterableBaseDataset
-from ldm.util import instantiate_from_config
-from ldm.privacy.myopacus import my_wrap_data_loader
+from models.ldm.data.base import Txt2ImgIterableBaseDataset
+from models.ldm.util import instantiate_from_config
+from models.ldm.privacy.myopacus import my_wrap_data_loader
 
 
 def worker_init_fn(_):
@@ -36,6 +36,20 @@ class WrappedDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.data[idx]
+
+
+class WrappedDataset_ldm(Dataset):
+    """Wraps an arbitrary object with __len__ and __getitem__ into a pytorch dataset"""
+
+    def __init__(self, dataset):
+        self.data = dataset
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        x, y = self.data[idx]
+        return {"image": x.to(torch.float32), "class_label": y}
 
 
 class DataModuleFromConfig(pl.LightningDataModule):
