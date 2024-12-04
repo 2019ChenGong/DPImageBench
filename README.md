@@ -69,11 +69,11 @@ We list currently supported DP image synthesis methods as follows.
   | DP-Kernel        |  [\[NeuriPS 2023\] Functional Renyi Differential Privacy for Generative Modeling](https://proceedings.neurips.cc/paper_files/paper/2023/hash/2f9ee101e35b890d9eae79ee27bcd69a-Abstract-Conference.html) |
   | PE          |  [\[ICLR 2024\] Differentially Private Synthetic Data via Foundation Model {API}s 1: Images](https://openreview.net/forum?id=YEhQs8POIo) |
   | GS-WGAN            |  [\[NeuriPS 2020\] GS-WGAN: A Gradient-Sanitized Approach for Learning Differentially Private Generators](https://arxiv.org/pdf/2006.08265) |
-  | DP-GAN            |  [\[1802.06739\] Differentially Private Generative Adversarial Network (arxiv.org)](https://arxiv.org/abs/1802.06739) |
+  | DP-GAN            |  [\[arXiv 2020\] Differentially Private Generative Adversarial Network (arxiv.org)](https://arxiv.org/abs/1802.06739) |
   | DPDM          |  [\[TMLR 2023\] Differentially Private Diffusion Models](https://openreview.net/forum?id=ZPpQk7FJXF) |
   | PDP-Diffusion       | [\[2302.13861\] Differentially Private Diffusion Models Generate Useful Synthetic Images (arxiv.org)](https://arxiv.org/abs/2302.13861) |
   | DP-LDM            | [\[TMLR 2024\] Differentially Private Latent Diffusion Models](https://arxiv.org/abs/2305.15759) |
-  | DP-LoRA           | [\[arXiv\] Differentially Private Fine-Tuning of Diffusion Models](https://arxiv.org/abs/2406.01355) |
+  | DP-LoRA           | [\[arXiv 2024\] Differentially Private Fine-Tuning of Diffusion Models](https://arxiv.org/abs/2406.01355) |
   | PrivImage       | [\[UESNIX Security 2024\] PrivImage: Differentially Private Synthetic Image Generation using Diffusion Models with Semantic-Aware Pretraining](https://www.usenix.org/conference/usenixsecurity24/presentation/li-kecen) |
 
 ### 2.2 Currently Supported Datasets
@@ -356,7 +356,6 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \
 DPImageBench also supports training synthesizers from the checkpoints. As mentioned in the [results structure](#451-results-structure), we provide `snapshot_checkpoint.pth` to store the synthesizer's parameters at the current epoch after each iteration.
 
 For pretraining using checkpoints, we
-
 
 
 ### 4.5 Results
