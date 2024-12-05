@@ -269,7 +269,10 @@ def main(config):
             sensitive_train_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "camelyon17_32", "train"), transform=transforms.ToTensor())
             sensitive_test_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "camelyon17_32", "test"), transform=transforms.ToTensor())
         elif data_name == "places365":
-            _ = torchvision.datasets.Places365(root=data_dir, small=True, download=True, transform=trans)
+            _ = torchvision.datasets.Places365(root=data_dir, small=True, download=True)
+            return
+        elif data_name == "emnist":
+            _ = torchvision.datasets.EMNIST(root=data_dir, train=True, split="letters", download=True)
             return
         elif config.train_path != '' and config.test_path != '':
             sensitive_train_set = torchvision.datasets.ImageFolder(root=config.train_path, transform=transforms.ToTensor())
@@ -308,7 +311,7 @@ def main(config):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_name', nargs="*", default=["mnist", "fmnist", "cifar10", "cifar100", "celeba", "camelyon", "imagenet", "places365"])
+    parser.add_argument('--data_name', nargs="*", default=["mnist", "fmnist", "cifar10", "cifar100", "celeba", "camelyon", "imagenet", "places365", "emnist"])
     parser.add_argument('--resolution', default=32, type=int)
     parser.add_argument('--c', default=3, type=int)
     parser.add_argument('--fid_batch_size', default=500, type=int)

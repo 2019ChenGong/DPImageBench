@@ -12,6 +12,7 @@ import torch.distributed as dist
 from data.stylegan3.dataset import ImageFolderDataset
 from data.SpecificImagenet import SpecificClassImagenet
 from data.SpecificPlaces365 import SpecificClassPlaces365
+from data.SpecificEMNIST import SpecificClassEMNIST
 from models.PrivImage import resnet
 from models.PrivImage.classifer_trainer import train_classifier
 
@@ -163,6 +164,12 @@ def load_data(config):
                 public_train_set = public_train_set_
             else:
                 public_train_set = SpecificClassPlaces365(public_train_set_, specific_class)
+        elif config.public_data.name == "emnist":
+            public_train_set_ = torchvision.datasets.EMNIST(root=config.public_data.train_path, split="letters", train=True)
+            if specific_class is None:
+                public_train_set = public_train_set_
+            else:
+                public_train_set = SpecificClassEMNIST(public_train_set_, specific_class)
         else:
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     
