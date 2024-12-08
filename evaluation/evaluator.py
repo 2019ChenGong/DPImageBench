@@ -30,7 +30,7 @@ from evaluation.classifier.resnext import ResNeXt
 class Evaluator(object):
     def __init__(self, config):
 
-        self.device = config.setup.local_rank
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         self.sensitive_stats_path = config.sensitive_data.fid_stats
         self.acc_models = ["resnet", "wrn", "resnext"]
@@ -38,7 +38,7 @@ class Evaluator(object):
         torch.cuda.empty_cache()
     
     def eval(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader):
-        if self.device != 0 or sensitive_test_loader is None:
+        if str(self.device) != 'cuda:0' or sensitive_test_loader is None:
             return
         if synthetic_images.shape[-1] != self.config.sensitive_data.resolution:
             synthetic_images = F.interpolate(torch.from_numpy(synthetic_images), size=[self.config.sensitive_data.resolution, self.config.sensitive_data.resolution]).numpy()
@@ -76,7 +76,7 @@ class Evaluator(object):
         logging.info("The ImageReward of synthetic images is {}".format(ir))
 
     def eval_fidelity(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader):
-        if self.device != 0 or sensitive_test_loader is None:
+        if str(self.device) != 'cuda:0' or sensitive_test_loader is None:
             return
         if synthetic_images.shape[-1] != self.config.sensitive_data.resolution:
             synthetic_images = F.interpolate(torch.from_numpy(synthetic_images), size=[self.config.sensitive_data.resolution, self.config.sensitive_data.resolution]).numpy()
@@ -188,7 +188,8 @@ class Evaluator(object):
             optimizer = optim.Adam(model.parameters(), lr=0.01)       
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.2)
 
-        model = torch.nn.DataParallel(model).to(self.device)
+        device = torch.device("cuda:0")
+        model = model.to(device)
 
         ema = ExponentialMovingAverage(model.parameters(), 0.9999)
 
