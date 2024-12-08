@@ -221,6 +221,8 @@ We list the key hyper-parameters below, including their explanations and availab
 - `pretrain.n_epochs`: the number of epoch for pretraining.
 - `train.n_epochs`: the number of epoch for finetuning on sensitive datasets.
 
+> [!Warning]
+>
 > It is a common [issue](https://pytorch.org/docs/stable/distributed.html) that we can not run a distributed process under a `setup.master_port=6026`. If you intend to run multiple distributed processes on the same machine, please consider using a different `setup.master_port`, such as 6027.
 
 
