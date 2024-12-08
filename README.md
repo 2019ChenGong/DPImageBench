@@ -282,7 +282,9 @@ CUDA_VISIBLE_DEVICES=0,1,2 python run.py \
  --data_name cifar10_32 --epsilon 10.0 \ 
  --exp_description pretrain_imagenet32
 ```
-It is noted that the default resolution for pretraining is 28x28 when --data_name is set to `mnist_28` or `fmnist_28`, but 32x32 for other datasets. Users can edit `pretrain.n_epochs` to control the number of pretrain epoch
+> [!Note]
+>
+> It is noted that the default resolution for pretraining is 28x28 when --data_name is set to `mnist_28` or `fmnist_28`, but 32x32 for other datasets. Users can edit `pretrain.n_epochs` to control the number of pretrain epoch
 
 #### For the implementation of the results reported in Figures 5, 6, and 9 (RQ2), the performance is analyzed by varying the epsilon and model size.
 
