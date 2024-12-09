@@ -35,6 +35,7 @@ class Evaluator(object):
         self.sensitive_stats_path = config.sensitive_data.fid_stats
         self.acc_models = ["resnet", "wrn", "resnext"]
         self.config = config
+        self.local_rank = config.setup.local_rank
         torch.cuda.empty_cache()
     
     def eval(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader):
@@ -113,9 +114,9 @@ class Evaluator(object):
             train_images = []
             test_images = []
             for x, _ in sensitive_train_loader:
-                train_images.append(x.float()/255.)
+                train_images.append(x.float())
             for x, _ in sensitive_test_loader:
-                test_images.append(x.float()/255.)
+                test_images.append(x.float())
             train_images = torch.cat(train_images)
             test_images = torch.cat(test_images)
             if train_images.shape[1] == 1:
@@ -244,7 +245,7 @@ class Evaluator(object):
             with torch.no_grad():
                 for _, (inputs, targets) in enumerate(val_loader):
                     if len(targets.shape) == 2:
-                        inputs = inputs.to(torch.float32) / 255.
+                        inputs = inputs.to(torch.float32)
                         targets = torch.argmax(targets, dim=1)
                     inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
                     outputs = model(inputs)
@@ -267,7 +268,7 @@ class Evaluator(object):
             with torch.no_grad():
                 for _, (inputs, targets) in enumerate(sensitive_test_loader):
                     if len(targets.shape) == 2:
-                        inputs = inputs.to(torch.float32) / 255.
+                        inputs = inputs.to(torch.float32)
                         targets = torch.argmax(targets, dim=1)
 
                     inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
@@ -376,7 +377,7 @@ class Evaluator(object):
                 total = 0
                 for inputs, labels in train_loader:
                     inputs, labels = inputs.to(self.device), labels.to(self.device)
-                    inputs = inputs.float() / 255. * 2. - 1.
+                    inputs = inputs.float() * 2. - 1.
                     labels = torch.argmax(labels, dim=1)
                     # Zero the parameter gradients
                     optimizer.zero_grad()
@@ -404,7 +405,7 @@ class Evaluator(object):
                 with torch.no_grad():
                     for inputs, labels in test_loader:
                         inputs, labels = inputs.to(self.device), labels.to(self.device)
-                        inputs = inputs.float() / 255. * 2. - 1.
+                        inputs = inputs.float() * 2. - 1.
                         labels = torch.argmax(labels, dim=1)
                         outputs = model(inputs)
                         _, predicted = outputs.max(1)
