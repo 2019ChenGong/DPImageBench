@@ -46,6 +46,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Can GS-WGAN have more intermediate results.
 
+- [ ] ImageReward
+
 - [ ] Merge DP-LoRA.
 
 - [ ] Exp: different resolutions.
@@ -224,7 +226,7 @@ We list the key hyper-parameters below, including their explanations and availab
 
 > [!Note]
 >
-> DP-LDM originally uses a text-to-image stable diffusion model as the DP synthesizer. For a fair comparison, we now use a standard diffusion model, just like other diffusion-based models, which we call `DP-LDM-SD`. In addition, `DP-LDM` means using text-to-image stable diffusion as synthesizers.
+> DP-LDM originally uses a latent diffusion model as the DP synthesizer. For a fair comparison, we now use a standard diffusion model, just like other diffusion-based models, which we call `DP-LDM-SD`. In addition, `DP-LDM` means using latent diffusion models (i.e., stabel diffusion) as synthesizers.
 
 > [!Warning]
 >
