@@ -24,19 +24,13 @@ from models.ldm.data.util import DataModuleFromConfig, WrappedDataset, WrappedDa
 class DP_LDM(DPSynther):
     def __init__(self, config, device):
         super().__init__()
-        self.local_rank = config.local_rank
-        self.global_rank = config.global_rank
-        self.global_size = config.global_size
+        self.local_rank = config.setup.local_rank
+        self.global_rank = config.setup.global_rank
+        self.global_size = config.setup.global_size
 
         self.config = config
         self.device = 'cuda:%d' % self.local_rank
 
-        self.private_num_classes = config.private_num_classes
-        self.public_num_classes = config.public_num_classes
-        label_dim = max(self.private_num_classes, self.public_num_classes)
-
-        if config.ckpt is not None:
-            pass
         self.is_pretrain = True
     
     def pretrain(self, public_dataloader, config):
@@ -48,8 +42,17 @@ class DP_LDM(DPSynther):
         
         dataset = WrappedDataset_ldm(public_dataloader.dataset)
         
-        self.pretrain_autoencoder(dataset, config.autoencoder, config.log_dir)
+        if self.config.train.model.params.ckpt_path is not None:
+            return
+        elif self.config.pretrain.unet.model.params.first_stage_config.params.ckpt_path is None:
+            ae_logdir = os.path.join(config.log_dir, "autoencoder")
+            self.pretrain_autoencoder(dataset, config.autoencoder, ae_logdir)
+            config.unet.model.params.first_stage_config.params.ckpt_path = os.path.join(ae_logdir, "checkpoints", "last.ckpt")
+        
+        config.unet.data.params.batch_size = config.batch_size
+        config.unet.lightning.trainer.max_epochs = config.n_epochs
         self.pretrain_unet(dataset, config.unet, config.log_dir)
+        self.config.train.model.params.ckpt_path = os.path.join(config.log_dir, "checkpoints", "last.ckpt")
 
         torch.cuda.empty_cache()
     
@@ -58,6 +61,7 @@ class DP_LDM(DPSynther):
         self.running_flow(data, config, logdir)
 
     def pretrain_unet(self, dataset, config, logdir):
+        logdir = os.path.join(logdir, "unet")
         data = DataModuleFromDataset(train=dataset, **config.data.params)
         self.running_flow(data, config, logdir)
 
@@ -68,7 +72,15 @@ class DP_LDM(DPSynther):
         if self.global_rank == 0:
             make_dir(config.log_dir)
         
-        data = DataModuleFromDataset(WrappedDataset_ldm(sensitive_dataloader.dataset), **config.data.params)
+        config.model.params.ckpt_path = self.config.train.model.params.ckpt_path
+        config.lightning.trainer.max_epochs = config.n_epochs
+        config.data.params.batch_size = config.batch_size
+        config.model.params.dp_config.delta = config.dp.delta
+        config.model.params.dp_config.epsilon = config.dp.epsilon
+        config.model.params.dp_config.max_grad_norm = config.dp.max_grad_norm
+        config.model.params.dp_config.max_batch_size = config.batch_size // config.n_splits
+
+        data = DataModuleFromDataset(train=WrappedDataset_ldm(sensitive_dataloader.dataset), **config.data.params)
         
         self.running_flow(data, config, config.log_dir)
 
@@ -78,8 +90,10 @@ class DP_LDM(DPSynther):
         parser = argparse.ArgumentParser()
         parser = Trainer.add_argparse_args(parser)
         opt, unknown = parser.parse_known_args()
-        for k in config.parser:
-            setattr(opt, k, config.parser[k])
+
+        config_parse = {"name": "", "resume": "", "base": "", "train": True, "no-test": False, "project": None, "debug": False, "seed": 0, "postfix": "", "logdir": "logs", "scale_lr": True}
+        for k in config_parse:
+            setattr(opt, k, config_parse[k])
 
         ckptdir = os.path.join(logdir, "checkpoints")
         cfgdir = os.path.join(logdir, "configs")
@@ -297,108 +311,6 @@ class DP_LDM(DPSynther):
             return syn_data, syn_labels
         else:
             return None, None
-
-def get_parser(**parser_kwargs):
-    def str2bool(v):
-        if isinstance(v, bool):
-            return v
-        if v.lower() in ("yes", "true", "t", "y", "1"):
-            return True
-        elif v.lower() in ("no", "false", "f", "n", "0"):
-            return False
-        else:
-            raise argparse.ArgumentTypeError("Boolean value expected.")
-
-    parser = argparse.ArgumentParser(**parser_kwargs)
-    parser.add_argument(
-        "-n",
-        "--name",
-        type=str,
-        const=True,
-        default="",
-        nargs="?",
-        help="postfix for logdir",
-    )
-
-    parser.add_argument(
-        "-r",
-        "--resume",
-        type=str,
-        const=True,
-        default="",
-        nargs="?",
-        help="resume from logdir or checkpoint in logdir",
-    )
-    parser.add_argument(
-        "-b",
-        "--base",
-        nargs="*",
-        metavar="base_config.yaml",
-        help="paths to base configs. Loaded from left-to-right. "
-             "Parameters can be overwritten or added with command-line options of the form `--key value`.",
-        default=list(),
-    )
-    parser.add_argument(
-        "-t",
-        "--train",
-        type=str2bool,
-        const=True,
-        default=False,
-        nargs="?",
-        help="train",
-    )
-    parser.add_argument(
-        "--no-test",
-        type=str2bool,
-        const=True,
-        default=False,
-        nargs="?",
-        help="disable test",
-    )
-    parser.add_argument(
-        "-p",
-        "--project",
-        help="name of new or path to existing project"
-    )
-    parser.add_argument(
-        "-d",
-        "--debug",
-        type=str2bool,
-        nargs="?",
-        const=True,
-        default=False,
-        help="enable post-mortem debugging",
-    )
-    parser.add_argument(
-        "-s",
-        "--seed",
-        type=int,
-        default=23,
-        help="seed for seed_everything",
-    )
-    parser.add_argument(
-        "-f",
-        "--postfix",
-        type=str,
-        default="",
-        help="post-postfix for default name",
-    )
-    parser.add_argument(
-        "-l",
-        "--logdir",
-        type=str,
-        default="logs",
-        help="directory for logging dat shit",
-    )
-    parser.add_argument(
-        "--scale_lr",
-        type=str2bool,
-        nargs="?",
-        const=True,
-        default=True,
-        help="scale base-lr by ngpu * batch_size * n_accumulate",
-    )
-    return parser
 
 
 def nondefault_trainer_args(opt):

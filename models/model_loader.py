@@ -26,7 +26,7 @@ def load_model(config, sess=None):
         model = DP_Diffusion(config.model, config.setup.local_rank)
     elif config.setup.method == 'dpsgd-ldm':
         from models.dpsgd_ldm import DP_LDM
-        model = DP_LDM(config.model, config.setup.local_rank)
+        model = DP_LDM(config, config.setup.local_rank)
     elif config.setup.method == 'dp-promise':
         from models.dp_promise import DP_Promise
         model = DP_Promise(config.model, config.setup.local_rank)

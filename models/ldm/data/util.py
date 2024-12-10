@@ -49,7 +49,7 @@ class WrappedDataset_ldm(Dataset):
 
     def __getitem__(self, idx):
         x, y = self.data[idx]
-        return {"image": x.to(torch.float32), "class_label": y}
+        return {"image": torch.tensor(x).to(torch.float32), "class_label": y}
 
 
 class DataModuleFromConfig(pl.LightningDataModule):

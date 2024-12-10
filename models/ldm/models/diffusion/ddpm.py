@@ -10,7 +10,8 @@ from pytorch_lightning.utilities.distributed import rank_zero_only
 from omegaconf.errors import ConfigAttributeError
 
 from models.ldm.data.util import get_sample_rate
-from models.ldm.models.autoencoder import AutoencoderKL, IdentityFirstStage, VQModelInterface
+# from models.ldm.models.autoencoder import AutoencoderKL, IdentityFirstStage, VQModelInterface
+from models.ldm.models.autoencoder import AutoencoderKL, IdentityFirstStage
 from models.ldm.models.diffusion.ddim import DDIMSampler
 from models.ldm.models.diffusion.ddpm_base import DDPM
 from models.ldm.modules.diffusionmodules.util import extract_into_tensor, noise_like

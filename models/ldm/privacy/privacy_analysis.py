@@ -3,8 +3,10 @@ from math import ceil
 from autodp.mechanism_zoo import ExactGaussianMechanism
 from autodp.calibrator_zoo import eps_delta_calibrator
 from autodp.transformer_zoo import AmplificationBySampling, Composition
+import importlib
+opacus = importlib.import_module('opacus')
 from opacus.accountants.utils import get_noise_multiplier
-from opacus.accountants import PRVAccountant
+# from opacus.accountants import PRVAccountant
 
 
 def get_noisysgd_mechanism(noise_scale, sample_rate, max_steps):
