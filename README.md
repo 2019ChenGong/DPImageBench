@@ -36,8 +36,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [ ] n_split, unify the batchsize?
-
 - [ ] DP-LDM and DP-LoRA for stable diffusion framework.
 
 - [ ] Hyper-pararmeter gradient norm, epoch.
@@ -46,9 +44,11 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Can GS-WGAN have more intermediate results.
 
-- [ ] ImageReward
+- [ ] Validation set.
 
 - [ ] Merge DP-LoRA.
+
+- [ ] downstream generative model?
 
 - [ ] Exp: different resolutions.
 
