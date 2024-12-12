@@ -80,7 +80,7 @@ class DP_LDM(DPSynther):
         config.model.params.dp_config.max_grad_norm = config.dp.max_grad_norm
         config.model.params.dp_config.max_batch_size = config.batch_size // config.n_splits
 
-        data = DataModuleFromDataset(train=WrappedDataset_ldm(sensitive_dataloader.dataset), **config.data.params)
+        data = DataModuleFromDataset(train=WrappedDataset_ldm(sensitive_dataloader.dataset), validation=WrappedDataset_ldm(sensitive_dataloader.dataset), **config.data.params)
         
         self.running_flow(data, config, config.log_dir)
 
@@ -106,7 +106,10 @@ class DP_LDM(DPSynther):
         # merge trainer cli with config
         trainer_config = lightning_config.get("trainer", OmegaConf.create())
         # default to ddp
-        trainer_config["accelerator"] = trainer_config.get("accelerator", "ddp")
+        if 'dp' not in config:
+            trainer_config["accelerator"] = trainer_config.get("accelerator", "ddp")
+        else:
+            trainer_config["accelerator"] = "gpu"
         trainer_config["gpus"] = ",".join([str(i) for i in range(self.global_size)]) + ","
         for k in nondefault_trainer_args(opt):
             trainer_config[k] = getattr(opt, k)

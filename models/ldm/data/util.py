@@ -143,7 +143,7 @@ class DataModuleFromDataset(pl.LightningDataModule):
             self.datasets["train"] = train
         if validation is not None:
             self.val_dataloader = partial(self._val_dataloader, shuffle=shuffle_val_dataloader)
-            self.datasets["val"] = validation
+            self.datasets["validation"] = validation
         self.wrap = wrap
 
     # def prepare_data(self):

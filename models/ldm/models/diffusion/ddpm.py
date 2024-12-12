@@ -1074,9 +1074,14 @@ class LatentDiffusion(DDPM):
         # Initialize and get the training dataloader
         # This API is unstable, see https://github.com/Lightning-AI/lightning/issues/10430
         if hasattr(self.trainer, "setup_data"):
+            print("*********")
+            print("*********")
             self.trainer.fit_loop.setup_data()
             return self.trainer.train_dataloader
         elif hasattr(self.trainer, "reset_train_dataloader"):
+            print("*********")
+            print("*********")
+            print("*********")
             self.trainer.reset_train_dataloader(self)
             return self.trainer.datamodule.train_dataloader()
         elif hasattr(self.trainer, "_data_connector"):
