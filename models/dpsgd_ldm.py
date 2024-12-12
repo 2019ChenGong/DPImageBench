@@ -12,6 +12,7 @@ from pytorch_lightning.trainer import Trainer
 
 from models.ldm.data.util import VirtualBatchWrapper, DataModuleFromDataset
 from models.ldm.util import instantiate_from_config
+from models.ldm.gen import generate_batch
 from models.ldm.privacy.myopacus import MyDPLightningDataModule
 from models.DP_Diffusion.utils.util import make_dir
 from models.synthesizer import DPSynther
@@ -80,7 +81,8 @@ class DP_LDM(DPSynther):
         config.model.params.dp_config.max_grad_norm = config.dp.max_grad_norm
         config.model.params.dp_config.max_batch_size = config.batch_size // config.n_splits
 
-        data = DataModuleFromDataset(train=WrappedDataset_ldm(sensitive_dataloader.dataset), validation=WrappedDataset_ldm(sensitive_dataloader.dataset), **config.data.params)
+        # data = DataModuleFromDataset(train=WrappedDataset_ldm(sensitive_dataloader.dataset), validation=WrappedDataset_ldm(sensitive_dataloader.dataset), **config.data.params)
+        data = DataModuleFromDataset(train=WrappedDataset_ldm(sensitive_dataloader.dataset), **config.data.params)
         
         self.running_flow(data, config, config.log_dir)
 
@@ -289,8 +291,8 @@ class DP_LDM(DPSynther):
             except Exception:
                 trainer.save_checkpoint(os.path.join(ckptdir, "on_exception.ckpt"))
                 raise
-        if not opt.no_test and not trainer.interrupted:
-            trainer.test(model, data)
+        # if not opt.no_test and not trainer.interrupted:
+        #     trainer.test(model, data)
 
 
     def generate(self, config):
@@ -298,22 +300,19 @@ class DP_LDM(DPSynther):
         if self.global_rank == 0 and not os.path.exists(config.log_dir):
             make_dir(config.log_dir)
         
+        model_path = os.path.join(self.config.train.log_dir, "checkpoints", "last.ckpt")
+        syn_data, syn_labels = generate_batch(self.config.train, config.data_num, model_path, num_classes=self.config.sensitive_data.n_classes, batch_size=config.batch_size)
 
-        if self.global_rank == 0:
-            logging.info("Generation Finished!")
-            syn_data = np.concatenate(syn_data)
-            syn_labels = np.concatenate(syn_labels)
+        logging.info("Generation Finished!")
 
-            np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
+        np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
 
-            show_images = []
-            for cls in range(self.private_num_classes):
-                show_images.append(syn_data[syn_labels==cls][:8])
-            show_images = np.concatenate(show_images)
-            torchvision.utils.save_image(torch.from_numpy(show_images), os.path.join(config.log_dir, 'sample.png'), padding=1, nrow=8)
-            return syn_data, syn_labels
-        else:
-            return None, None
+        show_images = []
+        for cls in range(self.config.sensitive_data.n_classes):
+            show_images.append(syn_data[syn_labels==cls][:8])
+        show_images = np.concatenate(show_images)
+        torchvision.utils.save_image(torch.from_numpy(show_images), os.path.join(config.log_dir, 'sample.png'), padding=1, nrow=8)
+        return syn_data, syn_labels
 
 
 def nondefault_trainer_args(opt):

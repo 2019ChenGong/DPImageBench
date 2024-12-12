@@ -29,6 +29,7 @@ from models.ldm.privacy.myopacus import MyBatchSplittingSampler
 from models.ldm.privacy.privacy_analysis import compute_noise_multiplier, get_noisysgd_mechanism
 import gc
 
+from peft import LoraConfig, get_peft_model
 
 __conditioning_keys__ = {'concat': 'c_concat',
                          'crossattn': 'c_crossattn',
@@ -85,6 +86,13 @@ class LatentDiffusion(DDPM):
                  train_resblocks_only=False,
                  ablation_blocks=-1,
                  dp_config=None,
+                 use_model_lora=False,
+                 model_lora_r=8,
+                 model_lora_target=[],
+                 use_cond_lora=False,
+                 cond_lora_r=8,
+                 cond_lora_target=[],
+                 DPDM_k=1,
                  *args, **kwargs):
         self.num_timesteps_cond = default(num_timesteps_cond, 1)
         self.scale_by_std = scale_by_std
@@ -136,6 +144,32 @@ class LatentDiffusion(DDPM):
         self.dp_config = dp_config
         if dp_config and dp_config.enabled:
             self.privacy_engine = opacus.PrivacyEngine()
+        
+        if use_model_lora:
+            self.use_model_lora = use_model_lora
+            self.use_cond_lora = use_cond_lora
+            if use_model_lora:
+                model_lora_config = LoraConfig(
+                    r=model_lora_r,
+                    lora_alpha=model_lora_r,
+                    target_modules=model_lora_target,
+                    init_lora_weights="gaussian",
+                    lora_dropout=0.0,
+                    bias='lora_only',
+                )
+                self.model = get_peft_model(self.model, model_lora_config)
+            if use_cond_lora:
+                cond_lora_config = LoraConfig(
+                    r=cond_lora_r,
+                    lora_alpha=model_lora_r,
+                    target_modules=cond_lora_target,
+                    init_lora_weights="gaussian",
+                    lora_dropout=0.0,
+                    bias='lora_only',
+                )
+                self.cond_stage_model = get_peft_model(self.cond_stage_model, cond_lora_config)
+        else:
+            self.use_model_lora = False
 
     def init_attention(self, attention_flag='spatial'):
         ignore_keys = []
@@ -464,10 +498,10 @@ class LatentDiffusion(DDPM):
                     return self.first_stage_model.decode(z)
 
         else:
-            if isinstance(self.first_stage_model, VQModelInterface):
-                return self.first_stage_model.decode(z, force_not_quantize=predict_cids or force_not_quantize)
-            else:
-                return self.first_stage_model.decode(z)
+            # if isinstance(self.first_stage_model, VQModelInterface):
+            #     return self.first_stage_model.decode(z, force_not_quantize=predict_cids or force_not_quantize)
+            # else:
+            return self.first_stage_model.decode(z)
 
     # same as above but without decorator
     def differentiable_decode_first_stage(self, z, predict_cids=False, force_not_quantize=False):
@@ -1091,148 +1125,278 @@ class LatentDiffusion(DDPM):
 
     def configure_optimizers(self):
         print("#### Finetuning ####")
+        if self.use_model_lora:
+            if self.train_condition_only:
+                if self.use_model_lora:
+                    model_params = list(self.model.parameters())
+                else:
+                    model_params = []
+                    self.model.requires_grad_(False)
+                    # self.model.requires_grad_(True)
+                    spatial_modules = [x for x in self.model.modules() if isinstance(x, SpatialTransformer)]
+                    for i, m in enumerate(spatial_modules):
+                        # All SpatialTransformer modules propagate gradients to the cond_stage_model
+                        m.requires_grad_(True)
+                        # Do not unfreeze the first `self.ablation_blocks` AttentionBlocks
+                        if i + 1 >= self.ablation_blocks:
+                            model_params.extend(m.parameters())
+                if self.cond_stage_trainable:
+                    if self.use_cond_lora:
+                        cond_params = list(self.cond_stage_model.parameters())
+                    else:
+                        self.cond_stage_model.requires_grad_(True)
+                        cond_params = list(self.cond_stage_model.parameters())
+                    params = model_params + cond_params
+                else:
+                    params = model_params
+                # num_blocks = len(spatial_modules)
+                # num_blocks_tuned = num_blocks - max(self.ablation_blocks, 0)
+                # print(f"  {num_blocks_tuned}/{num_blocks} SpatialTransformers will be trained")
+            elif self.train_attention_only:
+                print("  Training (unconditional) AttentionBlocks only")
+                if self.use_model_lora:
+                    model_params = list(self.model.parameters())
+                else:
+                    model_params = []
+                    # self.model.requires_grad_(False)
+                    self.model.requires_grad_(True)
+                    attention_modules = [x for x in self.model.modules() if isinstance(x, AttentionBlock)]
+                    for i, m in enumerate(attention_modules):
+                        # Do not unfreeze the first `self.ablation_blocks` AttentionBlocks
+                        if i + 1 >= self.ablation_blocks:
+                            # m.requires_grad_(True)
+                            model_params.extend(m.parameters())
+                            
+                params = model_params
 
-        att_params = []
-        if self.train_condition_only:
-            self.model.requires_grad_(False)
-            spatial_modules = [x for x in self.model.modules() if isinstance(x, SpatialTransformer)]
-            for i, m in enumerate(spatial_modules):
-                # All SpatialTransformer modules propagate gradients to the cond_stage_model
-                m.requires_grad_(True)
-                # Do not unfreeze the first `self.ablation_blocks` AttentionBlocks
-                if i + 1 >= self.ablation_blocks:
-                    att_params.extend(m.parameters())
+                # num_blocks = len(attention_modules)
+                # num_blocks_tuned = num_blocks - max(self.ablation_blocks, 0)
+                # print(f"  {num_blocks_tuned}/{num_blocks} AttentionBlocks will be trained")
+            else:
+                self.model.requires_grad_(True)
+                if self.ablation_blocks > 0:
+                    self.model.requires_grad_(False)
+                    current_block = 0
+                    TUNEFLAG = False
+                    att_params = []
+                    # params = self.cond_stage_model.parameters()
+                    for nm, m in self.model.named_modules():
+                        if isinstance(m, SpatialTransformer):
+                            current_block += 1
+                            if current_block == self.ablation_blocks - 1:
+                                TUNEFLAG = True
+                                print("Begin with Layer {}".format(current_block + 1))
+                        if TUNEFLAG:
+                            m.requires_grad_(True)
+                            att_params.extend(m.parameters())
+                    params = att_params
+                else:
+                    params = list(self.model.parameters())
+                if self.cond_stage_trainable:
+                    print(f"{self.__class__.__name__}: Also optimizing conditioner params!")
+                    params = params + list(self.cond_stage_model.parameters())
+                if self.learn_logvar:
+                    print('  Diffusion model optimizing logvar')
+                    params.append(self.logvar)
 
-            self.cond_stage_model.requires_grad_(True)
-            cond_params = self.cond_stage_model.parameters()
+            num_model_params = sum(p.numel() for p in self.model.parameters())
+            num_cond_params = sum(p.numel() for p in self.cond_stage_model.parameters()) if self.cond_stage_model else 0
+            num_params = num_model_params + num_cond_params
+            num_model_grad = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+            num_cond_grad = sum(p.numel() for p in self.cond_stage_model.parameters() if p.requires_grad) if self.cond_stage_model else 0
+            num_grad = num_model_grad + num_cond_grad
+            num_train = sum(p.numel() for p in params)
+            print(f"  {num_grad}/{num_params} ({num_grad/num_params*100:.02f}%) parameters will compute gradients")
+            print(f"  {num_train}/{num_params} ({num_train/num_params*100:.02f}%) parameters will be trained")
 
-            params = att_params + list(cond_params)
+            opt = torch.optim.AdamW(params, lr=self.learning_rate)
 
-            num_blocks = len(spatial_modules)
-            num_blocks_tuned = num_blocks - max(self.ablation_blocks, 0)
-            print(f"  {num_blocks_tuned}/{num_blocks} SpatialTransformers will be trained")
-        elif self.train_attention_only:
-            print("  Training (unconditional) AttentionBlocks only")
-            self.model.requires_grad_(False)
-            attention_modules = [x for x in self.model.modules() if isinstance(x, AttentionBlock)]
-            for i, m in enumerate(attention_modules):
-                # Do not unfreeze the first `self.ablation_blocks` AttentionBlocks
-                if i + 1 >= self.ablation_blocks:
-                    m.requires_grad_(True)
-                    att_params.extend(m.parameters())
-            params = att_params
+            # Wrap the optimizer if differentially private training is enabled
+            if self.dp_config and self.dp_config.enabled:
+                self.privacy_engine = opacus.PrivacyEngine()
+                # Compute the noise scale required for DP-SGD
+                data_loader = self.get_train_dataloader()
+                self.sample_rate = get_sample_rate(data_loader)
+                self.noise_scale = compute_noise_multiplier(
+                    self.dp_config,
+                    self.sample_rate,
+                    self.trainer.max_epochs
+                )
 
-            num_blocks = len(attention_modules)
-            num_blocks_tuned = num_blocks - max(self.ablation_blocks, 0)
-            print(f"  {num_blocks_tuned}/{num_blocks} AttentionBlocks will be trained")
-        elif self.train_input_blocks_only:
-            print("  Only training SpatialTransformers or AttentionBlocks in input_blocks", end="")
-            self.model.requires_grad_(True)
-            params = []
-            for m in self.model.diffusion_model.input_blocks.modules():
-                if isinstance(m, AttentionBlock) or isinstance(m, SpatialTransformer):
-                    params.extend(m.parameters())
-            if self.cond_stage_model:
-                print(" and cond_stage_model", end="")
-                self.cond_stage_model.requires_grad_(True)
-                params.extend(self.cond_stage_model.parameters())
-            print()
-        elif self.train_resblocks_only:
-            print("  Only training ResBlocks", end="")
-            self.model.requires_grad_(True)
-            params = []
-            resblocks = [x for x in self.model.modules() if isinstance(x, ResBlock)]
-            for block in resblocks:
-                params.extend(block.parameters())
-            if self.cond_stage_model:
-                print(" and cond_stage_model", end="")
-                self.cond_stage_model.requires_grad_(True)
-                params.extend(self.cond_stage_model.parameters())
-            print()
+                _, opt, _ = self.privacy_engine.make_private(
+                    module=self,
+                    optimizer=opt,
+                    # The sensitivity of replace-one DP is double that of add-remove
+                    #   DP, so the noise multiplier needs to be doubled in DPSGD
+                    noise_multiplier=self.noise_scale,
+                    max_grad_norm=self.dp_config.max_grad_norm,
+                    # NOTE: The data loader is recreated in main.py, so these parameters do nothing
+                    data_loader=data_loader,
+                    poisson_sampling=self.dp_config.poisson_sampling,
+                )
+
+                print()
+                print("#### Differential Privacy ####")
+                print("  Epsilon:", self.dp_config.epsilon)
+                print("  Delta:", self.dp_config.delta)
+                print("  Noise Scale:", self.noise_scale)
+                print()
+
+            if self.use_scheduler:
+                assert 'target' in self.scheduler_config
+                scheduler = instantiate_from_config(self.scheduler_config)
+
+                print("Setting up LambdaLR scheduler...")
+                scheduler = [
+                    {
+                        'scheduler': LambdaLR(opt, lr_lambda=scheduler.schedule),
+                        'interval': 'step',
+                        'frequency': 1
+                    }]
+                return [opt], scheduler
+            return opt
         else:
-            self.model.requires_grad_(True)
-            if self.ablation_blocks > 0:
+            att_params = []
+            if self.train_condition_only:
                 self.model.requires_grad_(False)
-                current_block = 0
-                TUNEFLAG = False
-                att_params = []
-                # params = self.cond_stage_model.parameters()
-                for nm, m in self.model.named_modules():
-                    if isinstance(m, SpatialTransformer):
-                        current_block += 1
-                        if current_block == self.ablation_blocks - 1:
-                            TUNEFLAG = True
-                            print("Begin with Layer {}".format(current_block + 1))
-                    if TUNEFLAG:
+                spatial_modules = [x for x in self.model.modules() if isinstance(x, SpatialTransformer)]
+                for i, m in enumerate(spatial_modules):
+                    # All SpatialTransformer modules propagate gradients to the cond_stage_model
+                    m.requires_grad_(True)
+                    # Do not unfreeze the first `self.ablation_blocks` AttentionBlocks
+                    if i + 1 >= self.ablation_blocks:
+                        att_params.extend(m.parameters())
+
+                self.cond_stage_model.requires_grad_(True)
+                cond_params = self.cond_stage_model.parameters()
+
+                params = att_params + list(cond_params)
+
+                num_blocks = len(spatial_modules)
+                num_blocks_tuned = num_blocks - max(self.ablation_blocks, 0)
+                print(f"  {num_blocks_tuned}/{num_blocks} SpatialTransformers will be trained")
+            elif self.train_attention_only:
+                print("  Training (unconditional) AttentionBlocks only")
+                self.model.requires_grad_(False)
+                attention_modules = [x for x in self.model.modules() if isinstance(x, AttentionBlock)]
+                for i, m in enumerate(attention_modules):
+                    # Do not unfreeze the first `self.ablation_blocks` AttentionBlocks
+                    if i + 1 >= self.ablation_blocks:
                         m.requires_grad_(True)
                         att_params.extend(m.parameters())
                 params = att_params
+
+                num_blocks = len(attention_modules)
+                num_blocks_tuned = num_blocks - max(self.ablation_blocks, 0)
+                print(f"  {num_blocks_tuned}/{num_blocks} AttentionBlocks will be trained")
+            elif self.train_input_blocks_only:
+                print("  Only training SpatialTransformers or AttentionBlocks in input_blocks", end="")
+                self.model.requires_grad_(True)
+                params = []
+                for m in self.model.diffusion_model.input_blocks.modules():
+                    if isinstance(m, AttentionBlock) or isinstance(m, SpatialTransformer):
+                        params.extend(m.parameters())
+                if self.cond_stage_model:
+                    print(" and cond_stage_model", end="")
+                    self.cond_stage_model.requires_grad_(True)
+                    params.extend(self.cond_stage_model.parameters())
+                print()
+            elif self.train_resblocks_only:
+                print("  Only training ResBlocks", end="")
+                self.model.requires_grad_(True)
+                params = []
+                resblocks = [x for x in self.model.modules() if isinstance(x, ResBlock)]
+                for block in resblocks:
+                    params.extend(block.parameters())
+                if self.cond_stage_model:
+                    print(" and cond_stage_model", end="")
+                    self.cond_stage_model.requires_grad_(True)
+                    params.extend(self.cond_stage_model.parameters())
+                print()
             else:
-                params = list(self.model.parameters())
-            # if self.cond_stage_trainable:
-            #     print(f"{self.__class__.__name__}: Also optimizing conditioner params!")
-            #     params = params + list(self.cond_stage_model.parameters())
-            if self.learn_logvar:
-                print('  Diffusion model optimizing logvar')
-                params.append(self.logvar)
+                self.model.requires_grad_(True)
+                if self.ablation_blocks > 0:
+                    self.model.requires_grad_(False)
+                    current_block = 0
+                    TUNEFLAG = False
+                    att_params = []
+                    # params = self.cond_stage_model.parameters()
+                    for nm, m in self.model.named_modules():
+                        if isinstance(m, SpatialTransformer):
+                            current_block += 1
+                            if current_block == self.ablation_blocks - 1:
+                                TUNEFLAG = True
+                                print("Begin with Layer {}".format(current_block + 1))
+                        if TUNEFLAG:
+                            m.requires_grad_(True)
+                            att_params.extend(m.parameters())
+                    params = att_params
+                else:
+                    params = list(self.model.parameters())
+                # if self.cond_stage_trainable:
+                #     print(f"{self.__class__.__name__}: Also optimizing conditioner params!")
+                #     params = params + list(self.cond_stage_model.parameters())
+                if self.learn_logvar:
+                    print('  Diffusion model optimizing logvar')
+                    params.append(self.logvar)
 
-        num_model_params = sum(p.numel() for p in self.model.parameters())
-        num_cond_params = sum(p.numel() for p in self.cond_stage_model.parameters()) if self.cond_stage_model else 0
-        num_params = num_model_params + num_cond_params
-        num_model_grad = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
-        num_cond_grad = sum(p.numel() for p in self.cond_stage_model.parameters() if p.requires_grad) if self.cond_stage_model else 0
-        num_grad = num_model_grad + num_cond_grad
-        num_train = sum(p.numel() for p in params)
-        print(f"  {num_grad}/{num_params} ({num_grad/num_params*100:.02f}%) parameters will compute gradients")
-        print(f"  {num_train}/{num_params} ({num_train/num_params*100:.02f}%) parameters will be trained")
-        print()
-
-        opt = torch.optim.AdamW(params, lr=self.learning_rate)
-
-        # Wrap the optimizer if differentially private training is enabled
-        if self.dp_config and self.dp_config.enabled:
-            # Compute the noise scale required for DP-SGD
-            data_loader = self.get_train_dataloader()
-            self.sample_rate = get_sample_rate(data_loader)
-            self.noise_scale = compute_noise_multiplier(
-                self.dp_config,
-                self.sample_rate,
-                self.trainer.max_epochs
-            )
-
-            # Add DP hooks to the model and optimizer for DPSGD implementation
-            _, opt, _ = self.privacy_engine.make_private(
-                module=self,
-                optimizer=opt,
-                # The sensitivity of replace-one DP is double that of add-remove
-                #   DP, so the noise multiplier needs to be doubled in DPSGD
-                noise_multiplier=self.noise_scale,
-                max_grad_norm=self.dp_config.max_grad_norm,
-                # NOTE: The data loader is recreated in main.py, so these parameters do nothing
-                data_loader=data_loader,
-                poisson_sampling=self.dp_config.poisson_sampling,
-            )
-
-            print()
-            print("#### Differential Privacy ####")
-            print("  Epsilon:", self.dp_config.epsilon)
-            print("  Delta:", self.dp_config.delta)
-            print("  Noise Scale:", self.noise_scale)
+            num_model_params = sum(p.numel() for p in self.model.parameters())
+            num_cond_params = sum(p.numel() for p in self.cond_stage_model.parameters()) if self.cond_stage_model else 0
+            num_params = num_model_params + num_cond_params
+            num_model_grad = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
+            num_cond_grad = sum(p.numel() for p in self.cond_stage_model.parameters() if p.requires_grad) if self.cond_stage_model else 0
+            num_grad = num_model_grad + num_cond_grad
+            num_train = sum(p.numel() for p in params)
+            print(f"  {num_grad}/{num_params} ({num_grad/num_params*100:.02f}%) parameters will compute gradients")
+            print(f"  {num_train}/{num_params} ({num_train/num_params*100:.02f}%) parameters will be trained")
             print()
 
-        if self.use_scheduler:
-            assert 'target' in self.scheduler_config
-            scheduler = instantiate_from_config(self.scheduler_config)
+            opt = torch.optim.AdamW(params, lr=self.learning_rate)
 
-            print("Setting up LambdaLR scheduler...")
-            scheduler = [
-                {
-                    'scheduler': LambdaLR(opt, lr_lambda=scheduler.schedule),
-                    'interval': 'step',
-                    'frequency': 1
-                }]
-            return [opt], scheduler
-        return opt
+            # Wrap the optimizer if differentially private training is enabled
+            if self.dp_config and self.dp_config.enabled:
+                # Compute the noise scale required for DP-SGD
+                data_loader = self.get_train_dataloader()
+                self.sample_rate = get_sample_rate(data_loader)
+                self.noise_scale = compute_noise_multiplier(
+                    self.dp_config,
+                    self.sample_rate,
+                    self.trainer.max_epochs
+                )
+
+                # Add DP hooks to the model and optimizer for DPSGD implementation
+                _, opt, _ = self.privacy_engine.make_private(
+                    module=self,
+                    optimizer=opt,
+                    # The sensitivity of replace-one DP is double that of add-remove
+                    #   DP, so the noise multiplier needs to be doubled in DPSGD
+                    noise_multiplier=self.noise_scale,
+                    max_grad_norm=self.dp_config.max_grad_norm,
+                    # NOTE: The data loader is recreated in main.py, so these parameters do nothing
+                    data_loader=data_loader,
+                    poisson_sampling=self.dp_config.poisson_sampling,
+                )
+
+                print()
+                print("#### Differential Privacy ####")
+                print("  Epsilon:", self.dp_config.epsilon)
+                print("  Delta:", self.dp_config.delta)
+                print("  Noise Scale:", self.noise_scale)
+                print()
+
+            if self.use_scheduler:
+                assert 'target' in self.scheduler_config
+                scheduler = instantiate_from_config(self.scheduler_config)
+
+                print("Setting up LambdaLR scheduler...")
+                scheduler = [
+                    {
+                        'scheduler': LambdaLR(opt, lr_lambda=scheduler.schedule),
+                        'interval': 'step',
+                        'frequency': 1
+                    }]
+                return [opt], scheduler
+            return opt
 
     def optimizer_zero_grad(self, *args, **kwargs):
         super().optimizer_zero_grad(*args, **kwargs)

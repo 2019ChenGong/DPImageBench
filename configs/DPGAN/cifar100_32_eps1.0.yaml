@@ -92,7 +92,7 @@ train:
       - 0.1
       - 75
     alpha_num: 0
-    max_grad_norm: 1.0
+    max_grad_norm: 0.001
     delta: 1e-5
     epsilon: 1.0
     max_physical_batch_size: 8192
