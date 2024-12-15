@@ -3,6 +3,7 @@ import os
 from PIL import Image
 
 from PIL import PngImagePlugin
+import copy
 
 MaximumDecompressedSize = 1024
 MegaByte = 2**20
@@ -582,7 +583,7 @@ class SpecificClassImagenet(torchvision.datasets.VisionDataset):
         Returns:
             tuple: (sample, target) where target is class_index of the target class.
         """
-        path, target = self.samples[index]
+        path, target = copy.deepcopy(self.samples[index])
         sample = self.loader(path)
         if self.transform is not None:
             sample = self.transform(sample)

@@ -28,6 +28,36 @@ new_cwd = os.path.dirname(os.getcwd())
 sys.path.insert(0, new_cwd)
 from data.stylegan3.dataset import ImageFolderDataset
 
+import os
+from PIL import Image
+
+def resize_images(source_dir, target_dir, size=(32, 32)):
+
+    for root, dirs, files in os.walk(source_dir):
+
+        relative_path = os.path.relpath(root, source_dir)
+
+        target_subdir = os.path.join(target_dir, relative_path)
+
+        os.makedirs(target_subdir, exist_ok=True)
+
+        for file in files:
+            file_ext = file.lower().split('.')[-1]
+            if file_ext in ['jpg', 'jpeg', 'png', 'bmp', 'gif', 'tiff']:
+                source_file = os.path.join(root, file)
+                target_file = os.path.join(target_subdir, file)
+                with Image.open(source_file) as img:
+                    img = img.convert('RGB')
+                    img_resized = img.resize(size, Image.LANCZOS)
+                    img_resized.save(target_file)
+                # try:
+                #     with Image.open(source_file) as img:
+                #         img = img.convert('RGB')
+                #         img_resized = img.resize(size, Image.LANCZOS)
+                #         img_resized.save(target_file)
+                # except Exception as e:
+                #     print(f" {source_file} : {e}")
+
 
 def error(msg):
     print('Error: ' + msg)
@@ -269,7 +299,8 @@ def main(config):
             sensitive_train_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "camelyon17_32", "train"), transform=transforms.ToTensor())
             sensitive_test_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "camelyon17_32", "test"), transform=transforms.ToTensor())
         elif data_name == "places365":
-            _ = torchvision.datasets.Places365(root=data_dir, small=True, download=True)
+            # _ = torchvision.datasets.Places365(root=data_dir, small=True, download=True)
+            resize_images(os.path.join(data_dir, "data_256_standard"), os.path.join(data_dir, "data_{}_standard".format(config.resolution)), (config.resolution, config.resolution))
             return
         elif data_name == "emnist":
             _ = torchvision.datasets.EMNIST(root=data_dir, train=True, split="letters", download=True)

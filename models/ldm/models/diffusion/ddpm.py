@@ -1399,7 +1399,8 @@ class LatentDiffusion(DDPM):
             return opt
 
     def optimizer_zero_grad(self, *args, **kwargs):
-        super().optimizer_zero_grad(*args, **kwargs)
+        # super().optimizer_zero_grad(*args, **kwargs)
+        args[2].zero_grad(set_to_none=True)
         self.zero_grad(set_to_none=True)
         for p in self.parameters():
             p.grad_sample = None
