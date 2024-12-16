@@ -311,7 +311,9 @@ In our experiments, we list the model sizes and corresponding hyper-parameter se
 | 19.6M |  `model.network.ch_mult=[1,2,2,4] model.network.attn_resolutions=[16,8,4] model.network.nf=64` |
 | 44.2M |  `model.network.ch_mult=[1,2,2,4] model.network.attn_resolutions=[16,8,4] model.network.nf=96` |
 | 78.5M |  `model.network.ch_mult=[1,2,2,4] model.network.nf=128` |
+
 | GAN size |  Hyper-parameters |
+| -------------- | ------------------------------------------------------------ |
 | 3.8M |  `model.Generator.g_conv_dim=40` |
 | 6.6M |  `model.Generator.g_conv_dim=60` |
 | 10.0M |  `model.Generator.g_conv_dim=80` |
