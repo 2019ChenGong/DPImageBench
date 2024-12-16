@@ -300,9 +300,9 @@ CUDA_VISIBLE_DEVICES=0,1,2 python run.py \
 If users wish to change the size of the synthesizer, the following parameters should be considered.
 
 - `train.dp.n_split`: the number of gradient accumulations for saving GPU memory usage. For example, if your server allows to train a 4M DPDM with `batch_size=4096` and `train.dp.n_split=32`. When you want to train an 80M DPDM with the same `batch_size`, you may need to increase `train.dp.n_split` into 512,
-- Change the model size: For diffusion based model, please change `model.network.ch_mult` and `model.network.nf` to adjust the synthesizer size. For GAN based model, please change `model.Generator.g_conv_dim` to adjust the synthesizer size.
+- Change the model size: For diffusion based model, please change `model.network.ch_mult`, `model.network.attn_resolutions` and `model.network.nf` to adjust the synthesizer size. For GAN based model, please change `model.Generator.g_conv_dim` to adjust the synthesizer size.
 
-In our experiments, for five different diffusion-based model sizes, we use `model.network.ch_mult=[2,4] model.network.nf=32`, `model.network.ch_mult=[1,2,3] model.network.nf=64`, `model.network.ch_mult=[1,2,2,4] model.network.nf=64`, `model.network.ch_mult=[1,2,2,4] model.network.nf=96`, and `model.network.ch_mult=[1,2,2,4] model.network.nf=128`. For five different gan-based model sizes, we use `model.Generator.g_conv_dim=40`, `model.Generator.g_conv_dim=60`, `model.Generator.g_conv_dim=80`, `model.Generator.g_conv_dim=100`, and `model.Generator.g_conv_dim=120`.
+In our experiments, for five different diffusion-based model sizes, we use `model.network.ch_mult=[2,4] model.network.attn_resolutions=[16] model.network.nf=32`, `model.network.ch_mult=[1,2,3] model.network.attn_resolutions=[16,8] model.network.nf=64`, `model.network.ch_mult=[1,2,2,4] model.network.attn_resolutions=[16,8,4] model.network.nf=64`, `model.network.ch_mult=[1,2,2,4] model.network.attn_resolutions=[16,8,4] model.network.nf=96`, and `model.network.ch_mult=[1,2,2,4] model.network.nf=128`. For five different gan-based model sizes, we use `model.Generator.g_conv_dim=40`, `model.Generator.g_conv_dim=60`, `model.Generator.g_conv_dim=80`, `model.Generator.g_conv_dim=100`, and `model.Generator.g_conv_dim=120`.
 
 For example:
 
@@ -312,6 +312,7 @@ For example:
 python run.py setup.n_gpus_per_node=4 --method DPDM --data_name mnist_28 --epsilon 10.0 eval.mode=val \
  public_data.name=null \
  model.network.ch_mult=[1,2,2,4] \
+ model.network.attn_resolutions=[16,8,4]
  model.network.nf=128 \
  train.dp.n_split=512 \
  --exp_description 80M 

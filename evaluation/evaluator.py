@@ -39,7 +39,7 @@ class Evaluator(object):
         torch.cuda.empty_cache()
     
     def eval(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader):
-        if str(self.device) != 'cuda:0' or sensitive_test_loader is None:
+        if self.config.setup.global_rank != 0 or sensitive_test_loader is None:
             return
         if synthetic_images.shape[-1] != self.config.sensitive_data.resolution:
             synthetic_images = F.interpolate(torch.from_numpy(synthetic_images), size=[self.config.sensitive_data.resolution, self.config.sensitive_data.resolution]).numpy()

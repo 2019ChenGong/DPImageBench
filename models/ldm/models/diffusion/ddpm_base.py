@@ -312,7 +312,7 @@ class DDPM(pl.LightningModule):
         x = batch[k]
         if len(x.shape) == 3:
             x = x[..., None]
-        x = x.to(memory_format=torch.contiguous_format).float()
+        x = x.to(memory_format=torch.contiguous_format).float() * 2 - 1
         # x = batch[k]
         # if len(x.shape) == 3:
         #     x = x[..., None]
