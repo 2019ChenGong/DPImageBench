@@ -44,8 +44,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Can GS-WGAN have more intermediate results.
 
-- [ ] Validation set.
-
 - [ ] Merge DP-LoRA.
 
 - [ ] downstream generative model?
