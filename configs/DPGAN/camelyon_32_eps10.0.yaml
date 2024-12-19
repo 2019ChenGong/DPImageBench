@@ -41,10 +41,10 @@ model:
 pretrain:
   log_dir: null
   seed: 0
-  batch_size: 64
+  batch_size: 1024
   snapshot_batch_size: 80
   fid_batch_size: 256
-  n_epochs: 1
+  n_epochs: 160
   d_updates: 5
   log_freq: 100
   snapshot_freq: 100
