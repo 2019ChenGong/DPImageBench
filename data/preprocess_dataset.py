@@ -258,9 +258,6 @@ def main(config):
         if data_name in ["mnist", "fmnist"]:
             config.c = 1
             config.resolution = 28
-        else:
-            config.c = 3
-            config.resolution = 32
         
         train_name = "train_{}".format(config.resolution)
         test_name = "test_{}".format(config.resolution)

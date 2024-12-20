@@ -74,8 +74,8 @@ model:
 pretrain:
   log_dir: null
   seed: 0
-  batch_size: 64
-  n_epochs: 5
+  batch_size: 1024
+  n_epochs: 3200
   log_freq: 100
   snapshot_freq: 4000
   snapshot_threshold: 1
