@@ -1,4 +1,5 @@
 import argparse, os, sys, datetime, glob
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 # os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 import torch
 # torch.backends.cudnn.enabled = False
@@ -218,6 +219,7 @@ if __name__ == "__main__":
             name = ""
         nowname = now + name + opt.postfix
         logdir = os.path.join(opt.logdir, nowname)
+    logdir = opt.logdir
 
     ckptdir = os.path.join(logdir, "checkpoints")
     cfgdir = os.path.join(logdir, "configs")

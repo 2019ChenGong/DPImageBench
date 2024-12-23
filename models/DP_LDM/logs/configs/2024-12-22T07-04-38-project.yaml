@@ -1,0 +1,107 @@
+data:
+  params:
+    batch_size: 2000
+    num_workers: 0
+    train:
+      params:
+        path: /p/fzv6enresearch/DPImageBench/dataset/cifar10/train_32.zip
+        resolution: 32
+        use_labels: true
+      target: data.stylegan3.dataset.ImageFolderDataset
+    validation:
+      params:
+        path: /p/fzv6enresearch/DPImageBench/dataset/cifar10/test_32.zip
+        resolution: 32
+        use_labels: true
+      target: data.stylegan3.dataset.ImageFolderDataset
+    wrap: false
+  target: models.DP_LDM.main.DataModuleFromConfig
+model:
+  base_learning_rate: 1.0e-06
+  params:
+    ablation_blocks: 9
+    attention_flag: spatial
+    channels: 3
+    ckpt_path: /p/fzv6enresearch/DPImageBench/DP-LDM_for_merge/logs/2024-12-11T11-06-26_imagenet32-conditional_ours/checkpoints/last.ckpt
+    cond_stage_config:
+      params:
+        embed_dim: 512
+        key: class_label
+        n_classes: 1001
+      target: models.DP_LDM.ldm.modules.encoders.modules.ClassEmbedder
+    cond_stage_key: class_label
+    cond_stage_trainable: true
+    conditioning_key: crossattn
+    dp_config:
+      delta: 1.0e-05
+      enabled: true
+      epsilon: 10
+      max_batch_size: 40
+      max_grad_norm: 1.0e-06
+      poisson_sampling: true
+    first_stage_config:
+      params:
+        ddconfig:
+          attn_resolutions:
+          - 16
+          - 8
+          ch: 128
+          ch_mult:
+          - 1
+          - 2
+          double_z: true
+          dropout: 0.0
+          in_channels: 3
+          num_res_blocks: 2
+          out_ch: 3
+          resolution: 32
+          z_channels: 3
+        embed_dim: 3
+        lossconfig:
+          target: torch.nn.Identity
+        monitor: val/rec_loss
+      target: models.DP_LDM.ldm.models.autoencoder.AutoencoderKL
+    first_stage_key: image
+    image_size: 16
+    linear_end: 0.0155
+    linear_start: 0.0015
+    log_every_t: 200
+    loss_type: l2
+    monitor: val/loss_simple_ema
+    num_timesteps_cond: 1
+    scheduler_config:
+      params:
+        cycle_lengths:
+        - 10000000000000
+        f_max:
+        - 1.0
+        f_min:
+        - 1.0
+        f_start:
+        - 1.0e-06
+        warm_up_steps:
+        - 10000
+      target: models.DP_LDM.ldm.lr_scheduler.LambdaLinearScheduler
+    timesteps: 1000
+    train_condition_only: true
+    unet_config:
+      params:
+        attention_resolutions:
+        - 1
+        - 2
+        - 4
+        channel_mult:
+        - 1
+        - 2
+        - 2
+        context_dim: 512
+        image_size: 16
+        in_channels: 3
+        model_channels: 32
+        num_heads: 8
+        num_res_blocks: 2
+        out_channels: 3
+        transformer_depth: 1
+        use_spatial_transformer: true
+      target: models.DP_LDM.ldm.modules.diffusionmodules.openaimodel.UNetModel
+  target: models.DP_LDM.ldm.models.diffusion.ddpm.LatentDiffusion

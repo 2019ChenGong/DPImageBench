@@ -10,6 +10,7 @@ setup:
   workdir: exp/pe/mnist_28_eps1.0
 public_data:
   name: null
+  train_path: /bigtemp/fzv6en/dataset/dpimagebench/imagenet_128
 sensitive_data:
   name: celeba_male_32
   num_channels: 3

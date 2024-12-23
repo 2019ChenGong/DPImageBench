@@ -1,0 +1,13 @@
+lightning:
+  callbacks:
+    image_logger:
+      params:
+        batch_frequency: 5000
+        increase_log_steps: false
+        max_images: 8
+      target: models.DP_LDM.main.ImageLogger
+  trainer:
+    benchmark: false
+    max_epochs: 30
+    accelerator: gpu
+    gpus: 0,

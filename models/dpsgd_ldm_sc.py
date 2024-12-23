@@ -10,6 +10,9 @@ import pytorch_lightning as pl
 from pytorch_lightning import seed_everything
 from pytorch_lightning.trainer import Trainer
 
+import subprocess
+from concurrent.futures import ProcessPoolExecutor
+
 from models.ldm.data.util import VirtualBatchWrapper, DataModuleFromDataset
 from models.ldm.util import instantiate_from_config
 from models.ldm.gen import generate_batch
@@ -65,13 +68,13 @@ class DP_LDM(DPSynther):
         scripts = ['models/DP_LDM/main.py', '-t', '--base', config_path, '--gpus', gpu_ids]
         
         with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(warm_up, script) for script in scripts]
+            futures = [executor.submit(execute, script) for script in scripts]
             for future in futures:
                 try:
                     output = future.result()
-                    print(f"Output:\n{output}")
+                    logging.info(f"Output:\n{output}")
                 except Exception as e:
-                    print(f"generated an exception: {e}")
+                    logging.info(f"generated an exception: {e}")
 
     def pretrain_unet(self, dataset, config, logdir):
         cuda_visible_devices = os.environ.get("CUDA_VISIBLE_DEVICES")
@@ -83,13 +86,13 @@ class DP_LDM(DPSynther):
         scripts = ['models/DP_LDM/main.py', '-t', '--base', config_path, '--gpus', gpu_ids]
         
         with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(warm_up, script) for script in scripts]
+            futures = [executor.submit(execute, script) for script in scripts]
             for future in futures:
                 try:
                     output = future.result()
-                    print(f"Output:\n{output}")
+                    logging.info(f"Output:\n{output}")
                 except Exception as e:
-                    print(f"generated an exception: {e}")
+                    logging.info(f"generated an exception: {e}")
 
     def train(self, sensitive_dataloader, config):
         if sensitive_dataloader is None:
@@ -104,16 +107,17 @@ class DP_LDM(DPSynther):
         else:
             gpu_ids = cuda_visible_devices[:2]
         config_path = config.config_path
-        scripts = ['models/DP_LDM/main.py', '-t', '--base', config_path, '--gpus', gpu_ids, '--accelerator', 'gpu']
+        pretrain_model = config.pretrain_model
+        scripts = [['models/DP_LDM/main.py', '-t', '--logdir', config.log_dir, '--base', config_path, '--gpus', gpu_ids, '--accelerator', 'gpu', 'model.params.ckpt_path={}'.format(pretrain_model), 'model.params.dp_config.epsilon={}'.format(config.dp.epsilon), 'model.params.dp_config.delta={}'.format(config.dp.delta), 'model.params.dp_config.max_grad_norm={}'.format(config.dp.max_grad_norm), 'data.params.batch_size={}'.format(config.batch_size), 'lightning.trainer.max_epochs={}'.format(config.n_epochs)]]
         
         with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(warm_up, script) for script in scripts]
+            futures = [executor.submit(execute, script) for script in scripts]
             for future in futures:
                 try:
                     output = future.result()
-                    print(f"Output:\n{output}")
+                    logging.info(f"Output:\n{output}")
                 except Exception as e:
-                    print(f"generated an exception: {e}")
+                    logging.info(f"generated an exception: {e}")
 
 
     def generate(self, config):
@@ -121,12 +125,21 @@ class DP_LDM(DPSynther):
         if self.global_rank == 0 and not os.path.exists(config.log_dir):
             make_dir(config.log_dir)
         
-        model_path = os.path.join(self.config.train.log_dir, "checkpoints", "last.ckpt")
-        syn_data, syn_labels = generate_batch(self.config.train, config.data_num, model_path, num_classes=self.config.sensitive_data.n_classes, batch_size=config.batch_size)
+        scripts = [['models/DP_LDM/cond_sampling_test.py', '--save_path', config.log_dir, '--yaml', self.config.train.config_path, '--ckpt_path', os.path.join(self.config.train.log_dir, 'checkpoints', 'last.ckpt'), '--num_samples', str(config.data_num), '--num_classes', str(self.config.sensitive_data.n_classes), '--batch_size', str(config.batch_size)]]
+        
+        with ProcessPoolExecutor() as executor:
+            futures = [executor.submit(execute, script) for script in scripts]
+            for future in futures:
+                try:
+                    output = future.result()
+                    logging.info(f"Output:\n{output}")
+                except Exception as e:
+                    logging.info(f"generated an exception: {e}")
 
         logging.info("Generation Finished!")
 
-        np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
+        syn = np.load(os.path.join(config.log_dir, 'gen.npz'))
+        syn_data, syn_labels = syn["x"], syn["y"]
 
         show_images = []
         for cls in range(self.config.sensitive_data.n_classes):

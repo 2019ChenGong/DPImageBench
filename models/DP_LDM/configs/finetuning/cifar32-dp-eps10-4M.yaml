@@ -7,15 +7,15 @@ data:
         path: /p/fzv6enresearch/DPImageBench/dataset/cifar10/train_32.zip
         resolution: 32
         use_labels: True
-      target: ldm.data.stylegan3.dataset.ImageFolderDataset
+      target: data.stylegan3.dataset.ImageFolderDataset
     validation:
       params:
         path: /p/fzv6enresearch/DPImageBench/dataset/cifar10/test_32.zip
         resolution: 32
         use_labels: True
-      target: ldm.data.stylegan3.dataset.ImageFolderDataset
+      target: data.stylegan3.dataset.ImageFolderDataset
     wrap: false
-  target: main.DataModuleFromConfig
+  target: models.DP_LDM.main.DataModuleFromConfig
 lightning:
   callbacks:
     image_logger:
@@ -23,7 +23,7 @@ lightning:
         batch_frequency: 5000
         increase_log_steps: false
         max_images: 8
-      target: main.ImageLogger
+      target: models.DP_LDM.main.ImageLogger
   trainer:
     benchmark: false
     max_epochs: 30
@@ -39,7 +39,7 @@ model:
         embed_dim: 512
         key: class_label
         n_classes: 1001
-      target: ldm.modules.encoders.modules.ClassEmbedder
+      target: models.DP_LDM.ldm.modules.encoders.modules.ClassEmbedder
     cond_stage_key: class_label
     cond_stage_trainable: true
     conditioning_key: crossattn
@@ -47,7 +47,7 @@ model:
       delta: 1e-5
       enabled: true
       epsilon: 10
-      max_batch_size: 40
+      max_batch_size: 500
       max_grad_norm: 1.0e-06
       poisson_sampling: true
     first_stage_config:
@@ -71,7 +71,7 @@ model:
         lossconfig:
           target: torch.nn.Identity
         monitor: val/rec_loss
-      target: ldm.models.autoencoder.AutoencoderKL
+      target: models.DP_LDM.ldm.models.autoencoder.AutoencoderKL
     first_stage_key: image
     image_size: 16
     linear_end: 0.0155
@@ -92,7 +92,7 @@ model:
         - 1.0e-06
         warm_up_steps:
         - 10000
-      target: ldm.lr_scheduler.LambdaLinearScheduler
+      target: models.DP_LDM.ldm.lr_scheduler.LambdaLinearScheduler
     timesteps: 1000
     train_condition_only: true
     unet_config:
@@ -114,5 +114,5 @@ model:
         out_channels: 3
         transformer_depth: 1
         use_spatial_transformer: true
-      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
-  target: ldm.models.diffusion.ddpm.LatentDiffusion
+      target: models.DP_LDM.ldm.modules.diffusionmodules.openaimodel.UNetModel
+  target: models.DP_LDM.ldm.models.diffusion.ddpm.LatentDiffusion

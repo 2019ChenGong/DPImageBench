@@ -9,23 +9,23 @@ from pytorch_lightning.trainer.supporters import CombinedLoader
 from pytorch_lightning.utilities.distributed import rank_zero_only
 from omegaconf.errors import ConfigAttributeError
 
-from ldm.data.util import get_sample_rate
-from ldm.models.autoencoder import AutoencoderKL, IdentityFirstStage, VQModelInterface
-from ldm.models.diffusion.ddim import DDIMSampler
-from ldm.models.diffusion.ddpm_base import DDPM
-from ldm.modules.diffusionmodules.util import extract_into_tensor, noise_like
-from ldm.modules.distributions.distributions import DiagonalGaussianDistribution, normal_kl
-from ldm.util import default, instantiate_from_config, isimage, ismap, log_txt_as_img, mean_flat
+from models.DP_LDM.ldm.data.util import get_sample_rate
+from models.DP_LDM.ldm.models.autoencoder import AutoencoderKL, IdentityFirstStage, VQModelInterface
+from models.DP_LDM.ldm.models.diffusion.ddim import DDIMSampler
+from models.DP_LDM.ldm.models.diffusion.ddpm_base import DDPM
+from models.DP_LDM.ldm.modules.diffusionmodules.util import extract_into_tensor, noise_like
+from models.DP_LDM.ldm.modules.distributions.distributions import DiagonalGaussianDistribution, normal_kl
+from models.DP_LDM.ldm.util import default, instantiate_from_config, isimage, ismap, log_txt_as_img, mean_flat
 
 # Transdiff
 import copy
-from ldm.modules.attention import SpatialTransformer
-from ldm.modules.diffusionmodules.openaimodel import AttentionBlock, ResBlock
+from models.DP_LDM.ldm.modules.attention import SpatialTransformer
+from models.DP_LDM.ldm.modules.diffusionmodules.openaimodel import AttentionBlock, ResBlock
 
 # Differential Privacy
 import opacus
-from ldm.privacy.myopacus import MyBatchSplittingSampler
-from ldm.privacy.privacy_analysis import compute_noise_multiplier, get_noisysgd_mechanism
+from models.DP_LDM.ldm.privacy.myopacus import MyBatchSplittingSampler
+from models.DP_LDM.ldm.privacy.privacy_analysis import compute_noise_multiplier, get_noisysgd_mechanism
 import gc
 
 

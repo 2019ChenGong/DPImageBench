@@ -13,7 +13,7 @@ public_data:
   num_channels: 3
   resolution: 128
   n_classes: 1000
-  train_path: dataset/imagenet/imagenet_128
+  train_path: /bigtemp/fzv6en/dataset/dpimagebench/imagenet_128
   selective:
     ratio: 1.0
 sensitive_data:

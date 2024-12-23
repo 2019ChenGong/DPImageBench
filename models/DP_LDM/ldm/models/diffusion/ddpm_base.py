@@ -16,9 +16,9 @@ from functools import partial
 from tqdm import tqdm
 from torchvision.utils import make_grid
 
-from ldm.util import exists, default, count_params, instantiate_from_config
-from ldm.modules.ema import LitEma
-from ldm.modules.diffusionmodules.util import make_beta_schedule, extract_into_tensor, noise_like
+from models.DP_LDM.ldm.util import exists, default, count_params, instantiate_from_config
+from models.DP_LDM.ldm.modules.ema import LitEma
+from models.DP_LDM.ldm.modules.diffusionmodules.util import make_beta_schedule, extract_into_tensor, noise_like
 import gc
 
 
