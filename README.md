@@ -42,7 +42,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] emnist as the pretraining dataset.
 
-- [ ] Can GS-WGAN have more intermediate results.
+- [x] Can GS-WGAN have more intermediate results.
 
 - [ ] Merge DP-LoRA.
 

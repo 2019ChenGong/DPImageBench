@@ -234,6 +234,7 @@ class GS_WGAN(DPSynther):
                 vals= [str(dis_id) for dis_id in range(start, end)]
                 script = ['models/GS_WGAN/pretrain.py', '-data', data_name, '--log_dir', log_dir, '--train_num', train_num, '-ndis', ndis, '-ids'] + vals + ['--img_size', img_size, '--c', c, '--private_num_classes', str(self.private_num_classes), '--public_num_classes', str(self.public_num_classes), '--gpu_id', str(gpu), '--data_path', data_path, '-piters', iters, '--gen_arch', gen_arch, '--z_dim', str(self.z_dim), '--latent_type', self.latent_type, '--model_dim', str(self.config.Generator.g_conv_dim)]
                 scripts.append(script)
+        scripts.append(['models/GS_WGAN/is_finished.py', '--D_path', log_dir, '--output_path', os.path.join(os.path.dirname(os.path.dirname(log_dir)), 'stdout.txt'), '--D_num', ndis])
         
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(warm_up, script) for script in scripts]

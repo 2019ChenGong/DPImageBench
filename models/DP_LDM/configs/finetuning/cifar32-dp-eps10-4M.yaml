@@ -7,13 +7,17 @@ data:
         path: /p/fzv6enresearch/DPImageBench/dataset/cifar10/train_32.zip
         resolution: 32
         use_labels: True
+        c: 3
       target: data.stylegan3.dataset.ImageFolderDataset
+      data_num: null
     validation:
       params:
         path: /p/fzv6enresearch/DPImageBench/dataset/cifar10/test_32.zip
         resolution: 32
         use_labels: True
+        c: 3
       target: data.stylegan3.dataset.ImageFolderDataset
+      data_num: null
     wrap: false
   target: models.DP_LDM.main.DataModuleFromConfig
 lightning:
@@ -33,7 +37,7 @@ model:
     ablation_blocks: 9
     attention_flag: spatial
     channels: 3
-    ckpt_path: /p/fzv6enresearch/DPImageBench/DP-LDM_for_merge/logs/2024-12-11T11-06-26_imagenet32-conditional_ours/checkpoints/last.ckpt
+    ckpt_path: null
     cond_stage_config:
       params:
         embed_dim: 512

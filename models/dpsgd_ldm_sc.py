@@ -52,12 +52,14 @@ class DP_LDM(DPSynther):
         if self.global_rank == 0:
             make_dir(config.log_dir)
         
-        self.pretrain_autoencoder(config.unet, config.log_dir)
-        self.pretrain_unet(config.unet, config.log_dir)
+        self.pretrain_autoencoder(config.autoencoder, os.path.join(config.log_dir, 'autoencoder'))
+        self.pretrain_unet(config.unet, os.path.join(config.log_dir, 'unet'))
 
         torch.cuda.empty_cache()
     
     def pretrain_autoencoder(self, config, logdir):
+        if self.global_rank == 0:
+            make_dir(logdir)
 
         cuda_visible_devices = os.environ.get("CUDA_VISIBLE_DEVICES")
         if cuda_visible_devices is None:
@@ -65,7 +67,7 @@ class DP_LDM(DPSynther):
         else:
             gpu_ids = cuda_visible_devices
         config_path = config.config_path
-        scripts = ['models/DP_LDM/main.py', '-t', '--base', config_path, '--gpus', gpu_ids]
+        scripts = ['models/DP_LDM/main.py', '-t', '--logdir', logdir, '--base', config_path, '--gpus', gpu_ids, 'data.params.batch_size={}'.format(config.batch_size), 'lightning.trainer.max_epochs={}'.format(config.n_epochs)]
         
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(execute, script) for script in scripts]
@@ -77,13 +79,17 @@ class DP_LDM(DPSynther):
                     logging.info(f"generated an exception: {e}")
 
     def pretrain_unet(self, dataset, config, logdir):
+        if self.global_rank == 0:
+            make_dir(logdir)
+
         cuda_visible_devices = os.environ.get("CUDA_VISIBLE_DEVICES")
         if cuda_visible_devices is None:
             gpu_ids = ','.join([i for i in range(self.config.setup.n_gpus_per_node)])
         else:
             gpu_ids = cuda_visible_devices
         config_path = config.config_path
-        scripts = ['models/DP_LDM/main.py', '-t', '--base', config_path, '--gpus', gpu_ids]
+        pretrain_model = config.pretrain_model
+        scripts = ['models/DP_LDM/main.py', '-t', '--logdir', logdir, '--base', config_path, '--gpus', gpu_ids, 'data.params.batch_size={}'.format(config.batch_size), 'lightning.trainer.max_epochs={}'.format(config.n_epochs), 'model.params.ckpt_path={}'.format(pretrain_model)]
         
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(execute, script) for script in scripts]
@@ -101,14 +107,31 @@ class DP_LDM(DPSynther):
         if self.global_rank == 0:
             make_dir(config.log_dir)
         
-        cuda_visible_devices = os.environ.get("CUDA_VISIBLE_DEVICES")
-        if cuda_visible_devices is None:
-            gpu_ids = '0,'
-        else:
-            gpu_ids = cuda_visible_devices[:2]
+        gpu_ids = '0,'
         config_path = config.config_path
         pretrain_model = config.pretrain_model
-        scripts = [['models/DP_LDM/main.py', '-t', '--logdir', config.log_dir, '--base', config_path, '--gpus', gpu_ids, '--accelerator', 'gpu', 'model.params.ckpt_path={}'.format(pretrain_model), 'model.params.dp_config.epsilon={}'.format(config.dp.epsilon), 'model.params.dp_config.delta={}'.format(config.dp.delta), 'model.params.dp_config.max_grad_norm={}'.format(config.dp.max_grad_norm), 'data.params.batch_size={}'.format(config.batch_size), 'lightning.trainer.max_epochs={}'.format(config.n_epochs)]]
+        scripts = [[
+            'models/DP_LDM/main.py', 
+            '-t', 
+            '--logdir', config.log_dir, 
+            '--base', config_path, 
+            '--gpus', gpu_ids, 
+            '--accelerator', 'gpu', 
+            'model.params.ckpt_path={}'.format(pretrain_model), 
+            'model.params.dp_config.epsilon={}'.format(config.dp.epsilon), 
+            'model.params.dp_config.delta={}'.format(config.dp.delta), 
+            'model.params.dp_config.max_grad_norm={}'.format(config.dp.max_grad_norm), 
+            'data.params.batch_size={}'.format(config.batch_size), 
+            'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
+            'data.params.train.params.path={}'.format(self.config.sensitive_data.train_path),
+            'data.params.validation.params.path={}'.format(self.config.sensitive_data.train_path),
+            'data.params.train.params.resolution={}'.format(self.config.sensitive_data.resolution),
+            'data.params.validation.params.resolution={}'.format(self.config.sensitive_data.resolution),
+            'data.params.train.params.c={}'.format(self.config.sensitive_data.num_channels),
+            'data.params.validation.params.c={}'.format(self.config.sensitive_data.num_channels),
+            'data.params.train.data_num={}'.format(len(sensitive_dataloader.dataset)),
+            'data.params.validation.data_num={}'.format(len(sensitive_dataloader.dataset)),
+            ]]
         
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(execute, script) for script in scripts]

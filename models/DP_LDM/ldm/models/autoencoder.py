@@ -369,19 +369,19 @@ class AutoencoderKL(pl.LightningModule):
             self.log_dict(log_dict_disc, prog_bar=False, logger=True, on_step=True, on_epoch=False)
             return discloss
 
-    def validation_step(self, batch, batch_idx):
-        inputs = self.get_input(batch, self.image_key)
-        reconstructions, posterior = self(inputs)
-        aeloss, log_dict_ae = self.loss(inputs, reconstructions, posterior, 0, self.global_step,
-                                        last_layer=self.get_last_layer(), split="val")
+    # def validation_step(self, batch, batch_idx):
+    #     inputs = self.get_input(batch, self.image_key)
+    #     reconstructions, posterior = self(inputs)
+    #     aeloss, log_dict_ae = self.loss(inputs, reconstructions, posterior, 0, self.global_step,
+    #                                     last_layer=self.get_last_layer(), split="val")
 
-        discloss, log_dict_disc = self.loss(inputs, reconstructions, posterior, 1, self.global_step,
-                                            last_layer=self.get_last_layer(), split="val")
+    #     discloss, log_dict_disc = self.loss(inputs, reconstructions, posterior, 1, self.global_step,
+    #                                         last_layer=self.get_last_layer(), split="val")
 
-        self.log("val/rec_loss", log_dict_ae["val/rec_loss"])
-        self.log_dict(log_dict_ae)
-        self.log_dict(log_dict_disc)
-        return self.log_dict
+    #     self.log("val/rec_loss", log_dict_ae["val/rec_loss"])
+    #     self.log_dict(log_dict_ae)
+    #     self.log_dict(log_dict_disc)
+    #     return self.log_dict
 
     def configure_optimizers(self):
         lr = self.learning_rate
