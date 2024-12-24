@@ -6,24 +6,12 @@ from omegaconf import OmegaConf
 
 import torch
 import torchvision
-import pytorch_lightning as pl
-from pytorch_lightning import seed_everything
-from pytorch_lightning.trainer import Trainer
 
 import subprocess
 from concurrent.futures import ProcessPoolExecutor
 
-from models.ldm.data.util import VirtualBatchWrapper, DataModuleFromDataset
-from models.ldm.util import instantiate_from_config
-from models.ldm.gen import generate_batch
-from models.ldm.privacy.myopacus import MyDPLightningDataModule
 from models.DP_Diffusion.utils.util import make_dir
 from models.synthesizer import DPSynther
-
-from models.ldm.callbacks.cuda import CUDACallback                         # noqa: F401
-from models.ldm.callbacks.image_logger import ImageLogger                  # noqa: F401
-from models.ldm.callbacks.setup import SetupCallback                       # noqa: F401
-from models.ldm.data.util import DataModuleFromConfig, WrappedDataset, WrappedDataset_ldm  # noqa: F401
 
 def execute(script):
     try:
@@ -170,10 +158,3 @@ class DP_LDM(DPSynther):
         show_images = np.concatenate(show_images)
         torchvision.utils.save_image(torch.from_numpy(show_images), os.path.join(config.log_dir, 'sample.png'), padding=1, nrow=8)
         return syn_data, syn_labels
-
-
-def nondefault_trainer_args(opt):
-    parser = argparse.ArgumentParser()
-    parser = Trainer.add_argparse_args(parser)
-    args = parser.parse_args([])
-    return sorted(k for k in vars(args) if getattr(opt, k) != getattr(args, k))
