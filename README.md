@@ -50,8 +50,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Exp: different resolutions.
 
-- [ ] Exp: All method for conditional pretraining except dm method.
-
 
 ## 2. Introduction
 
