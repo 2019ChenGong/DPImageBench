@@ -6,6 +6,9 @@ https://github.com/CompVis/taming-transformers
 -- merci
 """
 
+import os
+import psutil
+
 import torch
 import torch.nn as nn
 import numpy as np
@@ -309,6 +312,23 @@ class DDPM(pl.LightningModule):
         return self.p_losses(x, t, *args, **kwargs)
 
     def get_input(self, batch, k):
+        pid = os.getpid()
+
+        # 获取当前进程对象
+        current_process = psutil.Process(pid)
+
+        # 获取 CPU 使用情况
+        cpu_usage = current_process.cpu_percent(interval=1)
+        print(f"当前程序的 CPU 使用率: {cpu_usage}%")
+
+        # 获取内存使用情况
+        memory_info = current_process.memory_info()
+        memory_usage = memory_info.rss / (1024 * 1024)  # 转换为 MB
+        print(f"当前程序的内存使用量: {memory_usage} MB")
+        with open('linshi_log.txt', 'a') as f:
+            f.write(f"当前程序的 CPU 使用率: {cpu_usage}%\n")
+            f.write(f"当前程序的内存使用量: {memory_usage} MB\n")
+
         x = batch[k]
         if len(x.shape) == 3:
             x = x[..., None]
