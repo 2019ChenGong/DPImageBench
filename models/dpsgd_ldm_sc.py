@@ -40,12 +40,14 @@ class DP_LDM(DPSynther):
         if self.global_rank == 0:
             make_dir(config.log_dir)
         
-        self.pretrain_autoencoder(config.autoencoder, os.path.join(config.log_dir, 'autoencoder'))
-        self.pretrain_unet(config.unet, os.path.join(config.log_dir, 'unet'))
+        self.pretrain_autoencoder(public_dataloader.dataset, config.autoencoder, os.path.join(config.log_dir, 'autoencoder'))
+        self.pretrain_unet(public_dataloader.dataset, config.unet, os.path.join(config.log_dir, 'unet'))
 
         torch.cuda.empty_cache()
     
-    def pretrain_autoencoder(self, config, logdir):
+    def pretrain_autoencoder(self, public_dataset, config, logdir):
+        if self.config.pretrain.unet.pretrain_model is not None:
+            return
         if self.global_rank == 0:
             make_dir(logdir)
 
@@ -55,7 +57,23 @@ class DP_LDM(DPSynther):
         else:
             gpu_ids = cuda_visible_devices
         config_path = config.config_path
-        scripts = ['models/DP_LDM/main.py', '-t', '--logdir', logdir, '--base', config_path, '--gpus', gpu_ids, 'data.params.batch_size={}'.format(config.batch_size), 'lightning.trainer.max_epochs={}'.format(config.n_epochs)]
+        scripts = [[
+            'models/DP_LDM/main.py', 
+            '-t', 
+            '--logdir', logdir, 
+            '--base', config_path, 
+            '--gpus', gpu_ids, 
+            'data.params.batch_size={}'.format(config.batch_size), 
+            'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
+            'data.params.train.params.root={}'.format(self.config.public_data.train_path),
+            'data.params.validation.params.root={}'.format(self.config.public_data.train_path),
+            'data.params.train.params.image_size={}'.format(self.config.public_data.resolution),
+            'data.params.validation.params.image_size={}'.format(self.config.public_data.resolution),
+            'data.params.train.params.c={}'.format(self.config.public_data.num_channels),
+            'data.params.validation.params.c={}'.format(self.config.sensitive_data.num_channels),
+            'data.params.train.data_num={}'.format(len(public_dataset)),
+            'data.params.validation.data_num={}'.format(len(public_dataset)),
+            ]]
         
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(execute, script) for script in scripts]
@@ -65,19 +83,38 @@ class DP_LDM(DPSynther):
                     logging.info(f"Output:\n{output}")
                 except Exception as e:
                     logging.info(f"generated an exception: {e}")
+        
+        self.config.pretrain.unet.pretrain_model = os.path.join(logdir, 'checkpoints', 'last.ckpt')
 
-    def pretrain_unet(self, dataset, config, logdir):
+    def pretrain_unet(self, public_dataset, config, logdir):
         if self.global_rank == 0:
             make_dir(logdir)
 
         cuda_visible_devices = os.environ.get("CUDA_VISIBLE_DEVICES")
         if cuda_visible_devices is None:
-            gpu_ids = ','.join([i for i in range(self.config.setup.n_gpus_per_node)])
+            gpu_ids = ','.join([str(i) for i in range(self.config.setup.n_gpus_per_node)]) + ','
         else:
-            gpu_ids = cuda_visible_devices
+            gpu_ids = str(cuda_visible_devices) + ','
         config_path = config.config_path
-        pretrain_model = config.pretrain_model
-        scripts = ['models/DP_LDM/main.py', '-t', '--logdir', logdir, '--base', config_path, '--gpus', gpu_ids, 'data.params.batch_size={}'.format(config.batch_size), 'lightning.trainer.max_epochs={}'.format(config.n_epochs), 'model.params.ckpt_path={}'.format(pretrain_model)]
+        pretrain_model = self.config.pretrain.unet.pretrain_model
+        scripts = [[
+            'models/DP_LDM/main.py', 
+            '-t', 
+            '--logdir', logdir, 
+            '--base', config_path, 
+            '--gpus', gpu_ids, 
+            'data.params.batch_size={}'.format(config.batch_size), 
+            'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
+            'model.params.first_stage_config.params.ckpt_path={}'.format(pretrain_model), 
+            'data.params.train.params.root={}'.format(self.config.public_data.train_path),
+            'data.params.validation.params.root={}'.format(self.config.public_data.train_path),
+            'data.params.train.params.image_size={}'.format(self.config.public_data.resolution),
+            'data.params.validation.params.image_size={}'.format(self.config.public_data.resolution),
+            'data.params.train.params.c={}'.format(self.config.public_data.num_channels),
+            'data.params.validation.params.c={}'.format(self.config.sensitive_data.num_channels),
+            'data.params.train.data_num={}'.format(len(public_dataset)),
+            'data.params.validation.data_num={}'.format(len(public_dataset)),
+            ]]
         
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(execute, script) for script in scripts]
@@ -87,6 +124,8 @@ class DP_LDM(DPSynther):
                     logging.info(f"Output:\n{output}")
                 except Exception as e:
                     logging.info(f"generated an exception: {e}")
+        
+        self.config.train.pretrain_model = os.path.join(logdir, 'checkpoints', 'last.ckpt')
 
     def train(self, sensitive_dataloader, config):
         if sensitive_dataloader is None:
@@ -97,7 +136,7 @@ class DP_LDM(DPSynther):
         
         gpu_ids = '0,'
         config_path = config.config_path
-        pretrain_model = config.pretrain_model
+        pretrain_model = self.config.pretrain_model
         scripts = [[
             'models/DP_LDM/main.py', 
             '-t', 
@@ -136,7 +175,15 @@ class DP_LDM(DPSynther):
         if self.global_rank == 0 and not os.path.exists(config.log_dir):
             make_dir(config.log_dir)
         
-        scripts = [['models/DP_LDM/cond_sampling_test.py', '--save_path', config.log_dir, '--yaml', self.config.train.config_path, '--ckpt_path', os.path.join(self.config.train.log_dir, 'checkpoints', 'last.ckpt'), '--num_samples', str(config.data_num), '--num_classes', str(self.config.sensitive_data.n_classes), '--batch_size', str(config.batch_size)]]
+        scripts = [[
+            'models/DP_LDM/cond_sampling_test.py', 
+            '--save_path', config.log_dir, 
+            '--yaml', self.config.train.config_path, 
+            '--ckpt_path', os.path.join(self.config.train.log_dir, 'checkpoints', 'last.ckpt'), 
+            '--num_samples', str(config.data_num), 
+            '--num_classes', str(self.config.sensitive_data.n_classes), 
+            '--batch_size', str(config.batch_size)
+            ]]
         
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(execute, script) for script in scripts]

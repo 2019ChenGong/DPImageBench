@@ -1,10 +1,8 @@
 import torchvision
-from torchvision import transforms
 import os
 from PIL import Image
 
 from PIL import PngImagePlugin
-import copy
 
 MaximumDecompressedSize = 1024
 MegaByte = 2**20
@@ -521,21 +519,10 @@ IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif', '.tif
 
 class SpecificClassImagenet(torchvision.datasets.VisionDataset):
     def __init__(self, root, split='train', specific_class=None, loader=default_loader, extensions=IMG_EXTENSIONS,
-                 transform=None,
-                 c=3,
-                 image_size=32,
+                 transform=torchvision.transforms.ToTensor(),
                  target_transform=None, is_valid_file=None):
         self.root = root
         self.split = split
-        if transform is None:
-            transform = [
-                    transforms.Resize(image_size),
-                    transforms.RandomHorizontalFlip(p=0.5),
-                    transforms.ToTensor(),
-                ]
-            if c == 1:
-                transform = [transforms.Grayscale(num_output_channels=1)] + transform
-            transform = transforms.Compose(transform)
         super(SpecificClassImagenet, self).__init__(self.split_folder, transform=transform,
                                                     target_transform=target_transform)
         if specific_class is None:
@@ -595,14 +582,14 @@ class SpecificClassImagenet(torchvision.datasets.VisionDataset):
         Returns:
             tuple: (sample, target) where target is class_index of the target class.
         """
-        path, target = copy.deepcopy(self.samples[index])
+        path, target = self.samples[index]
         sample = self.loader(path)
         if self.transform is not None:
             sample = self.transform(sample)
         if self.target_transform is not None:
             target = self.target_transform(target)
 
-        return sample, target
+        return {"image": sample, "class_label": target}
 
     def __len__(self):
         return len(self.samples)

@@ -89,9 +89,6 @@ def semantic_query(sensitive_train_loader, config):
 
     with torch.no_grad():
         for (x, y) in sensitive_loader:
-            if len(y.shape) == 2:
-                x = x.to(torch.float32) / 255.
-                y = torch.argmax(y, dim=1)
             if x.shape[-1] != 32:
                 x = F.interpolate(x, size=[32, 32])
             if x.shape[1] == 1:

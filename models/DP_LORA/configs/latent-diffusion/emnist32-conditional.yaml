@@ -1,0 +1,101 @@
+model:
+  base_learning_rate: 5.0e-6   # set to target_lr by starting main.py with '--scale_lr False'
+  target: ldm.models.diffusion.ddpm.LatentDiffusion
+  params:
+    linear_start: 0.0015
+    linear_end: 0.0155
+    num_timesteps_cond: 1
+    log_every_t: 200
+    timesteps: 1000
+    loss_type: l2
+    first_stage_key: "image"
+    cond_stage_key: "class_label"  #class conditioning
+    image_size: 4
+    channels: 3
+    cond_stage_trainable: True  #class conditioning
+    conditioning_key: "crossattn"   #class  conditioning
+    monitor: "val/loss"
+
+    scheduler_config: # 10000 warmup steps
+      target: ldm.lr_scheduler.LambdaLinearScheduler
+      params:
+        warm_up_steps: [10000]
+        cycle_lengths: [10000000000000]
+        f_start: [1.e-6]
+        f_max: [1.]
+        f_min: [ 1.]
+
+    unet_config:
+      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      params:
+        image_size: 4
+        in_channels: 3 # should be the same as out_ch in the autoencoder yaml
+        out_channels: 3
+        model_channels: 64 
+        attention_resolutions: [1,2] 
+        num_res_blocks: 1 
+        channel_mult: [1,2] 
+        num_heads: 2 
+        use_spatial_transformer: True 
+        transformer_depth: 1
+        use_scale_shift_norm: True
+        resblock_updown: True
+        context_dim: 5 
+        
+    first_stage_config:
+      target: ldm.models.autoencoder.AutoencoderKL
+      params:
+        embed_dim: 3
+        monitor: "val/rec_loss"
+        ckpt_path: '/root/autodl-tmp/log/2024-04-28T23-22-06_autoencoder_kl_emnist32_4x4x3/checkpoints/last.ckpt'
+        ddconfig:
+          double_z: True
+          z_channels: 3
+          resolution: 32
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult: [1,2,3,5] 
+          num_res_blocks: 2
+          attn_resolutions: [32,16,8 ] #[ ]
+          dropout: 0.0
+        lossconfig:
+          target: torch.nn.Identity
+
+    cond_stage_config:
+      target: ldm.modules.encoders.modules.ClassEmbedder
+      params:
+        n_classes: 26
+        embed_dim: 5
+        key: class_label
+
+data:
+  target: main.DataModuleFromConfig
+  params:
+    batch_size: 512 
+    num_workers: 5
+    wrap: False 
+    train:
+      target: ldm.data.emnist.EMNISTBase
+      params:
+        size: 32 
+        train: True
+    validation:
+      target: ldm.data.emnist.EMNISTBase
+      params:
+        size: 32
+        train: False
+
+lightning:
+  callbacks:
+    image_logger:
+      target: main.ImageLogger
+      params:
+        batch_frequency: 10000
+        max_images: 8
+        increase_log_steps: False
+
+
+  trainer:
+    benchmark: True
+    max_epochs: 120

@@ -1,0 +1,139 @@
+model:
+  base_learning_rate: 2e-5   # set to target_lr by starting main.py with '--scale_lr False'
+  target: ldm.models.diffusion.ddpm.LatentDiffusion
+  params:
+    # load pretrained LDM
+    ckpt_path:  '/root/autodl-tmp/log/2024-04-29T02-46-55_emnist32-conditional/checkpoints/last.ckpt'
+
+    # DDPM beta schedule params (linear interpolation)
+    linear_start: 0.0015
+    linear_end: 0.0155
+    timesteps: 1000
+
+    num_timesteps_cond: 1
+
+    # The key of the input to the stage in the batch object (e.g. batch["image"])
+    first_stage_key: "image"
+    cond_stage_key: "class_label"
+
+    # The size of the latent space representation of the image
+    image_size: 4
+    channels: 3
+
+    # Training options
+    cond_stage_trainable:  True
+    loss_type: l2
+
+    conditioning_key: "crossattn"
+    train_condition_only: True
+    attention_flag: 'spatial'
+
+    ablation_blocks: -1
+
+    # Logging options
+    log_every_t: 200
+    monitor: 'val/loss_simple_ema'
+
+
+    use_model_lora: true
+    model_lora_r: 8
+    model_lora_target: [to_q, to_v, to_k, to_out.Linear]
+    use_cond_lora: false
+    DPDM_k: 12
+    
+    # Differential privacy options (also requires trainer.max_steps to be set)
+    dp_config:
+      enabled: True
+      epsilon: 10
+      delta: 1.0e-5
+      max_grad_norm: 0.001
+      poisson_sampling: True
+      max_batch_size: 256
+
+
+    scheduler_config: # 10000 warmup steps
+      target: ldm.lr_scheduler.LambdaLinearScheduler
+      params:
+        warm_up_steps: [10000]
+        cycle_lengths: [10000000000000]
+        f_start: [1.e-6]
+        f_max: [1.]
+        f_min: [ 1.]
+
+    unet_config:
+      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      params:
+        image_size: 4
+        in_channels: 3
+        out_channels: 3
+        model_channels: 64
+        attention_resolutions:
+          - 1
+          - 2
+        num_res_blocks: 1
+        channel_mult:
+          - 1
+          - 2
+        num_heads: 4
+        use_spatial_transformer: true
+        transformer_depth: 1
+        use_scale_shift_norm: true
+        resblock_updown: true
+        context_dim: 5
+
+    first_stage_config:
+      target: ldm.models.autoencoder.AutoencoderKL
+      params:
+        embed_dim: 3
+        monitor: "val/rec_loss"
+#        ckpt_path: ""
+        ddconfig:
+          double_z: True
+          z_channels: 3
+          resolution: 32
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult: [1,2,3,5]
+          num_res_blocks: 2
+          attn_resolutions: [32,16,8 ]
+          dropout: 0.0
+        lossconfig:
+          target: torch.nn.Identity
+
+    cond_stage_config:
+      target: ldm.modules.encoders.modules.ClassEmbedder
+      params:
+        n_classes: 26
+        embed_dim: 5
+        key: class_label
+
+data:
+  target: main.DataModuleFromConfig
+  params:
+    batch_size: 2000 
+    num_workers: 5
+    wrap: False 
+    train:
+      target: ldm.data.mnist.MNISTTrain
+      params:
+        size: 32 
+    validation:
+      target: ldm.data.mnist.MNISTVal
+      params:
+        size: 32 
+
+lightning:
+  callbacks:
+    image_logger:
+      target: main.ImageLogger
+      params:
+        batch_frequency: 1000
+        max_images: 8
+        increase_log_steps: False
+
+
+  trainer:
+    benchmark: True
+    max_epochs: 200
+    accelerator: gpu  # need to be gpu instead of ddp for dp settings
