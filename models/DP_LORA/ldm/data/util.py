@@ -3,6 +3,7 @@ import numpy as np
 import pytorch_lightning as pl
 import torch
 from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import random_split
 
 from ldm.data.base import Txt2ImgIterableBaseDataset
 from ldm.util import instantiate_from_config
@@ -38,6 +39,24 @@ class WrappedDataset(Dataset):
         return self.data[idx]
 
 
+class WrappedDataset_lora(Dataset):
+    """Wraps an arbitrary object with __len__ and __getitem__ into a pytorch dataset"""
+
+    def __init__(self, dataset, data_num=None):
+        if data_num is not None:
+            val_size = len(dataset) - data_num
+            torch.manual_seed(0)
+            self.data, _ = random_split(dataset, [data_num, val_size])
+        else:
+            self.data = dataset
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        x, y = self.data[idx]
+        return {"image": torch.tensor(x).to(torch.float32) * 2 - 1, "class_label": y}
+    
 class DataModuleFromConfig(pl.LightningDataModule):
     def __init__(self, batch_size, train=None, validation=None, test=None, predict=None,
                  wrap=False, num_workers=None, shuffle_test_loader=False, use_worker_init_fn=False,
@@ -67,7 +86,7 @@ class DataModuleFromConfig(pl.LightningDataModule):
 
     def setup(self, stage=None):
         self.datasets = dict(
-            (k, instantiate_from_config(self.dataset_configs[k]))
+            (k, WrappedDataset_lora(instantiate_from_config(self.dataset_configs[k]), data_num=self.dataset_configs[k].data_num))
             for k in self.dataset_configs)
         if self.wrap:
             for k in self.datasets:

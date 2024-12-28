@@ -54,6 +54,7 @@ model:
         - 1
         - 2
         - 2
+        num_res_blocks: 2
         num_head_channels: 8
         use_spatial_transformer: true
         transformer_depth: 1

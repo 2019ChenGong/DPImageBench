@@ -136,7 +136,7 @@ class DP_LDM(DPSynther):
         
         gpu_ids = '0,'
         config_path = config.config_path
-        pretrain_model = self.config.pretrain_model
+        pretrain_model = self.config.train.pretrain_model
         scripts = [[
             'models/DP_LDM/main.py', 
             '-t', 

@@ -21,7 +21,7 @@ def execute(script):
         print(f"error: {e.stderr}")
         return e.stderr
 
-class DP_LDM(DPSynther):
+class DP_LORA(DPSynther):
     def __init__(self, config, device):
         super().__init__()
         self.local_rank = config.setup.local_rank
@@ -136,7 +136,7 @@ class DP_LDM(DPSynther):
         
         gpu_ids = '0,'
         config_path = config.config_path
-        pretrain_model = self.config.pretrain_model
+        pretrain_model = self.config.train.pretrain_model
         scripts = [[
             'models/DP_LORA/main.py', 
             '-t', 
