@@ -37,7 +37,7 @@ model:
       delta: 1.0e-5
       max_grad_norm: 0.001
       poisson_sampling: True
-      max_batch_size: 32
+      max_batch_size: 500
       
     unet_config:
       target: models.DP_LORA.ldm.modules.diffusionmodules.openaimodel.UNetModel

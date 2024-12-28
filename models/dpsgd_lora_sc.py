@@ -148,6 +148,7 @@ class DP_LORA(DPSynther):
             'model.params.dp_config.epsilon={}'.format(config.dp.epsilon), 
             'model.params.dp_config.delta={}'.format(config.dp.delta), 
             'model.params.dp_config.max_grad_norm={}'.format(config.dp.max_grad_norm), 
+            'model.params.dp_config.max_batch_size={}'.format(config.batch_size//config.n_splits),
             'data.params.batch_size={}'.format(config.batch_size), 
             'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
             'data.params.train.params.path={}'.format(self.config.sensitive_data.train_path),
