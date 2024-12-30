@@ -36,13 +36,9 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [ ] DP-LDM and DP-LoRA for stable diffusion framework.
-
 - [ ] Hyper-pararmeter gradient norm, epoch.
 
 - [ ] emnist as the pretraining dataset.
-
-- [ ] Merge DP-LoRA.
 
 - [ ] downstream generative model?
 
