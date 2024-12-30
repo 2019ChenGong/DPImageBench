@@ -40,6 +40,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] emnist as the pretraining dataset.
 
+- [ ] Unify outputs.
+
 - [ ] downstream generative model?
 
 - [ ] DP ldm pretraining optimization.
