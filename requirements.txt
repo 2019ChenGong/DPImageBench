@@ -16,6 +16,7 @@ pytorch-lightning==1.4.2
 torchmetrics==0.5.0
 einops
 image-reward
+diffusers==0.30.3
 git+https://github.com/marcojira/fld.git
 improved-diffusion@git+https://github.com/fjxmlzn/improved-diffusion.git@8f6677c3c47d1c1ad2e22ad2603eaec4cc639805
 -e git+https://github.com/CompVis/taming-transformers.git@master#egg=taming-transformers
