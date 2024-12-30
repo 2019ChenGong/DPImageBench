@@ -161,11 +161,11 @@ class VQModel(pl.LightningModule):
             self.log_dict(log_dict_disc, prog_bar=False, logger=True, on_step=True, on_epoch=True)
             return discloss
 
-    def validation_step(self, batch, batch_idx):
-        log_dict = self._validation_step(batch, batch_idx)
-        with self.ema_scope():
-            log_dict_ema = self._validation_step(batch, batch_idx, suffix="_ema")
-        return log_dict
+    # def validation_step(self, batch, batch_idx):
+    #     log_dict = self._validation_step(batch, batch_idx)
+    #     with self.ema_scope():
+    #         log_dict_ema = self._validation_step(batch, batch_idx, suffix="_ema")
+    #     return log_dict
 
     def _validation_step(self, batch, batch_idx, suffix=""):
         x = self.get_input(batch, self.image_key)

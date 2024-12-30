@@ -15,7 +15,8 @@ from models.synthesizer import DPSynther
 
 def execute(script):
     try:
-        result = subprocess.run(['python'] + script, check=True, text=True, capture_output=True)
+        python_path = '/standard/dplab/fzv6en/miniconda3/envs/dpimagebench_1/bin/python'
+        result = subprocess.run([python_path] + script, check=True, text=True, capture_output=True)
         return result.stdout
     except subprocess.CalledProcessError as e:
         print(f"error: {e.stderr}")
@@ -144,6 +145,7 @@ class DP_LORA(DPSynther):
             '--base', config_path, 
             '--gpus', gpu_ids, 
             '--accelerator', 'gpu', 
+            'model.params.cond_stage_config.params.n_classes={}'.format(self.config.sensitive_data.n_classes),
             'model.params.ckpt_path={}'.format(pretrain_model), 
             'model.params.dp_config.epsilon={}'.format(config.dp.epsilon), 
             'model.params.dp_config.delta={}'.format(config.dp.delta), 
@@ -177,7 +179,7 @@ class DP_LORA(DPSynther):
             make_dir(config.log_dir)
         
         scripts = [[
-            'models/DP_LDM/cond_sampling_test.py', 
+            'models/DP_LORA/cond_sampling_test.py', 
             '--save_path', config.log_dir, 
             '--yaml', self.config.train.config_path, 
             '--ckpt_path', os.path.join(self.config.train.log_dir, 'checkpoints', 'last.ckpt'), 
