@@ -212,6 +212,7 @@ if __name__ == "__main__":
 
         # trainer and callbacks
         trainer_kwargs = dict()
+        trainer_kwargs['progress_bar_refresh_rate'] = 200
 
         # default logger configs
         default_logger_cfgs = {
