@@ -136,7 +136,7 @@ class DP_Diffusion(DPSynther):
         dist.barrier()
 
         dataset_loader = torch.utils.data.DataLoader(
-        dataset=public_dataloader.dataset, batch_size=config.batch_size//self.global_size, sampler=DistributedSampler(public_dataloader.dataset), pin_memory=True, drop_last=True)
+        dataset=public_dataloader.dataset, batch_size=config.batch_size//self.global_size, sampler=DistributedSampler(public_dataloader.dataset), pin_memory=True, drop_last=True, num_workers=8)
 
         if config.loss.version == 'edm':
             loss_fn = EDMLoss(**config.loss).get_loss

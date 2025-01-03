@@ -255,9 +255,9 @@ def fid_save(fid_path, dataset, batch_size):
 
 def main(config):
     for data_name in config.data_name:
-        if data_name in ["mnist", "fmnist"]:
-            config.c = 1
-            config.resolution = 28
+        # if data_name in ["mnist", "fmnist"]:
+        #     config.c = 1
+        #     config.resolution = 28
         
         train_name = "train_{}".format(config.resolution)
         test_name = "test_{}".format(config.resolution)
