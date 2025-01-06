@@ -84,7 +84,9 @@ class LatentDiffusion(DDPM):
                  train_resblocks_only=False,
                  ablation_blocks=-1,
                  dp_config=None,
+                 output_file=None,
                  *args, **kwargs):
+        self.output_file = output_file
         self.num_timesteps_cond = default(num_timesteps_cond, 1)
         self.scale_by_std = scale_by_std
         assert self.num_timesteps_cond <= kwargs['timesteps']
@@ -211,6 +213,11 @@ class LatentDiffusion(DDPM):
         self.first_stage_model.train = disabled_train
         for param in self.first_stage_model.parameters():
             param.requires_grad = False
+    
+    def training_epoch_end(self, outputs):
+        if self.output_file is not None:
+            with open(self.output_file, 'a') as f:
+                f.write(f"Epoch {self.current_epoch} is finished\n")
 
     def instantiate_cond_stage(self, config):
         if not self.cond_stage_trainable:
@@ -235,7 +242,7 @@ class LatentDiffusion(DDPM):
 
     def _get_denoise_row_from_list(self, samples, desc='', force_no_decoder_quantization=False):
         denoise_row = []
-        for zd in tqdm(samples, desc=desc):
+        for zd in samples:
             denoise_row.append(self.decode_first_stage(zd.to(self.device),
                                force_not_quantize=force_no_decoder_quantization))
         n_imgs_per_row = len(denoise_row)
@@ -845,9 +852,7 @@ class LatentDiffusion(DDPM):
 
         if start_T is not None:
             timesteps = min(timesteps, start_T)
-        iterator = tqdm(reversed(range(0, timesteps)), desc='Progressive Generation',
-                        total=timesteps) if verbose else reversed(
-            range(0, timesteps))
+        iterator = reversed(range(0, timesteps))
         if type(temperature) == float:
             temperature = [temperature] * timesteps
 
@@ -897,8 +902,7 @@ class LatentDiffusion(DDPM):
 
         if start_T is not None:
             timesteps = min(timesteps, start_T)
-        iterator = tqdm(reversed(range(0, timesteps)), desc='Sampling t', total=timesteps) if verbose else reversed(
-            range(0, timesteps))
+        iterator = reversed(range(0, timesteps))
 
         if mask is not None:
             assert x0 is not None

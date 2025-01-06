@@ -15,7 +15,7 @@ from models.synthesizer import DPSynther
 
 def execute(script):
     try:
-        python_path = '/standard/dplab/fzv6en/miniconda3/envs/dpimagebench_1/bin/python'
+        python_path = 'python'
         result = subprocess.run([python_path] + script, check=True, text=True, capture_output=True)
         return result.stdout
     except subprocess.CalledProcessError as e:
@@ -104,6 +104,7 @@ class DP_LORA(DPSynther):
             '--logdir', logdir, 
             '--base', config_path, 
             '--gpus', gpu_ids, 
+            'model.params.output_file={}'.format(os.path.join(os.path.dirname(config.log_dir), 'stdout.txt')),
             'data.params.batch_size={}'.format(config.batch_size), 
             'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
             'model.params.first_stage_config.params.ckpt_path={}'.format(pretrain_model), 
@@ -145,6 +146,7 @@ class DP_LORA(DPSynther):
             '--base', config_path, 
             '--gpus', gpu_ids, 
             '--accelerator', 'gpu', 
+            'model.params.output_file={}'.format(os.path.join(os.path.dirname(config.log_dir), 'stdout.txt')),
             'model.params.cond_stage_config.params.n_classes={}'.format(self.config.sensitive_data.n_classes),
             'model.params.ckpt_path={}'.format(pretrain_model), 
             'model.params.dp_config.epsilon={}'.format(config.dp.epsilon), 

@@ -2,6 +2,7 @@ model:
   base_learning_rate: 1.0e-06
   target: models.DP_LORA.ldm.models.diffusion.ddpm.LatentDiffusion
   params:
+    output_file: null
     ckpt_path: null
     ignore_keys:
     - cond_stage_model

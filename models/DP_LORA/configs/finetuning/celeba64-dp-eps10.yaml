@@ -2,7 +2,7 @@ model:
   base_learning_rate: 5.0e-07
   target: ldm.models.diffusion.ddpm.LatentDiffusion
   params:
-    ckpt_path: /root/autodl-tmp/2024-02-29T12-26-44_imagenet64-unconditional/checkpoints/epoch=000039.ckpt
+    ckpt_path: null
     ignore_keys:
     - cond_stage_model
     linear_start: 0.0015
@@ -10,7 +10,7 @@ model:
     timesteps: 1000
     num_timesteps_cond: 1
     first_stage_key: image
-    image_size: 32
+    image_size: 28
     channels: 3
     cond_stage_trainable: false
     train_attention_only: true

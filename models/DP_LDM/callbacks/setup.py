@@ -37,15 +37,13 @@ class SetupCallback(Callback):
             print(OmegaConf.to_yaml(self.config))
             print()
 
-            OmegaConf.save(self.config,
-                           os.path.join(self.cfgdir, "{}-project.yaml".format(self.now)))
+            # OmegaConf.save(self.config, os.path.join(self.cfgdir, "{}-project.yaml".format(self.now)))
 
             print("#### Lightning config ####")
             print(OmegaConf.to_yaml(self.lightning_config))
             print()
             
-            OmegaConf.save(OmegaConf.create({"lightning": self.lightning_config}),
-                           os.path.join(self.cfgdir, "{}-lightning.yaml".format(self.now)))
+            # OmegaConf.save(OmegaConf.create({"lightning": self.lightning_config}), os.path.join(self.cfgdir, "{}-lightning.yaml".format(self.now)))
 
         else:
             # ModelCheckpoint callback created log directory --- remove it

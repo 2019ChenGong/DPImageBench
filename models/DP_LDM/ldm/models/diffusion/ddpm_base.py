@@ -55,6 +55,7 @@ class DDPM(pl.LightningModule):
                  use_positional_encodings=False,
                  learn_logvar=False,
                  logvar_init=0.,
+                 output_file=None,
                  ):
         super().__init__()
         assert parameterization in ["eps", "x0"], 'currently only supporting "eps" and "x0"'
@@ -240,7 +241,7 @@ class DDPM(pl.LightningModule):
         b = shape[0]
         img = torch.randn(shape, device=device)
         intermediates = [img]
-        for i in tqdm(reversed(range(0, self.num_timesteps)), desc='Sampling t', total=self.num_timesteps):
+        for i in reversed(range(0, self.num_timesteps)):
             img = self.p_sample(img, torch.full((b,), i, device=device, dtype=torch.long),
                                 clip_denoised=self.clip_denoised)
             if i % self.log_every_t == 0 or i == self.num_timesteps - 1:
@@ -312,23 +313,6 @@ class DDPM(pl.LightningModule):
         return self.p_losses(x, t, *args, **kwargs)
 
     def get_input(self, batch, k):
-        pid = os.getpid()
-
-        # 获取当前进程对象
-        current_process = psutil.Process(pid)
-
-        # 获取 CPU 使用情况
-        cpu_usage = current_process.cpu_percent(interval=1)
-        print(f"当前程序的 CPU 使用率: {cpu_usage}%")
-
-        # 获取内存使用情况
-        memory_info = current_process.memory_info()
-        memory_usage = memory_info.rss / (1024 * 1024)  # 转换为 MB
-        print(f"当前程序的内存使用量: {memory_usage} MB")
-        with open('linshi_log.txt', 'a') as f:
-            f.write(f"当前程序的 CPU 使用率: {cpu_usage}%\n")
-            f.write(f"当前程序的内存使用量: {memory_usage} MB\n")
-
         x = batch[k]
         if len(x.shape) == 3:
             x = x[..., None]

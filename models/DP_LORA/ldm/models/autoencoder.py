@@ -292,8 +292,10 @@ class AutoencoderKL(pl.LightningModule):
                  image_key="image",
                  colorize_nlabels=None,
                  monitor=None,
+                 output_file=None,
                  ):
         super().__init__()
+        self.output_file = output_file
         self.image_key = image_key
         self.encoder = Encoder(**ddconfig)
         self.decoder = Decoder(**ddconfig)
@@ -320,6 +322,11 @@ class AutoencoderKL(pl.LightningModule):
                     del sd[k]
         self.load_state_dict(sd, strict=False)
         print(f"Restored from {path}")
+    
+    def training_epoch_end(self, outputs):
+        if self.output_file is not None:
+            with open(self.output_file, 'a') as f:
+                f.write(f"Epoch {self.current_epoch} is finished\n")
 
     def encode(self, x):
         h = self.encoder(x)
@@ -369,19 +376,19 @@ class AutoencoderKL(pl.LightningModule):
             self.log_dict(log_dict_disc, prog_bar=False, logger=True, on_step=True, on_epoch=False)
             return discloss
 
-    def validation_step(self, batch, batch_idx):
-        inputs = self.get_input(batch, self.image_key)
-        reconstructions, posterior = self(inputs)
-        aeloss, log_dict_ae = self.loss(inputs, reconstructions, posterior, 0, self.global_step,
-                                        last_layer=self.get_last_layer(), split="val")
+    # def validation_step(self, batch, batch_idx):
+    #     inputs = self.get_input(batch, self.image_key)
+    #     reconstructions, posterior = self(inputs)
+    #     aeloss, log_dict_ae = self.loss(inputs, reconstructions, posterior, 0, self.global_step,
+    #                                     last_layer=self.get_last_layer(), split="val")
 
-        discloss, log_dict_disc = self.loss(inputs, reconstructions, posterior, 1, self.global_step,
-                                            last_layer=self.get_last_layer(), split="val")
+    #     discloss, log_dict_disc = self.loss(inputs, reconstructions, posterior, 1, self.global_step,
+    #                                         last_layer=self.get_last_layer(), split="val")
 
-        self.log("val/rec_loss", log_dict_ae["val/rec_loss"])
-        self.log_dict(log_dict_ae)
-        self.log_dict(log_dict_disc)
-        return self.log_dict
+    #     self.log("val/rec_loss", log_dict_ae["val/rec_loss"])
+    #     self.log_dict(log_dict_ae)
+    #     self.log_dict(log_dict_disc)
+    #     return self.log_dict
 
     def configure_optimizers(self):
         lr = self.learning_rate

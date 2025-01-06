@@ -15,7 +15,8 @@ from models.synthesizer import DPSynther
 
 def execute(script):
     try:
-        result = subprocess.run(['python'] + script, check=True, text=True, capture_output=True)
+        python_path = 'python'
+        result = subprocess.run([python_path] + script, check=True, text=True, capture_output=True)
         return result.stdout
     except subprocess.CalledProcessError as e:
         print(f"error: {e.stderr}")
@@ -63,6 +64,7 @@ class DP_LDM(DPSynther):
             '--logdir', logdir, 
             '--base', config_path, 
             '--gpus', gpu_ids, 
+            'model.params.output_file={}'.format(os.path.join(os.path.join(os.path.dirname(logdir)), 'stdout.txt')),
             'data.params.batch_size={}'.format(config.batch_size), 
             'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
             'data.params.train.params.root={}'.format(self.config.public_data.train_path),
@@ -103,6 +105,7 @@ class DP_LDM(DPSynther):
             '--logdir', logdir, 
             '--base', config_path, 
             '--gpus', gpu_ids, 
+            'model.params.output_file={}'.format(os.path.join(os.path.dirname(os.path.dirname(logdir)), 'stdout.txt')),
             'data.params.batch_size={}'.format(config.batch_size), 
             'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
             'model.params.first_stage_config.params.ckpt_path={}'.format(pretrain_model), 
@@ -144,6 +147,7 @@ class DP_LDM(DPSynther):
             '--base', config_path, 
             '--gpus', gpu_ids, 
             '--accelerator', 'gpu', 
+            'model.params.output_file={}'.format(os.path.join(os.path.dirname(config.log_dir), 'stdout.txt')),
             'model.params.ckpt_path={}'.format(pretrain_model), 
             'model.params.dp_config.epsilon={}'.format(config.dp.epsilon), 
             'model.params.dp_config.delta={}'.format(config.dp.delta), 

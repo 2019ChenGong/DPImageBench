@@ -48,7 +48,8 @@ class Generator(nn.Module):
         g_in_dims_collection = {
             "28": [g_conv_dim * 4, g_conv_dim * 4],
             "32": [g_conv_dim * 4, g_conv_dim * 4, g_conv_dim * 4],
-            "64": [g_conv_dim * 16, g_conv_dim * 8, g_conv_dim * 4, g_conv_dim * 2],
+            "64": [g_conv_dim * 4, g_conv_dim * 4, g_conv_dim * 4],
+            # "64": [g_conv_dim * 16, g_conv_dim * 8, g_conv_dim * 4, g_conv_dim * 2],
             "128": [g_conv_dim * 16, g_conv_dim * 16, g_conv_dim * 8, g_conv_dim * 4, g_conv_dim * 2],
             "256": [g_conv_dim * 16, g_conv_dim * 16, g_conv_dim * 8, g_conv_dim * 8, g_conv_dim * 4, g_conv_dim * 2],
             "512": [g_conv_dim * 16, g_conv_dim * 16, g_conv_dim * 8, g_conv_dim * 8, g_conv_dim * 4, g_conv_dim * 2, g_conv_dim]
@@ -57,7 +58,8 @@ class Generator(nn.Module):
         g_out_dims_collection = {
             "28": [g_conv_dim * 4, g_conv_dim * 4],
             "32": [g_conv_dim * 4, g_conv_dim * 4, g_conv_dim * 4],
-            "64": [g_conv_dim * 8, g_conv_dim * 4, g_conv_dim * 2, g_conv_dim],
+            "64": [g_conv_dim * 4, g_conv_dim * 4, g_conv_dim * 4],
+            # "64": [g_conv_dim * 8, g_conv_dim * 4, g_conv_dim * 2, g_conv_dim],
             "128": [g_conv_dim * 16, g_conv_dim * 8, g_conv_dim * 4, g_conv_dim * 2, g_conv_dim],
             "256": [g_conv_dim * 16, g_conv_dim * 8, g_conv_dim * 8, g_conv_dim * 4, g_conv_dim * 2, g_conv_dim],
             "512": [g_conv_dim * 16, g_conv_dim * 8, g_conv_dim * 8, g_conv_dim * 4, g_conv_dim * 2, g_conv_dim, g_conv_dim]

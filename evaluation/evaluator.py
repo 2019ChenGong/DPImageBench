@@ -166,6 +166,7 @@ class Evaluator(object):
         if 'cifar' in self.config.sensitive_data.name:
             batch_size = 126
             max_epoch = 200
+            n_splits = 1
             if model_name == "wrn":
                 model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, depth=28, widen_factor=10, dropRate=0.3)
             elif model_name == "resnet":
@@ -177,6 +178,12 @@ class Evaluator(object):
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=60, gamma=0.2)
         else:
             batch_size = 256
+            if synthetic_images.shape[-1] == 64:
+                n_splits = 4
+            elif synthetic_images.shape[-1] == 128:
+                n_splits = 8
+            else:
+                n_splits = 1
             max_epoch = 50
             if model_name == "wrn":
                 model = WideResNet(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
@@ -194,10 +201,10 @@ class Evaluator(object):
 
         ema = ExponentialMovingAverage(model.parameters(), 0.9999)
 
-        train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_train).float(), torch.from_numpy(synthetic_labels_train).long()), shuffle=True, batch_size=batch_size)
+        train_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_train).float(), torch.from_numpy(synthetic_labels_train).long()), shuffle=True, batch_size=batch_size//n_splits)
 
         if sensitive_val_loader is None:
-            val_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_val).float(), torch.from_numpy(synthetic_labels_val).long()), shuffle=True, batch_size=batch_size)
+            val_loader = DataLoader(TensorDataset(torch.from_numpy(synthetic_images_val).float(), torch.from_numpy(synthetic_labels_val).long()), shuffle=True, batch_size=batch_size//n_splits)
             sensitive_val = False
         else:
             val_loader = sensitive_val_loader
@@ -209,6 +216,8 @@ class Evaluator(object):
         best_test_acc_on_val = 0.
         best_test_acc_on_test = 0.
 
+        grad_accu_step = 0
+
         for epoch in range(max_epoch):
             model.train()
             train_loss = 0
@@ -217,12 +226,19 @@ class Evaluator(object):
             correct = 0
             for _, (inputs, targets) in enumerate(train_loader):
                 inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
-                optimizer.zero_grad()
+
+                if grad_accu_step == 0:
+                    optimizer.zero_grad()
+                    
                 outputs = model(inputs)
-                loss = criterion(outputs, targets)
+                loss = criterion(outputs, targets) / n_splits
                 train_loss += loss.item()
                 loss.backward()
-                optimizer.step()
+                grad_accu_step += 1
+
+                if grad_accu_step == n_splits:
+                    optimizer.step()
+                    grad_accu_step = 0
 
                 _, predicted = outputs.max(1)
                 total += targets.size(0)
