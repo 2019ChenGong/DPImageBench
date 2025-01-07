@@ -110,8 +110,9 @@ class Discriminator(nn.Module):
             "28": [1] + [d_conv_dim * 2, d_conv_dim * 2],
             "32": [3] + [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 2],
             "64": [3] + [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 2],
+            "128": [3] + [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 2],
             # "64": [3] + [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 4, d_conv_dim * 8],
-            "128": [3] + [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 4, d_conv_dim * 8, d_conv_dim * 16],
+            # "128": [3] + [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 4, d_conv_dim * 8, d_conv_dim * 16],
             "256": [3] + [d_conv_dim, d_conv_dim * 2, d_conv_dim * 4, d_conv_dim * 8, d_conv_dim * 8, d_conv_dim * 16],
             "512": [3] + [d_conv_dim, d_conv_dim, d_conv_dim * 2, d_conv_dim * 4, d_conv_dim * 8, d_conv_dim * 8, d_conv_dim * 16]
         }
@@ -120,8 +121,9 @@ class Discriminator(nn.Module):
             "28": [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 2],
             "32": [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 2],
             "64": [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 2],
+            "128": [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 2],
             # "64": [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 4, d_conv_dim * 8, d_conv_dim * 16],
-            "128": [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 4, d_conv_dim * 8, d_conv_dim * 16, d_conv_dim * 16],
+            # "128": [d_conv_dim * 2, d_conv_dim * 2, d_conv_dim * 4, d_conv_dim * 8, d_conv_dim * 16, d_conv_dim * 16],
             "256": [d_conv_dim, d_conv_dim * 2, d_conv_dim * 4, d_conv_dim * 8, d_conv_dim * 8, d_conv_dim * 16, d_conv_dim * 16],
             "512":
             [d_conv_dim, d_conv_dim, d_conv_dim * 2, d_conv_dim * 4, d_conv_dim * 8, d_conv_dim * 8, d_conv_dim * 16, d_conv_dim * 16]

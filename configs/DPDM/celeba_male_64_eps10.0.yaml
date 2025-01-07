@@ -118,7 +118,7 @@ train:
     version: edm
     p_mean: -1.2
     p_std: 1.2
-    n_noise_samples: 32
+    n_noise_samples: 4
     n_classes: 2
   dp:
     sdq: null
