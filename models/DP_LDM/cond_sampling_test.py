@@ -113,9 +113,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# CUDA_VISIBLE_DEVICES=1 python cond_sampling_test.py \
-#     -y /p/fzv6enresearch/DPImageBench/models/DP_LDM/configs/finetuning/cifar32-dp-eps10-4M.yaml \
-#     -ckpt /p/fzv6enresearch/DPImageBench/models/DP_LDM/logs/checkpoints/last.ckpt \
-#     -c 10 \
-#     -bs 2000

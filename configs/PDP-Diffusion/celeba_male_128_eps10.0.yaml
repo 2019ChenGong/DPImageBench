@@ -36,7 +36,9 @@ model:
     label_dim: 1000
     attn_resolutions:
     - 64
+    - 32
     ch_mult:
+    - 1
     - 2
     - 4
   sampler:
@@ -70,8 +72,8 @@ model:
 pretrain:
   log_dir: null
   seed: 0
-  batch_size: 1024
-  n_epochs: 160
+  batch_size: 64
+  n_epochs: 40
   log_freq: 100
   snapshot_freq: 2000
   snapshot_threshold: 1
@@ -96,7 +98,7 @@ train:
   log_dir: null
   seed: 0
   batch_size: 4096
-  n_epochs: 100
+  n_epochs: 50
   partly_finetune: false
   log_freq: 100
   snapshot_freq: 2000
@@ -118,7 +120,7 @@ train:
     version: edm
     p_mean: -1.2
     p_std: 1.2
-    n_noise_samples: 32
+    n_noise_samples: 4
     n_classes: 2
   dp:
     sdq: null

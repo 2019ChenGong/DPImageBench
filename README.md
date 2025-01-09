@@ -42,11 +42,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Unify outputs.
 
-- [ ] Chinese in output files.
-
 - [ ] downstream generative model?
-
-- [ ] DP ldm pretraining optimization.
 
 - [ ] Exp: different resolutions.
 

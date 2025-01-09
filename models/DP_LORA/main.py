@@ -129,9 +129,6 @@ def nondefault_trainer_args(opt):
 if __name__ == "__main__":
     now = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
-    # add cwd for convenience and to make classes in this file available when
-    # running as `python main.py`
-    # (in particular `main.DataModuleFromConfig`)
     sys.path.append(os.getcwd())
 
     parser = get_parser()
@@ -324,12 +321,6 @@ if __name__ == "__main__":
 
         # Instantiate data
         data = instantiate_from_config(config.data)
-        # NOTE according to https://pytorch-lightning.readthedocs.io/en/latest/datamodules.html
-        # calling these ourselves should not be necessary but it is.
-        # lightning still takes care of proper multiprocessing though
-        # NOTE: Datamodules are set up just before training begins. These
-        #       functions are called because we want to print out some
-        #       train/validation/test dataset stats
         data.prepare_data()
         data.setup()
         print("#### Data #####")

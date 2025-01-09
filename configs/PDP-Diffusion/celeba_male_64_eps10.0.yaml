@@ -36,7 +36,9 @@ model:
     label_dim: 1000
     attn_resolutions:
     - 32
+    - 16
     ch_mult:
+    - 1
     - 2
     - 4
   sampler:
