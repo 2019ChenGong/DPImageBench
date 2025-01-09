@@ -67,7 +67,7 @@ class Generator(nn.Module):
             "512": [g_conv_dim * 16, g_conv_dim * 8, g_conv_dim * 8, g_conv_dim * 4, g_conv_dim * 2, g_conv_dim, g_conv_dim]
         }
 
-        bottom_collection = {"28": 7, "32": 4, "64": 4, "128": 4, "256": 4, "512": 4}
+        bottom_collection = {"28": 7, "32": 4, "64": 8, "128": 16, "256": 4, "512": 4}
 
         self.MODULES = misc.make_empty_object()
         self.apply_g_sn = True

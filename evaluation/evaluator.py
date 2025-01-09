@@ -179,9 +179,9 @@ class Evaluator(object):
         else:
             batch_size = 256
             if synthetic_images.shape[-1] == 64:
-                n_splits = 4
+                n_splits = 16
             elif synthetic_images.shape[-1] == 128:
-                n_splits = 8
+                n_splits = 64
             else:
                 n_splits = 1
             max_epoch = 50
@@ -265,7 +265,7 @@ class Evaluator(object):
                         targets = torch.argmax(targets, dim=1)
                     inputs, targets = inputs.to(self.device) * 2. - 1., targets.to(self.device)
                     outputs = model(inputs)
-                    loss = criterion(outputs, targets)
+                    loss = criterion(outputs, targets) / n_splits
                     test_loss += loss.item()
 
                     _, predicted = outputs.max(1)
