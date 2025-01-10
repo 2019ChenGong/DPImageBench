@@ -36,13 +36,9 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [ ] Hyper-pararmeter gradient norm, epoch.
+- [ ] Hyper-pararmeter epoch.
 
 - [ ] emnist as the pretraining dataset.
-
-- [ ] Unify outputs.
-
-- [ ] downstream generative model?
 
 - [ ] Exp: different resolutions.
 
