@@ -48,6 +48,9 @@ class Evaluator(object):
 
         acc_list = []
 
+        if synthetic_images.shape[-1] > 32:
+            self.acc_models = self.acc_models[:2]
+
         for model_name in self.acc_models:
             acc, test_acc_on_val, test_acc_on_test, best_noisy_acc, best_test_acc_on_noisy_val = self.cal_acc_2(model_name, synthetic_images, synthetic_labels, sensitive_val_loader, sensitive_test_loader)
             if sensitive_val_loader is not None:

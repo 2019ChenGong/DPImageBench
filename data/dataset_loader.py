@@ -25,7 +25,7 @@ def load_sensitive_data(config):
     sensitive_test_set = ImageFolderDataset(
             config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
     
-    if config.eval.mode == "val":
+    if config.eval.mode == "val" or True:
         if "mnist" in config.sensitive_data.name:
             train_size = 55000
         elif "cifar" in config.sensitive_data.name:
