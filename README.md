@@ -40,8 +40,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] emnist as the pretraining dataset.
 
-- [ ] Exp: different resolutions.
-
 
 ## 2. Introduction
 
@@ -198,7 +196,7 @@ def main(config):
 We list the key hyper-parameters below, including their explanations and available options.
 
 - `--data_name`: means the sensitive dataset; the option is [`mnist_28`, `fmnist_28`, `cifar10_32`, `cifar100_32`, `eurosat_32`, `celeba_male_32`, `camelyon_32`].
-- `--method`: the method to train the DP image synthesizers; the option is [`DP-NTK`, `DP-Kernel`, `DP-MERF`, `DPGAN`, `DP-LDM-SD`, `DP-LDM`, `DPDM`, `PE`, `GS-WGAN`, `PDP-Diffusion`, `PrivImage`].
+- `--method`: the method to train the DP image synthesizers; the option is [`DP-NTK`, `DP-Kernel`, `DP-MERF`, `DPGAN`, `DP-LDM-SD`, `DP-LDM`, `DP-LORA`, `DPDM`, `PE`, `GS-WGAN`, `PDP-Diffusion`, `PrivImage`].
 - `--epsilon`: the privacy budget 10.0; the option is [`1.0`, `10.0`].
 - `--exp_description`: the notes for the name of result folders.
 - `setup.n_gpus_per_node`: means the number of GPUs to be used for training.

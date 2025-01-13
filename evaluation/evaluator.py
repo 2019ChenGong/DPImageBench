@@ -72,6 +72,7 @@ class Evaluator(object):
         logging.info(f"The average and std of accuracy of synthetic images are {acc_mean:.2f} and {acc_std:.2f}")
 
         # fid, is_mean = self.visual_metric(synthetic_images)
+        torch.cuda.empty_cache()
         fid, is_mean, fld, p, r, ir = self.visual_metric(synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader)
         logging.info("The FID of synthetic images is {}".format(fid))
         logging.info("The Inception Score of synthetic images is {}".format(is_mean))
