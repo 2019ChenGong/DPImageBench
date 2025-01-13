@@ -1,0 +1,121 @@
+data:
+  params:
+    batch_size: 2000
+    num_workers: 0
+    train:
+      params:
+        path: null
+        resolution: 28
+        use_labels: True
+        c: 1
+      target: data.stylegan3.dataset.ImageFolderDataset
+      data_num: null
+    validation:
+      params:
+        path: null
+        resolution: 28
+        use_labels: True
+        c: 1
+      target: data.stylegan3.dataset.ImageFolderDataset
+      data_num: null
+    wrap: false
+  target: models.DP_LDM.main.DataModuleFromConfig
+lightning:
+  callbacks:
+    image_logger:
+      params:
+        batch_frequency: 5000
+        increase_log_steps: false
+        max_images: 8
+      target: models.DP_LDM.main.ImageLogger
+  trainer:
+    benchmark: false
+    max_epochs: 30
+model:
+  base_learning_rate: 1.0e-06
+  params:
+    output_file: null
+    ablation_blocks: -1
+    attention_flag: spatial
+    channels: 3
+    ckpt_path: null
+    cond_stage_config:
+      params:
+        embed_dim: 512
+        key: class_label
+        n_classes: 1001
+      target: models.DP_LDM.ldm.modules.encoders.modules.ClassEmbedder
+    cond_stage_key: class_label
+    cond_stage_trainable: true
+    conditioning_key: crossattn
+    dp_config:
+      delta: 1e-5
+      enabled: true
+      epsilon: 10
+      max_batch_size: 500
+      max_grad_norm: 1.0e-06
+      poisson_sampling: true
+    first_stage_config:
+      params:
+        ddconfig:
+          double_z: true
+          z_channels: 3
+          resolution: 28
+          in_channels: 1
+          out_ch: 1
+          ch: 128
+          ch_mult:
+          - 1
+          - 2
+          num_res_blocks: 2
+          attn_resolutions:
+          - 14
+          - 7
+          dropout: 0.0
+        embed_dim: 3
+        lossconfig:
+          target: torch.nn.Identity
+        monitor: val/rec_loss
+      target: models.DP_LDM.ldm.models.autoencoder.AutoencoderKL
+    first_stage_key: image
+    image_size: 14
+    linear_end: 0.0155
+    linear_start: 0.0015
+    log_every_t: 200
+    loss_type: l2
+    monitor: val/loss_simple_ema
+    num_timesteps_cond: 1
+    scheduler_config:
+      params:
+        cycle_lengths:
+        - 10000000000000
+        f_max:
+        - 1.0
+        f_min:
+        - 1.0
+        f_start:
+        - 1.0e-06
+        warm_up_steps:
+        - 10000
+      target: models.DP_LDM.ldm.lr_scheduler.LambdaLinearScheduler
+    timesteps: 1000
+    train_condition_only: true
+    unet_config:
+      params:
+        image_size: 14
+        in_channels: 3
+        out_channels: 3
+        model_channels: 64
+        attention_resolutions:
+        - 1
+        - 2
+        num_res_blocks: 2
+        channel_mult:
+        - 1
+        - 2
+        num_head_channels: 8
+        use_spatial_transformer: true
+        transformer_depth: 1
+        context_dim: 512
+      target: models.DP_LDM.ldm.modules.diffusionmodules.openaimodel.UNetModel
+  target: models.DP_LDM.ldm.models.diffusion.ddpm.LatentDiffusion
