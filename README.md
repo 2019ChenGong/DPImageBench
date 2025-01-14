@@ -40,6 +40,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] emnist as the pretraining dataset.
 
+- [ ] Personal information in dp-ldm configuration file
+
 
 ## 2. Introduction
 

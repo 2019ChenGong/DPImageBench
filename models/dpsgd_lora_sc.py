@@ -14,6 +14,7 @@ from models.DP_Diffusion.utils.util import make_dir
 from models.synthesizer import DPSynther
 
 def execute(script):
+    script = [item.replace('None', 'null') for item in script]
     try:
         python_path = 'python'
         result = subprocess.run([python_path] + script, check=True, text=True, capture_output=True)

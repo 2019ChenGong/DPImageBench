@@ -28,7 +28,7 @@ def visualize_main():
     row_per_method = 2
     img_size = 32
     datasets = ["MNIST", "F-MNIST", "CIFAR-10", "CIFAR-100", "EuroSAT", "CelebA", "Camelyon"]
-    methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "GS-WGAN", "DP-GAN", "DPDM", "PDP-Diffusion", "DP-LDM", "PrivImage", "Real"]
+    methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "GS-WGAN", "DPGAN", "DPDM", "PDP-Diffusion", "DP-LDM-SD", "DP-LDM", "DP-L0RA", "PrivImage", "Real"]
     width_per_patch = img_size * column_per_dataset
     height_per_patch = img_size * row_per_method
 
@@ -107,6 +107,24 @@ def visualize_main():
         "/exp/pdp-diffusion/eurosat_32_eps10.0Unconditional-2024-10-21-23-34-18/gen/gen.npz",
         "/exp/pdp-diffusion/celeba_male_32_eps10.0_trainval_LZN-2024-10-28-05-49-50/gen/gen.npz",
         "/exp/pdp-diffusion/camelyon_32_eps1.0_LZN-2024-10-28-21-49-21/gen/gen.npz"
+    ],
+    [
+        "/exp/dp-ldm/mnist_28_eps10.0unconditional-2024-10-24-09-51-58/gen/gen.npz",
+        "/exp/dp-ldm/fmnist_28_eps10.0unconditional-2024-10-24-20-59-35/gen/gen.npz",
+        "/exp/dp-ldm/cifar10_32_eps10.0unconditional-2024-10-24-22-18-33/gen/gen.npz",
+        "/exp/dp-ldm/cifar100_32_eps10.0unconditional-2024-10-25-07-00-22/gen/gen.npz",
+        "/exp/dp-ldm/eurosat_32_eps10.0unconditional-2024-10-25-10-01-21/gen/gen.npz",
+        "/exp/dp-ldm/celeba_male_32_eps10.0unconditional-2024-10-25-20-11-00/gen/gen.npz",
+        "/exp/dp-ldm/camelyon_32_eps10.0unconditional-2024-10-25-11-13-20/gen/gen.npz"
+    ],
+    [
+        "/exp/dp-ldm/mnist_28_eps10.0unconditional-2024-10-24-09-51-58/gen/gen.npz",
+        "/exp/dp-ldm/fmnist_28_eps10.0unconditional-2024-10-24-20-59-35/gen/gen.npz",
+        "/exp/dp-ldm/cifar10_32_eps10.0unconditional-2024-10-24-22-18-33/gen/gen.npz",
+        "/exp/dp-ldm/cifar100_32_eps10.0unconditional-2024-10-25-07-00-22/gen/gen.npz",
+        "/exp/dp-ldm/eurosat_32_eps10.0unconditional-2024-10-25-10-01-21/gen/gen.npz",
+        "/exp/dp-ldm/celeba_male_32_eps10.0unconditional-2024-10-25-20-11-00/gen/gen.npz",
+        "/exp/dp-ldm/camelyon_32_eps10.0unconditional-2024-10-25-11-13-20/gen/gen.npz"
     ],
     [
         "/exp/dp-ldm/mnist_28_eps10.0unconditional-2024-10-24-09-51-58/gen/gen.npz",

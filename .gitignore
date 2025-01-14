@@ -42,6 +42,9 @@ requirements_old.txt
 multi_node_run.sh
 golden_pretrain.sh
 
+eps10_visual*
+visualization.py
+
 models_old/pretrained_models
 models_old/PE/improved-diffusion
 models_old/pretrained_models.zip

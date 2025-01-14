@@ -236,7 +236,7 @@ class DP_Diffusion(DPSynther):
         torch.cuda.empty_cache()
 
     def train(self, sensitive_dataloader, config):
-        if sensitive_dataloader is None:
+        if sensitive_dataloader is None or config.n_epochs == 0:
             return
         
         set_seeds(self.global_rank, config.seed)

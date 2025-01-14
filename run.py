@@ -49,5 +49,3 @@ if __name__ == '__main__':
         config.setup.workdir = "exp/{}/{}_eps{}{}{}-{}".format(str.lower(opt.method), opt.data_name, opt.epsilon, opt.config_suffix, opt.exp_description, nowTime)
 
     run(main, config)
-    
-# python run.py setup.n_gpus_per_node=3 public_data.name=null eval.mode=val -ed trainval_BigGENSig
