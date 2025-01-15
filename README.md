@@ -42,6 +42,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Personal information in dp-ldm configuration file
 
+- [ ] Tips for accelerating.
+
 
 ## 2. Introduction
 
@@ -210,6 +212,10 @@ We list the key hyper-parameters below, including their explanations and availab
 - `train.n_epochs`: the number of epoch for finetuning on sensitive datasets.
 
 > [!Note]
+>
+> DP-LDM originally uses a latent diffusion model as the DP synthesizer. For a fair comparison, we now use a standard diffusion model, just like other diffusion-based models, which we call `DP-LDM-SD`. In addition, `DP-LDM` means using latent diffusion models (i.e., stabel diffusion) as synthesizers.
+
+> [!Tip]
 >
 > DP-LDM originally uses a latent diffusion model as the DP synthesizer. For a fair comparison, we now use a standard diffusion model, just like other diffusion-based models, which we call `DP-LDM-SD`. In addition, `DP-LDM` means using latent diffusion models (i.e., stabel diffusion) as synthesizers.
 
