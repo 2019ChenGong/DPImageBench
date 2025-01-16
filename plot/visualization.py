@@ -37,31 +37,31 @@ def visualize_main():
 
     gen_lists = [
     [
-        "/exp/dp-merf/mnist_28_eps10.0-2024-10-06-23-27-19/gen/gen.npz",
-        "/exp/dp-merf/fmnist_28_eps10.0-2024-10-06-23-27-19/gen/gen.npz",
-        "/exp/dp-merf/cifar10_32_eps10.0-2024-10-07-16-20-58/gen/gen.npz",
-        "/exp/dp-merf/cifar100_32_eps10.0-2024-10-07-16-20-58/gen/gen.npz",
-        "/exp/dp-merf/eurosat_32_eps10.0-2024-10-07-13-23-29/gen/gen.npz",
-        "/exp/dp-merf/celeba_male_32_eps10.0-2024-10-07-16-17-22/gen/gen.npz",
-        "/exp/dp-merf/camelyon_32_eps10.0-2024-10-07-20-32-22/gen/gen.npz"
+        "/p/fzv6enresearch/DPImageBench/exp/dp-merf/mnist_28_eps10.0trainval-2024-10-19-06-42-21/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-merf/fmnist_28_eps10.0trainval-2024-10-20-06-27-04/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-merf/cifar10_32_eps10.0trainval-2024-10-20-06-27-04/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-merf/cifar100_32_eps10.0trainval-2024-10-20-06-30-09/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-merf/eurosat_32_eps10.0trainval-2024-10-20-06-30-09/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-merf/celeba_male_32_eps10.0trainval-2024-10-22-03-29-00/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-merf/camelyon_32_eps10.0trainval-2024-10-20-06-32-32/gen/gen.npz"
     ],  
     [
-        "/exp/dp-ntk/mnist_28_eps10.0-2024-10-07-00-45-38/gen/gen.npz",
-        "/exp/dp-ntk/fmnist_28_eps10.0-2024-10-07-00-43-41/gen/gen.npz",
-        "/exp/dp-ntk/cifar10_32_eps10.0-2024-10-07-16-22-49/gen/gen.npz",
-        "/exp/dp-ntk/cifar100_32_eps10.0-2024-10-07-16-22-49/gen/gen.npz",
-        "/exp/dp-ntk/eurosat_32_eps10.0-2024-10-07-00-46-23/gen/gen.npz",
-        "/exp/dp-ntk/celeba_male_32_eps10.0-2024-10-07-20-00-33/gen/gen.npz",
-        "/exp/dp-ntk/camelyon_32_eps10.0-2024-10-07-00-46-23/gen/gen.npz"
+        "/p/fzv6enresearch/DPImageBench/exp/dp-ntk/mnist_28_eps10.0trainval-2024-10-20-09-43-52/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-ntk/fmnist_28_eps10.0trainval-2024-10-20-09-45-58/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-ntk/cifar10_32_eps10.0trainval-2024-10-24-12-30-04/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-ntk/cifar100_32_eps10.0trainval-2024-10-24-12-30-04/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-ntk/eurosat_32_eps10.0trainval-2024-10-24-01-48-00/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-ntk/celeba_male_32_eps10.0trainval-2024-10-23-07-28-01/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-ntk/camelyon_32_eps10.0trainval-2024-10-23-07-26-25/gen/gen.npz"
     ],
     [
-        "/exp/dp-kernel/mnist_28_eps10.0-2024-10-06-23-53-17/gen/gen.npz",
-        "/exp/dp-kernel/fmnist_28_eps10.0-2024-10-06-23-53-17/gen/gen.npz",
-        "/exp/dp-kernel/cifar10_32_eps10.0-2024-10-07-16-22-49/gen/gen.npz",
-        "/exp/dp-kernel/cifar100_32_eps10.0-2024-10-08-14-59-38/gen/gen.npz",
-        "/exp/dp-kernel/eurosat_32_eps10.0-2024-10-06-23-53-17/gen/gen.npz",
-        "/exp/dp-kernel/celeba_male_32_eps10.0-2024-10-09-15-12-05/gen/gen.npz",
-        "/exp/dp-kernel/camelyon_32_eps10.0-2024-10-06-23-55-05/gen/gen.npz"
+        "/p/fzv6enresearch/DPImageBench/exp/dp-kernel/mnist_28_eps10.0trainval-2024-10-20-06-44-57/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-kernel/fmnist_28_eps10.0trainval-2024-10-20-06-44-57/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-kernel/cifar10_32_eps10.0trainval-2024-10-20-09-38-09/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-kernel/cifar100_32_eps10.0trainval-2024-10-22-14-48-27/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-kernel/eurosat_32_eps10.0trainval-2024-10-20-09-39-26/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-kernel/celeba_male_32_eps10.0trainval-2024-10-22-08-00-43/gen/gen.npz",
+        "/p/fzv6enresearch/DPImageBench/exp/dp-kernel/camelyon_32_eps10.0trainval-2024-10-20-09-41-01/gen/gen.npz"
     ],
     [
         "/exp/pe/mnist_28_eps10.0_trainval_th3_tr10_vds000011112222-2024-11-01-08-24-53/gen/gen.npz",

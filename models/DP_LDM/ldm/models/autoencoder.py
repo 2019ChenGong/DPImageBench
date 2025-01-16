@@ -27,7 +27,8 @@ class VQModel(pl.LightningModule):
                  lr_g_factor=1.0,
                  remap=None,
                  sane_index_shape=False, # tell vector quantizer to return indices as bhw
-                 use_ema=False
+                 use_ema=False,
+                 output_file=None,
                  ):
         super().__init__()
         self.embed_dim = embed_dim
@@ -403,6 +404,11 @@ class AutoencoderKL(pl.LightningModule):
 
     def get_last_layer(self):
         return self.decoder.conv_out.weight
+    
+    def training_epoch_end(self, outputs):
+        if self.output_file is not None:
+            with open(self.output_file, 'a') as f:
+                f.write(f"Epoch {self.current_epoch} is finished\n")
 
     @torch.no_grad()
     def log_images(self, batch, only_inputs=False, **kwargs):

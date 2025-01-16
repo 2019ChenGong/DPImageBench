@@ -25,7 +25,6 @@ imagenet*
 configs_old
 configs/G-PATE 
 configs/DP-Promise
-!configs/GS-WGAN/
 models_old
 dataset
 models/pretrained_models/imagenet*

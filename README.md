@@ -36,13 +36,13 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [ ] Hyper-pararmeter epoch.
-
-- [ ] emnist as the pretraining dataset.
-
 - [ ] Personal information in dp-ldm configuration file
 
-- [ ] Tips for accelerating.
+- [ ] doc: Tips for accelerating, high resolution.
+
+- [ ] GSWGAN intermediate results
+
+- [ ] Structure: unify the output files
 
 
 ## 2. Introduction
