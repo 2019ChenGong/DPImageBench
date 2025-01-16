@@ -21,6 +21,7 @@ model:
       ch_mult:
       - 1
       - 2
+      - 2
       num_res_blocks: 2
       attn_resolutions:
       - 32
@@ -43,6 +44,6 @@ data:
       target: data.SpecificImagenet.SpecificClassImagenet
       params:
         root: null
-        split: val
+        split: train
         image_size: 28
         c: 1

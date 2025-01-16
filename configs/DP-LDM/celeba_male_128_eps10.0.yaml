@@ -36,13 +36,13 @@ pretrain:
   unet:
     config_path: null
     pretrain_model: null
-    n_epochs: 160
-    batch_size: 1024
+    n_epochs: 40
+    batch_size: 64
     cond: true
-  batch_size: 1024
+  batch_size: 64
 train:
-  config_path: ./models/DP_LDM/configs/finetuning/cifar32-dp-eps10-4M.yaml
-  pretrain_model: /p/fzv6enresearch/DPImageBench/DP-LDM_for_merge/logs/2024-12-11T11-06-26_imagenet32-conditional_ours/checkpoints/last.ckpt
+  config_path: /p/fzv6enresearch/DPImageBench/models/DP_LDM/configs/finetuning/128-cond.yaml
+  pretrain_model: null
   log_dir: null
   seed: 0
   batch_size: 4096

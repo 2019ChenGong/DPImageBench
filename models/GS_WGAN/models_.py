@@ -95,8 +95,12 @@ class GeneratorResNet(nn.Module):
         self.num_classes = num_classes
         self.c = c
         self.img_size = img_size
+        if self.img_size == 28:
+            self.final_dim = 4
+        else:
+            self.final_dim = self.img_size // 8
 
-        fc = SpectralNorm(nn.Linear(z_dim + num_classes, 4 * self.img_size * self.img_size * model_dim // 8 // 8))
+        fc = SpectralNorm(nn.Linear(z_dim + num_classes, self.final_dim * self.final_dim * 4 * model_dim))
         block1 = GBlock(model_dim * 4, model_dim * 4)
         block2 = GBlock(model_dim * 4, model_dim * 4)
         block3 = GBlock(model_dim * 4, model_dim * 4)
@@ -114,7 +118,7 @@ class GeneratorResNet(nn.Module):
         y_onehot = one_hot_embedding(y, self.num_classes)
         z_in = torch.cat([z, y_onehot], dim=1)
         output = self.fc(z_in)
-        output = output.view(-1, 4 * self.model_dim, self.img_size // 8, self.img_size // 8)
+        output = output.view(-1, 4 * self.model_dim, self.final_dim, self.final_dim)
         output = self.relu(output)
         output = pixel_norm(output)
         output = self.block1(output)
@@ -135,19 +139,23 @@ class DiscriminatorDCGAN(nn.Module):
         self.num_classes = num_classes
         self.c = c
         self.img_size = img_size
+        if self.img_size == 28:
+            self.final_dim = 4 * 4 * 4 * model_dim
+        else:
+            self.final_dim = 4 * self.img_size * self.img_size * model_dim // 8 // 8
 
         if if_SN:
             self.conv1 = SpectralNorm(nn.Conv2d(self.c, model_dim, 5, stride=2, padding=2))
             self.conv2 = SpectralNorm(nn.Conv2d(model_dim, model_dim * 2, 5, stride=2, padding=2))
             self.conv3 = SpectralNorm(nn.Conv2d(model_dim * 2, model_dim * 4, 5, stride=2, padding=2))
-            self.linear = SpectralNorm(nn.Linear(4 * self.img_size * self.img_size * model_dim // 8 // 8, 1))
-            self.linear_y = SpectralNorm(nn.Embedding(num_classes, 4 * self.img_size * self.img_size * model_dim // 8 // 8))
+            self.linear = SpectralNorm(nn.Linear(self.final_dim, 1))
+            self.linear_y = SpectralNorm(nn.Embedding(num_classes, self.final_dim))
         else:
             self.conv1 = nn.Conv2d(self.c, model_dim, 5, stride=2, padding=2)
             self.conv2 = nn.Conv2d(model_dim, model_dim * 2, 5, stride=2, padding=2)
             self.conv3 = nn.Conv2d(model_dim * 2, model_dim * 4, 5, stride=2, padding=2)
-            self.linear = nn.Linear(4 * self.img_size * self.img_size * model_dim // 8 // 8, 1)
-            self.linear_y = nn.Embedding(num_classes, 4 * self.img_size * self.img_size * model_dim // 8 // 8)
+            self.linear = nn.Linear(self.final_dim, 1)
+            self.linear_y = nn.Embedding(num_classes, self.final_dim)
         self.relu = nn.ReLU()
 
     def forward(self, input, y):
@@ -155,7 +163,7 @@ class DiscriminatorDCGAN(nn.Module):
         h = self.relu(self.conv1(input))
         h = self.relu(self.conv2(h))
         h = self.relu(self.conv3(h))
-        h = h.view(-1, 4 * self.img_size * self.img_size * self.model_dim // 8 // 8)
+        h = h.view(-1, self.final_dim)
         out = self.linear(h)
         out += torch.sum(self.linear_y(y) * h, dim=1, keepdim=True)
         return out.view(-1)

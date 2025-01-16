@@ -163,6 +163,7 @@ def parse_config(opt, unknown):
         config.sensitive_data.fid_stats = os.path.join("dataset", opt.data_name, "fid_stats_32.npz")
     if opt.method == "PE":
         config.train.private_num_classes = config.sensitive_data.n_classes
+        return config
     config.model.private_num_classes = config.sensitive_data.n_classes
     config.model.public_num_classes = config.public_data.n_classes
     return config
