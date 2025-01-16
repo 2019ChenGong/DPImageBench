@@ -1,0 +1,146 @@
+setup:
+  method: dpsgd-diffusion
+  run_type: torchmp
+  n_gpus_per_node: 4
+  n_nodes: 1
+  node_rank: 0
+  master_address: 127.0.0.1
+  master_port: 6025
+  omp_n_threads: 8
+  workdir: exp/dpdm/eurosat_32_eps10.0
+public_data:
+  name: imagenet
+  num_channels: 3
+  resolution: 32
+  n_classes: 1000
+  train_path: dataset/imagenet/imagenet_32
+  selective:
+    ratio: 1.0
+sensitive_data:
+  name: eurosat
+  num_channels: 3
+  resolution: 32
+  n_classes: 10
+  train_path: dataset/eurosat/train_32.zip
+  test_path: dataset/eurosat/test_32.zip
+  fid_stats: dataset/eurosat/fid_stats_32.npz
+model:
+  ckpt: null
+  denoiser_name: edm
+  denoiser_network: song
+  ema_rate: 0.999
+  network:
+    image_size: 32
+    num_in_channels: 3
+    num_out_channels: 3
+    label_dim: 1000
+    attn_resolutions:
+    - 16
+    ch_mult:
+    - 2
+    - 4
+  sampler:
+    type: ddim
+    stochastic: false
+    num_steps: 50
+    tmin: 0.002
+    tmax: 80.0
+    rho: 7.0
+    guid_scale: 0.0
+    snapshot_batch_size: 80
+    fid_batch_size: 256
+  sampler_fid:
+    type: edm
+    s_churn: 100
+    s_min: 0.05
+    s_max: 50
+    num_steps: 250
+    tmin: 0.002
+    tmax: 80.0
+    rho: 7.0
+    guid_scale: 0.0
+  sampler_acc:
+    type: edm
+    s_churn: 10
+    s_min: 0.1
+    s_max: 50
+    num_steps: 250
+    tmin: 0.002
+    tmax: 80.0
+    rho: 7.0
+    guid_scale: 0.0
+    labels: 10
+  private_num_classes: 10
+  public_num_classes: 1000
+pretrain:
+  log_dir: null
+  seed: 0
+  batch_size: 1024
+  n_epochs: 160
+  log_freq: 100
+  snapshot_freq: 2000
+  snapshot_threshold: 1
+  save_freq: 100000
+  save_threshold: 1
+  fid_freq: 2000
+  fid_samples: 5000
+  fid_threshold: 1
+  optim:
+    optimizer: Adam
+    params:
+      lr: 3e-4
+      weight_decay: 0.0
+  loss:
+    version: edm
+    p_mean: -1.2
+    p_std: 1.2
+    n_noise_samples: 1
+    n_classes: 1000
+  cond: true
+train:
+  log_dir: null
+  seed: 0
+  batch_size: 2048
+  n_epochs: 150
+  partly_finetune: true
+  log_freq: 100
+  snapshot_freq: 2000
+  snapshot_threshold: 1
+  save_freq: 100000
+  save_threshold: 1
+  fid_freq: 2000
+  fid_samples: 5000
+  final_fid_samples: 60000
+  fid_threshold: 1
+  gen: false
+  gen_batch_size: 8192
+  optim:
+    optimizer: Adam
+    params:
+      lr: 3e-4
+      weight_decay: 0.0
+  loss:
+    version: edm
+    p_mean: -1.2
+    p_std: 1.2
+    n_noise_samples: 32
+    n_classes: 10
+  dp:
+    sdq: null
+    privacy_history:
+    - - 5
+      - 0.1
+      - 75
+    alpha_num: 0
+    max_grad_norm: 0.001
+    delta: 1e-5
+    epsilon: 10.0
+    max_physical_batch_size: 8192
+  n_splits: 64
+gen:
+  data_num: 60000
+  batch_size: 1000
+  log_dir: null
+eval:
+  batch_size: 1000
+  mode: val

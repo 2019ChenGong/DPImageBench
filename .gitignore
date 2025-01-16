@@ -4,14 +4,11 @@
 *.c
 *.cpp
 *.so
-exp/d*
-exp/g*
-exp/p*
-exp/c*
+exp/*
 debug.py
 
-DP-LDM
-DP-LORA
+DP-LDM/
+DP-LORA/
 DP-LDM_for_merge
 GS-WGAN
 DP-LDM*
@@ -23,8 +20,12 @@ debug*
 logs
 imagenet*
 configs_old
-configs/G-PATE 
-configs/DP-Promise
+configs/G-PATE/
+configs/DP-Promise/
+!configs/DP-LDM/
+!configs/GS-WGAN/
+!configs/DP-LDM-SD/
+!configs/DP-LORA/
 models_old
 dataset
 models/pretrained_models/imagenet*
