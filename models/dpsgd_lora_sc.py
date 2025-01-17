@@ -14,7 +14,7 @@ from models.DP_Diffusion.utils.util import make_dir
 from models.synthesizer import DPSynther
 
 def execute(script):
-    script = [item.replace('None', 'null') for item in script]
+    script = ['null' if item is None else item.replace('None', 'null') for item in script]
     try:
         python_path = '/u/fzv6en/anaconda3/envs/dpimagebench_cuda12.1/bin/python'
         result = subprocess.run([python_path] + script, check=True, text=True, capture_output=True)
@@ -54,19 +54,26 @@ class DP_LORA(DPSynther):
             make_dir(logdir)
 
         cuda_visible_devices = os.environ.get("CUDA_VISIBLE_DEVICES")
-        if cuda_visible_devices is None:
-            gpu_ids = ','.join([i for i in range(self.config.setup.n_gpus_per_node)])
+        if cuda_visible_devices is None or True:
+            gpu_ids = ','.join([str(i) for i in range(self.config.setup.n_gpus_per_node)]) + ','
         else:
-            gpu_ids = cuda_visible_devices
+            gpu_ids = str(cuda_visible_devices) + ','
         config_path = config.config_path
+        if 'imagenet' in self.config.public_data.train_path:
+            data_target = 'data.SpecificImagenet.SpecificClassImagenet'
+        elif 'places' in self.config.public_data.train_path:
+            data_target = 'data.SpecificPlaces365.SpecificClassPlaces365_ldm'
         scripts = [[
             'models/DP_LDM/main.py', 
             '-t', 
             '--logdir', logdir, 
             '--base', config_path, 
             '--gpus', gpu_ids, 
+            'model.params.output_file={}'.format(os.path.join(os.path.dirname(os.path.dirname(logdir)), 'stdout.txt')),
             'data.params.batch_size={}'.format(config.batch_size), 
             'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
+            'data.params.train.target={}'.format(data_target),
+            'data.params.validation.target={}'.format(data_target),
             'data.params.train.params.root={}'.format(self.config.public_data.train_path),
             'data.params.validation.params.root={}'.format(self.config.public_data.train_path),
             'data.params.train.params.image_size={}'.format(self.config.public_data.resolution),
@@ -93,19 +100,25 @@ class DP_LORA(DPSynther):
             make_dir(logdir)
 
         cuda_visible_devices = os.environ.get("CUDA_VISIBLE_DEVICES")
-        if cuda_visible_devices is None:
+        if cuda_visible_devices is None or True:
             gpu_ids = ','.join([str(i) for i in range(self.config.setup.n_gpus_per_node)]) + ','
         else:
             gpu_ids = str(cuda_visible_devices) + ','
         config_path = config.config_path
         pretrain_model = self.config.pretrain.unet.pretrain_model
+        if 'imagenet' in self.config.public_data.train_path:
+            data_target = 'data.SpecificImagenet.SpecificClassImagenet'
+        elif 'places' in self.config.public_data.train_path:
+            data_target = 'data.SpecificPlaces365.SpecificClassPlaces365_ldm'
         scripts = [[
             'models/DP_LDM/main.py', 
             '-t', 
             '--logdir', logdir, 
             '--base', config_path, 
             '--gpus', gpu_ids, 
-            'model.params.output_file={}'.format(os.path.join(os.path.dirname(config.log_dir), 'stdout.txt')),
+            'data.params.train.target={}'.format(data_target),
+            'data.params.validation.target={}'.format(data_target),
+            'model.params.output_file={}'.format(os.path.join(os.path.dirname(os.path.dirname(logdir)), 'stdout.txt')),
             'data.params.batch_size={}'.format(config.batch_size), 
             'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
             'model.params.first_stage_config.params.ckpt_path={}'.format(pretrain_model), 

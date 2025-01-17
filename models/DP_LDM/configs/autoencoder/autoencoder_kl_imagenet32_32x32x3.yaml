@@ -28,19 +28,23 @@ model:
 data:
   target: models.DP_LDM.main.DataModuleFromConfig
   params:
-    batch_size: 16
-    num_workers: 4
-    wrap: true
+    batch_size: 1024
+    num_workers: 32
+    wrap: false
     train:
-      target: ldm.data.SpecificImagenet.SpecificClassImagenet
+      target: data.SpecificImagenet.SpecificClassImagenet
       params:
-        root: /p/fzv6enresearch/DPImageBench/dataset/imagenet/imagenet_32
+        root: null
         split: train
+        image_size: 28
+        c: 1
     validation:
-      target: ldm.data.SpecificImagenet.SpecificClassImagenet
+      target: data.SpecificImagenet.SpecificClassImagenet
       params:
-        root: /p/fzv6enresearch/DPImageBench/dataset/imagenet/imagenet_32
-        split: val
+        root: null
+        split: train
+        image_size: 28
+        c: 1
 lightning:
   trainer:
     max_epochs: 2
