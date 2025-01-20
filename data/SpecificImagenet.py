@@ -610,3 +610,4 @@ class SpecificClassImagenet(torchvision.datasets.VisionDataset):
     @property
     def split_folder(self):
         return os.path.join(self.root, self.split)
+

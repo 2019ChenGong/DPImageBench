@@ -28,8 +28,7 @@ configs/DP-Promise/
 !configs/DP-LORA/
 models_old
 dataset
-models/pretrained_models/imagenet*
-models/pretrained_models/places365_classifier_0.992_ckpt.pth
+models/pretrained_models
 models/PE/improved-diffusion
 models/pretrained_models.zip
 models/DataLens

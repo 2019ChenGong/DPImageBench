@@ -6,7 +6,6 @@ import logging
 from .api import API
 from models.PE.pe.arg_utils import str2bool
 
-from .improved_diffusion.unet import create_model
 from .improved_diffusion.unet_128 import create_model as create_model_128
 from improved_diffusion import dist_util
 from improved_diffusion.script_util import NUM_CLASSES
@@ -17,9 +16,9 @@ def _round_to_uint8(image):
     return np.around(np.clip(image, a_min=0, a_max=255)).astype(np.uint8)
 
 
-class ImprovedDiffusionAPI(API):
+class GuidedDiffusionAPI(API):
     def __init__(self, model_image_size, num_channels, num_res_blocks,
-                 learn_sigma, class_cond, use_checkpoint,
+                 learn_sigma, class_cond, use_checkpoint, resblock_updown,
                  attention_resolutions, num_heads, num_heads_upsample,
                  use_scale_shift_norm, dropout, diffusion_steps, sigma_small,
                  noise_schedule, use_kl, predict_xstart, rescale_timesteps,
@@ -27,7 +26,7 @@ class ImprovedDiffusionAPI(API):
                  batch_size, use_ddim, clip_denoised, use_data_parallel,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._model = create_model(
+        self._model = create_model_128(
             image_size=model_image_size,
             num_channels=num_channels,
             num_res_blocks=num_res_blocks,
@@ -36,6 +35,7 @@ class ImprovedDiffusionAPI(API):
             use_checkpoint=use_checkpoint,
             attention_resolutions=attention_resolutions,
             num_heads=num_heads,
+            resblock_updown=resblock_updown,
             num_heads_upsample=num_heads_upsample,
             use_scale_shift_norm=use_scale_shift_norm,
             dropout=dropout)
@@ -65,7 +65,7 @@ class ImprovedDiffusionAPI(API):
     @staticmethod
     def command_line_parser():
         parser = super(
-            ImprovedDiffusionAPI, ImprovedDiffusionAPI).command_line_parser()
+            GuidedDiffusionAPI, GuidedDiffusionAPI).command_line_parser()
         parser.description = (
             'See https://github.com/openai/improved-diffusion for the details'
             ' of the arguments.')
@@ -83,6 +83,10 @@ class ImprovedDiffusionAPI(API):
             default=2)
         parser.add_argument(
             '--learn_sigma',
+            type=str2bool,
+            default=False)
+        parser.add_argument(
+            '--resblock_updown',
             type=str2bool,
             default=False)
         parser.add_argument(

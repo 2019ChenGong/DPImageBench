@@ -12,6 +12,9 @@ def get_api_class_from_name(name):
     elif name == 'improved_diffusion':
         from .improved_diffusion_api import ImprovedDiffusionAPI
         return ImprovedDiffusionAPI
+    elif name == 'guided_diffusion':
+        from .guided_diffusion_api import GuidedDiffusionAPI
+        return GuidedDiffusionAPI
     else:
         raise ValueError(f'Unknown API name {name}')
 

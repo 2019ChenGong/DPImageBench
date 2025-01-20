@@ -20,29 +20,33 @@ sensitive_data:
   test_path: dataset/celeba/test_128_Male.zip
   fid_stats: dataset/celeba/fid_stats_128.npz
 model:
-  api: improved_diffusion
+  api: guided_diffusion
   feature_extractor: inception_v3
   api_params:
-    model_image_size: 64
-    num_channels: 192
-    num_res_blocks: 3
+    model_image_size: 128
+    num_channels: 256
+    num_heads: 4
+    num_res_blocks: 2
+    resblock_updown: true
     learn_sigma: true
     class_cond: true
-    diffusion_steps: 4000
-    noise_schedule: cosine
+    diffusion_steps: 1000
+    noise_schedule: linear
+    use_scale_shift_norm: true
     rescale_learned_sigmas: false
     rescale_timesteps: false
     use_ddim: true
+    attention_resolutions: 32,16,8
     timestep_respacing: 100
-    batch_size: 2000
-    model_path: models/pretrained_models/imagenet64_cond_270M_250K.pt
+    batch_size: 500
+    model_path: models/pretrained_models/128x128_diffusion.pt
   private_num_classes: 2
   public_num_classes: 1000
 pretrain:
   log_dir: null
   cond: true
 train:
-  batch_size: 2000
+  batch_size: 500
   feature_extractor_batch_size: 500
   private_image_size: 128
   private_num_classes: 2
@@ -61,7 +65,7 @@ train:
   - 8
   - 10
   initial_prompt: null
-  image_size: 64x64
+  image_size: 128x128
   lookahead_degree: 8
   num_nearest_neighbor: 1
   nn_mode: L2

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.ticker import FormatStrFormatter
 
-methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "GS-WGAN", "DP-GAN", "PDP-Diffusion", "DP-LDM", "PrivImage"]
+methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "GS-WGAN", "DP-GAN", "PDP-Diffusion", "DP-LDM (SD)", "DP-LDM", "DP-LoRA", "PrivImage"]
 
 def plot_con_uncon_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
     diff = data1 - data2
@@ -50,12 +50,12 @@ def plot_pre_nonpre_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
     ax.barh(y[diff>=0], data2[::-1][diff>=0], color='#129ECC', zorder=2)
     ax.legend(fontsize=11)
     if yticks:
-        ax.set_yticks(range(len(data2)), methods[::-1], fontsize=12)
+        ax.set_yticks(range(len(data2)), methods[::-1], fontsize=13)
     else:
         ax.set_yticks([])
     ax.set_xlabel(xlabel, fontsize=14)
     ax.set_xticks([0.0,20.0,40.0,60.0,80.0, 100.0]) 
-    ax.tick_params(axis='both', which='major', labelsize=12)
+    ax.tick_params(axis='both', which='major', labelsize=13)
 
     x_max = np.where(data1>data2, data1, data2)
     diff = diff[::-1]
@@ -69,19 +69,20 @@ def plot_pre_nonpre_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
         ax.text(x, y, str(improve), fontsize=12)
     
 
-fig = plt.figure(figsize=(9.0, 4.0))
+fig = plt.figure(figsize=(10.5, 5.0))
 axs = fig.subplots(1, 2)
 
 colors= ['#A1A9D0', '#2F7FC1']
 
-accs_pretrain = np.array([70.1, 68.8, 72.2, 56.8, 56.2, 81.7, 48.8, 85.9])
-accs_nonpretrain = np.array([70.0, 67.8, 75.9, 48.4, 66.3, 85.4, 15.9, 85.4])
+accs_pretrain = np.array([71.2, 66.6, 77.1, 62.1, 71.1, 85.4, 81.6, 86.3, 83.8, 87.1])
+accs_nonpretrain = np.array([70.0, 67.8, 75.9, 48.4, 66.3, 85.4, 15.9, 16.3, 15.5, 85.6])
 
-flds_pretrain = np.array([26.0, 27.4, 18.0, 23.0, 36.6, 8.6, 30.2, 5.3])
-flds_nonpretrain = np.array([28.6, 28.4, 18.1, 23.6, 27.7, 6.6, 82.9, 6.6])
+flds_pretrain = np.array([27.3, 36.2, 17.7, 28.7, 21.8, 4.9, 11.7, 15.4, 14.8, 4.3])
+flds_nonpretrain = np.array([29.2, 36.4, 21.3, 28.1, 23.9, 6.6, 120.1, 118.3, 124.6, 4.9])
 
 plot_pre_nonpre_fig(axs[0], accs_pretrain, 'w/ pretrain', accs_nonpretrain, 'w/o pretrain', 'Acc (%)')
 plot_pre_nonpre_fig(axs[1], flds_pretrain, 'w/ pretrain', flds_nonpretrain, 'w/o pretrain', 'FLD', yticks=False)
+axs[1].set_xticks([0.0,30.0,60.0,90.0,120.0,150.0])
 
 fig.subplots_adjust(wspace=0.07, hspace=0.3)
 
@@ -91,11 +92,11 @@ fig.savefig("fmnist_wo_pretrain.pdf", bbox_inches='tight')
 fig.clf()
 axs = fig.subplots(1, 2)
 
-accs_condi = np.array([70.1, 68.8, 75.9, 48.4, 56.2, 79.8, 35.7, 85.9])
-accs_uncondi = np.array([71.4, 70.7, 75.8, 54.5, 39.2, 82.1, 48.8, 86.0])
+accs_condi = np.array([26.1, 20.0, 24.0, 20.1, 32.1, 70.1, 69.9, 64.8, 77.2, 78.4])
+accs_uncondi = np.array([29.0, 19.8, 32.2, 18.5, 39.2, 82.1, 81.7, 48.8, 48.8, 86.0])
 
-flds_condi = np.array([26.0, 46.4, 18.0, 24.0, 33.6, 8.8, 29.4, 5.3])
-flds_uncondi = np.array([24.6, 49.2, 18.5, 22.5, 39.5, 8.6, 20.4, 5.2])
+flds_condi = np.array([26.0, 46.4, 18.0, 24.0, 33.6, 8.8, 81.7, 48.8, 29.4, 5.3])
+flds_uncondi = np.array([24.6, 49.2, 18.5, 22.5, 39.5, 8.6, 81.7, 48.8, 20.4, 5.2])
 
 plot_con_uncon_fig(axs[0], accs_condi, 'cond.', accs_uncondi, 'uncond.', 'Acc (%)')
 plot_con_uncon_fig(axs[1], flds_condi, 'cond.', flds_uncondi, 'uncond.', 'FLD', yticks=False)
