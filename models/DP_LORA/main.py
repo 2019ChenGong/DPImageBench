@@ -208,15 +208,6 @@ if __name__ == "__main__":
 
         # default logger configs
         default_logger_cfgs = {
-            "wandb": {
-                "target": "pytorch_lightning.loggers.WandbLogger",
-                "params": {
-                    "name": nowname,
-                    "save_dir": logdir,
-                    "offline": opt.debug,
-                    "id": nowname,
-                }
-            },
             "testtube": {
                 "target": "pytorch_lightning.loggers.TestTubeLogger",
                 "params": {
@@ -225,10 +216,10 @@ if __name__ == "__main__":
                 }
             },
         }
-        # default_logger_cfg = default_logger_cfgs["testtube"]
-        # logger_cfg = lightning_config.get("logger", OmegaConf.create())
-        # logger_cfg = OmegaConf.merge(default_logger_cfg, logger_cfg)
-        # trainer_kwargs["logger"] = instantiate_from_config(logger_cfg)
+        default_logger_cfg = default_logger_cfgs["testtube"]
+        logger_cfg = lightning_config.get("logger", OmegaConf.create())
+        logger_cfg = OmegaConf.merge(default_logger_cfg, logger_cfg)
+        trainer_kwargs["logger"] = instantiate_from_config(logger_cfg)
 
         # modelcheckpoint - use TrainResult/EvalResult(checkpoint_on=metric) to
         # specify which metric is used to determine best models

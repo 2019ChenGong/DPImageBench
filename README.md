@@ -50,6 +50,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Clear model/PE/guided-diffusion
 
+- [ ] DP-LDM and DP-LORA share the same config, imagenet and places365 confused.
+
 ## 2. Introduction
 
 ### 2.1 Currently Supported Algorithms
