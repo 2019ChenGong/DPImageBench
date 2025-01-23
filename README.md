@@ -3,7 +3,13 @@
 # DPImageBench: A Unified Benchmark for Differentially Private Image Synthesis Algorithms
 </div>
 
-DPImageBench is an open-source toolkit developed to facilitate the research and application of DP image synthesis. DPImageBench simplifies the access, understanding, and assessment of DP image synthesis, making it accessible to both researchers and the broader community.
+DPImageBench is an open-source toolkit developed to facilitate the research and application of DP image synthesis. DPImageBench simplifies the access, understanding, and assessment of DP image synthesis, making it accessible to both researchers and the broader community. The strengths of DPImageBench are presented as follows. 
+
+(1) **Methods**: DPImageBench studies eleven prominent methods and systematically characterize each based on model architecture, pretraining strategy, and privacy mechanism. 
+
+(2) **Evaluation**: We include nine datasets, and seven fidelity and utility metrics to thoroughly assess these methods. Notably, we find that the common practice of selecting downstream classifiers based on the highest accuracy on the sensitive test set not only violates DP but also overestimates the utility scores. DPImageBench corrects for these mistakes. 
+
+(3) **Platform**: Despite the wide variety of methods and evaluation protocols, DPImageBench provides a standardized interface that accommodates all current and future implementations within a unified framework.
 
 <div align=center>
 <img src="./plot/figures/eps10_visual.png" width = "1000" alt="Synthetic images by algorithms in DPImageBench with epsilon=10" align=center />
