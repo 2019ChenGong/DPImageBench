@@ -52,6 +52,8 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] DP-LDM and DP-LORA share the same config, imagenet and places365 confused.
 
+- [ ] Places365 pretraining model without pretraining.
+
 ## 2. Introduction
 
 ### 2.1 Currently Supported Algorithms

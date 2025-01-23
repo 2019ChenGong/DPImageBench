@@ -1,5 +1,6 @@
 import torchvision
 from torchvision import transforms
+import torch
 import os
 from PIL import Image
 
@@ -611,3 +612,17 @@ class SpecificClassImagenet(torchvision.datasets.VisionDataset):
     def split_folder(self):
         return os.path.join(self.root, self.split)
 
+
+def SpecificClassImagenet_ldm(root, split, image_size, c, specific_class=None):
+    if specific_class is not None:
+        specific_class = torch.load(specific_class)
+    trans = [
+            transforms.Resize(image_size),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+        ]
+    if c == 1:
+        trans = [transforms.Grayscale(num_output_channels=1)] + trans
+    trans = transforms.Compose(trans)
+    public_train_set = SpecificClassImagenet(root=root, specific_class=specific_class, transform=trans, split="train")
+    return public_train_set

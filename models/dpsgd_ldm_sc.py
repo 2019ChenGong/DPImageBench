@@ -106,10 +106,18 @@ class DP_LDM(DPSynther):
             gpu_ids = str(cuda_visible_devices) + ','
         config_path = config.config_path
         pretrain_model = self.config.pretrain.unet.pretrain_model
+        if 'unet' in pretrain_model:
+            model_target = 'model.params.ckpt_path='
+        else:
+            model_target = 'model.params.first_stage_config.params.ckpt_path='
         if 'imagenet' in self.config.public_data.train_path:
-            data_target = 'data.SpecificImagenet.SpecificClassImagenet'
+            data_target = 'data.SpecificImagenet.SpecificClassImagenet_ldm'
         elif 'places' in self.config.public_data.train_path:
             data_target = 'data.SpecificPlaces365.SpecificClassPlaces365_ldm'
+        if self.config.public_data.selective.ratio == 1.0:
+            specific_class = None
+        else:
+            specific_class = self.config.public_data.selective.semantic_path
         scripts = [[
             'models/DP_LDM/main.py', 
             '-t', 
@@ -121,7 +129,7 @@ class DP_LDM(DPSynther):
             'model.params.output_file={}'.format(os.path.join(os.path.dirname(os.path.dirname(logdir)), 'stdout.txt')),
             'data.params.batch_size={}'.format(config.batch_size), 
             'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
-            'model.params.first_stage_config.params.ckpt_path={}'.format(pretrain_model), 
+            model_target+str(pretrain_model),
             'data.params.train.params.root={}'.format(self.config.public_data.train_path),
             'data.params.validation.params.root={}'.format(self.config.public_data.train_path),
             'data.params.train.params.image_size={}'.format(self.config.public_data.resolution),
@@ -130,6 +138,8 @@ class DP_LDM(DPSynther):
             'data.params.validation.params.c={}'.format(self.config.sensitive_data.num_channels),
             'data.params.train.data_num={}'.format(len(public_dataset)),
             'data.params.validation.data_num={}'.format(len(public_dataset)),
+            'data.params.train.params.specific_class={}'.format(specific_class),
+            'data.params.validation.params.specific_class={}'.format(specific_class),
             ]]
         
         with ProcessPoolExecutor() as executor:
