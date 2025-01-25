@@ -1,5 +1,5 @@
 setup:
-  method: dpsgd-ldm
+  method: dpsgd-lora
   run_type: normal
   n_gpus_per_node: 1
   n_nodes: 1
@@ -11,36 +11,37 @@ setup:
 public_data:
   name: imagenet
   num_channels: 3
-  resolution: 32
+  resolution: 128
   n_classes: 1000
-  train_path: dataset/imagenet/imagenet_32
+  train_path: /bigtemp/fzv6en/dataset/dpimagebench/imagenet_128
   selective:
     ratio: 1.0
 sensitive_data:
-  name: camelyon_32
+  name: celeba_male_128
   num_channels: 3
-  resolution: 32
+  resolution: 128
   n_classes: 2
-  train_path: dataset/camelyon/train_32.zip
-  test_path: dataset/camelyon/test_32.zip
-  fid_stats: dataset/camelyon/fid_stats_32.npz
+  train_path: dataset/celeba/train_128_Male.zip
+  test_path: dataset/celeba/test_128_Male.zip
+  fid_stats: dataset/celeba/fid_stats_128.npz
 model:
   ckpt: null
 pretrain:
   log_dir: null
   autoencoder:
+    config_path: ./models/DP_LDM/configs/autoencoder/autoencoder_kl_128.yaml
     n_epochs: 4
     batch_size: 64
     cond: true
-    config_path: ./models/DP_LDM/configs/autoencoder/autoencoder_kl_32.yaml
   unet:
+    config_path: ./models/DP_LDM/configs/latent-diffusion/128_4M.yaml
     pretrain_model: null
-    n_epochs: 160
-    batch_size: 1024
+    n_epochs: 40
+    batch_size: 64
     cond: true
-    config_path: ./models/DP_LDM/configs/latent-diffusion/32_4M.yaml
+  batch_size: 64
 train:
-  config_path: ./models/DP_LDM/configs/finetuning/32_4M.yaml
+  config_path: ./models/DP_LORA/configs/finetuning/128_4M.yaml
   pretrain_model: null
   log_dir: null
   seed: 0
@@ -50,7 +51,7 @@ train:
     sdq: null
     max_grad_norm: 0.001
     delta: 1e-5
-    epsilon: 1.0
+    epsilon: 10.0
     max_physical_batch_size: 8192
   n_splits: 8
 gen:

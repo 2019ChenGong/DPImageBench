@@ -16,14 +16,12 @@ def main(config):
 
     syn = np.load(config.gen.log_dir)
     syn_data, syn_labels = syn["x"], syn["y"]
-
-    if len(syn_data.shape) == 5:
-        syn_data = syn_data.reshape(60000, 3, 32, 32)
+    print(syn_data.shape)
 
     evaluator = Evaluator(config)
     
-    evaluator.eval(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
-    # evaluator.eval_fidelity(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
+    # evaluator.eval(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
+    evaluator.eval_fidelity(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
 
 
 if __name__ == '__main__':

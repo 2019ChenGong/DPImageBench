@@ -32,13 +32,15 @@ pretrain:
     n_epochs: 4
     batch_size: 64
     cond: true
+    config_path: ./models/DP_LDM/configs/autoencoder/autoencoder_kl_32.yaml
   unet:
     pretrain_model: null
     n_epochs: 160
     batch_size: 1024
     cond: true
+    config_path: ./models/DP_LDM/configs/latent-diffusion/32_4M.yaml
 train:
-  config_path: ./models/DP_LDM/configs/finetuning/cifar32-dp-eps10-4M.yaml
+  config_path: ./models/DP_LDM/configs/finetuning/32_4M.yaml
   pretrain_model: null
   log_dir: null
   seed: 0

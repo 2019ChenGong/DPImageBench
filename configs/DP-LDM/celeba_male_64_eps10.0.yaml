@@ -29,19 +29,19 @@ model:
 pretrain:
   log_dir: null
   autoencoder:
-    config_path: /p/fzv6enresearch/DPImageBench/models/DP_LDM/configs/autoencoder/autoencoder_kl_imagenet64_32x32x3.yaml
+    config_path: ./models/DP_LDM/configs/autoencoder/autoencoder_kl_64.yaml
     n_epochs: 4
     batch_size: 64
     cond: true
   unet:
-    config_path: /p/fzv6enresearch/DPImageBench/models/DP_LDM/configs/latent-diffusion/imagenet64-conditional_3.8M.yaml
+    config_path: ./models/DP_LDM/configs/latent-diffusion/64_4M.yaml
     pretrain_model: null
     n_epochs: 80
     batch_size: 512
     cond: true
   batch_size: 512
 train:
-  config_path: /p/fzv6enresearch/DPImageBench/models/DP_LDM/configs/finetuning/64-cond.yaml
+  config_path: ./models/DP_LDM/configs/finetuning/64_4M.yaml
   pretrain_model: null
   log_dir: null
   seed: 0

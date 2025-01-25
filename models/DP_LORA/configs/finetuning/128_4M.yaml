@@ -1,8 +1,9 @@
 model:
   base_learning_rate: 1.0e-06
-  target: ldm.models.diffusion.ddpm.LatentDiffusion
+  target: models.DP_LORA.ldm.models.diffusion.ddpm.LatentDiffusion
   params:
-    ckpt_path: /root/autodl-tmp/log/2024-04-30T00-56-22_imagenet32-conditional/checkpoints/epoch=000031.ckpt
+    output_file: null
+    ckpt_path: null
     ignore_keys:
     - cond_stage_model
     linear_start: 0.0015
@@ -37,76 +38,84 @@ model:
       delta: 1.0e-5
       max_grad_norm: 0.001
       poisson_sampling: True
-      max_batch_size: 32
+      max_batch_size: 500
       
     unet_config:
-      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      target: models.DP_LORA.ldm.modules.diffusionmodules.openaimodel.UNetModel
       params:
-        image_size: 16
+        image_size: 32
         in_channels: 3
         out_channels: 3
-        model_channels: 128
+        model_channels: 32
         attention_resolutions:
         - 1
         - 2
         - 4
-        num_res_blocks: 2
         channel_mult:
         - 1
         - 2
         - 2
-        - 4
+        num_res_blocks: 2
         num_head_channels: 8
         use_spatial_transformer: true
         transformer_depth: 1
         context_dim: 512
     first_stage_config:
-      target: ldm.models.autoencoder.AutoencoderKL
+      target: models.DP_LORA.ldm.models.autoencoder.AutoencoderKL
       params:
         embed_dim: 3
         monitor: val/rec_loss
         ddconfig:
           double_z: true
           z_channels: 3
-          resolution: 32
+          resolution: 128
           in_channels: 3
           out_ch: 3
-          ch: 128
+          ch: 192
           ch_mult:
           - 1
           - 2
+          - 2
           num_res_blocks: 2
           attn_resolutions:
+          - 32
           - 16
-          - 8
           dropout: 0.0
         lossconfig:
           target: torch.nn.Identity
     cond_stage_config:
-      target: ldm.modules.encoders.modules.ClassEmbedder
+      target: models.DP_LORA.ldm.modules.encoders.modules.ClassEmbedder
       params:
         embed_dim: 512
         key: class_label
         n_classes: 10
 data:
-  target: main.DataModuleFromConfig
+  target: models.DP_LORA.main.DataModuleFromConfig
   params:
     # batch_size: 384
     batch_size: 80
-    num_workers: 4
+    num_workers: 0
     train:
-      target: ldm.data.cifar10.CIFAR10Train
       params:
-        size: 32
+        path: /p/fzv6enresearch/DPImageBench/dataset/cifar10/train_32.zip
+        resolution: 32
+        use_labels: True
+        c: 3
+      target: data.stylegan3.dataset.ImageFolderDataset
+      data_num: null
     validation:
-      target: ldm.data.cifar10.CIFAR10Train
       params:
-        size: 32
+        path: /p/fzv6enresearch/DPImageBench/dataset/cifar10/test_32.zip
+        resolution: 32
+        use_labels: True
+        c: 3
+      target: data.stylegan3.dataset.ImageFolderDataset
+      data_num: null
 
 lightning:
   callbacks:
     image_logger:
-      target: main.ImageLogger
+      target: models.DP_LORA.main.ImageLogger
       params:
         batch_frequency: 500
         max_images: 8

@@ -29,20 +29,20 @@ model:
 pretrain:
   log_dir: null
   autoencoder:
-    config_path: null
+    config_path: ./models/DP_LDM/configs/autoencoder/autoencoder_kl_28.yaml
     n_epochs: 4
     batch_size: 64
     cond: true
   unet:
-    config_path: ./models/DP_LDM/configs/latent-diffusion/imagenet28-conditional_ours.yaml
+    config_path: ./models/DP_LDM/configs/latent-diffusion/28_1.8M.yaml
     pretrain_model: null
     n_epochs: 160
     batch_size: 1024
     cond: true
   batch_size: 1024
 train:
-  config_path: ./models/DP_LDM/configs/finetuning/28-dp-1.8M.yaml
-  pretrain_model: /p/fzv6enresearch/DPImageBench/exp/dp-ldm/mnist_28_eps10.0val-2024-12-25-22-52-50/pretrain/unet/checkpoints/last.ckpt
+  config_path: ./models/DP_LDM/configs/finetuning/28_1.8M_nf64.yaml
+  pretrain_model: null
   log_dir: null
   seed: 0
   batch_size: 4096

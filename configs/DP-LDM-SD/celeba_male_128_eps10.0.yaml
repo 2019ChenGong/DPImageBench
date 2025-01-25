@@ -36,7 +36,9 @@ model:
     label_dim: 1000
     attn_resolutions:
     - 64
+    - 32
     ch_mult:
+    - 1
     - 2
     - 4
   sampler:
@@ -129,7 +131,7 @@ train:
   n_splits: 64
 gen:
   data_num: 60000
-  batch_size: 1000
+  batch_size: 100
   log_dir: null
 eval:
   batch_size: 1000

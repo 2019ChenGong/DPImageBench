@@ -1,0 +1,99 @@
+model:
+  base_learning_rate: 1.0e-06
+  target: models.DP_LDM.ldm.models.diffusion.ddpm.LatentDiffusion
+  params:
+    output_file: null
+    linear_start: 0.0015
+    linear_end: 0.0155
+    num_timesteps_cond: 1
+    log_every_t: 200
+    timesteps: 1000
+    first_stage_key: image
+    cond_stage_key: class_label
+    image_size: 64
+    channels: 3
+    cond_stage_trainable: true
+    conditioning_key: crossattn
+    monitor: val/loss_simple_ema
+    unet_config:
+      target: models.DP_LDM.ldm.modules.diffusionmodules.openaimodel.UNetModel
+      params:
+        image_size: 32
+        in_channels: 3
+        out_channels: 3
+        model_channels: 32
+        attention_resolutions:
+        - 1
+        - 2
+        - 4
+        num_res_blocks: 2
+        channel_mult:
+        - 1
+        - 2
+        - 2
+        num_head_channels: 8
+        use_spatial_transformer: true
+        transformer_depth: 1
+        context_dim: 512
+    first_stage_config:
+      target: models.DP_LDM.ldm.models.autoencoder.AutoencoderKL
+      params:
+        embed_dim: 3
+        monitor: val/rec_loss
+        ckpt_path: null
+        ddconfig:
+          double_z: true
+          z_channels: 3
+          resolution: 128
+          in_channels: 3
+          out_ch: 3
+          ch: 192
+          ch_mult:
+          - 1
+          - 2
+          - 2
+          num_res_blocks: 2
+          attn_resolutions:
+          - 32
+          - 16
+          dropout: 0.0
+        lossconfig:
+          target: torch.nn.Identity
+    cond_stage_config:
+      target: models.DP_LDM.ldm.modules.encoders.modules.ClassEmbedder
+      params:
+        embed_dim: 512
+        key: class_label
+        n_classes: 1001
+data:
+  target: models.DP_LDM.main.DataModuleFromConfig
+  params:
+    batch_size: 1024
+    num_workers: 32
+    wrap: false
+    train:
+      target: data.SpecificImagenet.SpecificClassImagenet
+      params:
+        root: null
+        split: train
+        image_size: 28
+        c: 1
+    validation:
+      target: data.SpecificImagenet.SpecificClassImagenet
+      params:
+        root: null
+        split: train
+        image_size: 28
+        c: 1
+
+lightning:
+  callbacks:
+    image_logger:
+      target: models.DP_LDM.main.ImageLogger
+      params:
+        batch_frequency: 500
+        max_images: 8
+        increase_log_steps: False
+  trainer:
+    # benchmark: True
+    max_epochs: 160

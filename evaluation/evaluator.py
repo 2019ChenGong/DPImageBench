@@ -243,17 +243,16 @@ class Evaluator(object):
                 if grad_accu_step == n_splits:
                     optimizer.step()
                     grad_accu_step = 0
+                    ema.update(model.parameters())
 
                 _, predicted = outputs.max(1)
                 total += targets.size(0)
                 correct += predicted.eq(targets).sum().item()
-                
-                ema.update(model.parameters())
 
             scheduler.step()
 
             train_acc = correct / total * 100
-            train_loss = train_loss / total
+            train_loss = train_loss / total * batch_size
             
             model.eval()
             ema.store(model.parameters())
@@ -279,7 +278,7 @@ class Evaluator(object):
             
             # print(val_total)
             val_acc = val_correct / val_total * 100
-            val_loss = test_loss / val_total
+            val_loss = test_loss / val_total * batch_size
 
 
             test_total = 0
