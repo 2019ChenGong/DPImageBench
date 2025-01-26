@@ -44,7 +44,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [ ] Personal information in dp-ldm configuration file
+- [x] Personal information in dp-ldm configuration file
 
 - [ ] doc: Tips for accelerating, high resolution.
 
@@ -58,7 +58,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Clear model/PE/guided-diffusion
 
-- [ ] DP-LDM and DP-LORA share the same config, imagenet and places365 confused.
+- [x] DP-LDM and DP-LORA share the same config, imagenet and places365 confused.
 
 - [ ] Places365 pretraining model without pretraining.
 
