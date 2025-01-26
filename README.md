@@ -238,7 +238,7 @@ We list the key hyper-parameters below, including their explanations and availab
 > Experiments such as pretraining or using DPSGD require significant computational resources, as shown in Table 17 of our paper. Here are some tips to help users efficiently reduce computational resource usage and running time in an appropriate way:
 > - Reduce `pretrain.n_epochs` and `train.n_epochs`: Reducing the number of pretraining and fine-tuning steps can decrease running time but may also impact the performance of synthetic images.
 > - Increase `train.dp.n_split`: Increasing `train.dp.n_split` enables jobs to run even when GPU memory is insufficient. However, this adjustment will lead to longer running times.
-> - Share the pretraing models: Inceasing `train.dp.n_split` allows to run .
+> - Share the pretraing models: Some algorithms can share the same pretrained models, `PDP-Diffusion` and `DP-LDM-SD`, as well as `DP-LoRA and DP-LDM`. Additionally, for certain algorithms, different sensitive datasets can also share the same pretrained model. For detailed instructions on using pretrained synthesizers, please refer to the section "Directly use the pretrained synthesizers" in [4.3.2 How to run](#432-how-to-run). Sharing pretrained models eliminates the need for additional pretraining, helping to save computational resources.
 
 
 > [!Warning]
