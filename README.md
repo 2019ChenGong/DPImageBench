@@ -44,7 +44,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [x] Personal information in dp-ldm configuration file
+- [ ] Personal information in dp-ldm configuration file
 
 - [ ] doc: Tips for accelerating, high resolution.
 
@@ -58,7 +58,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Clear model/PE/guided-diffusion
 
-- [x] DP-LDM and DP-LORA share the same config, imagenet and places365 confused.
+- [ ] DP-LDM and DP-LORA share the same config, imagenet and places365 confused.
 
 - [ ] Places365 pretraining model without pretraining.
 
@@ -227,6 +227,7 @@ We list the key hyper-parameters below, including their explanations and availab
 - `setup.master_port`: a configuration parameter specifying the port number on the master node (or primary process) that other processes or nodes use to communicate within a distributed system.
 - `pretrain.n_epochs`: the number of epoch for pretraining.
 - `train.n_epochs`: the number of epoch for finetuning on sensitive datasets.
+- `train.dp.n_split`: the number of gradient accumulations for saving GPU memory usage.
 
 > [!Note]
 >
@@ -234,7 +235,9 @@ We list the key hyper-parameters below, including their explanations and availab
 
 > [!Tip]
 >
-> DP-LDM originally uses a latent diffusion model as the DP synthesizer. For a fair comparison, we now use a standard diffusion model, just like other diffusion-based models, which we call `DP-LDM-SD`. In addition, `DP-LDM` means using latent diffusion models (i.e., stabel diffusion) as synthesizers.
+> Experiments such as pretraining or using DPSGD require significant computational resources, as shown in Table 17 of our paper. Here are some tips to help users efficiently reduce computational resource usage and running time in an appropriate way:
+> - Reduce the `pretrain.n_epochs`: 
+
 
 > [!Warning]
 >
