@@ -46,7 +46,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Personal information in dp-ldm configuration file
 
-- [ ] doc: Tips for accelerating, high resolution.
+- [ ] doc: Tips for high resolution.
 
 - [ ] GSWGAN intermediate results
 
