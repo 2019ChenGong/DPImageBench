@@ -541,5 +541,5 @@ If you have any question about our work or this repository, please don't hesitat
 
 ## Acknowledgement
  
-Part of code is borrowed from [DP-MERF](https://github.com/ParkLabML/DP-MERF), [DP-Kernel](https://github.com/antoninschrab/dpkernel), [DP-NTK](https://github.com/Justinyangjy/DP-NTK), [GS-WGAN](https://github.com/DingfanChen/Private-Set), [DPAGN](https://github.com/illidanlab/dpgan), [PE](https://github.com/microsoft/DPSDA), [DPDM](https://github.com/nv-tlabs/DPDM), [PrivImage](https://github.com/SunnierLee/DP-ImaGen). We have elaborate them on the Appendix B.1 of our paper.
+Part of code is borrowed from [DP-MERF](https://github.com/ParkLabML/DP-MERF), [DP-Kernel](https://github.com/antoninschrab/dpkernel), [DP-NTK](https://github.com/Justinyangjy/DP-NTK), [GS-WGAN](https://github.com/DingfanChen/Private-Set), [DPAGN](https://github.com/illidanlab/dpgan), [PE](https://github.com/microsoft/DPSDA), [DPDM](https://github.com/nv-tlabs/DPDM), [DP-LDM](https://github.com/SaiyueLyu/DP-LDM), [DP-LORA](https://github.com/EzzzLi/DP-LORA), [PrivImage](https://github.com/SunnierLee/DP-ImaGen). We have elaborate them on the Appendix B.1 of our paper.
 We sincerely thank them for their contributions to the community.
