@@ -304,7 +304,7 @@ CUDA_VISIBLE_DEVICES=0,1,2 python run.py \
 ```
 > [!Note]
 >
-> It is noted that the default resolution for pretraining is 28x28 when --data_name is set to `mnist_28` or `fmnist_28`, but 32x32 for other datasets. Users can edit `pretrain.n_epochs` to control the number of pretrain epoch
+> It is noted that the default resolution for pretraining is 28x28 when --data_name is set to `mnist_28` or `fmnist_28`, but 32x32 for other datasets. 
 
 #### For the implementation of the results reported in Figures 5, 6, and 9 (RQ2), the performance is analyzed by varying the epsilon and model size.
 
@@ -541,5 +541,4 @@ If you have any question about our work or this repository, please don't hesitat
 
 ## Acknowledgement
  
-Part of code is borrowed from [DP-MERF](https://github.com/ParkLabML/DP-MERF), [DP-Kernel](https://github.com/antoninschrab/dpkernel), [DP-NTK](https://github.com/Justinyangjy/DP-NTK), [GS-WGAN](https://github.com/DingfanChen/Private-Set), [DPAGN](https://github.com/illidanlab/dpgan), [PE](https://github.com/microsoft/DPSDA), [DPDM](https://github.com/nv-tlabs/DPDM), [DP-LDM](https://github.com/SaiyueLyu/DP-LDM), [DP-LORA](https://github.com/EzzzLi/DP-LORA), [PrivImage](https://github.com/SunnierLee/DP-ImaGen). We have elaborate them on the Appendix B.1 of our paper.
-We sincerely thank them for their contributions to the community.
+Part of code is borrowed from [DP-MERF](https://github.com/ParkLabML/DP-MERF), [DP-Kernel](https://github.com/antoninschrab/dpkernel), [DP-NTK](https://github.com/Justinyangjy/DP-NTK), [GS-WGAN](https://github.com/DingfanChen/Private-Set), [DPAGN](https://github.com/illidanlab/dpgan), [PE](https://github.com/microsoft/DPSDA), [DPDM](https://github.com/nv-tlabs/DPDM), [DP-LDM](https://github.com/SaiyueLyu/DP-LDM), [DP-LORA](https://github.com/EzzzLi/DP-LORA), [PrivImage](https://github.com/SunnierLee/DP-ImaGen). We have elaborate them on the Appendix B.1 of our paper. We sincerely thank them for their contributions to the community.
