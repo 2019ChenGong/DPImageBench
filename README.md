@@ -280,16 +280,6 @@ python ./scripts/test_classifier.py --method PDP-Diffusion --data_name mnist_28 
 ```
 The results are recorded in `exp/pdp-diffusion/<the-name-of-file>no-dp-mnist_28/stdout.txt`. This process is independent of `--method` and uses of `--epsilon`.
 
-#### Directly use the pretrained synthesizers.
-
-If users wish to finetune the synthesizers using pretrained models, they should: (1) set `public_data.name=null`, and (2) load the pretrained synthesizers through `model.ckpt`. For example, the pretrained synthesizer can be sourced from other algorithms. Readers can refer to the [file structure](./exp/README.md) for more details about loading pretrained models. Currently, only diffuisn-based methods are supported, because we fint that GAN-based methods do not benefit from pretraining and their training is fast.
-
-```
-python run.py setup.n_gpus_per_node=3 public_data.name=null eval.mode=val \
- model.ckpt=./exp/pdp-diffusion/<the-name-of-scripts>/pretrain/checkpoints/final_checkpoint.pth \
- --method PDP-Diffusion --data_name fmnist_28 --epsilon 10.0 --exp_description <any-notes>
-```
-
 ####  Only pretraining the synthesizer on public datasets and without finetuning on the sensitive datasets. 
 
 Please set sensitive_data.name=null and eval.mode=sen. For example, to use ImageNet for pretraining:
@@ -393,17 +383,23 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \
  --exp_description pretrain_places365_unconditional 
 ```
 
-<!--### 4.4 Training Using Checkpoints
-DPImageBench also supports training synthesizers from the checkpoints. As mentioned in the [results structure](#451-results-structure), we provide `snapshot_checkpoint.pth` to store the synthesizer's parameters at the current epoch after each iteration.
+### 4.4 Training Using Checkpoints
+DPImageBench also supports training synthesizers from the checkpoints. As mentioned in the [results structure](#451-results-structure), we provide `snapshot_checkpoint.pth` to store the synthesizer's parameters at the current epoch after each iteration. If users wish to finetune the synthesizers using pretrained models, they should: (1) set `public_data.name=null`, and (2) load the pretrained synthesizers through `model.ckpt`. For example, the pretrained synthesizer can be sourced from other algorithms. Readers can refer to the [file structure](./exp/README.md) for more details about loading pretrained models like
 
-For pretraining using checkpoints, we -->
+```
+python run.py setup.n_gpus_per_node=3 public_data.name=null eval.mode=val \
+ model.ckpt=./exp/pdp-diffusion/<the-name-of-scripts>/pretrain/checkpoints/snapshot_checkpoint.pth \
+ --method PDP-Diffusion --data_name fmnist_28 --epsilon 10.0 --exp_description <any-notes>
+```
+
+Currently, only diffuisn-based methods are supported, because we fint that GAN-based methods usually do not benefit from pretraining and their training is fast.
 
 
-### 4.4 Results
+### 4.5 Results
 We can find the `stdout.txt` files in the result folder, which record the training and evaluation processes. The results for utility and fidelity evaluations are available in `stdout.txt`. The result folder name consists of `<data_name>_eps<epsilon><notes>-<starting-time>`, e.g., `mnist_28_eps1.0-2024-10-25-23-09-18`.
 
 
-#### 4.4.1 Results Structure
+#### 4.5.1 Results Structure
 
 We outline the structure of the results files as follows. The training and evaluations results are recorded in the file `exp`. For example, if users leverage the PDP-Diffusion method to generate synthetic images for the MNIST dataset under a privacy budget of `eps=1.0`, the structure of the folder is as follows:
 
@@ -452,7 +448,7 @@ We introduce the files as follows,
 - `./train/samples/iter_2000`: the synthetic images under 2000 iterations for training on sensitive datasets.
 - `./stdout.txt`: the file used to record the training and evaluation results.
 
-#### 4.4.2 Results Explanation
+#### 4.5.2 Results Explanation
 
 In utility evaluation, after each classifier training, we can find,
 
@@ -488,7 +484,7 @@ INFO - evaluator.py - 2024-11-12 09:06:18,148 - The best acc of accuracy (using 
 ```
 The synthetic images can be found at the `/exp/<algorithm_name>/<file_name>/gen/gen.npz`.
 
-### 4.5 Results Visualization
+### 4.6 Results Visualization
 
 We provide the plotting codes for results visualization in the folder `plot` of DPImageBench.
 
