@@ -116,6 +116,7 @@ class DP_LORA(DPSynther):
             '--logdir', logdir, 
             '--base', config_path, 
             '--gpus', gpu_ids, 
+            'data.params.cond={}'.format(self.config.pretrain.cond),
             'data.params.train.target={}'.format(data_target),
             'data.params.validation.target={}'.format(data_target),
             'model.params.output_file={}'.format(os.path.join(os.path.dirname(os.path.dirname(logdir)), 'stdout.txt')),

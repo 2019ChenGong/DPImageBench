@@ -41,28 +41,33 @@ class WrappedDataset(Dataset):
 class WrappedDataset_ldm(Dataset):
     """Wraps an arbitrary object with __len__ and __getitem__ into a pytorch dataset"""
 
-    def __init__(self, dataset, data_num=None):
+    def __init__(self, dataset, cond=True, data_num=None):
         if data_num is not None:
             val_size = len(dataset) - data_num
             torch.manual_seed(0)
             self.data, _ = random_split(dataset, [data_num, val_size])
         else:
             self.data = dataset
+        self.cond = cond
 
     def __len__(self):
         return len(self.data)
 
     def __getitem__(self, idx):
         x, y = self.data[idx]
-        return {"image": torch.tensor(x).to(torch.float32) * 2 - 1, "class_label": y}
+        if self.cond:
+            return {"image": torch.tensor(x).to(torch.float32) * 2 - 1, "class_label": y}
+        else:
+            return {"image": torch.tensor(x).to(torch.float32) * 2 - 1, "class_label": 0}
 
 
 class DataModuleFromConfig(pl.LightningDataModule):
     def __init__(self, batch_size, train=None, validation=None, test=None, predict=None,
-                 wrap=False, num_workers=None, shuffle_test_loader=False, use_worker_init_fn=False,
+                 wrap=False, num_workers=None, shuffle_test_loader=False, use_worker_init_fn=False, cond=True,
                  shuffle_val_dataloader=False):
         super().__init__()
         self.batch_size = batch_size
+        self.cond = cond
         self.dataset_configs = dict()
         self.num_workers = num_workers if num_workers is not None else batch_size * 2
         self.use_worker_init_fn = use_worker_init_fn
@@ -86,7 +91,7 @@ class DataModuleFromConfig(pl.LightningDataModule):
 
     def setup(self, stage=None):
         self.datasets = dict(
-            (k, WrappedDataset_ldm(instantiate_from_config(self.dataset_configs[k]), data_num=self.dataset_configs[k].data_num))
+            (k, WrappedDataset_ldm(instantiate_from_config(self.dataset_configs[k]), cond=self.cond, data_num=self.dataset_configs[k].data_num))
             for k in self.dataset_configs)
         if self.wrap:
             for k in self.datasets:

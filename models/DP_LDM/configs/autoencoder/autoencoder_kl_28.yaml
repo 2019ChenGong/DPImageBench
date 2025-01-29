@@ -35,12 +35,12 @@ data:
     train:
       target: ldm.data.SpecificImagenet.SpecificClassImagenet
       params:
-        root: /p/fzv6enresearch/DPImageBench/dataset/imagenet/imagenet_32
+        root: null
         split: train
     validation:
       target: ldm.data.SpecificImagenet.SpecificClassImagenet
       params:
-        root: /p/fzv6enresearch/DPImageBench/dataset/imagenet/imagenet_32
+        root: null
         split: val
 lightning:
   trainer:

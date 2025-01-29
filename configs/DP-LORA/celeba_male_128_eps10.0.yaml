@@ -32,14 +32,13 @@ pretrain:
     config_path: ./models/DP_LDM/configs/autoencoder/autoencoder_kl_128.yaml
     n_epochs: 4
     batch_size: 64
-    cond: true
   unet:
     config_path: ./models/DP_LDM/configs/latent-diffusion/128_4M.yaml
     pretrain_model: null
     n_epochs: 40
     batch_size: 64
-    cond: true
   batch_size: 64
+  cond: true
 train:
   config_path: ./models/DP_LORA/configs/finetuning/128_4M.yaml
   pretrain_model: null
@@ -53,7 +52,7 @@ train:
     delta: 1e-5
     epsilon: 10.0
     max_physical_batch_size: 8192
-  n_splits: 8
+  n_splits: 256
 gen:
   data_num: 60000
   batch_size: 1000

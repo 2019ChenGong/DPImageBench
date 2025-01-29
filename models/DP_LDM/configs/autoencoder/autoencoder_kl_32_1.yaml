@@ -35,14 +35,14 @@ data:
     train:
       target: ldm.data.SpecificImagenet.SpecificClassImagenet
       params:
-        root: /p/fzv6enresearch/DPImageBench/dataset/imagenet/imagenet_32
+        root: null
         split: train
         image_size: 32
         c: 1
     validation:
       target: ldm.data.SpecificImagenet.SpecificClassImagenet
       params:
-        root: /p/fzv6enresearch/DPImageBench/dataset/imagenet/imagenet_32
+        root: null
         split: val
         image_size: 32
         c: 1

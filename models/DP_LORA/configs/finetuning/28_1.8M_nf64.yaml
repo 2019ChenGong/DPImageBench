@@ -95,7 +95,7 @@ data:
     num_workers: 0
     train:
       params:
-        path: /p/fzv6enresearch/DPImageBench/dataset/cifar10/train_32.zip
+        path: null
         resolution: 32
         use_labels: True
         c: 3
@@ -103,7 +103,7 @@ data:
       data_num: null
     validation:
       params:
-        path: /p/fzv6enresearch/DPImageBench/dataset/cifar10/test_32.zip
+        path: null
         resolution: 32
         use_labels: True
         c: 3

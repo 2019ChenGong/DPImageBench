@@ -32,28 +32,27 @@ pretrain:
     config_path: ./models/DP_LDM/configs/autoencoder/autoencoder_kl_64.yaml
     n_epochs: 4
     batch_size: 64
-    cond: true
   unet:
     config_path: ./models/DP_LDM/configs/latent-diffusion/64_4M.yaml
     pretrain_model: null
     n_epochs: 80
     batch_size: 512
-    cond: true
   batch_size: 512
+  cond: true
 train:
   config_path: ./models/DP_LDM/configs/finetuning/64_4M.yaml
   pretrain_model: null
   log_dir: null
   seed: 0
   batch_size: 4096
-  n_epochs: 100
+  n_epochs: 50
   dp:
     sdq: null
     max_grad_norm: 0.001
     delta: 1e-5
     epsilon: 10.0
     max_physical_batch_size: 8192
-  n_splits: 8
+  n_splits: 16
 gen:
   data_num: 60000
   batch_size: 1000

@@ -39,7 +39,7 @@ model:
       params:
         embed_dim: 3
         monitor: val/rec_loss
-        ckpt_path: /p/fzv6enresearch/DPImageBench/DP-LDM_for_merge/logs/2024-12-03T00-38-33_autoencoder_kl_imagenet32_32x32x3/checkpoints/last.ckpt
+        ckpt_path: null
         ddconfig:
           double_z: true
           z_channels: 3
@@ -72,14 +72,14 @@ data:
     train:
       target: data.SpecificImagenet.SpecificClassImagenet
       params:
-        root: /p/fzv6enresearch/DPImageBench/dataset/imagenet/imagenet_32
+        root: null
         split: train
         image_size: 28
         c: 1
     validation:
       target: data.SpecificImagenet.SpecificClassImagenet
       params:
-        root: /p/fzv6enresearch/DPImageBench/dataset/imagenet/imagenet_32
+        root: null
         split: val
         image_size: 28
         c: 1

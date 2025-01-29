@@ -45,7 +45,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [ ] Personal information in dp-ldm configuration file
+- [x] Personal information in dp-ldm configuration file
 
 - [ ] doc: Tips for high resolution.
 
