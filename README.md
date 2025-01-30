@@ -45,8 +45,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [x] Personal information in dp-ldm configuration file
-
 - [ ] doc: Tips for high resolution.
 
 - [ ] GSWGAN intermediate results
@@ -536,6 +534,17 @@ Other processes are the same.
 
 ## 6. Contacts
 If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
+
+## 7. Citation
+
+```text
+@article{dpimagebench,
+author = {Chen Gong and Kecen Li and Zinan Lin and Tianhao Wang},
+title = {DPImageBench: A Unified Benchmark for Differentially Private Image Synthesis},
+year = {2025},
+howpublished = {https://github.com/2019ChenGong/DPImageBench}
+}
+```
 
 ## Acknowledgement
  

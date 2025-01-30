@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.ticker import FormatStrFormatter
 
-methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "DP-GAN", "PDP-Diffusion", "DP-LDM", "PrivImage"]
+methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "GS-WGAN", "DP-GAN", "PDP-Diffusion", "DP-LDM (SD)", "DP-LDM", "DP-LORA", "PrivImage"]
 
-def plot_con_uncon_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
+def plot_cifar(ax, data1, label1, data2, label2, xlabel, yticks=True):
     diff = data1 - data2
     diff = diff[::-1]
     y = np.array([i for i in range(len(data1))])
@@ -18,14 +18,13 @@ def plot_con_uncon_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
 
     ax.barh(y[diff<0], data2[::-1][diff<0], label=label2, color='#129ECC', zorder=1)
     ax.barh(y[diff>=0], data2[::-1][diff>=0], color='#129ECC', zorder=2)
-    ax.legend(fontsize=11)
     if yticks:
-        ax.set_yticks(range(len(data2)), methods[::-1], fontsize=12)
+        ax.set_yticks(range(len(data2)), methods[::-1], fontsize=14)
     else:
         ax.set_yticks([])
     ax.set_xlabel(xlabel, fontsize=14)
-    ax.set_xticks([0.0,20.0,40.0,60.0,80.0]) 
-    ax.tick_params(axis='both', which='major', labelsize=12)
+    ax.tick_params(axis='both', which='major', labelsize=14)
+
 
     x_max = np.where(data1>data2, data1, data2)
     diff = diff[::-1]
@@ -36,9 +35,9 @@ def plot_con_uncon_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
         improve = str(round(improve, 1))
         if improve[0] != '-':
             improve = '+' + improve
-        ax.text(x, y, str(improve), fontsize=12)
+        ax.text(x, y, str(improve), fontsize=14)
 
-def plot_pre_nonpre_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
+def plot_fmnist(ax, data1, label1, data2, label2, xlabel, yticks=True):
     diff = data1 - data2
     diff = diff[::-1]
     y = np.array([i for i in range(len(data1))])
@@ -48,14 +47,13 @@ def plot_pre_nonpre_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
 
     ax.barh(y[diff<0], data2[::-1][diff<0], label=label2, color='#129ECC', zorder=1)
     ax.barh(y[diff>=0], data2[::-1][diff>=0], color='#129ECC', zorder=2)
-    ax.legend(fontsize=11)
+    
     if yticks:
-        ax.set_yticks(range(len(data2)), methods[::-1], fontsize=12)
+        ax.set_yticks(range(len(data2)), methods[::-1], fontsize=14)
     else:
         ax.set_yticks([])
     ax.set_xlabel(xlabel, fontsize=14)
-    ax.set_xticks([0.0,20.0,40.0,60.0,80.0,100.0]) 
-    ax.tick_params(axis='both', which='major', labelsize=12)
+    ax.tick_params(axis='both', which='major', labelsize=14)
 
     x_max = np.where(data1>data2, data1, data2)
     diff = diff[::-1]
@@ -66,22 +64,26 @@ def plot_pre_nonpre_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
         improve = str(round(improve, 1))
         if improve[0] != '-':
             improve = '+' + improve
-        ax.text(x, y, str(improve), fontsize=12)
+        ax.text(x, y, str(improve), fontsize=14)
     
 
-fig = plt.figure(figsize=(9.0, 4.0))
+fig = plt.figure(figsize=(10.5, 5.0))
 axs = fig.subplots(1, 2)
 
 colors= ['#A1A9D0', '#2F7FC1']
 
-accs_fmnist_imagenet = np.array([70.1, 68.8, 72.2, 56.2, 81.7, 48.8, 85.9])
-accs_fmnist_places365 = np.array([69.5, 55.9, 75.5, 45.5, 81.1, 59.3, 82.4])
+accs_fmnist_imagenet = np.array([71.2, 66.6, 77.1, 62.1, 71.1, 85.4, 81.6, 86.3, 83.8, 87.1])
+accs_fmnist_places365 = np.array([69.2, 68.6, 78.6, 62.3, 69.9, 85.7, 79.9, 83.2, 80.2, 84.0])
 
-flds_fmnist_imagenet = np.array([26.0, 27.4, 18.0, 36.6, 8.6, 30.2, 5.3])
-flds_fmnist_places365 = np.array([26.1, 50.8, 18.6, 38.9, 8.9, 24.3, 7.8])
+flds_fmnist_imagenet = np.array([27.3, 36.2, 17.7, 28.7, 21.8, 4.9, 11.7, 15.4, 14.8, 4.3])
+flds_fmnist_places365 = np.array([30.3, 38.6, 18.2, 27.7, 24.3, 4.4, 13.1, 21.6, 19.1, 5.2])
 
-plot_pre_nonpre_fig(axs[0], accs_fmnist_imagenet, 'imagenet', accs_fmnist_places365, 'places365', 'Acc (%)')
-plot_pre_nonpre_fig(axs[1], flds_fmnist_imagenet, 'imagenet', flds_fmnist_places365, 'places365', 'FLD', yticks=False)
+plot_fmnist(axs[0], accs_fmnist_imagenet, 'imagenet', accs_fmnist_places365, 'places365', 'Acc (%)')
+axs[0].set_xticks([0.0,20.0,40.0,60.0,80.0,100.0]) 
+
+plot_fmnist(axs[1], flds_fmnist_imagenet, 'imagenet', flds_fmnist_places365, 'places365', 'FLD', yticks=False)
+axs[1].set_xticks([0.0,10.0,20.0,30.0,40.0,50.0]) 
+axs[1].legend(fontsize=11)
 
 fig.subplots_adjust(wspace=0.07, hspace=0.3)
 
@@ -91,14 +93,17 @@ fig.savefig("fmnist_place_imagenet.pdf", bbox_inches='tight')
 fig.clf()
 axs = fig.subplots(1, 2)
 
-accs_cifar10_imagenet = np.array([22.3, 20.0, 30.2, 20.6, 27.4, 21.3, 66.5])
-accs_cifar10_places365 = np.array([23.6, 20.6, 29.7, 18.3, 24.6, 18.9, 55.5])
+accs_cifar10_imagenet = np.array([26.1, 20.0, 24.0, 20.1, 32.1, 70.1, 69.9, 64.8, 77.2, 78.4])
+accs_cifar10_places365 = np.array([28.1, 20.8, 26.7, 20.5, 23.3, 60.1, 61.2, 51.3, 57.5, 73.3])
 
-flds_cifar10_imagenet = np.array([31.5, 41.2, 30.4, 31.0, 14.7, 16.0, 7.3])
-flds_cifar10_places365 = np.array([28.6, 52.9, 32.7, 35.3, 26.7, 35.1, 9.8])
+flds_cifar10_imagenet = np.array([28.4, 50.0, 40.0, 33.2, 25.3, 7.2, 9.0, 14.1, 9.3, 5.1])
+flds_cifar10_places365 = np.array([29.1, 49.5, 30.8, 30.8, 27.3, 8.8, 12.9, 16.4, 14.7, 7.1])
 
-plot_con_uncon_fig(axs[0], accs_cifar10_imagenet, 'imagenet', accs_cifar10_places365, 'places365', 'Acc (%)')
-plot_con_uncon_fig(axs[1], flds_cifar10_imagenet, 'imagenet', flds_cifar10_places365, 'places365', 'FLD', yticks=False)
+plot_cifar(axs[0], accs_cifar10_imagenet, 'imagenet', accs_cifar10_places365, 'places365', 'Acc (%)')
+axs[0].set_xticks([0.0,20.0,40.0,60.0,80.0,100.0]) 
+plot_cifar(axs[1], flds_cifar10_imagenet, 'imagenet', flds_cifar10_places365, 'places365', 'FLD', yticks=False)
+axs[1].set_xticks([0.0,15.0,30.0,45.0,60.0]) 
+axs[1].legend(fontsize=11, loc='lower right')
 
 fig.subplots_adjust(wspace=0.07, hspace=0.3)
 
