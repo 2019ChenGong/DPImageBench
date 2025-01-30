@@ -36,6 +36,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
     - [4.5 Results Visualization](#45-results-visualization)
   - [5. Customization](#5-customization)
   - [6. Contacts](#6-contacts)
+  - [7. Citation](#7-citation)
   - [Acknowledgment](#acknowledgement)
 
 ### Updates 
