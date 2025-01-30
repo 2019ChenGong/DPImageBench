@@ -155,7 +155,7 @@ class DP_LDM(DPSynther):
         self.config.train.pretrain_model = os.path.join(logdir, 'checkpoints', 'last.ckpt')
 
     def train(self, sensitive_dataloader, config):
-        if sensitive_dataloader is None:
+        if sensitive_dataloader is None or config.n_epochs == 0:
             return
         
         if self.global_rank == 0:
@@ -203,6 +203,7 @@ class DP_LDM(DPSynther):
         logging.info("start to generate {} samples".format(config.data_num))
         if self.global_rank == 0 and not os.path.exists(config.log_dir):
             make_dir(config.log_dir)
+        # self.config.train.log_dir = '/p/fzv6enresearch/DPImageBench/exp/dp-ldm/celeba_male_64_eps10.0val-2025-01-29-02-43-05/train/'
         
         scripts = [[
             'models/DP_LDM/cond_sampling_test.py', 

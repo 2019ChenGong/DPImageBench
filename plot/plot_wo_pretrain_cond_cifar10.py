@@ -92,7 +92,7 @@ fig.savefig("wo_pretrain.pdf", bbox_inches='tight')
 fig.clf()
 axs = fig.subplots(1, 2)
 
-accs_condi = np.array([22.3, 20, 24.2, 18.5, 19.2, 29.5, 19.2, 29.5, 19.4, 66.7])
+accs_condi = np.array([26.1, 20.0, 24.0, 18.5, 35.2, 70.1, 69.9, 64.8, 77.2, 78.4])
 accs_uncondi = np.array([24.8, 21.1, 29.9, 21.9, 23.0, 27.4, 19.2, 29.5, 21.3, 22.3])
 
 flds_condi = np.array([31.5, 41.2, 30.4, 31.0, 22.8, 14.7, 19.2, 29.5, 16.0, 7.3])

@@ -55,7 +55,7 @@ train:
   n_splits: 16
 gen:
   data_num: 60000
-  batch_size: 1000
+  batch_size: 200
   log_dir: null
 eval:
   batch_size: 1000

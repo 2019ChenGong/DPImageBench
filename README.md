@@ -393,7 +393,7 @@ python run.py setup.n_gpus_per_node=3 public_data.name=null eval.mode=val \
  --method PDP-Diffusion --data_name fmnist_28 --epsilon 10.0 --exp_description <any-notes>
 ```
 
-Currently, only diffuisn-based methods are supported, because we fint that GAN-based methods usually do not benefit from pretraining and their training is fast.
+Currently, only diffuisn-based methods are supported, because GAN-based methods usually do not benefit from pretraining and their training is fast.
 
 
 ### 4.4 Results
