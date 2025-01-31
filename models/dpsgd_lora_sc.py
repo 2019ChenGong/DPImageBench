@@ -93,7 +93,7 @@ class DP_LORA(DPSynther):
                 except Exception as e:
                     logging.info(f"generated an exception: {e}")
         
-        self.config.pretrain.unet.pretrain_model = os.path.join(logdir, 'checkpoints', 'last.ckpt')
+        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'last.ckpt')
 
     def pretrain_unet(self, public_dataset, config, logdir):
         if self.global_rank == 0:
@@ -105,7 +105,7 @@ class DP_LORA(DPSynther):
         else:
             gpu_ids = str(cuda_visible_devices) + ','
         config_path = config.config_path
-        pretrain_model = self.config.pretrain.unet.pretrain_model
+        pretrain_model = self.config.model.ckpt
         if 'imagenet' in self.config.public_data.train_path:
             data_target = 'data.SpecificImagenet.SpecificClassImagenet'
         elif 'places' in self.config.public_data.train_path:
@@ -142,7 +142,7 @@ class DP_LORA(DPSynther):
                 except Exception as e:
                     logging.info(f"generated an exception: {e}")
         
-        self.config.train.pretrain_model = os.path.join(logdir, 'checkpoints', 'last.ckpt')
+        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'last.ckpt')
 
     def train(self, sensitive_dataloader, config):
         if sensitive_dataloader is None:
@@ -153,7 +153,7 @@ class DP_LORA(DPSynther):
         
         gpu_ids = '0,'
         config_path = config.config_path
-        pretrain_model = self.config.train.pretrain_model
+        pretrain_model = self.config.model.ckpt
         scripts = [[
             'models/DP_LORA/main.py', 
             '-t', 

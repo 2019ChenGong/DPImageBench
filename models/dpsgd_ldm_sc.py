@@ -93,7 +93,7 @@ class DP_LDM(DPSynther):
                 except Exception as e:
                     logging.info(f"generated an exception: {e}")
         
-        self.config.pretrain.unet.pretrain_model = os.path.join(logdir, 'checkpoints', 'last.ckpt')
+        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'last.ckpt')
 
     def pretrain_unet(self, public_dataset, config, logdir):
         if self.global_rank == 0:
@@ -105,7 +105,7 @@ class DP_LDM(DPSynther):
         else:
             gpu_ids = str(cuda_visible_devices) + ','
         config_path = config.config_path
-        pretrain_model = self.config.pretrain.unet.pretrain_model
+        pretrain_model = self.config.model.ckpt
         if 'unet' in pretrain_model:
             model_target = 'model.params.ckpt_path='
         else:
@@ -152,7 +152,7 @@ class DP_LDM(DPSynther):
                 except Exception as e:
                     logging.info(f"generated an exception: {e}")
         
-        self.config.train.pretrain_model = os.path.join(logdir, 'checkpoints', 'last.ckpt')
+        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'last.ckpt')
 
     def train(self, sensitive_dataloader, config):
         if sensitive_dataloader is None or config.n_epochs == 0:
@@ -163,7 +163,7 @@ class DP_LDM(DPSynther):
         
         gpu_ids = '0,'
         config_path = config.config_path
-        pretrain_model = self.config.train.pretrain_model
+        pretrain_model = self.config.model.ckpt
         scripts = [[
             'models/DP_LDM/main.py', 
             '-t', 
@@ -203,7 +203,6 @@ class DP_LDM(DPSynther):
         logging.info("start to generate {} samples".format(config.data_num))
         if self.global_rank == 0 and not os.path.exists(config.log_dir):
             make_dir(config.log_dir)
-        # self.config.train.log_dir = '/p/fzv6enresearch/DPImageBench/exp/dp-ldm/celeba_male_64_eps10.0val-2025-01-29-02-43-05/train/'
         
         scripts = [[
             'models/DP_LDM/cond_sampling_test.py', 

@@ -34,14 +34,12 @@ pretrain:
     batch_size: 64
   unet:
     config_path: ./models/DP_LDM/configs/latent-diffusion/28_1.8M.yaml
-    pretrain_model: null
     n_epochs: 160
     batch_size: 1024
   batch_size: 1024
   cond: true
 train:
   config_path: ./models/DP_LDM/configs/finetuning/28_1.8M_nf64.yaml
-  pretrain_model: null
   log_dir: null
   seed: 0
   batch_size: 4096
