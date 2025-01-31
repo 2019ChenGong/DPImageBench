@@ -266,7 +266,13 @@ The results reported in Table 5 were obtained by following the instructions belo
 ```
 python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --data_name mnist_28 --epsilon 10.0 eval.mode=sen
 ```
-The results reported in Table 9 were obtained by following the instructions below.
+
+> [!Note]
+>
+> It is noted that the default resolution for pretraining is 28x28 when --data_name is set to `mnist_28` or `fmnist_28`, but 32x32 for other datasets. 
+
+
+The results presented in Table 9, which explore synthetic images at different resolutions for `celeba`, are obtained by following the instructions below.
 ```
 python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --data_name celeba_male_64 --epsilon 10.0 eval.mode=val
 ```
@@ -297,9 +303,6 @@ CUDA_VISIBLE_DEVICES=0,1,2 python run.py \
  --data_name cifar10_32 --epsilon 10.0 \ 
  --exp_description pretrain_imagenet32
 ```
-> [!Note]
->
-> It is noted that the default resolution for pretraining is 28x28 when --data_name is set to `mnist_28` or `fmnist_28`, but 32x32 for other datasets. 
 
 #### For the implementation of the results reported in Figures 5, 6, and 9 (RQ2), the performance is analyzed by varying the epsilon and model size.
 
