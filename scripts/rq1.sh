@@ -18,3 +18,23 @@ python run.py setup.n_gpus_per_node=4 --method DP-LDM-SD --dataset_name $data_na
 python run.py setup.n_gpus_per_node=1 --method DP-LDM --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
 python run.py setup.n_gpus_per_node=1 --method DP-LORA --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
 python run.py setup.n_gpus_per_node=4 --method PrivImage --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+
+
+# The results in Table 9
+# resolution: [32, 64, 128]
+resolution=32
+data_name='celeba_male_'$resolution
+eps=10.0
+eval_mode=val
+python run.py setup.n_gpus_per_node=1 public_data.name=null --method DP-MERF --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+python run.py setup.n_gpus_per_node=1 public_data.name=null  --method DP-NTK --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+python run.py setup.n_gpus_per_node=1 public_data.name=null  --method DP-Kernel --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+python run.py setup.n_gpus_per_node=4 --method PE --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+python run.py setup.n_gpus_per_node=4 public_data.name=null --method GS-WGAN --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+python run.py setup.n_gpus_per_node=4 public_data.name=null --method DPGAN --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+python run.py setup.n_gpus_per_node=4 public_data.name=null --method DPDM --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+python run.py setup.n_gpus_per_node=4 --method DP-LDM-SD --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+python run.py setup.n_gpus_per_node=1 --method DP-LDM --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+python run.py setup.n_gpus_per_node=1 --method DP-LORA --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 
+python run.py setup.n_gpus_per_node=4 --method PrivImage --dataset_name $data_name --epsilon $eps eval.mode=$eval_mode 

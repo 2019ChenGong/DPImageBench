@@ -254,7 +254,7 @@ Users should first activate the conda environment.
 conda activate dpimagebench
 cd DPImageBench
 ```
-#### For the implementation of results reported in Table 5, 6, and 7 (RQ1). 
+#### For the implementation of results reported in Table 5, 6, 7, and 9 (RQ1). 
 
 We list an example as follows. Users can modify the configuration files in [configs](./configs) as their preference. 
 
@@ -264,7 +264,11 @@ python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --data_name mnist_2
 ```
 The results reported in Table 5 were obtained by following the instructions below.
 ```
-python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --data_name mnist_28 --epsilon 10.0 eval.mode=syn
+python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --data_name mnist_28 --epsilon 10.0 eval.mode=sen
+```
+The results reported in Table 9 were obtained by following the instructions below.
+```
+python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --data_name celeba_male_64 --epsilon 10.0 eval.mode=val
 ```
 We provide more examples in the `scripts/rq1.sh`, please refer to [scrips](scripts/rq1.sh).
 
@@ -279,6 +283,7 @@ Test the classification algorithm on the sensitive images without DP.
 python ./scripts/test_classifier.py --method PDP-Diffusion --data_name mnist_28 --epsilon 10.0  -ed no-dp-mnist_28
 ```
 The results are recorded in `exp/pdp-diffusion/<the-name-of-file>no-dp-mnist_28/stdout.txt`. This process is independent of `--method` and uses of `--epsilon`.
+
 
 ####  Only pretraining the synthesizer on public datasets and without finetuning on the sensitive datasets. 
 
