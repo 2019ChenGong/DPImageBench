@@ -46,8 +46,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [ ] doc: Tips for high resolution.
-
 - [ ] GSWGAN intermediate results
 
 - [ ] Structure: unify the output files; add notes

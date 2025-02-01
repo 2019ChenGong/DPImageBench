@@ -94,10 +94,10 @@ fig.clf()
 axs = fig.subplots(1, 2)
 
 accs_cifar10_imagenet = np.array([26.1, 20.0, 24.0, 20.1, 32.1, 70.1, 69.9, 64.8, 77.2, 78.4])
-accs_cifar10_places365 = np.array([28.1, 20.8, 26.7, 20.5, 23.3, 60.1, 61.2, 51.3, 57.5, 73.3])
+accs_cifar10_places365 = np.array([28.1, 20.8, 26.7, 20.5, 23.3, 60.1, 61.2, 51.3, 57.5, 63.3])
 
 flds_cifar10_imagenet = np.array([28.4, 50.0, 40.0, 33.2, 25.3, 7.2, 9.0, 14.1, 9.3, 5.1])
-flds_cifar10_places365 = np.array([29.1, 49.5, 30.8, 30.8, 27.3, 8.8, 12.9, 16.4, 14.7, 7.1])
+flds_cifar10_places365 = np.array([29.1, 49.5, 30.8, 30.8, 27.3, 8.8, 12.9, 16.4, 14.7, 10.5])
 
 plot_cifar(axs[0], accs_cifar10_imagenet, 'imagenet', accs_cifar10_places365, 'places365', 'Acc (%)')
 axs[0].set_xticks([0.0,20.0,40.0,60.0,80.0,100.0]) 
