@@ -26,6 +26,16 @@ sensitive_data:
   fid_stats: dataset/camelyon/fid_stats_32.npz
 model:
   ckpt: null
+  network:
+    attn_resolutions:
+    - 16
+    - 8
+    - 4
+    ch_mult:
+    - 1
+    - 2
+    - 2
+    nf: 32
 pretrain:
   log_dir: null
   autoencoder:

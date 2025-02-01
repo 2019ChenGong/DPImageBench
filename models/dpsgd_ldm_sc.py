@@ -48,7 +48,7 @@ class DP_LDM(DPSynther):
         torch.cuda.empty_cache()
     
     def pretrain_autoencoder(self, public_dataset, config, logdir):
-        if self.config.pretrain.unet.pretrain_model is not None:
+        if self.config.model.ckpt is not None:
             return
         if self.global_rank == 0:
             make_dir(logdir)
@@ -128,6 +128,9 @@ class DP_LDM(DPSynther):
             'data.params.train.target={}'.format(data_target),
             'data.params.validation.target={}'.format(data_target),
             'model.params.output_file={}'.format(os.path.join(os.path.dirname(os.path.dirname(logdir)), 'stdout.txt')),
+            'model.params.unet_config.params.attention_resolutions={}'.format([i**2 for i in range(len(self.config.model.network.attn_resolutions))]),
+            'model.params.unet_config.params.channel_mult={}'.format(self.config.model.network.ch_mult),
+            'model.params.unet_config.params.model_channels={}'.format(self.config.model.network.nf),
             'data.params.batch_size={}'.format(config.batch_size), 
             'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
             model_target+str(pretrain_model),
@@ -171,6 +174,9 @@ class DP_LDM(DPSynther):
             '--base', config_path, 
             '--gpus', gpu_ids, 
             '--accelerator', 'gpu', 
+            'model.params.unet_config.params.attention_resolutions={}'.format([i**2 for i in range(len(self.config.model.network.attn_resolutions))]),
+            'model.params.unet_config.params.channel_mult={}'.format(self.config.model.network.ch_mult),
+            'model.params.unet_config.params.model_channels={}'.format(self.config.model.network.nf),
             'model.params.output_file={}'.format(os.path.join(os.path.dirname(config.log_dir), 'stdout.txt')),
             'model.params.ckpt_path={}'.format(pretrain_model), 
             'model.params.dp_config.epsilon={}'.format(config.dp.epsilon), 

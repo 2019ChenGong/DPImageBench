@@ -317,7 +317,15 @@ In our experiments, we list the model sizes and corresponding hyper-parameter se
 | 11.1M |  `model.network.ch_mult=[1,2,3] model.network.attn_resolutions=[16,8] model.network.nf=64` |
 | 19.6M |  `model.network.ch_mult=[1,2,2,4] model.network.attn_resolutions=[16,8,4] model.network.nf=64` |
 | 44.2M |  `model.network.ch_mult=[1,2,2,4] model.network.attn_resolutions=[16,8,4] model.network.nf=96` |
-| 78.5M |  `model.network.ch_mult=[1,2,2,4] model.network.nf=128` |
+| 78.5M |  `model.network.ch_mult=[1,2,2,4] model.network.attn_resolutions=[16,8,4] model.network.nf=128` |
+
+| Latent Diffusion Model size |  Hyper-parameters |
+| -------------- | ------------------------------------------------------------ |
+| 3.9M |  `model.network.ch_mult=[1,2,2] model.network.attn_resolutions=[16,8,4] model.network.nf=32` |
+| 11.9M |  `model.network.ch_mult=[1,2,2] model.network.attn_resolutions=[16,8,4] model.network.nf=64` |
+| 23.6M |  `model.network.ch_mult=[1,2,2,4] model.network.attn_resolutions=[16,8,4] model.network.nf=64` |
+| 39.7M |  `model.network.ch_mult=[1,2,2,3] model.network.attn_resolutions=[16,8,4] model.network.nf=96` |
+| 77.4M |  `model.network.ch_mult=[1,1,2,4] model.network.attn_resolutions=[16,8,4] model.network.nf=128` |
 
 | GAN size |  Hyper-parameters |
 | -------------- | ------------------------------------------------------------ |
@@ -341,7 +349,19 @@ python run.py setup.n_gpus_per_node=4 --method DPDM --data_name mnist_28 --epsil
  --exp_description 80M 
 ```
 
-(2) Using DPGAN with a 14M generator.
+(2) Using DP-LDM with an 80M diffusion model.
+
+```
+python run.py setup.n_gpus_per_node=1 --method DP-LDM --data_name mnist_28 --epsilon 10.0 eval.mode=val \
+ public_data.name=imagenet \
+ model.network.ch_mult=[1,1,2,4] \
+ model.network.attn_resolutions=[16,8,4]
+ model.network.nf=128 \
+ train.dp.n_split=16 \
+ --exp_description 80M 
+```
+
+(3) Using DPGAN with a 14M generator.
 
 ```
 python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsilon 10.0 eval.mode=val \
@@ -395,6 +415,14 @@ DPImageBench also supports training synthesizers from the checkpoints. As mentio
 
 ```
 python run.py setup.n_gpus_per_node=3 public_data.name=null eval.mode=val \
+ model.ckpt=./exp/pdp-diffusion/<the-name-of-scripts>/pretrain/checkpoints/snapshot_checkpoint.pth \
+ --method PDP-Diffusion --data_name fmnist_28 --epsilon 10.0 --exp_description <any-notes>
+```
+
+If users wish to continue the pretraining using checkpoints, you just need to set the `public_data.name` as usual like
+
+```
+python run.py setup.n_gpus_per_node=3 public_data.name=imagenet eval.mode=val \
  model.ckpt=./exp/pdp-diffusion/<the-name-of-scripts>/pretrain/checkpoints/snapshot_checkpoint.pth \
  --method PDP-Diffusion --data_name fmnist_28 --epsilon 10.0 --exp_description <any-notes>
 ```

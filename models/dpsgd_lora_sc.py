@@ -48,7 +48,7 @@ class DP_LORA(DPSynther):
         torch.cuda.empty_cache()
     
     def pretrain_autoencoder(self, public_dataset, config, logdir):
-        if self.config.pretrain.unet.pretrain_model is not None:
+        if self.config.model.ckpt is not None:
             return
         if self.global_rank == 0:
             make_dir(logdir)
@@ -119,6 +119,9 @@ class DP_LORA(DPSynther):
             'data.params.cond={}'.format(self.config.pretrain.cond),
             'data.params.train.target={}'.format(data_target),
             'data.params.validation.target={}'.format(data_target),
+            'model.params.unet_config.params.attention_resolutions={}'.format([i**2 for i in range(len(self.config.model.network.attn_resolutions))]),
+            'model.params.unet_config.params.channel_mult={}'.format(self.config.model.network.ch_mult),
+            'model.params.unet_config.params.model_channels={}'.format(self.config.model.network.nf),
             'model.params.output_file={}'.format(os.path.join(os.path.dirname(os.path.dirname(logdir)), 'stdout.txt')),
             'data.params.batch_size={}'.format(config.batch_size), 
             'lightning.trainer.max_epochs={}'.format(config.n_epochs), 
@@ -145,7 +148,7 @@ class DP_LORA(DPSynther):
         self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'last.ckpt')
 
     def train(self, sensitive_dataloader, config):
-        if sensitive_dataloader is None:
+        if sensitive_dataloader is None or config.n_epochs == 0:
             return
         
         if self.global_rank == 0:
@@ -161,6 +164,9 @@ class DP_LORA(DPSynther):
             '--base', config_path, 
             '--gpus', gpu_ids, 
             '--accelerator', 'gpu', 
+            'model.params.unet_config.params.attention_resolutions={}'.format([i**2 for i in range(len(self.config.model.network.attn_resolutions))]),
+            'model.params.unet_config.params.channel_mult={}'.format(self.config.model.network.ch_mult),
+            'model.params.unet_config.params.model_channels={}'.format(self.config.model.network.nf),
             'model.params.output_file={}'.format(os.path.join(os.path.dirname(config.log_dir), 'stdout.txt')),
             'model.params.cond_stage_config.params.n_classes={}'.format(self.config.sensitive_data.n_classes),
             'model.params.ckpt_path={}'.format(pretrain_model), 

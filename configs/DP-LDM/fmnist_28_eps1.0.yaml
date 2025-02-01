@@ -26,6 +26,14 @@ sensitive_data:
   fid_stats: dataset/fmnist/fid_stats_28.npz
 model:
   ckpt: null
+  network:
+    attn_resolutions:
+    - 14
+    - 7
+    ch_mult:
+    - 1
+    - 2
+    nf: 32
 pretrain:
   log_dir: null
   autoencoder:

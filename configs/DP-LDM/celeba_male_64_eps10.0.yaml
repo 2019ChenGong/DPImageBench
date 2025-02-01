@@ -26,6 +26,16 @@ sensitive_data:
   fid_stats: dataset/celeba/fid_stats_64.npz
 model:
   ckpt: null
+  network:
+    attn_resolutions:
+    - 32
+    - 16
+    - 8
+    ch_mult:
+    - 1
+    - 2
+    - 2
+    nf: 32
 pretrain:
   log_dir: null
   autoencoder:
