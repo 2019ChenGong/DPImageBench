@@ -311,7 +311,7 @@ If users wish to change the size of the synthesizer, the following parameters sh
 
 In our experiments, we list the model sizes and corresponding hyper-parameter settings as follows.
 
-| Diffusion Model size |  Hyper-parameters |
+| Standard Diffusion Model size |  Hyper-parameters |
 | -------------- | ------------------------------------------------------------ |
 | 3.8M |  `model.network.ch_mult=[2,4] model.network.attn_resolutions=[16] model.network.nf=32` |
 | 11.1M |  `model.network.ch_mult=[1,2,3] model.network.attn_resolutions=[16,8] model.network.nf=64` |
