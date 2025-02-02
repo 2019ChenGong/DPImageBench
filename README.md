@@ -46,15 +46,12 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [x] GSWGAN intermediate results
 
 - [ ] Structure: unify the output files; add notes
 
 - [ ] DPLDM places365 pretraining
 
 - [ ] Privimage automatically edit the semantic selective classifier.
-
-- [x] Clear model/PE/guided-diffusion (kc: this folder has been ignored)
 
 - [ ] DP-LDM and DP-LORA share the same config, imagenet and places365 confused.
 
