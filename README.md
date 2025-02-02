@@ -46,7 +46,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [ ] GSWGAN intermediate results
+- [x] GSWGAN intermediate results
 
 - [ ] Structure: unify the output files; add notes
 
@@ -54,7 +54,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Privimage automatically edit the semantic selective classifier.
 
-- [ ] Clear model/PE/guided-diffusion
+- [x] Clear model/PE/guided-diffusion (kc: this folder has been ignored)
 
 - [ ] DP-LDM and DP-LORA share the same config, imagenet and places365 confused.
 
@@ -334,6 +334,10 @@ In our experiments, we list the model sizes and corresponding hyper-parameter se
 | 10.0M |  `model.Generator.g_conv_dim=80` |
 | 14.3M |  `model.Generator.g_conv_dim=100` |
 | 19.4M |  `model.Generator.g_conv_dim=120` |
+
+> [!Note]
+>
+> It is hard to control synthesizers with different foundational models so that they have exactly the same parameter sizes.
 
 For example:
 

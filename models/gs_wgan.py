@@ -11,7 +11,7 @@ import random
 import numpy as np
 import logging
 import subprocess
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import importlib
 opacus = importlib.import_module('opacus')
@@ -241,9 +241,8 @@ class GS_WGAN(DPSynther):
             for future in futures:
                 try:
                     output = future.result()
-                    print(f"Output:\n{output}")
                 except Exception as e:
-                    print(f"generated an exception: {e}")
+                    logging.info(f"generated an exception: {e}")
 
 
 

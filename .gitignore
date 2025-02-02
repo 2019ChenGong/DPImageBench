@@ -30,6 +30,7 @@ models_old
 dataset
 models/pretrained_models
 models/PE/improved-diffusion
+models/PE/guided-diffusion
 models/pretrained_models.zip
 models/DataLens
 models/G_PATE
@@ -43,10 +44,6 @@ golden_pretrain.sh
 
 eps10_visual*
 visualization.py
-
-models_old/pretrained_models
-models_old/PE/improved-diffusion
-models_old/pretrained_models.zip
 
 cifar10_32*
 

@@ -33,7 +33,7 @@ model:
     ch_mult:
     - 1
     - 2
-    nf: 32
+    nf: 64
 pretrain:
   log_dir: null
   autoencoder:
@@ -41,13 +41,13 @@ pretrain:
     n_epochs: 4
     batch_size: 64
   unet:
-    config_path: ./models/DP_LDM/configs/latent-diffusion/28_1.8M.yaml
+    config_path: ./models/DP_LDM/configs/latent-diffusion/28.yaml
     n_epochs: 160
     batch_size: 1024
   batch_size: 1024
   cond: true
 train:
-  config_path: ./models/DP_LORA/configs/finetuning/28_1.8M_nf64.yaml
+  config_path: ./models/DP_LORA/configs/finetuning/28.yaml
   log_dir: null
   seed: 0
   batch_size: 4096
@@ -58,7 +58,7 @@ train:
     delta: 1e-5
     epsilon: 10.0
     max_physical_batch_size: 8192
-  n_splits: 16
+  n_splits: 32
 gen:
   data_num: 60000
   batch_size: 1000

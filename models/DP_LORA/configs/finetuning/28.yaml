@@ -46,11 +46,10 @@ model:
         image_size: 14
         in_channels: 3
         out_channels: 3
-        model_channels: 32
+        model_channels: 64
         attention_resolutions:
         - 1
         - 2
-        - 4
         channel_mult:
         - 1
         - 2

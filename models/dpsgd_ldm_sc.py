@@ -128,7 +128,7 @@ class DP_LDM(DPSynther):
             'data.params.train.target={}'.format(data_target),
             'data.params.validation.target={}'.format(data_target),
             'model.params.output_file={}'.format(os.path.join(os.path.dirname(os.path.dirname(logdir)), 'stdout.txt')),
-            'model.params.unet_config.params.attention_resolutions={}'.format([i**2 for i in range(len(self.config.model.network.attn_resolutions))]),
+            'model.params.unet_config.params.attention_resolutions={}'.format([2**i for i in range(len(self.config.model.network.attn_resolutions))]),
             'model.params.unet_config.params.channel_mult={}'.format(self.config.model.network.ch_mult),
             'model.params.unet_config.params.model_channels={}'.format(self.config.model.network.nf),
             'data.params.batch_size={}'.format(config.batch_size), 
@@ -145,6 +145,7 @@ class DP_LDM(DPSynther):
             'data.params.train.params.specific_class={}'.format(specific_class),
             'data.params.validation.params.specific_class={}'.format(specific_class),
             ]]
+        print(scripts)
         
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(execute, script) for script in scripts]
@@ -174,7 +175,7 @@ class DP_LDM(DPSynther):
             '--base', config_path, 
             '--gpus', gpu_ids, 
             '--accelerator', 'gpu', 
-            'model.params.unet_config.params.attention_resolutions={}'.format([i**2 for i in range(len(self.config.model.network.attn_resolutions))]),
+            'model.params.unet_config.params.attention_resolutions={}'.format([2**i for i in range(len(self.config.model.network.attn_resolutions))]),
             'model.params.unet_config.params.channel_mult={}'.format(self.config.model.network.ch_mult),
             'model.params.unet_config.params.model_channels={}'.format(self.config.model.network.nf),
             'model.params.output_file={}'.format(os.path.join(os.path.dirname(config.log_dir), 'stdout.txt')),
