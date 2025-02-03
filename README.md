@@ -260,7 +260,7 @@ python run.py setup.n_gpus_per_node=4 --method PDP-Diffusion --data_name mnist_2
 
 > [!Note]
 >
-> It is noted that the default resolution for pretraining is 28x28 when --data_name is set to `mnist_28` or `fmnist_28`, but 32x32 for other datasets. 
+> It is noted that the default resolution for pretraining is 28x28 when --data_name is set to `mnist_28` or `fmnist_28`, but 32x32 for other datasets. we provide synthetic images for `celeba` in resolutions of 64x64 and 128x128 as follows.
 
 
 The results presented in Table 9, which explore synthetic images at different resolutions for `celeba`, are obtained by following the instructions below.
