@@ -145,7 +145,6 @@ class DP_LDM(DPSynther):
             'data.params.train.params.specific_class={}'.format(specific_class),
             'data.params.validation.params.specific_class={}'.format(specific_class),
             ]]
-        print(scripts)
         
         with ProcessPoolExecutor() as executor:
             futures = [executor.submit(execute, script) for script in scripts]

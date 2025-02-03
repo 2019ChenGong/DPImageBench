@@ -46,7 +46,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-
 - [ ] Structure: unify the output files; add notes
 
 - [ ] DPLDM places365 pretraining
