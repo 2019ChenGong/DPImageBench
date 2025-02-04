@@ -208,7 +208,10 @@ class DP_LORA(DPSynther):
             '--ckpt_path', os.path.join(self.config.train.log_dir, 'checkpoints', 'last.ckpt'), 
             '--num_samples', str(config.data_num), 
             '--num_classes', str(self.config.sensitive_data.n_classes), 
-            '--batch_size', str(config.batch_size)
+            '--batch_size', str(config.batch_size),
+            'model.params.unet_config.params.attention_resolutions={}'.format([2**i for i in range(len(self.config.model.network.attn_resolutions))]),
+            'model.params.unet_config.params.channel_mult={}'.format(self.config.model.network.ch_mult),
+            'model.params.unet_config.params.model_channels={}'.format(self.config.model.network.nf),
             ]]
         
         with ProcessPoolExecutor() as executor:

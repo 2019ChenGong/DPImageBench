@@ -42,7 +42,6 @@ def train(net, loader, optimizer, device):
         correct += predicted.eq(targets).sum().item()
         if device == 0:
             print(loss.item())
-        break
     return correct/total
 
 
@@ -82,7 +81,7 @@ def train_classifier(model, config):
     if rank == 0:
         logging.info("Training Semantic Query Function")
     img_size = 32
-    max_epoch = 1
+    max_epoch = 100
     lr = 1e-2
     batch_size = 2048
     val_batch_size = 8192

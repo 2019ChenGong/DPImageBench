@@ -18,14 +18,12 @@ def plot_con_uncon_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
 
     ax.barh(y[diff<0], data2[::-1][diff<0], label=label2, color='#FABB6E', zorder=1)
     ax.barh(y[diff>=0], data2[::-1][diff>=0], color='#FABB6E', zorder=2)
-    ax.legend(fontsize=11)
     if yticks:
-        ax.set_yticks(range(len(data2)), methods[::-1], fontsize=12)
+        ax.set_yticks(range(len(data2)), methods[::-1], fontsize=14)
     else:
         ax.set_yticks([])
     ax.set_xlabel(xlabel, fontsize=14)
-    ax.set_xticks([0.0,20.0,40.0,60.0,80.0,100.0]) 
-    ax.tick_params(axis='both', which='major', labelsize=12)
+    ax.tick_params(axis='both', which='major', labelsize=14)
 
     x_max = np.where(data1>data2, data1, data2)
     diff = diff[::-1]
@@ -36,7 +34,7 @@ def plot_con_uncon_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
         improve = str(round(improve, 1))
         if improve[0] != '-':
             improve = '+' + improve
-        ax.text(x, y, str(improve), fontsize=12)
+        ax.text(x, y, str(improve), fontsize=14)
 
 def plot_pre_nonpre_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
     diff = data1 - data2
@@ -50,12 +48,12 @@ def plot_pre_nonpre_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
     ax.barh(y[diff>=0], data2[::-1][diff>=0], color='#129ECC', zorder=2)
     ax.legend(fontsize=11)
     if yticks:
-        ax.set_yticks(range(len(data2)), methods[::-1], fontsize=13)
+        ax.set_yticks(range(len(data2)), methods[::-1], fontsize=14)
     else:
         ax.set_yticks([])
     ax.set_xlabel(xlabel, fontsize=14)
     ax.set_xticks([0.0,20.0,40.0,60.0,80.0, 100.0]) 
-    ax.tick_params(axis='both', which='major', labelsize=13)
+    ax.tick_params(axis='both', which='major', labelsize=14)
 
     x_max = np.where(data1>data2, data1, data2)
     diff = diff[::-1]
@@ -66,7 +64,7 @@ def plot_pre_nonpre_fig(ax, data1, label1, data2, label2, xlabel, yticks=True):
         improve = str(round(improve, 1))
         if improve[0] != '-':
             improve = '+' + improve
-        ax.text(x, y, str(improve), fontsize=12)
+        ax.text(x, y, str(improve), fontsize=14)
     
 
 fig = plt.figure(figsize=(10.5, 5.0))
@@ -92,14 +90,17 @@ fig.savefig("fmnist_wo_pretrain.pdf", bbox_inches='tight')
 fig.clf()
 axs = fig.subplots(1, 2)
 
-accs_condi = np.array([26.1, 20.0, 24.0, 20.1, 32.1, 70.1, 69.9, 64.8, 77.2, 78.4])
-accs_uncondi = np.array([71.2, 66.6, 77.1, 62.1, 71.1, 85.4, 81.6, 86.3, 83.8, 87.1])
+accs_condi = np.array([71.2, 66.6, 77.1, 62.1, 71.1, 85.4, 81.6, 86.3, 83.8, 87.1])
+accs_uncondi = np.array([62.6, 56.3, 75.4, 61.4, 20.1, 84.3, 74.2, 84.6, 83.6, 79.5])
 
-flds_condi = np.array([26.0, 46.4, 18.0, 24.0, 33.6, 8.8, 81.7, 48.8, 29.4, 5.3])
-flds_uncondi = np.array([24.6, 49.2, 18.5, 22.5, 39.5, 8.6, 81.7, 48.8, 20.4, 5.2])
+flds_condi = np.array([27.3, 36.2, 17.7, 28.7, 21.8, 4.9, 11.7, 15.4, 14.8, 4.3])
+flds_uncondi = np.array([30.6, 42.2, 19.4, 34.3, 67.4, 5.5, 14.6, 17.5, 14.0, 6.1 ])
 
 plot_con_uncon_fig(axs[0], accs_condi, 'cond.', accs_uncondi, 'uncond.', 'Acc (%)')
+axs[0].set_xticks([0.0,20.0,40.0,60.0,80.0,100.0]) 
 plot_con_uncon_fig(axs[1], flds_condi, 'cond.', flds_uncondi, 'uncond.', 'FLD', yticks=False)
+axs[1].legend(fontsize=11)
+axs[1].set_xticks([0.0,20.0,40.0,60.0,80.0])
 
 fig.subplots_adjust(wspace=0.07, hspace=0.3)
 
