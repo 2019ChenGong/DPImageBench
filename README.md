@@ -48,8 +48,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Structure: unify the output files; add notes
 
-- [x] DPLDM places365 pretraining
-
 - [x] Privimage automatically edit the semantic selective classifier.
 
 
