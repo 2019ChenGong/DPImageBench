@@ -704,6 +704,7 @@ Fidelity evaluations of synthetic Camelyon images under eps = 10.0.
 | PrivImage     | 10.1   | 2.17   | 0.50   | 0.71   | -4.76  | -1.88  |
 
 
+
 ## 7. Contacts
 If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
 
