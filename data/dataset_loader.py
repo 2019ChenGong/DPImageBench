@@ -43,7 +43,7 @@ def load_sensitive_data(config):
         torch.manual_seed(0)
         sensitive_train_set, sensitive_val_set = random_split(sensitive_train_set, [train_size, val_size])
         sensitive_val_loader = torch.utils.data.DataLoader(dataset=sensitive_val_set, shuffle=False, drop_last=False, batch_size=config.eval.batch_size)
-        print(len(sensitive_train_set), len(sensitive_val_set))
+        logging.info("train size: {} val size: {}".format(len(sensitive_train_set), len(sensitive_val_set)))
     else:
         sensitive_val_set = None
         sensitive_val_loader = None
@@ -85,8 +85,7 @@ def semantic_query(sensitive_train_loader, config):
     semantics_hist = torch.zeros((config.sensitive_data.n_classes, config.public_data.n_classes)).to(config.setup.local_rank)
 
     num_words = int(config.public_data.n_classes * config.public_data.selective.ratio / config.sensitive_data.n_classes)
-    print(config.public_data.n_classes, config.public_data.selective.ratio, config.sensitive_data.n_classes)
-    print(num_words)
+    config.train.dp.privacy_history = [[config.public_data.selective.sigma, 1.0, 1]]
 
     with torch.no_grad():
         for (x, y) in sensitive_loader:
@@ -152,7 +151,7 @@ def load_data(config):
                 specific_class = torch.load(config.public_data.selective.semantic_path)
                 logging.info(specific_class)
             except:
-                specific_class = semantic_query(sensitive_train_loader, config)
+                specific_class, config = semantic_query(sensitive_train_loader, config)
         if config.public_data.name == "imagenet":
             public_train_set = SpecificClassImagenet(root=config.public_data.train_path, specific_class=specific_class, transform=trans, split="train")
         elif config.public_data.name == "places365":
