@@ -75,17 +75,18 @@ def semantic_query(sensitive_train_loader, config):
     model = MyClassifier()
     model = model.to(config.setup.local_rank)
 
-    if config.public_data.selective.model_path is None:
-        if os.path.exists('models/pretrained_models/{}_classifier_ckpt.pth'.format(config.public_data.name)):
-            model_path = 'models/pretrained_models/{}_classifier_ckpt.pth'.format(config.public_data.name)
-        else:
-            model_path = train_classifier(model, config)
+    if os.path.exists('models/pretrained_models/{}_classifier_ckpt.pth'.format(config.public_data.name)):
+        model_path = 'models/pretrained_models/{}_classifier_ckpt.pth'.format(config.public_data.name)
     else:
-        model_path = config.public_data.selective.model_path
+        model_path = train_classifier(model, config)
     load_weight(model, model_path)
     model.eval()
 
     semantics_hist = torch.zeros((config.sensitive_data.n_classes, config.public_data.n_classes)).to(config.setup.local_rank)
+
+    num_words = int(config.public_data.n_classes * config.public_data.selective.ratio / config.sensitive_data.n_classes)
+    print(config.public_data.n_classes, config.public_data.selective.ratio, config.sensitive_data.n_classes)
+    print(num_words)
 
     with torch.no_grad():
         for (x, y) in sensitive_loader:
@@ -96,13 +97,13 @@ def semantic_query(sensitive_train_loader, config):
             x = x.to(config.setup.local_rank) * 2. - 1.
             y = y.to(config.setup.local_rank).long()
             out = model(x)
-            words_idx = torch.topk(out, k=config.public_data.selective.num_words, dim=1)[1]
+            words_idx = torch.topk(out, k=num_words, dim=1)[1]
             for i in range(x.shape[0]):
                 cls = y[i]
                 words = words_idx[i]
                 semantics_hist[cls, words] += 1
 
-    sensitivity = np.sqrt(config.public_data.selective.num_words)
+    sensitivity = np.sqrt(num_words)
     torch.manual_seed(0)
     semantics_hist = semantics_hist + torch.randn_like(semantics_hist) * sensitivity * config.public_data.selective.sigma
     
@@ -111,7 +112,7 @@ def semantic_query(sensitive_train_loader, config):
         semantics_hist_i = semantics_hist[i]
         if i != 0:
             semantics_hist_i[topk_mask] = -999
-        semantics_description_i = torch.topk(semantics_hist_i, k=config.public_data.selective.num_words)[1]
+        semantics_description_i = torch.topk(semantics_hist_i, k=num_words)[1]
         if i == 0:
             topk_mask = semantics_description_i
         else:

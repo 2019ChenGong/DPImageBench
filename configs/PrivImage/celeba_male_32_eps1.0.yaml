@@ -15,11 +15,9 @@ public_data:
   n_classes: 1000
   train_path: dataset/imagenet/imagenet_32
   selective:
-    ratio: 0.01
-    num_words: 10
+    ratio: 0.05
     sigma: 500
     batch_size: 1000
-    model_path: models/pretrained_models/imagenet_classifier_0.454_ckpt.pth
 sensitive_data:
   name: celeba_male_32
   num_channels: 3
