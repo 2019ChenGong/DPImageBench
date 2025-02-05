@@ -49,8 +49,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Structure: unify the output files; add notes
 
-- [x] Privimage automatically edit the semantic selective classifier.
-
+- [ ] Places365 output
 
 ## 2. Introduction
 
