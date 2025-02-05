@@ -35,8 +35,9 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
       - [4.4.2 Results Explanation](#442-results-explanation)
     - [4.5 Results Visualization](#45-results-visualization)
   - [5. Customization](#5-customization)
-  - [6. Contacts](#6-contacts)
-  - [7. Citation](#7-citation)
+  - [6. Main Results](#6-main-results)
+  - [7. Contacts](#7-contacts)
+  - [8. Citation](#8-citation)
   - [Acknowledgment](#acknowledgement)
 
 ### Updates 
@@ -562,10 +563,12 @@ python run.py setup.n_gpus_per_node=4 --method PrivImage --epsilon 10.0 --data_n
 
 Other processes are the same.
 
-## 6. Contacts
+## 6. Main Results
+
+## 7. Contacts
 If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
 
-## 7. Citation
+## 8. Citation
 
 ```text
 @article{dpimagebench,
