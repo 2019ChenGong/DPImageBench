@@ -49,8 +49,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 - [ ] Structure: unify the output files; add notes
 
-- [ ] Places365 output
-
 ## 2. Introduction
 
 ### 2.1 Currently Supported Algorithms
