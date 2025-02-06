@@ -7,7 +7,7 @@ import os
 
 class SpecificClassPlaces365(Dataset):
     def __init__(self, original_dataset, specific_class):
-        print(specific_class)
+        # print(specific_class)
         self.original_dataset = original_dataset
         self.targets = []
         self.indices = []
@@ -17,7 +17,7 @@ class SpecificClassPlaces365(Dataset):
             for public_cls in specific_class[sensitive_cls]:
                 selected_classes.append(public_cls)
                 public_to_sensitive[int(public_cls)] = int(sensitive_cls)
-        print(selected_classes)
+        # print(selected_classes)
         for i, label in enumerate(original_dataset.targets):
             if label in selected_classes:
                 self.targets.append(public_to_sensitive[label])

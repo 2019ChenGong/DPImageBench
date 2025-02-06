@@ -122,7 +122,7 @@ def semantic_query(sensitive_train_loader, config):
         logging.info(cls_dict)
     del model
     torch.cuda.empty_cache()
-    return cls_dict
+    return cls_dict, config
 
 
 def load_data(config):
