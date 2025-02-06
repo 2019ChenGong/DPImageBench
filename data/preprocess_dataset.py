@@ -31,6 +31,7 @@ from data.stylegan3.dataset import ImageFolderDataset
 import os
 from PIL import Image
 
+# resize images into the needed resolution
 def resize_images(source_dir, target_dir, size=(32, 32)):
 
     for root, dirs, files in os.walk(source_dir):
@@ -158,6 +159,7 @@ def open_dest(dest: str) -> Tuple[str, Callable[[str, Union[bytes, str]], None],
                 fout.write(data)
         return dest, folder_write_bytes, lambda: None
 
+# preprocess and save the images
 def data_save(data_loader, num_files, transform_image, archive_root_dir, save_bytes, close_dest):
     labels = []
     for idx, (image, label) in tqdm(enumerate(data_loader), total=num_files):
@@ -254,11 +256,7 @@ def fid_save(fid_path, dataset, batch_size):
     np.savez(fid_path, mu=mu, sigma=sigma)
 
 def main(config):
-    for data_name in config.data_name:
-        # if data_name in ["mnist", "fmnist"]:
-        #     config.c = 1
-        #     config.resolution = 28
-        
+    for data_name in config.data_name:   
         train_name = "train_{}".format(config.resolution)
         test_name = "test_{}".format(config.resolution)
         fid_name = "fid_stats_{}".format(config.resolution)
@@ -333,21 +331,23 @@ def main(config):
         data_save(sensitive_test_loader, max_idx, transform_image, archive_root_dir, save_bytes, close_dest)
 
         dataset = ImageFolderDataset(os.path.join(data_dir, train_name + '.zip'))
+
+        # calculate the feature of training image for FID metric
         fid_save(os.path.join(data_dir, fid_name + '.npz'), dataset, config.fid_batch_size)
     
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_name', nargs="*", default=["mnist", "fmnist", "cifar10", "cifar100", "celeba", "camelyon", "imagenet", "places365", "emnist"])
-    parser.add_argument('--resolution', default=32, type=int)
-    parser.add_argument('--c', default=3, type=int)
-    parser.add_argument('--fid_batch_size', default=500, type=int)
-    parser.add_argument('--data_dir', default='../dataset')
-    parser.add_argument('--transform', default="center-crop")
-    parser.add_argument('--celeba_attr', default="Male")
-    parser.add_argument('--max_image', default=None, type=int)
-    parser.add_argument('--train_path', default='')
-    parser.add_argument('--test_path', default='')
+    parser.add_argument('--data_name', nargs="*", default=["mnist", "fmnist", "cifar10", "cifar100", "celeba", "camelyon", "imagenet", "places365", "emnist"], help='List of datasets to use. Default is all provided datasets.')
+    parser.add_argument('--resolution', default=32, type=int, help='Resolution of the images. Default is 32.')
+    parser.add_argument('--c', default=3, type=int, help='Number of color channels in the images. Default is 3 (RGB).')
+    parser.add_argument('--fid_batch_size', default=500, type=int, help='Batch size for FID calculation. Default is 500.')
+    parser.add_argument('--data_dir', default='../dataset', help='Directory where the datasets are stored. Default is ../dataset.')
+    parser.add_argument('--transform', default="center-crop", help='Type of transform to apply to the data. Default is center-crop.')
+    parser.add_argument('--celeba_attr', default="Male", help='Attribute to filter CelebA dataset. Default is Male.')
+    parser.add_argument('--max_image', default=None, type=int, help='Maximum number of images to load. Default is None (load all).')
+    parser.add_argument('--train_path', default='', help='Path to the custom training set. Leave empty if using default datasets.')
+    parser.add_argument('--test_path', default='', help='Path to the custom test set. Leave empty if using default datasets.')
     config = parser.parse_args()
     main(config)

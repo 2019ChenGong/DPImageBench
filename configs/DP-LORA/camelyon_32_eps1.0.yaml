@@ -59,7 +59,7 @@ train:
     delta: 1e-5
     epsilon: 1.0
     max_physical_batch_size: 8192
-  n_splits: 8
+  n_splits: 32
 gen:
   data_num: 60000
   batch_size: 1000

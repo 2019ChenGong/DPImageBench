@@ -17,15 +17,13 @@ from models.PrivImage import resnet
 from models.PrivImage.classifer_trainer import train_classifier
 
 def load_sensitive_data(config):    
-    # sensitive_train_set = ImageFolderDataset(
-    #         config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
-    
     sensitive_train_set = ImageFolderDataset(
             config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
     sensitive_test_set = ImageFolderDataset(
             config.sensitive_data.test_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
     
     if config.eval.mode == "val":
+        # split the sensitive dataset into training set and validation set
         if "mnist" in config.sensitive_data.name:
             train_size = 55000
         elif "cifar" in config.sensitive_data.name:
@@ -71,7 +69,8 @@ def semantic_query(sensitive_train_loader, config):
 
         def forward(self, x):
             return self.model(x)
-        
+    
+    # load semantic query function
     model = MyClassifier()
     model = model.to(config.setup.local_rank)
 
@@ -82,6 +81,7 @@ def semantic_query(sensitive_train_loader, config):
     load_weight(model, model_path)
     model.eval()
 
+    # query semantic distribution
     semantics_hist = torch.zeros((config.sensitive_data.n_classes, config.public_data.n_classes)).to(config.setup.local_rank)
 
     num_words = int(config.public_data.n_classes * config.public_data.selective.ratio / config.sensitive_data.n_classes)
@@ -118,14 +118,13 @@ def semantic_query(sensitive_train_loader, config):
             topk_mask = torch.cat([topk_mask, semantics_description_i])
         cls_dict[i] = list(semantics_description_i.detach().cpu().numpy())
             
-    if config.setup.global_rank == 0:
-        logging.info(cls_dict)
     del model
     torch.cuda.empty_cache()
     return cls_dict, config
 
 
 def load_data(config):
+    # load sensitive dataset
     sensitive_train_loader, sensitive_val_loader, sensitive_test_loader = load_sensitive_data(config)
     N = len(sensitive_train_loader.dataset)
     config.train.dp.delta = float(1.0 / (N * np.log(N)))
@@ -133,6 +132,7 @@ def load_data(config):
     if config.setup.global_rank == 0:
         logging.info("delta is reset as {}".format(config.train.dp.delta))
 
+    # load public dataset
     if config.public_data.name is None:
         public_train_loader = None
     else:
@@ -144,6 +144,8 @@ def load_data(config):
         if config.public_data.num_channels == 1:
             trans = [transforms.Grayscale(num_output_channels=1)] + trans
         trans = transforms.Compose(trans)
+
+        # whether to select the public data
         if config.public_data.selective.ratio == 1.0:
             specific_class = None
         else:
