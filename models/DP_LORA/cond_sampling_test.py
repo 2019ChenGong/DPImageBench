@@ -44,9 +44,15 @@ def main():
     parser.add_argument("-bs", "--batch_size", type=int, default=500, help="mini batch size of sampling (to avoid cuda out of memory, change to a smaller value if needed)")
     parser.add_argument("--save_path", type=str, default='.', help="load the checkpoint from the specified path")
 
-    args = parser.parse_args()
+    # args = parser.parse_args()
 
-    config = OmegaConf.load(args.yaml)
+    args, unknown = parser.parse_known_args()
+
+    configs = [OmegaConf.load(args.yaml)]
+    cli = OmegaConf.from_dotlist(unknown)
+    config = OmegaConf.merge(*configs, cli)
+
+    # config = OmegaConf.load(args.yaml)
     config.model.params.cond_stage_config.params.n_classes = args.num_classes
     model = load_model_from_config(config, args.ckpt_path)
     ddim_steps = args.ddim_step

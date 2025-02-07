@@ -30,29 +30,50 @@ from evaluation.classifier.resnext import ResNeXt
 class Evaluator(object):
     def __init__(self, config):
 
+        
+        # Set the computing device. Use GPU if available, otherwise use CPU.
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+        # Store the path for the statistics of sensitive data.
         self.sensitive_stats_path = config.sensitive_data.fid_stats
+
+        # List of models used for evaluation.
         self.acc_models = ["resnet", "wrn", "resnext"]
+
+        # Save the configuration.
         self.config = config
+
+        # Save the local rank for distributed settings.
         self.local_rank = config.setup.local_rank
+
+        # Clear the GPU cache to free memory.
         torch.cuda.empty_cache()
     
     def eval(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader):
+        
+        # Proceed only if this is the main process and a test loader is provided.
         if self.config.setup.global_rank != 0 or sensitive_test_loader is None:
             return
+        
+        # Check if the synthetic images have the expected resolution.
         if synthetic_images.shape[-1] != self.config.sensitive_data.resolution:
             synthetic_images = F.interpolate(torch.from_numpy(synthetic_images), size=[self.config.sensitive_data.resolution, self.config.sensitive_data.resolution]).numpy()
+
+        # If the images are in color but only one channel is expected, convert to grayscale.
         if synthetic_images.shape[1] == 3 and self.config.sensitive_data.num_channels == 1:
             synthetic_images = 0.299 * synthetic_images[:, 2:, ...] + 0.587 * synthetic_images[:, 1:2, ...] + 0.114 * synthetic_images[:, :1, ...]
 
         acc_list = []
 
+        # If the image resolution is greater than 32, use only the first two models.
         if synthetic_images.shape[-1] > 32:
             self.acc_models = self.acc_models[:2]
 
+        # Loop over each model and compute accuracy metrics.
         for model_name in self.acc_models:
-            acc, test_acc_on_val, test_acc_on_test, best_noisy_acc, best_test_acc_on_noisy_val = self.cal_acc_2(model_name, synthetic_images, synthetic_labels, sensitive_val_loader, sensitive_test_loader)
+            acc, test_acc_on_val, test_acc_on_test, best_noisy_acc, best_test_acc_on_noisy_val = self.cal_acc(model_name, synthetic_images, synthetic_labels, sensitive_val_loader, sensitive_test_loader)
+            
+            # Log the accuracy results.
             if sensitive_val_loader is not None:
                 logging.info("The best acc of synthetic images on sensitive val and the corresponding acc on test dataset from {} is {} and {}".format(model_name, acc, test_acc_on_val))
                 logging.info("The best acc of synthetic images on noisy sensitive val and the corresponding acc on test dataset from {} is {} and {}".format(model_name, acc, test_acc_on_val))
@@ -71,8 +92,9 @@ class Evaluator(object):
         
         logging.info(f"The average and std of accuracy of synthetic images are {acc_mean:.2f} and {acc_std:.2f}")
 
-        # fid, is_mean = self.visual_metric(synthetic_images)
         torch.cuda.empty_cache()
+
+        # Calculate visual metrics: FID, Inception Score, FLD, precision, recall, and ImageReward.
         fid, is_mean, fld, p, r, ir = self.visual_metric(synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader)
         logging.info("The FID of synthetic images is {}".format(fid))
         logging.info("The Inception Score of synthetic images is {}".format(is_mean))
@@ -81,14 +103,19 @@ class Evaluator(object):
         logging.info("The ImageReward of synthetic images is {}".format(ir))
 
     def eval_fidelity(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader):
+
+        # Proceed only if this is the main process and a test loader is provided.
         if str(self.device) != 'cuda:0' or sensitive_test_loader is None:
             return
+        
+        # Check if the synthetic images have the expected resolution.
         if synthetic_images.shape[-1] != self.config.sensitive_data.resolution:
             synthetic_images = F.interpolate(torch.from_numpy(synthetic_images), size=[self.config.sensitive_data.resolution, self.config.sensitive_data.resolution]).numpy()
+        
+        # If the images are in color but only one channel is expected, convert to grayscale.
         if synthetic_images.shape[1] == 3 and self.config.sensitive_data.num_channels == 1:
             synthetic_images = 0.299 * synthetic_images[:, 2:, ...] + 0.587 * synthetic_images[:, 1:2, ...] + 0.114 * synthetic_images[:, :1, ...]
         
-        # fid, is_mean = self.visual_metric(synthetic_images)
         fid, is_mean, fld, p, r, ir = self.visual_metric(synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader)
         logging.info("The FID of synthetic images is {}".format(fid))
         logging.info("The Inception Score of synthetic images is {}".format(is_mean))
@@ -99,44 +126,65 @@ class Evaluator(object):
         return fid, is_mean, p, r, fld, ir
     
     def visual_metric(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_test_loader):
+
+        # Create an inception-based feature extractor. The save_path is based on the dataset name and resolution.
         feature_extractor = InceptionFeatureExtractor(save_path="dataset/{}_{}/".format(self.config.sensitive_data.name, self.config.sensitive_data.resolution))
         fc_layer = fid_inception_v3().fc
         fc_layer.eval()
 
         gen_images = torch.from_numpy(synthetic_images)
+
+        # If the images have one channel, replicate it to create three channels.
         if gen_images.shape[1] == 1:
             gen_images = gen_images.repeat(1, 3, 1, 1)
+        
+        # Extract features from the synthetic images using the feature extractor.
         gen_feat = feature_extractor.get_tensor_features(gen_images)
+
+        # Compute logits from the features without tracking gradients.
         with torch.no_grad():
             gen_logit = fc_layer(gen_feat).detach().cpu().numpy()
             gen_logit = np.exp(gen_logit) / np.sum(np.exp(gen_logit), 1, keepdims=True)
 
+        # Try to obtain train and test features with a placeholder tensor.
         try:
             train_feat = feature_extractor.get_tensor_features(torch.tensor([0]), name="train")
             test_feat = feature_extractor.get_tensor_features(torch.tensor([0]), name="test")
         except:
+        # If the placeholder method fails, load images from the sensitive loaders.
             train_images = []
             test_images = []
             for x, _ in sensitive_train_loader:
                 train_images.append(x.float())
             for x, _ in sensitive_test_loader:
                 test_images.append(x.float())
+
+            # Concatenate the loaded images into tensors.
             train_images = torch.cat(train_images)
             test_images = torch.cat(test_images)
+
+            # If the images have one channel, replicate it to get three channels.
             if train_images.shape[1] == 1:
                 train_images = train_images.repeat(1, 3, 1, 1)
                 test_images = test_images.repeat(1, 3, 1, 1)
             
+            # Extract features from the train and test images.
             train_feat = feature_extractor.get_tensor_features(train_images, name="train")
             test_feat = feature_extractor.get_tensor_features(test_images, name="test")
-        # print(train_feat.shape, test_feat.shape, gen_feat.shape)
 
+        # Determine the number of unique classes in the synthetic labels.
         num_classes = len(set(synthetic_labels))
+
+        # Load the image reward model.
         rm_model = RM.load("ImageReward-v1.0")
         ir = 0
         prompt = get_prompt(self.config.sensitive_data.name)
+
+        # Compute the image reward score for each class without tracking gradients.
         with torch.no_grad():
             for cls in range(num_classes):
+
+                # Select images for the current class, scale to 0-255, and convert to unsigned 8-bit integers.
                 imgs = (synthetic_images[synthetic_labels==cls] * 255.).astype('uint8')
                 imgs = np.transpose(imgs, (0, 2, 3, 1))
                 if imgs.shape[-1] == 1:
@@ -144,6 +192,7 @@ class Evaluator(object):
                 imgs = [Image.fromarray(img) for img in imgs]
                 score = rm_model.score(prompt[cls], imgs)
                 ir += np.sum(score)
+        
         ir /= len(synthetic_images)
 
         is_mean, _ = compute_inception_score_from_logits(gen_logit)
@@ -154,13 +203,15 @@ class Evaluator(object):
 
         return fid, is_mean, fld, p, r, ir
     
-    def cal_acc_2(self, model_name, synthetic_images, synthetic_labels, sensitive_val_loader, sensitive_test_loader):
-        # Fixed seed for better reproducibility
+    def cal_acc(self, model_name, synthetic_images, synthetic_labels, sensitive_val_loader, sensitive_test_loader):
+
+        # Set a fixed random seed and shuffle the synthetic images and labels.
         rng = np.random.default_rng(seed=0)
         indices = rng.permutation(len(synthetic_images))
         synthetic_images = synthetic_images[indices]
         synthetic_labels = synthetic_labels[indices]
 
+        # Split the shuffled data into a training set and a validation set.
         synthetic_images_train, synthetic_images_val = synthetic_images[:55000], synthetic_images[55000:]
         synthetic_labels_train, synthetic_labels_val = synthetic_labels[:55000], synthetic_labels[55000:]
     
@@ -196,7 +247,6 @@ class Evaluator(object):
             elif model_name == "resnext":
                 model = ResNeXt(in_c=synthetic_images.shape[1], img_size=synthetic_images.shape[2], num_classes=num_classes, dropRate=0.3)
 
-            # optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4) 
             optimizer = optim.Adam(model.parameters(), lr=0.01)       
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.2)
 
@@ -274,12 +324,9 @@ class Evaluator(object):
                     _, predicted = outputs.max(1)
                     val_total += targets.size(0)
                     val_correct += predicted.eq(targets).sum().item()
-
             
-            # print(val_total)
             val_acc = val_correct / val_total * 100
             val_loss = test_loss / val_total * batch_size
-
 
             test_total = 0
             test_correct = 0
@@ -303,6 +350,7 @@ class Evaluator(object):
 
             logging.info("Epoch: {} Train acc: {} Val acc: {} Test acc{}; Train loss: {} Val loss: {}".format(epoch, train_acc, val_acc, test_acc, train_loss, val_loss))
 
+            # If a sensitive validation loader is used, add Laplace noise for differential privacy.
             if sensitive_val:
                 noisy_val_correct = val_correct + np.random.laplace(loc=0, scale=1/self.config.train.dp.epsilon)
                 if noisy_val_correct >= best_noisy_correct:
@@ -320,9 +368,9 @@ class Evaluator(object):
             if test_acc >= best_test_acc_on_test:
                 best_test_acc_on_test = test_acc
             
+            # Restore the original model parameters from EMA.
             ema.restore(model.parameters())
         
-
         return best_acc, best_test_acc_on_val, best_test_acc_on_test, best_noisy_acc, best_test_acc_on_noisy_val
     
     def cal_acc_no_dp(self, sensitive_train_loader, sensitive_test_loader):
@@ -375,7 +423,6 @@ class Evaluator(object):
 
                 
                 optimizer = optim.Adam(model.parameters(), lr=0.01)
-                # optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)        
                 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.2)
 
 
@@ -450,19 +497,25 @@ class Evaluator(object):
 
 
 def compute_inception_score_from_logits(logits, splits=1):
+
     scores = []
+
     for i in range(splits):
         part = logits[(i * logits.shape[0] // splits):((i + 1) * logits.shape[0] // splits), :]
         py = np.mean(part, axis=0)
         kl = np.mean([entropy(part[i, :], py) for i in range(part.shape[0])])
         scores.append(np.exp(kl))
+
     return np.mean(scores), np.std(scores)
 
 def get_prompt(data_name: str):
+
     if data_name.startswith("mnist"):
         return ["A grayscale image of a handwritten digit 0", "A grayscale image of a handwritten digit 1", "an image of hand-written 2", "an image of hand-written 3", "an image of hand-written 4", "an image of hand-written 5", "an image of hand-written 6", "an image of hand-written 7", "an image of hand-written 8", "an image of hand-written 9"]
+    
     elif data_name.startswith("fmnist"):
         return ["A grayscale image of a T-shirt", "A grayscale image of a handwritten digit Trouser", "an image of hand-written Pullover", "an image of hand-written Dress", "an image of hand-written Coat", "an image of hand-written Sandal", "an image of hand-written Shirt", "an image of hand-written Sneaker", "an image of hand-written Bag", "an image of hand-written Ankle boot"]
+    
     elif data_name.startswith("cifar100"):
         cifar100_y = '''Superclass	Classes
         aquatic mammals	beaver, dolphin, otter, seal, whale
@@ -486,19 +539,26 @@ def get_prompt(data_name: str):
         vehicles 1	bicycle, bus, motorcycle, pickup truck, train
         vehicles 2	lawn-mower, rocket, streetcar, tank, tractor'''
         class_lins = cifar100_y.split("\n")
+
         prompt = []
+
         for line in class_lins[1:]:
             super_class, child_classes = line.split("\t")
             for child_class in child_classes.split(", "):
                 prompt.append("An image of {}".format(child_class))
         return prompt
+    
     elif data_name.startswith("cifar10"):
         return ["An image of an airplane", "An image of an automobile", "An image of a bird", "An image of a cat", "An image of a deer", "An image of a dog", "An image of a frog", "An image of a horse", "An image of a ship", "An image of a truck"]
+
     elif data_name.startswith("eurosat"):
         return ["A remote sensing image of an industrial area", "A remote sensing image of a residential area", "A remote sensing image of an annual crop area", "A remote sensing image of a permanent crop area", "A remote sensing image of a river area", "A remote sensing image of a sea or lake area", "A remote sensing image of a herbaceous veg. area", "A remote sensing image of a highway area", "A remote sensing image of a pasture area", "A remote sensing image of a forest area"]
+ 
     elif data_name.startswith("celeba_male"):
         return ["An image of a female face", "An image of a male face"]
+    
     elif data_name.startswith("camelyon"):
         return ["A normal lymph node image", "A lymph node histopathology image"]
+    
     else:
         raise NotImplementedError

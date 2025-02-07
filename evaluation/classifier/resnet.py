@@ -1,12 +1,4 @@
 from __future__ import absolute_import
-
-'''Resnet for cifar dataset.
-Ported form
-https://github.com/facebook/fb.resnet.torch
-and
-https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
-(c) YANG, Wei
-'''
 import torch.nn as nn
 import math
 
@@ -94,6 +86,7 @@ class ResNet(nn.Module):
 
     def __init__(self, depth=110, in_c=3, img_size=32, num_classes=1000, block_name='BasicBlock'):
         super(ResNet, self).__init__()
+
         # Model type specifies number of layers for CIFAR-10 model
         if block_name.lower() == 'basicblock':
             assert (depth - 2) % 6 == 0, 'When use basicblock, depth should be 6n+2, e.g. 20, 32, 44, 56, 110, 1202'

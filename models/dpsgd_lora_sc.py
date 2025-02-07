@@ -195,6 +195,7 @@ class DP_LORA(DPSynther):
                 except Exception as e:
                     logging.info(f"generated an exception: {e}")
 
+        self.config.model.ckpt = os.path.join(self.config.train.log_dir, 'checkpoints', 'last.ckpt')
 
     def generate(self, config):
         logging.info("start to generate {} samples".format(config.data_num))
@@ -205,7 +206,7 @@ class DP_LORA(DPSynther):
             'models/DP_LORA/cond_sampling_test.py', 
             '--save_path', config.log_dir, 
             '--yaml', self.config.train.config_path, 
-            '--ckpt_path', os.path.join(self.config.train.log_dir, 'checkpoints', 'last.ckpt'), 
+            '--ckpt_path', self.config.model.ckpt, 
             '--num_samples', str(config.data_num), 
             '--num_classes', str(self.config.sensitive_data.n_classes), 
             '--batch_size', str(config.batch_size),

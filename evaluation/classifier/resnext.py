@@ -1,11 +1,4 @@
 from __future__ import division
-""" 
-Creates a ResNeXt Model as defined in:
-Xie, S., Girshick, R., Dollar, P., Tu, Z., & He, K. (2016). 
-Aggregated residual transformations for deep neural networks. 
-arXiv preprint arXiv:1611.05431.
-import from https://github.com/prlz77/ResNeXt.pytorch/blob/master/models/model.py
-"""
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import init
