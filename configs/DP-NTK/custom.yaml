@@ -58,7 +58,7 @@ train:
   scheduler_interval: 2001
   log_interval: 100
   log_dir: null
-  n_splits: 1
+  n_splits: 8
   dp:
     epsilon: 10.0
     delta: 1e-5

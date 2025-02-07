@@ -38,6 +38,7 @@ model:
     d_conv_dim: 80
   private_num_classes: 100
   public_num_classes: 1000
+  ckpt: null
 pretrain:
   log_dir: null
   seed: 0
@@ -62,7 +63,6 @@ pretrain:
       beta1: 0.0
   cond: true
 train:
-  ckpt: null
   log_dir: null
   seed: 0
   batch_size: 4096
