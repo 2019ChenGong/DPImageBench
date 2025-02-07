@@ -16,7 +16,7 @@ from models.synthesizer import DPSynther
 def execute(script):
     script = ['null' if item is None else item.replace('None', 'null') for item in script]
     try:
-        python_path = '/u/fzv6en/anaconda3/envs/dpimagebench_cuda12.1/bin/python'
+        python_path = 'python'
         result = subprocess.run([python_path] + script, check=True, text=True, capture_output=True)
         return result.stdout
     except subprocess.CalledProcessError as e:

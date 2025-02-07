@@ -57,12 +57,10 @@ class PE(DPSynther):
     def __init__(self, config, device):
         super().__init__()
         api_class = get_api_class_from_name(config.api)
-        # self.api = api_class(**config.api_params)
         api_args = []
         for k in config.api_params:
             api_args.append('--' + k)
             api_args.append(str(config.api_params[k]))
-        # print(api_args)
         self.api = api_class.from_command_line_args(api_args)
         self.feature_extractor = config.feature_extractor
         self.samples = None
@@ -105,7 +103,6 @@ class PE(DPSynther):
             batch_size=config.feature_extractor_batch_size)
         logging.info(f'all_private_features.shape: {all_private_features.shape}')
 
-        # Generating initial samples.
         logging.info('Generating initial samples')
 
         labels = None
@@ -214,20 +211,6 @@ class PE(DPSynther):
                 size=config.image_size,
                 variation_degree=config.variation_degree_schedule[t])
             samples = np.squeeze(samples, axis=1)
-
-            # if args.compute_fid:
-            #     logging.info('Computing FID')
-            #     new_new_fid = compute_fid(
-            #         new_new_samples,
-            #         tmp_folder=args.tmp_folder,
-            #         num_fid_samples=args.num_fid_samples,
-            #         dataset_res=args.private_image_size,
-            #         dataset=args.fid_dataset_name,
-            #         dataset_split=args.fid_dataset_split,
-            #         model_name=args.fid_model_name,
-            #         batch_size=args.fid_batch_size)
-            #     logging.info(f'fid={new_new_fid}')
-            #     log_fid(args.result_folder, new_new_fid, t)
 
             if t == len(config.num_samples_schedule) - 1:
                 log_samples(
