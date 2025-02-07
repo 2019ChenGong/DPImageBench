@@ -93,11 +93,14 @@ DPImageBench/
 │   ├── PDP-Diffusion      
 │   ├── DP-LDM-SD
 │   ├── DP-LDM
+│   ├── DP-LORA
 │   ├── GS-WGAN
 │   └── PDP-Diffusion   
 ├── data/                       # Data Preparation for Our Benchmark
 │   ├── stylegan3
 │   ├── SpecificPlaces365.py
+│   ├── SpecificImagenet.py
+│   ├── SpecificEMNIST.py
 │   ├── dataset_loader.py
 │   └── preprocess_dataset.py 
 ├── dataset/                    # Datasets studied in the project
@@ -114,6 +117,8 @@ DPImageBench/
 ├── models/                     # Implementation framework for DP image synthesis algorithms
 │   ├── DP_Diffusion      
 │   ├── DP_GAN       
+│   ├── DP_LDM
+│   ├── DP_LORA     
 │   ├── DP_MERF
 │   ├── DP_NTK          
 │   ├── GS_WGAN       
@@ -121,8 +126,11 @@ DPImageBench/
 │   ├── PrivImage
 │   ├── dpsgd_diffusion.py
 │   ├── dpsgd_gan.py
+│   ├── dpsgd_ldm_sc.py
+│   ├── dpsgd_lora_sc.py
 │   ├── pretrained_models       # The pre-downloaed files for PE and PrivImage
-│   ├── model_loader.py           
+│   ├── model_loader.py  
+│   ├── pe.py          
 │   └── synthesizer.py  
 ├── opacus/                     # Implementation of DPSGD
 ├── plot/                       # Figures and plots in our paper
@@ -137,10 +145,12 @@ DPImageBench/
 │   ├── download_dataset.sh                          
 │   ├── eps_change.sh.                               
 │   ├── gan_size_change.sh                           
-│   ├── pdp_diffusion.sh                             
+│   ├── pdp_diffusion.sh            
+│   ├── rq1.sh 
+│   ├── rq3.sh                  
 │   └── test_classifier.py                                            
 ├── utils/                      # Helper classes and functions supporting various operations
-│   └── utils.py                     
+│   └── utils.py                    
 ├── README.md                   # Main project documentation
 └── requirements.txt            # Dependencies required for the project
 ```
@@ -362,6 +372,8 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsi
  model.Generator.g_conv_dim=120 \
  --exp_description 14M 
 ```
+
+We provide more implementation examples of edit the model size of synthesizers in the [scripts](./scripts/rq2.sh).
 
 #### For the implementation of the results reported in RQ3.
 
