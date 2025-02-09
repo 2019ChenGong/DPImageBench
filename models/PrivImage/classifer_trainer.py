@@ -77,9 +77,14 @@ class MyClassifier(nn.Module):
 
 
 def train_classifier(model, config):
+    # Get the local rank of the current process
     rank = config.setup.local_rank
+    
+    # Log training start message if this is the main process
     if rank == 0:
         logging.info("Training Semantic Query Function")
+    
+    # Set up training parameters
     img_size = 32
     max_epoch = 100
     lr = 1e-2
@@ -87,54 +92,86 @@ def train_classifier(model, config):
     val_batch_size = 8192
     num_workers = 8
 
+    # Adjust batch sizes and number of workers based on the global size
     batch_size = batch_size // config.setup.global_size
     val_batch_size = val_batch_size // config.setup.global_size
     num_workers = num_workers // config.setup.global_size
 
+    # Load the appropriate dataset based on the configuration
     if config.public_data.name == "imagenet":
-        train_dataset = SpecificClassImagenet(root=config.public_data.train_path, split="train", transform=transforms.Compose(
-        [transforms.RandomHorizontalFlip(),
-         transforms.ToTensor(),
-         transforms.Normalize([0.5] * 3, [0.5] * 3)
-         ]))
-        val_dataset = SpecificClassImagenet(root=config.public_data.train_path, split="val", transform=transforms.Compose(
-        [transforms.ToTensor(),
-         transforms.Normalize([0.5] * 3, [0.5] * 3)
-         ]))
+        # Define transformations for ImageNet dataset
+        train_transform = transforms.Compose([
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.5] * 3, [0.5] * 3)
+        ])
+        val_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize([0.5] * 3, [0.5] * 3)
+        ])
+        
+        # Load ImageNet dataset
+        train_dataset = SpecificClassImagenet(root=config.public_data.train_path, split="train", transform=train_transform)
+        val_dataset = SpecificClassImagenet(root=config.public_data.train_path, split="val", transform=val_transform)
+    
     elif config.public_data.name == "places365":
-        download = (not os.path.exists(os.path.join(config.public_data.train_path, "data_256_standard")))
-        public_train_set_ = torchvision.datasets.Places365(root=config.public_data.train_path, small=True, download=download, transform=trans)
-
-        dataset = Places365(root=config.public_data.train_path, small=True, transform=transforms.Compose(
-        [
-        transforms.Resize(32),
-        transforms.ToTensor(),
-         transforms.Normalize([0.5] * 3, [0.5] * 3)
-         ]))
+        # Check if the dataset needs to be downloaded
+        download = not os.path.exists(os.path.join(config.public_data.train_path, "data_256_standard"))
+        
+        # Load Places365 dataset
+        dataset = Places365(root=config.public_data.train_path, small=True, transform=transforms.Compose([
+            transforms.Resize(32),
+            transforms.ToTensor(),
+            transforms.Normalize([0.5] * 3, [0.5] * 3)
+        ]), download=download)
+        
+        # Split the dataset into training and validation sets
         train_size = int(len(dataset) * 0.9)
         val_size = len(dataset) - train_size
         train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
     
+    # Wrap the model with DistributedDataParallel for multi-GPU training
     model = DDP(model, device_ids=[rank])
+    
+    # Set up the optimizer and learning rate scheduler
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max_epoch)
+    
+    # Create data loaders for training and validation datasets
     train_loader = DataLoader(train_dataset, batch_size=batch_size, num_workers=num_workers, drop_last=True, sampler=DistributedSampler(train_dataset))
     val_loader = DataLoader(val_dataset, batch_size=val_batch_size, num_workers=num_workers, drop_last=False)
 
+    # Initialize the best accuracy
     best_acc = 0
+    
+    # Training loop
     for epoch in range(max_epoch):
+        # Set the epoch for the distributed sampler
         train_loader.sampler.set_epoch(epoch)
+        
+        # Train the model for one epoch
         train_acc = train(model, train_loader, optimizer, rank)
+        
+        # Log training accuracy if this is the main process
         if rank == 0 or True:
             logging.info('Epoch: {} Train Acc: {}'.format(epoch, train_acc))
-
+            
+            # Evaluate the model on the validation set
             val_acc = test(model, val_loader, rank)
             logging.info('Val Acc: {}'.format(val_acc))
+            
+            # Save the model if it achieves the best validation accuracy
             if val_acc > best_acc:
                 logging.info('Saving..')
                 torch.save(model.state_dict(), 'models/pretrained_models/{}_classifier_ckpt.pth'.format(config.public_data.name))
                 best_acc = val_acc
+        
+        # Step the learning rate scheduler
         scheduler.step()
+    
+    # Synchronize all processes and clear the GPU cache
     dist.barrier()
     torch.cuda.empty_cache()
+    
+    # Return the path to the saved model checkpoint
     return 'models/pretrained_models/{}_classifier_ckpt.pth'.format(config.public_data.name)
