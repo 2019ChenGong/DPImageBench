@@ -4,8 +4,8 @@ model:
   params:
     output_file: null
     ckpt_path: null
-    ignore_keys:
-    - cond_stage_model
+    # ignore_keys:
+    # - cond_stage_model
     linear_start: 0.0015
     linear_end: 0.0155
     num_timesteps_cond: 1

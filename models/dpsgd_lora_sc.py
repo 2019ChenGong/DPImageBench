@@ -33,6 +33,10 @@ class DP_LORA(DPSynther):
         self.config = config
         self.device = 'cuda:%d' % self.local_rank
 
+        self.private_num_classes = config.model.private_num_classes  # Number of private classes
+        self.public_num_classes = config.model.public_num_classes  # Number of public classes
+        self.label_dim = max(self.private_num_classes, self.public_num_classes)
+
         self.is_pretrain = True
     
     def pretrain(self, public_dataloader, config):
@@ -116,6 +120,7 @@ class DP_LORA(DPSynther):
             '--logdir', logdir, 
             '--base', config_path, 
             '--gpus', gpu_ids, 
+            'model.params.cond_stage_config.params.n_classes={}'.format(self.label_dim+1),
             'data.params.cond={}'.format(self.config.pretrain.cond),
             'data.params.train.target={}'.format(data_target),
             'data.params.validation.target={}'.format(data_target),
@@ -164,11 +169,11 @@ class DP_LORA(DPSynther):
             '--base', config_path, 
             '--gpus', gpu_ids, 
             '--accelerator', 'gpu', 
+            'model.params.cond_stage_config.params.n_classes={}'.format(self.label_dim+1),
             'model.params.unet_config.params.attention_resolutions={}'.format([2**i for i in range(len(self.config.model.network.attn_resolutions))]),
             'model.params.unet_config.params.channel_mult={}'.format(self.config.model.network.ch_mult),
             'model.params.unet_config.params.model_channels={}'.format(self.config.model.network.nf),
             'model.params.output_file={}'.format(os.path.join(os.path.dirname(config.log_dir), 'stdout.txt')),
-            'model.params.cond_stage_config.params.n_classes={}'.format(self.config.sensitive_data.n_classes),
             'model.params.ckpt_path={}'.format(pretrain_model), 
             'model.params.dp_config.epsilon={}'.format(config.dp.epsilon), 
             'model.params.dp_config.delta={}'.format(config.dp.delta), 
