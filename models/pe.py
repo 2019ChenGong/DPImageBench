@@ -140,12 +140,6 @@ class PE(DPSynther):
             size=config.image_size,
             labels=labels
         )
-        log_samples(
-            samples=samples,
-            additional_info=additional_info,
-            folder=f'{config.log_dir}/{0}',
-            plot_images=False
-        )
 
         start_t = 1
 
@@ -198,11 +192,11 @@ class PE(DPSynther):
                     mode=config.nn_mode,
                     threshold=config.count_threshold
                 )
-                log_count(
-                    sub_count,
-                    sub_clean_count,
-                    f'{config.log_dir}/{t}/count_class{class_}.npz'
-                )
+                # log_count(
+                #     sub_count,
+                #     sub_clean_count,
+                #     f'{config.log_dir}/{t}/count_class{class_}.npz'
+                # )
                 count.append(sub_count)
             count = np.concatenate(count)
 
@@ -212,7 +206,7 @@ class PE(DPSynther):
                     samples=samples[num_samples_per_class * class_i:num_samples_per_class * (class_i + 1)],
                     packed_samples=packed_samples[num_samples_per_class * class_i:num_samples_per_class * (class_i + 1)],
                     count=count[num_samples_per_class * class_i:num_samples_per_class * (class_i + 1)],
-                    folder=f'{config.log_dir}/{t}',
+                    folder=f'{config.log_dir}/samples/{t}',
                     suffix=f'class{class_}'
                 )
 

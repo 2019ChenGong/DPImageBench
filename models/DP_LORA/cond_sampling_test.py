@@ -52,8 +52,6 @@ def main():
     cli = OmegaConf.from_dotlist(unknown)
     config = OmegaConf.merge(*configs, cli)
 
-    # config = OmegaConf.load(args.yaml)
-    config.model.params.cond_stage_config.params.n_classes = args.num_classes
     model = load_model_from_config(config, args.ckpt_path)
     ddim_steps = args.ddim_step
     ddim_eta = args.eta

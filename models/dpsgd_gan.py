@@ -170,7 +170,7 @@ class DPGAN(DPSynther):
 
                 # Generate fake labels and noise
                 fake_labels = torch.randint(0, self.public_num_classes, (batch_size,), device=self.device)
-                noise = torch.randn((batch_size, 80), device=self.device)
+                noise = torch.randn((batch_size, self.z_dim), device=self.device)
                 fake_images = G(noise, fake_labels)
 
                 # Compute outputs of the discriminator
@@ -197,7 +197,7 @@ class DPGAN(DPSynther):
 
                     # Generate new fake images
                     fake_labels = torch.randint(0, self.public_num_classes, (batch_size,), device=self.device)
-                    noise = torch.randn((batch_size, 80), device=self.device)
+                    noise = torch.randn((batch_size, self.z_dim), device=self.device)
                     fake_images = G(noise, fake_labels)
 
                     # Compute generator loss
@@ -365,7 +365,7 @@ class DPGAN(DPSynther):
 
                     # Generate fake labels and noise for generating fake images
                     fake_labels = torch.randint(0, self.private_num_classes, (batch_size, ), device=self.device)
-                    noise = torch.randn((batch_size, 80), device=self.device)
+                    noise = torch.randn((batch_size, self.z_dim), device=self.device)
                     fake_images = G(noise, fake_labels)
 
                     # Compute discriminator outputs for real and fake images
@@ -392,7 +392,7 @@ class DPGAN(DPSynther):
                             for _ in range(config.n_splits):
                                 optimizerD.zero_grad(set_to_none=True)
                                 fake_labels = torch.randint(0, self.private_num_classes, (batch_size, ), device=self.device)
-                                noise = torch.randn((batch_size, 80), device=self.device)
+                                noise = torch.randn((batch_size, self.z_dim), device=self.device)
                                 fake_images = G(noise, fake_labels)
                                 output_g = self.D_copy(fake_images, fake_labels)
                                 loss_G = self.g_hinge(output_g) / config.n_splits

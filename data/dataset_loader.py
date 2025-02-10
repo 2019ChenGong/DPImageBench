@@ -55,7 +55,14 @@ def load_sensitive_data(config):
 
 def semantic_query(sensitive_train_loader, config):
 
-    sensitive_loader = torch.utils.data.DataLoader(dataset=sensitive_train_loader.dataset, shuffle=True, drop_last=False, batch_size=config.public_data.selective.batch_size)
+    try:
+        batch_size = config.public_data.selective.batch_size
+        sigma = config.public_data.selective.sigma
+    except:
+        batch_size = 1000
+        sigma = 50
+
+    sensitive_loader = torch.utils.data.DataLoader(dataset=sensitive_train_loader.dataset, shuffle=True, drop_last=False, batch_size=batch_size)
 
     def load_weight(net, weight_path):
         weight = torch.load(weight_path, map_location= 'cuda:%d' % config.setup.local_rank)
@@ -85,7 +92,8 @@ def semantic_query(sensitive_train_loader, config):
     semantics_hist = torch.zeros((config.sensitive_data.n_classes, config.public_data.n_classes)).to(config.setup.local_rank)
 
     num_words = int(config.public_data.n_classes * config.public_data.selective.ratio / config.sensitive_data.n_classes)
-    config.train.dp.privacy_history = [[config.public_data.selective.sigma, 1.0, 1]]
+    config.train.dp['sdq'] = True
+    config.train.dp['privacy_history'] = [[config.public_data.selective.sigma, 1.0, 1]]
 
     with torch.no_grad():
         for (x, y) in sensitive_loader:
@@ -104,7 +112,7 @@ def semantic_query(sensitive_train_loader, config):
 
     sensitivity = np.sqrt(num_words)
     torch.manual_seed(0)
-    semantics_hist = semantics_hist + torch.randn_like(semantics_hist) * sensitivity * config.public_data.selective.sigma
+    semantics_hist = semantics_hist + torch.randn_like(semantics_hist) * sensitivity * sigma
     
     cls_dict = {}
     for i in range(config.sensitive_data.n_classes):

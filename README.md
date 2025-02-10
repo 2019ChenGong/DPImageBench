@@ -414,6 +414,18 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \
  --exp_description pretrain_places365_unconditional 
 ```
 
+If users wish to use select the public dataset for pretraining like PrivImage, you should set the `public_data.selective.ratio`.
+
+For example, use 5% ImageNet to pretrain DPDM.
+```
+python run.py setup.n_gpus_per_node=4 --method DPDM --data_name cifar10_32 \
+ --epsilon 10.0 eval.mode=val \
+ public_data.name=imagenet \
+ public_data.selective.ratio=0.05 \
+ pretrain.cond=Ture \
+ --exp_description pretrain_imagenet_5perc 
+```
+
 #### 4.3.3 Training Using Checkpoints
 
 DPImageBench also supports training synthesizers from the checkpoints. As mentioned in the [results structure](#451-results-structure), we provide `snapshot_checkpoint.pth` to store the synthesizer's parameters at the current epoch after each iteration. If users wish to finetune the synthesizers using pretrained models, they should: (1) set `public_data.name=null`, and (2) load the pretrained synthesizers through `model.ckpt`. For example, the pretrained synthesizer can be sourced from other algorithms. Readers can refer to the [file structure](./exp/README.md) for more details about loading pretrained models like

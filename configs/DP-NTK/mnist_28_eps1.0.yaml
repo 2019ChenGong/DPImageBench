@@ -25,9 +25,8 @@ sensitive_data:
   test_path: dataset/fmnist/test_28.zip
   fid_stats: dataset/fmnist/fid_stats_28.npz
 model:
-  model_ntk: fc_2l
-  ntk_width: 32
-  ntk_width2: 256
+  model_ntk: fc_1l
+  ntk_width: 800
   img_size: 28
   c: 1
   Generator:
