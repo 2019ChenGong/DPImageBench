@@ -414,7 +414,7 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \
  --exp_description pretrain_places365_unconditional 
 ```
 
-If users wish to use select the public dataset for pretraining like PrivImage, you should set the `public_data.selective.ratio`.
+If users wish to use select the public dataset for pretraining like PrivImage in Table 12, you should set the `public_data.selective.ratio`.
 
 For example, use 5% ImageNet to pretrain DPDM.
 ```
