@@ -39,6 +39,7 @@ model:
     apply_attn: true
   private_num_classes: 2
   public_num_classes: 1000
+  ckpt: null
 pretrain:
   log_dir: null
   n_iter: 4000
@@ -50,7 +51,6 @@ pretrain:
   cond: true
   n_splits: 8
 train:
-  ckpt: null
   n_iter: 2000
   batch_size: 5000
   lr: 1e-2

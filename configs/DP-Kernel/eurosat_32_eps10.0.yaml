@@ -41,6 +41,7 @@ model:
   - 16
   private_num_classes: 10
   public_num_classes: 1000
+  ckpt: null
 pretrain:
   log_dir: null
   n_epochs: 1
@@ -48,7 +49,6 @@ pretrain:
   batch_size: 60
   cond: true
 train:
-  ckpt: null
   max_iter: 200002
   batch_size: 60
   lr: 5e-5

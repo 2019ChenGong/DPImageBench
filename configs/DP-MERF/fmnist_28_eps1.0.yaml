@@ -39,6 +39,7 @@ model:
   mmd_type: sphere
   private_num_classes: 10
   public_num_classes: 1000
+  ckpt: null
 pretrain:
   log_dir: null
   epochs: 1
@@ -48,7 +49,6 @@ pretrain:
   log_interval: 10000
   cond: true
 train:
-  ckpt: null
   epochs: 5
   batch_size: 100
   lr: 0.01

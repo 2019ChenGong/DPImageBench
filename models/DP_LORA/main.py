@@ -211,7 +211,7 @@ if __name__ == "__main__":
             "testtube": {
                 "target": "pytorch_lightning.loggers.TestTubeLogger",
                 "params": {
-                    "name": "testtube",
+                    "name": "checkpoints",
                     "save_dir": logdir,
                 }
             },

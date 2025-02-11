@@ -37,6 +37,9 @@ class DP_MERF(DPSynther):
         # Initialize the generator network
         self.gen = Generator(img_size=self.img_size, num_classes=label_dim, **config.Generator).to(device)
 
+        if config.ckpt is not None:
+            self.gen.load_state_dict(torch.load(config.ckpt))  # Load checkpoint if provided
+
         # Count and log the number of trainable parameters in the model
         model_parameters = filter(lambda p: p.requires_grad, self.gen.parameters())
         n_params = sum([np.prod(p.size()) for p in model_parameters])
@@ -47,6 +50,8 @@ class DP_MERF(DPSynther):
         if public_dataloader is None:
             return
         os.mkdir(config.log_dir)  # Create a directory for logs
+        os.mkdir(os.path.join(config.log_dir, "samples"))
+        os.mkdir(os.path.join(config.log_dir, "checkpoints"))
 
         # Define loss functions
         n_data = len(public_dataloader.dataset)  # Number of data points in the public dataset
@@ -62,15 +67,16 @@ class DP_MERF(DPSynther):
             scheduler.step()  # Update learning rate
 
         # Save the pretrained model
-        torch.save(self.gen.state_dict(), os.path.join(config.log_dir, 'gen.pt'))
+        torch.save(self.gen.state_dict(), os.path.join(config.log_dir, 'checkpoints', 'final_checkpoint.pth'))
 
     # Method for training using sensitive data with differential privacy
     def train(self, sensitive_dataloader, config):
         if sensitive_dataloader is None:
             return
-        if config.ckpt is not None:
-            self.gen.load_state_dict(torch.load(config.ckpt))  # Load checkpoint if provided
+
         os.mkdir(config.log_dir)  # Create a directory for logs
+        os.mkdir(os.path.join(config.log_dir, "samples"))
+        os.mkdir(os.path.join(config.log_dir, "checkpoints"))
 
         # Define loss functions and compute noise factor
         self.noise_factor = get_noise_multiplier(target_epsilon=config.dp.epsilon, target_delta=config.dp.delta, sample_rate=1., epochs=1)
@@ -89,7 +95,7 @@ class DP_MERF(DPSynther):
             scheduler.step()  # Update learning rate
 
         # Save the trained model
-        torch.save(self.gen.state_dict(), os.path.join(config.log_dir, 'gen.pt'))
+        torch.save(self.gen.state_dict(), os.path.join(config.log_dir, 'checkpoints', 'final_checkpoint.pth'))
 
     # Method to generate synthetic data
     def generate(self, config):

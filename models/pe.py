@@ -206,7 +206,7 @@ class PE(DPSynther):
                     samples=samples[num_samples_per_class * class_i:num_samples_per_class * (class_i + 1)],
                     packed_samples=packed_samples[num_samples_per_class * class_i:num_samples_per_class * (class_i + 1)],
                     count=count[num_samples_per_class * class_i:num_samples_per_class * (class_i + 1)],
-                    folder=f'{config.log_dir}/samples/{t}',
+                    folder=f'{config.log_dir}/samples',
                     suffix=f'class{class_}'
                 )
 

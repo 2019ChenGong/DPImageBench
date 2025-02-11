@@ -172,7 +172,7 @@ class Generator(nn.Module):
 
 if __name__ == "__main__":
     import numpy as np
-    g = Generator(img_size=28, num_classes=10, z_dim=60)
+    g = Generator(img_size=28, num_classes=10, z_dim=60, g_conv_dim=50)
     model_parameters = filter(lambda p: p.requires_grad, g.parameters())
     n_params = sum([np.prod(p.size()) for p in model_parameters])
     print("Number of trainable parameters in G: {}".format(n_params))

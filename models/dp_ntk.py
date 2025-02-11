@@ -53,6 +53,8 @@ class DP_NTK(DPSynther):
 
         # Initialize the generator model with the specified image size, number of classes, and additional configuration parameters
         self.model_gen = Generator(img_size=self.img_size, num_classes=label_dim, **config.Generator).to(device)
+        if config.ckpt is not None:
+            self.model_gen.load(torch.load(config.ckpt))
         self.model_gen.train()  # Set the generator model to training mode
 
         # Calculate the number of trainable parameters in the generator model
@@ -64,7 +66,8 @@ class DP_NTK(DPSynther):
         if public_dataloader is None:
             return
         os.mkdir(config.log_dir)
-        # Define the loss function (though not explicitly shown here, it's implied by the loss calculation later)
+        os.mkdir(os.path.join(config.log_dir, "samples"))
+        os.mkdir(os.path.join(config.log_dir, "checkpoints"))
 
         # Calculate the mean embedding of the public dataset
         self.noisy_mean_emb = calc_mean_emb1(self.model_ntk, public_dataloader, self.public_num_classes, 0., self.device, cond=config.cond)
@@ -132,7 +135,7 @@ class DP_NTK(DPSynther):
                 scheduler.step()  # Step the learning rate scheduler
 
         # Save the trained generator model
-        torch.save(self.model_gen.state_dict(), os.path.join(config.log_dir, 'gen.pt'))
+        torch.save(self.model_gen.state_dict(), os.path.join(config.log_dir, 'checkpoints', 'final_checkpoint.pth'))
 
 
     def train(self, sensitive_dataloader, config):
@@ -140,12 +143,10 @@ class DP_NTK(DPSynther):
         if sensitive_dataloader is None:
             return
         
-        # Load model state from checkpoint if provided
-        if config.ckpt is not None:
-            self.model_gen.load_state_dict(torch.load(config.ckpt))
-        
         # Create log directory
         os.mkdir(config.log_dir)
+        os.mkdir(os.path.join(config.log_dir, "samples"))
+        os.mkdir(os.path.join(config.log_dir, "checkpoints"))
         
         # Calculate noise multiplier for differential privacy
         self.noise_factor = get_noise_multiplier(
@@ -228,7 +229,7 @@ class DP_NTK(DPSynther):
                 scheduler.step()
         
         # Save the trained generator model
-        torch.save(self.model_gen.state_dict(), os.path.join(config.log_dir, 'gen.pt'))
+        torch.save(self.model_gen.state_dict(), os.path.join(config.log_dir, 'checkpoints', 'final_checkpoint.pth'))
 
 
     def generate(self, config):

@@ -296,7 +296,7 @@ CUDA_VISIBLE_DEVICES=0,1,2 python run.py \
  sensitive_data.name=null eval.mode=sen \ 
  setup.n_gpus_per_node=3 \ 
  public_data.name=imagenet \ 
- pretrain.cond=Ture --method PDP-Diffusion \
+ pretrain.cond=true --method PDP-Diffusion \
  --data_name cifar10_32 --epsilon 10.0 \ 
  --exp_description pretrain_imagenet32
 ```
@@ -392,7 +392,7 @@ For example,
 python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \
  --epsilon 10.0 eval.mode=val \
  public_data.name=imagenet \
- pretrain.cond=Ture \
+ pretrain.cond=true \
  --exp_description pretrain_imagenet_conditional 
 ```
 
@@ -401,7 +401,7 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \
 python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \ 
  --epsilon 10.0 eval.mode=val \
  public_data.name=places365 public_data.n_classes=365 public_data.train_path=dataset/places365 \
- pretrain.cond=Ture \
+ pretrain.cond=true \
  --exp_description pretrain_places365_conditional 
 ```
 
@@ -422,7 +422,7 @@ python run.py setup.n_gpus_per_node=4 --method DPDM --data_name cifar10_32 \
  --epsilon 10.0 eval.mode=val \
  public_data.name=imagenet \
  public_data.selective.ratio=0.05 \
- pretrain.cond=Ture \
+ pretrain.cond=true \
  --exp_description pretrain_imagenet_5perc 
 ```
 

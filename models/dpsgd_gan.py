@@ -220,8 +220,7 @@ class DPGAN(DPSynther):
                             ema.restore(G.parameters())
 
                         if self.global_rank == 0:
-                            make_dir(os.path.join(sample_dir, 'iter_%d' % state['step']))
-                            save_img(samples, os.path.join(os.path.join(sample_dir, 'iter_%d' % state['step']), 'sample.png'))
+                            save_img(samples, os.path.join(sample_dir, 'sample_%d.png' % state['step']))
 
                     if state['step'] % config.fid_freq == 0 and state['step'] >= config.fid_threshold:
                         with torch.no_grad():
@@ -415,8 +414,7 @@ class DPGAN(DPSynther):
                                     ema.restore(G.parameters())
                                 
                                 if self.global_rank == 0:
-                                    make_dir(os.path.join(sample_dir, 'iter_%d' % state['step']))
-                                    save_img(samples, os.path.join(os.path.join(sample_dir, 'iter_%d' % state['step']), 'sample.png'))
+                                    save_img(samples, os.path.join(sample_dir, 'sample_%d.png' % state['step']))
                                 dist.barrier()
                             if state['step'] % config.fid_freq == 0 and state['step'] >= config.fid_threshold:
                                 with torch.no_grad():

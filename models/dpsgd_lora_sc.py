@@ -135,7 +135,7 @@ class DP_LORA(DPSynther):
                     logging.info(f"Generated an exception: {e}")
 
         # Update the model checkpoint path after pretraining
-        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'last.ckpt')
+        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'final_checkpoint.pth')
 
     def pretrain_unet(self, public_dataset, config, logdir):
         # If this is the main process (rank 0), create the log directory
@@ -212,7 +212,7 @@ class DP_LORA(DPSynther):
                     logging.info(f"Generated an exception: {e}")
 
         # Update the model checkpoint path after pretraining
-        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'last.ckpt')
+        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'final_checkpoint.pth')
 
     def train(self, sensitive_dataloader, config):
         """
@@ -278,7 +278,7 @@ class DP_LORA(DPSynther):
                     logging.info(f"Generated an exception: {e}")  # Log any exceptions that occur.
 
         # Update the checkpoint path in the configuration.
-        self.config.model.ckpt = os.path.join(self.config.train.log_dir, 'checkpoints', 'last.ckpt')
+        self.config.model.ckpt = os.path.join(self.config.train.log_dir, 'checkpoints', 'final_checkpoint.pth')
 
 
     def generate(self, config):

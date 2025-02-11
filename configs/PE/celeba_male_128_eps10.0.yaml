@@ -42,6 +42,7 @@ model:
     model_path: models/pretrained_models/128x128_diffusion.pt
   private_num_classes: 2
   public_num_classes: 1000
+  ckpt: null
 pretrain:
   log_dir: null
   cond: true
@@ -51,17 +52,19 @@ train:
   private_image_size: 128
   private_num_classes: 2
   num_samples_schedule:
-  - 30000
-  - 30000
-  - 30000
-  - 30000
-  - 30000
+  - 60000
+  - 60000
+  - 60000
+  - 60000
+  - 60000
+  - 60000
   variation_degree_schedule:
   - 0
   - 2
   - 4
   - 6
   - 8
+  - 10
   initial_prompt: null
   image_size: 128x128
   lookahead_degree: 8

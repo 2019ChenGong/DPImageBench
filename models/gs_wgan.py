@@ -87,6 +87,8 @@ class GS_WGAN(DPSynther):
         
         # Create a directory to store logs
         os.mkdir(config.log_dir)
+        os.mkdir(os.path.join(config.log_dir, "checkpoints"))
+        os.mkdir(os.path.join(config.log_dir, "samples"))
 
         # Set seeds for reproducibility
         random.seed(config.seed)
@@ -215,15 +217,15 @@ class GS_WGAN(DPSynther):
 
             # Generate images and save them periodically
             if iter % config.vis_step == 0:
-                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.private_num_classes)
+                generate_image(iter, netGS, fix_noise, os.path.join(config.log_dir, "samples"), self.device, c=self.c, img_size=self.img_size, num_classes=self.private_num_classes)
 
             # Clean up variables to free memory
             del label, fake, noisev, noise, G, G_cost, D_cost
             torch.cuda.empty_cache()
 
         # Save the trained models
-        torch.save(self.netG.state_dict(), os.path.join(config.log_dir, 'netG.pth'))
-        torch.save(self.netGS.state_dict(), os.path.join(config.log_dir, 'netGS.pth'))
+        torch.save(self.netG.state_dict(), os.path.join(config.log_dir, "checkponts", 'netG.pth'))
+        torch.save(self.netGS.state_dict(), os.path.join(config.log_dir, "checkponts", 'netGS.pth'))
 
     
     def warmup_training(self, config):
@@ -336,6 +338,8 @@ class GS_WGAN(DPSynther):
         
         # Create the log directory if it doesn't exist
         os.mkdir(config.log_dir)
+        os.mkdir(os.path.join(config.log_dir, "checkpoints"))
+        os.mkdir(os.path.join(config.log_dir, "samples"))
 
         # Initialize the model based on whether a checkpoint is provided
         if self.ckpt is None:
@@ -516,19 +520,19 @@ class GS_WGAN(DPSynther):
 
             # Visualize generated images
             if iter % config.vis_step == 0:
-                generate_image(iter, netGS, fix_noise, config.log_dir, self.device, c=self.c, img_size=self.img_size, num_classes=self.private_num_classes)
+                generate_image(iter, netGS, fix_noise, os.path.join(config.log_dir, "samples"), self.device, c=self.c, img_size=self.img_size, num_classes=self.private_num_classes)
 
             # Save model checkpoints
             if iter % config.save_step == 0:
-                torch.save(netGS.state_dict(), os.path.join(config.log_dir, 'netGS_%d.pth' % iter))
+                torch.save(netGS.state_dict(), os.path.join(config.log_dir, "checkpoints", 'netGS_%d.pth' % iter))
 
             # Clean up memory
             del label, fake, noisev, noise, G, G_cost, D_cost
             torch.cuda.empty_cache()
 
         # Save final models
-        torch.save(self.netG.state_dict(), os.path.join(config.log_dir, 'netG.pth'))
-        torch.save(self.netGS.state_dict(), os.path.join(config.log_dir, 'netGS.pth'))
+        torch.save(self.netG.state_dict(), os.path.join(config.log_dir, "checkpoints", 'netG.pth'))
+        torch.save(self.netGS.state_dict(), os.path.join(config.log_dir, "checkpoints", 'netGS.pth'))
 
 
     def generate(self, config):

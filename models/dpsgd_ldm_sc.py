@@ -136,7 +136,7 @@ class DP_LDM(DPSynther):
                     logging.info(f"Generated an exception: {e}")
 
         # Update the model checkpoint path after pretraining
-        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'last.ckpt')
+        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'final_checkpoint.pth')
 
     def pretrain_unet(self, public_dataset, config, logdir):
         # If this is the main process (rank 0), create the log directory
@@ -213,7 +213,7 @@ class DP_LDM(DPSynther):
                     logging.info(f"Generated an exception: {e}")
 
         # Update the model checkpoint path after pretraining
-        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'last.ckpt')
+        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'final_checkpoint.pth')
 
 
     def train(self, sensitive_dataloader, config):
@@ -291,7 +291,7 @@ class DP_LDM(DPSynther):
             'models/DP_LDM/cond_sampling_test.py',  # Path to the generation script
             '--save_path', config.log_dir,  # Directory where the generated data will be saved
             '--yaml', self.config.train.config_path,  # Path to the configuration file
-            '--ckpt_path', os.path.join(self.config.train.log_dir, 'checkpoints', 'last.ckpt'),  # Path to the checkpoint file
+            '--ckpt_path', os.path.join(self.config.train.log_dir, 'checkpoints', 'final_checkpoint.pth'),  # Path to the checkpoint file
             '--num_samples', str(config.data_num),  # Number of samples to generate
             '--num_classes', str(self.config.sensitive_data.n_classes),  # Number of classes in the dataset
             '--batch_size', str(config.batch_size),  # Batch size for the generation process

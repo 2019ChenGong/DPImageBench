@@ -34,6 +34,10 @@ class DP_Kernel(DPSynther):
         G_decoder =  Generator(img_size=self.image_size, num_classes=label_dim, **config.Generator).to(device)
         self.gen = CNetG(G_decoder).to(device)
 
+        # Load pre-trained model if a checkpoint is provided
+        if config.ckpt is not None:
+            self.gen.load_state_dict(torch.load(config.ckpt))
+
         # Log the number of trainable parameters
         model_parameters = filter(lambda p: p.requires_grad, self.gen.parameters())
         n_params = sum([np.prod(p.size()) for p in model_parameters])
@@ -47,6 +51,8 @@ class DP_Kernel(DPSynther):
         
         # Create directory for logs
         os.mkdir(config.log_dir)
+        os.mkdir(os.path.join(config.log_dir, "samples"))
+        os.mkdir(os.path.join(config.log_dir, "checkpoints"))
 
         # Prepare fixed noise and labels for visualization
         fixed_noise = torch.randn(8 * 10, self.nz).to(self.device)
@@ -116,14 +122,11 @@ class DP_Kernel(DPSynther):
             grid = torchvision.utils.make_grid(y_fixed.data, nrow=10)
 
             # Save the generated images
-            torchvision.utils.save_image(grid, 
-                                        os.path.join(config.log_dir, 
-                                                    f'netG_epoch{epoch}_lr{config.lr}_bs{config.batch_size}.png'))
+            torchvision.utils.save_image(grid, os.path.join(config.log_dir, 'samples', f'epoch{epoch}.png'))
             
             # Save the state dictionary of the generator network
-            torch.save(self.gen.state_dict(), 
-                    os.path.join(config.log_dir, 
-                                    f'netG_epoch{epoch}_lr{config.lr}_bs{config.batch_size}.pkl'))
+            torch.save(self.gen.state_dict(), os.path.join(config.log_dir, 'checkpoints', 'snapshot_checkpoint.pth'))
+        torch.save(self.gen.state_dict(), os.path.join(config.log_dir, 'checkpoints', 'final_checkpoint.pth'))
 
 
     # Training function using sensitive data with differential privacy
@@ -132,12 +135,10 @@ class DP_Kernel(DPSynther):
         if sensitive_dataloader is None:
             return
         
-        # Load pre-trained model if a checkpoint is provided
-        if config.ckpt is not None:
-            self.gen.load_state_dict(torch.load(config.ckpt))
-        
         # Create a directory for logging
         os.mkdir(config.log_dir)
+        os.mkdir(os.path.join(config.log_dir, "samples"))
+        os.mkdir(os.path.join(config.log_dir, "checkpoints"))
 
         # Calculate the noise multiplier for differential privacy
         self.noise_factor = get_noise_multiplier(
@@ -212,10 +213,10 @@ class DP_Kernel(DPSynther):
                     y_fixed = self.gen(fixed_noise, label=fixed_label)
                     y_fixed.data = y_fixed.data.mul(0.5).add(0.5)
                     grid = torchvision.utils.make_grid(y_fixed.data, nrow=10)
-                    torchvision.utils.save_image(grid, os.path.join(config.log_dir, f'netG_iter{iter}_noise{self.noise_factor}_lr{config.lr}_bs{config.batch_size}.png'))
+                    torchvision.utils.save_image(grid, os.path.join(config.log_dir, 'samples', f'iter{iter}.png'))
 
                     # Save the model state
-                    torch.save(self.gen.state_dict(), os.path.join(config.log_dir, f'netG_iter{iter}_noise{self.noise_factor}_lr{config.lr}_bs{config.batch_size}.pkl'))
+                    torch.save(self.gen.state_dict(), os.path.join(config.log_dir, 'checkpoints', 'snapshot_checkpoint.pth'))
 
                 # Increment the iteration counter
                 iter += 1
@@ -227,6 +228,7 @@ class DP_Kernel(DPSynther):
             # Break the outer loop if the maximum number of iterations is reached
             if iter >= config.max_iter:
                 break
+        torch.save(self.gen.state_dict(), os.path.join(config.log_dir, 'checkpoints', 'final_checkpoint.pth'))
 
 
     # Function to generate synthetic data

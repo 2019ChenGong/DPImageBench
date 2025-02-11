@@ -18,7 +18,7 @@ class SetupCallback(Callback):
     def on_keyboard_interrupt(self, trainer, pl_module):
         if trainer.global_rank == 0:
             print("Summoning checkpoint.")
-            ckpt_path = os.path.join(self.ckptdir, "last.ckpt")
+            ckpt_path = os.path.join(self.ckptdir, "final_checkpoint.pth")
             trainer.save_checkpoint(ckpt_path)
 
     def on_pretrain_routine_start(self, trainer, pl_module):
@@ -26,7 +26,7 @@ class SetupCallback(Callback):
             # Create logdirs and save configs
             os.makedirs(self.logdir, exist_ok=True)
             os.makedirs(self.ckptdir, exist_ok=True)
-            os.makedirs(self.cfgdir, exist_ok=True)
+            # os.makedirs(self.cfgdir, exist_ok=True)
 
             if "callbacks" in self.lightning_config:
                 if 'metrics_over_trainsteps_checkpoint' in self.lightning_config['callbacks']:
