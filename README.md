@@ -47,8 +47,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Todo
 
-- [ ] Structure: unify the output files;
-
 ## 2. Introduction
 
 ### 2.1 Currently Supported Algorithms
