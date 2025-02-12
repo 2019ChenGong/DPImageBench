@@ -56,13 +56,10 @@ class DP_LDM(DPSynther):
         self.public_num_classes = config.model.public_num_classes  # Number of public classes
         self.label_dim = max(self.private_num_classes, self.public_num_classes)  # Dimension of the label space
 
-        self.is_pretrain = True  # Flag to indicate if the model is in pre-training mode
-
     
     def pretrain(self, public_dataloader, config):
         # Check if the dataloader is provided; if not, set pretraining flag to False and return
         if public_dataloader is None:
-            self.is_pretrain = False
             return
         
         # If this is the main process (rank 0), create the necessary log directory
@@ -276,7 +273,7 @@ class DP_LDM(DPSynther):
                 except Exception as e:
                     logging.info(f"Generated an exception: {e}")  # Log any exceptions that occur.
 
-
+        self.config.model.ckpt = os.path.join(config.logdir, 'checkpoints', 'final_checkpoint.pth')
 
     def generate(self, config):
         # Log the start of the generation process with the number of samples to be generated
@@ -291,7 +288,7 @@ class DP_LDM(DPSynther):
             'models/DP_LDM/cond_sampling_test.py',  # Path to the generation script
             '--save_path', config.log_dir,  # Directory where the generated data will be saved
             '--yaml', self.config.train.config_path,  # Path to the configuration file
-            '--ckpt_path', os.path.join(self.config.train.log_dir, 'checkpoints', 'final_checkpoint.pth'),  # Path to the checkpoint file
+            '--ckpt_path', self.config.model.ckpt,  # Path to the checkpoint file
             '--num_samples', str(config.data_num),  # Number of samples to generate
             '--num_classes', str(self.config.sensitive_data.n_classes),  # Number of classes in the dataset
             '--batch_size', str(config.batch_size),  # Batch size for the generation process

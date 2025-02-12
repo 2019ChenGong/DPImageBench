@@ -73,7 +73,7 @@ class DP_NTK(DPSynther):
         self.noisy_mean_emb = calc_mean_emb1(self.model_ntk, public_dataloader, self.public_num_classes, 0., self.device, cond=config.cond)
 
         # Save the noisy mean embedding to disk
-        torch.save(self.noisy_mean_emb, os.path.join(config.log_dir, 'noisy_mean_emb.pt'))
+        torch.save(self.noisy_mean_emb, os.path.join(config.log_dir, "checkpoints", 'noisy_mean_emb.pt'))
 
         # Initialize the optimizer and learning rate scheduler
         optimizer = torch.optim.Adam(self.model_gen.parameters(), lr=config.lr)
@@ -169,7 +169,7 @@ class DP_NTK(DPSynther):
         )
         
         # Save the noisy mean embedding
-        torch.save(self.noisy_mean_emb, os.path.join(config.log_dir, 'noisy_mean_emb.pt'))
+        torch.save(self.noisy_mean_emb, os.path.join(config.log_dir, "checkpoints", 'noisy_mean_emb.pt'))
         
         # Initialize optimizer and scheduler
         optimizer = torch.optim.Adam(self.model_gen.parameters(), lr=config.lr)
