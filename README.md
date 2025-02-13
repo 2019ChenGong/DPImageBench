@@ -145,6 +145,7 @@ DPImageBench/
 │   ├── gan_size_change.sh                           
 │   ├── pdp_diffusion.sh            
 │   ├── rq1.sh 
+│   ├── rq2.sh 
 │   ├── rq3.sh                  
 │   └── test_classifier.py                                            
 ├── utils/                      # Helper classes and functions supporting various operations

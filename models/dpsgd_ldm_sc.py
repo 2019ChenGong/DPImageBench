@@ -133,7 +133,7 @@ class DP_LDM(DPSynther):
                     logging.info(f"Generated an exception: {e}")
 
         # Update the model checkpoint path after pretraining
-        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'final_checkpoint.pth')
+        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'last.ckpt')
 
     def pretrain_unet(self, public_dataset, config, logdir):
         # If this is the main process (rank 0), create the log directory
@@ -210,7 +210,7 @@ class DP_LDM(DPSynther):
                     logging.info(f"Generated an exception: {e}")
 
         # Update the model checkpoint path after pretraining
-        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'final_checkpoint.pth')
+        self.config.model.ckpt = os.path.join(logdir, 'checkpoints', 'last.ckpt')
 
 
     def train(self, sensitive_dataloader, config):
@@ -273,7 +273,7 @@ class DP_LDM(DPSynther):
                 except Exception as e:
                     logging.info(f"Generated an exception: {e}")  # Log any exceptions that occur.
 
-        self.config.model.ckpt = os.path.join(config.logdir, 'checkpoints', 'final_checkpoint.pth')
+        self.config.model.ckpt = os.path.join(config.log_dir, 'checkpoints', 'last.ckpt')
 
     def generate(self, config):
         # Log the start of the generation process with the number of samples to be generated
