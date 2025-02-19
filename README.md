@@ -81,7 +81,7 @@ Below is the directory structure of the DPImageBench project, which organizes it
 
 ```plaintext
 DPImageBench/
-├── config/                     # Configuration files for various DP image synthesis algorithms
+├── configs/                     # Configuration files for various DP image synthesis algorithms
 │   ├── DP-MERF      
 │   ├── DP-NTK       
 │   ├── DP-Kernel
@@ -533,7 +533,7 @@ If synthetic images are used as the validation set (`model.eval = syn`), the fir
 ```
 INFO - evaluator.py - 2024-11-12 09:06:18,148 - The best acc of accuracy (using synthetic images as the validation set) of synthetic images from resnet, wrn, and resnext are [59.48, 63.99, 59.53].
 ```
-The synthetic images can be found at the `/exp/<algorithm_name>/<file_name>/gen/gen.npz`.
+The synthetic images can be found at the `./exp/<algorithm_name>/<file_name>/gen/gen.npz`.
 
 ### 4.5 Results Visualization
 
@@ -548,7 +548,7 @@ We provide the plotting codes for results visualization in the folder `plot` of 
 
 ## 5. Customization
 
-This part introduces how to apply DPImageBench for your own sensitive dataset.
+This part introduces how to apply DPImageBench for your own sensitive dataset or new synthesizer algorithm.
 
 ### 5.1 Data Preparation
 
@@ -573,12 +573,34 @@ Process your dataset using:
 cd data; python preprocess_dataset.py --data_name <name-of-your-dataset> --train_path <dir-of-train-folder> --test_path <dir-of-test-folder>
 ```
 
-### 5.2 Training
+### 5.2 New Synthesizer
 
-For example, if your want to use PrivImage as your synthesizer with eps=10, you can run:
+#### 5.2.1 Config File
+
+You need to create a config folder for your algorithm like:
 
 ```
-python run.py setup.n_gpus_per_node=4 --method PrivImage --epsilon 10.0 --data_name <name-of-your-dataset> sensitive_data.n_classes=<num_of_classes>
+configs/
+├── <name-of-your-algorithm>/     
+│   ├── <name-of-your-dataset>_32_eps10.0.yaml
+│   ├── <name-of-your-dataset>_32_eps1.0.yaml 
+...
+```
+
+Please refer to `./configs/DP-MERF/mnist_28_eps10.0.yaml` for the config file structure.
+
+#### 5.2.2 Functions File
+
+You need to create a `./models/<name-of-your-algorithm>.py`, including two essential functions to be consistant with DPImageBench. The first function takes an image dataset `sensitive_dataloader` and the training hyperparamters `config` as input to perform the training and outputs the trained model. The second function takes the generation hyperparameters `config` as input and outputs the specified number of synthetic images. Please refer to `./models/dp_merf.py` for the detailed function structure.
+
+After that, you need to import the new function in `./models/model_loader.py`.
+
+### 5.3 Training
+
+For example, if your want to use your new synthesizer as your synthesizer with eps=10, you can run:
+
+```
+python run.py setup.n_gpus_per_node=4 --method <name-of-your-algorithm> --epsilon 10.0 --data_name <name-of-your-dataset> sensitive_data.n_classes=<num_of_classes>
 ```
 
 Other processes are the same.
