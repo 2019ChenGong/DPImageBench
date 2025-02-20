@@ -161,6 +161,27 @@ dataset/
 
 The training and evaluatin codes are `run.py` and `eval.py`.
 
+The core codes of `run.py` are present as follows.
+
+```python
+def main(config):
+
+    initialize_environment(config)
+
+    model, config = load_model(config)
+
+    sensitive_train_loader, sensitive_val_loader, sensitive_test_loader, public_train_loader, config = load_data(config)
+
+    model.pretrain(public_train_loader, config.pretrain)
+
+    model.train(sensitive_train_loader, config.train)
+
+    syn_data, syn_labels = model.generate(config.gen)
+
+    evaluator = Evaluator(config)
+    evaluator.eval(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
+```
+
 #### 4.3.1 Key hyper-parameter introductions
 
 We list the key hyper-parameters below, including their explanations and available options.
@@ -415,15 +436,45 @@ Process your dataset using:
 cd data; python preprocess_dataset.py --data_name <name-of-your-dataset> --train_path <dir-of-train-folder> --test_path <dir-of-test-folder>
 ```
 
-### 5.2 Training
+### 5.2 New Synthesizer
 
-For example, if your want to use PrivImage as your synthesizer with eps=10, you can run:
+#### 5.2.1 Config File
+
+You need to create a config folder for your algorithm like:
 
 ```
-python run.py setup.n_gpus_per_node=4 --method PrivImage --epsilon 10.0 --data_name <name-of-your-dataset> sensitive_data.n_classes=<num_of_classes>
+configs/
+├── <name-of-your-algorithm>/     
+│   ├── <name-of-your-dataset>_32_eps10.0.yaml
+│   ├── <name-of-your-dataset>_32_eps1.0.yaml 
+...
 ```
 
-Other processes are the same.
+Please refer to `./configs/DP-MERF/mnist_28_eps10.0.yaml` for the config file structure.
+
+#### 5.2.2 Functions File
+
+You need to create a `./models/<name-of-your-algorithm>.py`, including two essential functions to be consistant with DPImageBench. The first function takes an image dataset `sensitive_dataloader` and the training hyperparamters `config` as input to perform the training and outputs the trained model. The second function takes the generation hyperparameters `config` as input and outputs the specified number of synthetic images. Please refer to `./models/dp_merf.py` for the detailed function structure.
+
+After that, you need to import the new function in `./models/model_loader.py`.
+
+For example, if we want to optimize the training process of DPDM and name the new algorithm DPDM-plus, we can start by copying `./configs/DPDM/mnist_28_eps10.0.yaml` to `./configs/DPDM-plus/mnist_28_eps10.0.yaml`, and set `setup.method=dpdm-plus`. Then, we can copy `./models/dpsgd_diffusion.py` to `./models/dpdm_plus.py`. We can rename its `DP_Diffusion` class `DPDM_plus` and make the necessary modification to the train function inside the `DPDM_plus` class. Fininally, we need to add an if statement to the load_model function in `./models/model_loader.py` to support the loading of the new algorithm:
+
+```
+...
+elif config.setup.method == 'dpdm-plus':
+    from models.dpdm_plus import DPDM_plus
+    model = DPDM_plus(config.model, config.setup.local_rank)
+...
+```
+
+### 5.3 Training
+
+For example, if your want to use your new synthesizer as your synthesizer with eps=10, you can run:
+
+```
+python run.py setup.n_gpus_per_node=4 --method <name-of-your-algorithm> --epsilon 10.0 --data_name <name-of-your-dataset> sensitive_data.n_classes=<num_of_classes>
+```
 
 
 ## 6. Contacts
