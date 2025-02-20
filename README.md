@@ -761,6 +761,11 @@ Fidelity evaluations of synthetic Camelyon images under eps = 10.0.
 ## 7. Contacts
 If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
 
+- Chen Gong (ChenG_abc@outlook.com)
+
+- Kecen Li (likecen2023@ia.ac.cn)
+
+
 ## 8. Citation
 
 ```text
