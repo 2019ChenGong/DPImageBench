@@ -49,7 +49,7 @@ class DPGAN(DPSynther):
         label_dim = max(self.private_num_classes, self.public_num_classes)  # Maximum number of classes for labels
 
         self.config = config  # Store the configuration object
-        self.device = device  # Store the device
+        self.device = 'cuda:%d' % self.local_rank  # Set the device based on local rank
 
         # Initialize the generator and discriminators
         self.G = Generator(img_size=self.img_size, num_classes=label_dim, **config.Generator).to(self.device)
@@ -60,7 +60,7 @@ class DPGAN(DPSynther):
         if config.ckpt is not None:
             state = torch.load(config.ckpt, map_location=self.device)  # Load the checkpoint
             new_state_dict = {}
-            for k, v in state['emaG'].items():
+            for k, v in state['G'].items():
                 new_state_dict[k[7:]] = v  # Remove 'module.' prefix from keys
             logging.info(self.G.load_state_dict(new_state_dict, strict=True))  # Load state dict into the generator
 

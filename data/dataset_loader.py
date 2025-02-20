@@ -177,6 +177,26 @@ def load_data(config):
                 public_train_set = public_train_set_
             else:
                 public_train_set = SpecificClassEMNIST(public_train_set_, specific_class)
+        elif config.public_data.name == "central":
+            import random
+            # class random_aug(object):
+            #     def __init__(self, magnitude, num_ops):
+            #         self.mag = magnitude
+            #         self.no = num_ops
+            #     def __call__(self, img):
+            #         mag = random.choice([i for i in range(1, self.mag+1)])
+            #         return transforms.RandAugment(num_ops=self.no, magnitude=mag)(img)
+
+            #     def __repr__(self):
+            #         return self.__class__.__name__
+            trans = [
+                    # random_aug(magnitude=3, num_ops=2),
+                    transforms.ToTensor(),
+                ]
+            if config.public_data.num_channels == 1:
+                trans = [transforms.Grayscale(num_output_channels=1)] + trans
+            trans = transforms.Compose(trans)
+            public_train_set = torchvision.datasets.ImageFolder(root=config.public_data.train_path, transform=trans)
         else:
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     

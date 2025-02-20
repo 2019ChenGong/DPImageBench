@@ -30,7 +30,7 @@ model:
   Generator:
     z_dim: 60
     g_shared_dim: 128
-    g_conv_dim: 41
+    g_conv_dim: 96
     attn_g_loc:
     - 2
     apply_attn: true

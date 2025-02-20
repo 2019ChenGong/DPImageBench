@@ -595,6 +595,16 @@ You need to create a `./models/<name-of-your-algorithm>.py`, including two essen
 
 After that, you need to import the new function in `./models/model_loader.py`.
 
+For example, if we want to optimize the training process of DPDM and name the new algorithm DPDM-plus, we can start by copying `./configs/DPDM/mnist_28_eps10.0.yaml` to `./configs/DPDM-plus/mnist_28_eps10.0.yaml`, and set `setup.method=dpdm-plus`. Then, we can copy `./models/dpsgd_diffusion.py` to `./models/dpdm_plus.py`. We can rename its `DP_Diffusion` class `DPDM_plus` and make the necessary modification to the train function inside the `DPDM_plus` class. Fininally, we need to add an if statement to the load_model function in `./models/model_loader.py` to support the loading of the new algorithm:
+
+```
+...
+elif config.setup.method == 'dpdm-plus':
+    from models.dpdm_plus import DPDM_plus
+    model = DPDM_plus(config.model, config.setup.local_rank)
+...
+```
+
 ### 5.3 Training
 
 For example, if your want to use your new synthesizer as your synthesizer with eps=10, you can run:
