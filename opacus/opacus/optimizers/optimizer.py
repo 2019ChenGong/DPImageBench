@@ -423,7 +423,6 @@ class DPOptimizer(Optimizer):
                 p.summed_grad = grad
 
             _mark_as_processed(p.grad_sample)
-        self.real_cum_batch_size += grad_sample.shape[0]
 
     def add_noise(self):
         """
