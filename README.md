@@ -3,7 +3,9 @@
 # DPImageBench: A Unified Benchmark for Differentially Private Image Synthesis Algorithms
 </div>
 
-Authors: [Chen Gong*](https://2019chengong.github.io/), [Kecen Li*](https://scholar.google.com/citations?user=vY5GC2gAAAAJ&hl=zh-CN), [Zinan Li](https://zinanlin.me/), [Tianhao Wang](https://tianhao.wang/). "*" means equal contributions.
+Authors: [Chen Gong*](https://2019chengong.github.io/), [Kecen Li*](https://scholar.google.com/citations?user=vY5GC2gAAAAJ&hl=zh-CN), [Zinan Li](https://zinanlin.me/), [Tianhao Wang](https://tianhao.wang/). 
+
+"*" means equal contributions.
 
 DPImageBench is an open-source toolkit developed to facilitate the research and application of DP image synthesis. DPImageBench simplifies the access, understanding, and assessment of DP image synthesis, making it accessible to both researchers and the broader community. The strengths of DPImageBench are presented as follows. 
 
