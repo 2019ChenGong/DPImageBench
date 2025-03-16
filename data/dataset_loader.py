@@ -2,7 +2,7 @@ import os
 import torch
 import torch.nn.functional as F
 import torchvision
-from torch.utils.data import random_split
+from torch.utils.data import random_split, Dataset, DataLoader
 from torchvision import transforms
 import numpy as np
 import logging
@@ -16,6 +16,18 @@ from data.SpecificEMNIST import SpecificClassEMNIST
 from models.PrivImage import resnet
 from models.PrivImage.classifer_trainer import train_classifier
 
+import random
+class random_aug(object):
+    def __init__(self, magnitude, num_ops):
+        self.mag = magnitude
+        self.no = num_ops
+    def __call__(self, img):
+        mag = random.choice([i for i in range(1, self.mag+1)])
+        return transforms.RandAugment(num_ops=self.no, magnitude=mag)(img)
+
+    def __repr__(self):
+        return self.__class__.__name__
+                
 def load_sensitive_data(config):    
     sensitive_train_set = ImageFolderDataset(
             config.sensitive_data.train_path, config.sensitive_data.resolution, config.sensitive_data.num_channels, use_labels=True)
@@ -130,6 +142,97 @@ def semantic_query(sensitive_train_loader, config):
     torch.cuda.empty_cache()
     return cls_dict, config
 
+class CentralDataset(Dataset):
+    def __init__(self, sensitive_dataset, sample_num=50, sigma=5, batch_size=6000, num_classes=10, c_type='mean'):
+        super().__init__()
+
+        self.trans = random_aug(magnitude=3, num_ops=2)
+
+        if c_type == 'mean':
+            self.central_x, self.central_y = self.query_mean_image(sensitive_dataset, sample_num // num_classes, sigma, batch_size, num_classes)
+        else:
+            self.central_x, self.central_y = self.query_mode_image(sensitive_dataset, sample_num // num_classes, sigma, batch_size, num_classes)
+    
+    def query_mean_image(self, sensitive_dataset, sample_num, sigma, batch_size, num_classes):
+        c = 0
+        central_x, central_y = [], []
+        ds = 0.5
+        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+        for _ in range(10000):
+            for x, y in dataloader:
+                for cls in range(num_classes):
+                    
+                    x_cls = x if num_classes==1 else x[y==cls]
+
+                    sensitivity_m = np.sqrt((ds**2) * np.prod(x_cls.shape[1:])) / x_cls.shape[0]
+
+                    xm = torch.mean(x_cls, dim=0, keepdim=True)
+                    xm = F.interpolate(xm, scale_factor=ds)
+                    xm = xm + torch.randn_like(xm) * sensitivity_m * sigma
+                    xm = xm.clamp(0., 1.)
+                    xm = F.interpolate(xm, size=x.shape[-2:], mode="bilinear")
+
+                    xm = (xm.cpu() * 255.).to(torch.uint8)
+                    central_x.append(xm)
+                    central_y.append(cls)
+                c += 1
+                if c == sample_num:
+                    break
+            if c == sample_num:
+                break
+        
+        return torch.cat(central_x), central_y
+
+    def query_mode_image(self, sensitive_dataset, sample_num, sigma, batch_size, num_classes):
+        c = 0
+        central_x, central_y = [], []
+        ds = 0.5
+        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+        for _ in range(10000):
+            for x, y in dataloader:
+                if x.shape[-1] == 28:
+                    bins = 2
+                else:
+                    bins = 16
+                for cls in range(num_classes):
+                    
+                    x_cls = x if num_classes==1 else x[y==cls]
+
+                    sensitivity = np.sqrt((ds**2) * np.prod(x_cls.shape[1:]))
+
+                    x_cls = F.interpolate(x_cls, scale_factor=ds)
+                    x_cls_shape = x_cls.shape[-3:]
+                    x_cls = x_cls.view(x_cls.shape[0], -1)
+                    x_mode_noisy = []
+                    for i in range(x_cls.shape[1]):
+                        hist = torch.histc(x_cls[:, i], bins=bins, min=0, max=1)
+                        hist = hist + torch.randn_like(hist) * sensitivity * sigma
+                        x_mode_noisy.append(torch.argmax(hist))
+                    x_mode_noisy = torch.tensor(x_mode_noisy).view(1, *x_cls_shape).float() / (bins-1)
+
+                    x_mode_noisy = F.interpolate(x_mode_noisy.float(), size=x.shape[-2:], mode="bilinear")
+
+                    x_mode_noisy = (x_mode_noisy.cpu()*255).to(torch.uint8)
+
+                    central_x.append(x_mode_noisy)
+                    central_y.append(cls)
+
+                c += 1
+                if c == sample_num:
+                    break
+            if c == sample_num:
+                break
+        return torch.cat(central_x), central_y
+
+    def __len__(self,):
+        return len(self.central_x)
+
+    def __getitem__(self, index):
+        x, y = self.central_x[index:index+1], self.central_y[index]
+
+        return self.trans(x)[0].float() / 255., y
+
+
 
 def load_data(config):
     # load sensitive dataset
@@ -177,26 +280,10 @@ def load_data(config):
                 public_train_set = public_train_set_
             else:
                 public_train_set = SpecificClassEMNIST(public_train_set_, specific_class)
-        elif config.public_data.name == "central":
-            import random
-            # class random_aug(object):
-            #     def __init__(self, magnitude, num_ops):
-            #         self.mag = magnitude
-            #         self.no = num_ops
-            #     def __call__(self, img):
-            #         mag = random.choice([i for i in range(1, self.mag+1)])
-            #         return transforms.RandAugment(num_ops=self.no, magnitude=mag)(img)
-
-            #     def __repr__(self):
-            #         return self.__class__.__name__
-            trans = [
-                    # random_aug(magnitude=3, num_ops=2),
-                    transforms.ToTensor(),
-                ]
-            if config.public_data.num_channels == 1:
-                trans = [transforms.Grayscale(num_output_channels=1)] + trans
-            trans = transforms.Compose(trans)
-            public_train_set = torchvision.datasets.ImageFolder(root=config.public_data.train_path, transform=trans)
+        elif "central" in config.public_data.name:
+            public_train_set = CentralDataset(sensitive_train_loader.dataset, num_classes=config.sensitive_data.n_classes, c_type=config.public_data.name.split('_')[-1])
+            config.train.dp['sdq'] = True
+            config.train.dp['privacy_history'] = [[5, 6000/len(sensitive_train_loader.dataset), 5]]
         else:
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     
