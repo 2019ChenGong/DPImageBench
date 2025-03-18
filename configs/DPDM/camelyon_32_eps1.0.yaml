@@ -96,7 +96,7 @@ train:
   log_dir: null
   seed: 0
   batch_size: 4096
-  n_epochs: 150
+  n_epochs: 50
   partly_finetune: false
   log_freq: 100
   snapshot_freq: 2000

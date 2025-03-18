@@ -146,7 +146,7 @@ class CentralDataset(Dataset):
     def __init__(self, sensitive_dataset, sample_num=50, sigma=5, batch_size=6000, num_classes=10, c_type='mean'):
         super().__init__()
 
-        self.trans = random_aug(magnitude=9, num_ops=2)
+        self.trans = random_aug(magnitude=3, num_ops=2)
 
         if c_type == 'mean':
             self.central_x, self.central_y = self.query_mean_image(sensitive_dataset, sample_num // num_classes, sigma, batch_size, num_classes)
