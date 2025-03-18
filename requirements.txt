@@ -15,6 +15,7 @@ gdown==4.7.3
 pytorch-lightning==1.4.2
 torchmetrics==0.5.0
 einops
+opencv-python
 image-reward
 diffusers==0.30.3
 test-tube==0.7.5

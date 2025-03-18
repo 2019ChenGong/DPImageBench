@@ -34,7 +34,7 @@ if __name__ == '__main__':
     parser.add_argument('--config_suffix', '-cs', default="")
     parser.add_argument('--resume_exp', '-re', default=None)
     parser.add_argument('--exp_description', '-ed', default="")
-    parser.add_argument('--exp_path', '-ep', default="/p/fzv6enresearch/DPImageBench/exp/privimage/cifar10_32_eps10.0val_pre1900_cn1e-3-2024-12-01-22-09-29")
+    parser.add_argument('--exp_path', '-ep', default="")
     opt, unknown = parser.parse_known_args()
 
     config = parse_config(opt, unknown)

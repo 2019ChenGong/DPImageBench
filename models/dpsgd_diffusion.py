@@ -98,8 +98,6 @@ class DP_Diffusion(DPSynther):
             self.ema.load_state_dict(state['ema'])  # Load the EMA state dictionary
             del state, new_state_dict  # Clean up memory
 
-        self.is_pretrain = True  # Flag to indicate pretraining status
-
     
     def pretrain(self, public_dataloader, config):
         """
@@ -110,14 +108,13 @@ class DP_Diffusion(DPSynther):
             config (dict): Configuration dictionary containing various settings and hyperparameters.
         """
         if public_dataloader is None:
-            # If no public dataloader is provided, set pretraining flag to False and return.
-            self.is_pretrain = False
+            # If no public dataloader is provided, return.
             return
         
         # Set the number of classes in the loss function to the number of private classes.
-        config.loss.n_classes = self.private_num_classes
+        config.loss.n_classes = self.public_num_classes
         if config.cond:
-            # If conditional training is enabled, set the label unconditioning probability.
+            # If conditional training is enabled, set the label unconditioning probability to 0.1. Conditional training with a low unconditioning probability usually performs better.
             config.loss['label_unconditioning_prob'] = 0.1
         else:
             # If conditional training is disabled, set the label unconditioning probability to 1.0.
@@ -186,6 +183,15 @@ class DP_Diffusion(DPSynther):
         # Initialize the Inception model for feature extraction.
         inception_model = InceptionFeatureExtractor()
         inception_model.model = inception_model.model.to(self.device)
+
+        # Define the sampler function for generating images.
+        def sampler(x, y=None):
+            if self.sampler.type == 'ddim':
+                return ddim_sampler(x, y, model, **self.sampler)
+            elif self.sampler.type == 'edm':
+                return edm_sampler(x, y, model, **self.sampler)
+            else:
+                raise NotImplementedError("Sampler type not supported")
 
         # Define the shape of the batches for sampling and FID computation.
         snapshot_sampling_shape = (self.sampler.snapshot_batch_size,
@@ -349,18 +355,10 @@ class DP_Diffusion(DPSynther):
 
         # Initialize the Privacy Engine for differential privacy.
         privacy_engine = PrivacyEngine()
-        if config.dp.sdq is None:
+        if config.dp.privacy_history is None:
             account_history = None
-            alpha_history = None
         else:
             account_history = [tuple(item) for item in config.dp.privacy_history]
-            if config.dp.alpha_num == 0:
-                alpha_history = None
-            else:
-                alpha = np.arange(config.dp.alpha_num) / config.dp.alpha_num
-                alpha = alpha * (config.dp.alpha_max - config.dp.alpha_min)
-                alpha += config.dp.alpha_min 
-                alpha_history = list(alpha)
 
         # Make the model, optimizer, and data loader private.
         model, optimizer, dataset_loader = privacy_engine.make_private_with_epsilon(
@@ -373,7 +371,6 @@ class DP_Diffusion(DPSynther):
             max_grad_norm=config.dp.max_grad_norm,
             noise_multiplicity=config.loss.n_noise_samples,
             account_history=account_history,
-            alpha_history=alpha_history,
         )
 
         # Initialize the loss function based on the configuration.

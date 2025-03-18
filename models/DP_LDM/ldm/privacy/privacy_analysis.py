@@ -25,13 +25,18 @@ def get_noisysgd_mechanism(noise_scale, sample_rate, max_steps):
 
 
 def compute_noise_multiplier_poisson(dp_config, sample_rate, max_epochs):
+    if dp_config['privacy_history'] is None:
+        account_history = None
+    else:
+        account_history = [tuple(item) for item in dp_config['privacy_history']]
     return get_noise_multiplier(
         target_epsilon=dp_config["epsilon"],
         target_delta=dp_config["delta"],
         sample_rate=sample_rate,
         epochs=max_epochs,
         accountant="prv",
-        epsilon_tolerance=1e-3
+        epsilon_tolerance=1e-3,
+        account_history=account_history
     )
 
 

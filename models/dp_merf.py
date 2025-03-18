@@ -78,8 +78,13 @@ class DP_MERF(DPSynther):
         os.mkdir(os.path.join(config.log_dir, "samples"))
         os.mkdir(os.path.join(config.log_dir, "checkpoints"))
 
+        if config.dp.privacy_history is None:
+            account_history = None
+        else:
+            account_history = [tuple(item) for item in config.dp.privacy_history]
+
         # Define loss functions and compute noise factor
-        self.noise_factor = get_noise_multiplier(target_epsilon=config.dp.epsilon, target_delta=config.dp.delta, sample_rate=1., epochs=1)
+        self.noise_factor = get_noise_multiplier(target_epsilon=config.dp.epsilon, target_delta=config.dp.delta, sample_rate=1., epochs=1, account_history=account_history)
         logging.info("The noise factor is {}".format(self.noise_factor))
 
         n_data = len(sensitive_dataloader.dataset)  # Number of data points in the sensitive dataset

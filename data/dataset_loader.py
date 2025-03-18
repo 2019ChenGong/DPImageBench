@@ -6,7 +6,8 @@ from torch.utils.data import random_split, Dataset, DataLoader
 from torchvision import transforms
 import numpy as np
 import logging
-import torch.distributed as dist
+from PIL import Image
+import cv2
 
 
 from data.stylegan3.dataset import ImageFolderDataset
@@ -104,7 +105,6 @@ def semantic_query(sensitive_train_loader, config):
     semantics_hist = torch.zeros((config.sensitive_data.n_classes, config.public_data.n_classes)).to(config.setup.local_rank)
 
     num_words = int(config.public_data.n_classes * config.public_data.selective.ratio / config.sensitive_data.n_classes)
-    config.train.dp['sdq'] = True
     config.train.dp['privacy_history'] = [[config.public_data.selective.sigma, 1.0, 1]]
 
     with torch.no_grad():
@@ -146,7 +146,7 @@ class CentralDataset(Dataset):
     def __init__(self, sensitive_dataset, sample_num=50, sigma=5, batch_size=6000, num_classes=10, c_type='mean'):
         super().__init__()
 
-        self.trans = random_aug(magnitude=3, num_ops=2)
+        self.trans = random_aug(magnitude=9, num_ops=2)
 
         if c_type == 'mean':
             self.central_x, self.central_y = self.query_mean_image(sensitive_dataset, sample_num // num_classes, sigma, batch_size, num_classes)
@@ -157,7 +157,7 @@ class CentralDataset(Dataset):
         c = 0
         central_x, central_y = [], []
         ds = 0.5
-        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=16)
         for _ in range(10000):
             for x, y in dataloader:
                 for cls in range(num_classes):
@@ -173,6 +173,9 @@ class CentralDataset(Dataset):
                     xm = F.interpolate(xm, size=x.shape[-2:], mode="bilinear")
 
                     xm = (xm.cpu() * 255.).to(torch.uint8)
+
+                    xm = self.post_process(xm)
+
                     central_x.append(xm)
                     central_y.append(cls)
                 c += 1
@@ -187,7 +190,7 @@ class CentralDataset(Dataset):
         c = 0
         central_x, central_y = [], []
         ds = 0.5
-        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=16)
         for _ in range(10000):
             for x, y in dataloader:
                 if x.shape[-1] == 28:
@@ -214,6 +217,8 @@ class CentralDataset(Dataset):
 
                     x_mode_noisy = (x_mode_noisy.cpu()*255).to(torch.uint8)
 
+                    x_mode_noisy = self.post_process(x_mode_noisy)
+
                     central_x.append(x_mode_noisy)
                     central_y.append(cls)
 
@@ -223,6 +228,27 @@ class CentralDataset(Dataset):
             if c == sample_num:
                 break
         return torch.cat(central_x), central_y
+
+    def post_process(self, x):
+        is_gray = x.shape[1] == 1
+        if is_gray:
+            x = x[0][0].numpy()
+        else:
+            x = x[0].permute(1, 2, 0).numpy()
+        if not is_gray:
+            x = cv2.cvtColor(x, cv2.COLOR_BGR2RGB)
+        x = cv2.medianBlur(x, 3)
+        if is_gray:
+            kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+            x = cv2.filter2D(x, -1, kernel)
+        if not is_gray:
+            x = cv2.cvtColor(x, cv2.COLOR_RGB2BGR)
+        x = torch.tensor(x)
+        if is_gray:
+            x = x.unsqueeze(-1)
+        x = x.permute(2, 0, 1).unsqueeze(0)
+        return x
+
 
     def __len__(self,):
         return len(self.central_x)
@@ -281,9 +307,11 @@ def load_data(config):
             else:
                 public_train_set = SpecificClassEMNIST(public_train_set_, specific_class)
         elif "central" in config.public_data.name:
-            public_train_set = CentralDataset(sensitive_train_loader.dataset, num_classes=config.sensitive_data.n_classes, c_type=config.public_data.name.split('_')[-1])
-            config.train.dp['sdq'] = True
-            config.train.dp['privacy_history'] = [[5, 6000/len(sensitive_train_loader.dataset), 5]]
+            sigma = 10
+            batch_size = 12000
+            sample_num = 500
+            public_train_set = CentralDataset(sensitive_train_loader.dataset, num_classes=config.sensitive_data.n_classes, c_type=config.public_data.name.split('_')[-1], sigma=sigma, sample_num=sample_num, batch_size=batch_size)
+            config.train.dp['privacy_history'] = [[sigma, batch_size/len(sensitive_train_loader.dataset), sample_num]]
         else:
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     

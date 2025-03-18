@@ -140,12 +140,18 @@ class DP_Kernel(DPSynther):
         os.mkdir(os.path.join(config.log_dir, "samples"))
         os.mkdir(os.path.join(config.log_dir, "checkpoints"))
 
+        if config.dp.privacy_history is None:
+            account_history = None
+        else:
+            account_history = [tuple(item) for item in config.dp.privacy_history]
+
         # Calculate the noise multiplier for differential privacy
         self.noise_factor = get_noise_multiplier(
             target_epsilon=config.dp.epsilon, 
             target_delta=config.dp.delta, 
             sample_rate=1/len(sensitive_dataloader), 
-            steps=config.max_iter
+            steps=config.max_iter,
+            account_history=account_history
         )
 
         # Log the noise factor

@@ -7,13 +7,13 @@ setup:
   master_address: 127.0.0.1
   master_port: 6024
   omp_n_threads: 8
-  workdir: exp/dpgan/mnist_28_eps1.0
+  workdir: null
 public_data:
   name: imagenet
   num_channels: 3
   resolution: 128
   n_classes: 1000
-  train_path: /bigtemp/fzv6en/dataset/dpimagebench/imagenet_128
+  train_path: null
   selective:
     ratio: 1.0
 sensitive_data:
@@ -86,12 +86,7 @@ train:
       g_lr: 2e-4
       beta1: 0.0
   dp:
-    sdq: null
-    privacy_history:
-    - - 5
-      - 0.1
-      - 75
-    alpha_num: 0
+    privacy_history: null
     max_grad_norm: 0.001
     delta: 1e-5
     epsilon: 10.0

@@ -255,6 +255,7 @@ class DP_LORA(DPSynther):
             'model.params.dp_config.delta={}'.format(config.dp.delta),  # Differential privacy delta.
             'model.params.dp_config.max_grad_norm={}'.format(config.dp.max_grad_norm),  # Maximum gradient norm.
             'model.params.dp_config.max_batch_size={}'.format(config.batch_size // config.n_splits),  # Maximum batch size per split.
+            'model.params.dp_config.privacy_history={}'.format('None' if config.dp.sdq is None else str(config.dp.privacy_history)),  # privacy_history.
             'data.params.batch_size={}'.format(config.batch_size),  # Batch size.
             'lightning.trainer.max_epochs={}'.format(config.n_epochs),  # Number of epochs.
             'data.params.train.params.path={}'.format(self.config.sensitive_data.train_path),  # Path to the training data.

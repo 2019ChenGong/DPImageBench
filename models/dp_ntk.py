@@ -147,13 +147,19 @@ class DP_NTK(DPSynther):
         os.mkdir(config.log_dir)
         os.mkdir(os.path.join(config.log_dir, "samples"))
         os.mkdir(os.path.join(config.log_dir, "checkpoints"))
+
+        if config.dp.privacy_history is None:
+            account_history = None
+        else:
+            account_history = [tuple(item) for item in config.dp.privacy_history]
         
         # Calculate noise multiplier for differential privacy
         self.noise_factor = get_noise_multiplier(
             target_epsilon=config.dp.epsilon, 
             target_delta=config.dp.delta, 
             sample_rate=1., 
-            epochs=1
+            epochs=1,
+            account_history=account_history,
         )
         
         # Log the noise factor
