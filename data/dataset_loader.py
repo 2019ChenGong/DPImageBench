@@ -106,6 +106,8 @@ def semantic_query(sensitive_train_loader, config):
 
     num_words = int(config.public_data.n_classes * config.public_data.selective.ratio / config.sensitive_data.n_classes)
     config.train.dp['privacy_history'] = [[config.public_data.selective.sigma, 1.0, 1]]
+    if config.setup.global_rank == 0:
+        logging.info("Additional privacy cost: {}".format(str([config.public_data.selective.sigma, 1.0, 1])))
 
     with torch.no_grad():
         for (x, y) in sensitive_loader:
@@ -146,7 +148,7 @@ class CentralDataset(Dataset):
     def __init__(self, sensitive_dataset, sample_num=50, sigma=5, batch_size=6000, num_classes=10, c_type='mean'):
         super().__init__()
 
-        self.trans = random_aug(magnitude=3, num_ops=2)
+        self.trans = random_aug(magnitude=9, num_ops=2)
 
         if c_type == 'mean':
             self.central_x, self.central_y = self.query_mean_image(sensitive_dataset, sample_num // num_classes, sigma, batch_size, num_classes)
@@ -307,11 +309,13 @@ def load_data(config):
             else:
                 public_train_set = SpecificClassEMNIST(public_train_set_, specific_class)
         elif "central" in config.public_data.name:
-            sigma = 10
+            sigma = 5
             batch_size = 12000
-            sample_num = 500
+            sample_num = 30
             public_train_set = CentralDataset(sensitive_train_loader.dataset, num_classes=config.sensitive_data.n_classes, c_type=config.public_data.name.split('_')[-1], sigma=sigma, sample_num=sample_num, batch_size=batch_size)
             config.train.dp['privacy_history'] = [[sigma, batch_size/len(sensitive_train_loader.dataset), sample_num]]
+            if config.setup.global_rank == 0:
+                logging.info("Additional privacy cost: {}".format(str([sigma, batch_size/len(sensitive_train_loader.dataset), sample_num])))
         else:
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     
