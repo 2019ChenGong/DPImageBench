@@ -46,7 +46,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Updates 
 
-- 🎉 **(2025.03.18)**
+- 🎉 **(2025.03.18)** We release our paper [DPImageBench](http://arxiv.org/abs/2503.14681).
 - 🎉 **(2025.01.23)** We add a new SOTA DP image synthesizer [DP-LORA](https://arxiv.org/abs/2406.01355) to DPImageBench! Please try it out!
 - 🎉 **(2024.11.19)** We're thrilled to announce the release of initial version of DPImageBench!
 
@@ -775,10 +775,10 @@ If you have any question about our work or this repository, please don't hesitat
 
 ```text
 @article{dpimagebench,
-author = {Chen Gong and Kecen Li and Zinan Lin and Tianhao Wang},
-title = {DPImageBench: A Unified Benchmark for Differentially Private Image Synthesis},
-year = {2025},
-howpublished = {https://github.com/2019ChenGong/DPImageBench}
+  author = {Chen Gong and Kecen Li and Zinan Lin and Tianhao Wang},
+  title = {DPImageBench: A Unified Benchmark for Differentially Private Image Synthesis},
+  year = {2025},
+  journal={arXiv preprint arXiv:2503.14681}
 }
 ```
 
