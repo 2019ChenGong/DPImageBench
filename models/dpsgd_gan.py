@@ -515,8 +515,8 @@ class DPGAN(DPSynther):
             logging.info("Generation Finished!")
             
             # Concatenate all generated data and labels
-            syn_data = np.concatenate(syn_data)
-            syn_labels = np.concatenate(syn_labels)
+            syn_data = np.concatenate(syn_data)[:config.data_num]
+            syn_labels = np.concatenate(syn_labels)[:config.data_num]
 
             # Save the generated data and labels to a file
             np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)

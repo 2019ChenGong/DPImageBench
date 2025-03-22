@@ -311,7 +311,7 @@ def load_data(config):
         elif "central" in config.public_data.name:
             sigma = 5
             batch_size = 12000
-            sample_num = 30
+            sample_num = 1
             public_train_set = CentralDataset(sensitive_train_loader.dataset, num_classes=config.sensitive_data.n_classes, c_type=config.public_data.name.split('_')[-1], sigma=sigma, sample_num=sample_num, batch_size=batch_size)
             config.train.dp['privacy_history'] = [[sigma, batch_size/len(sensitive_train_loader.dataset), sample_num]]
             if config.setup.global_rank == 0:

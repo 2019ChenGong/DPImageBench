@@ -558,8 +558,8 @@ class DP_Diffusion(DPSynther):
             logging.info("Generation Finished!")
             
             # Concatenate all collected synthetic data and labels
-            syn_data = np.concatenate(syn_data)
-            syn_labels = np.concatenate(syn_labels)
+            syn_data = np.concatenate(syn_data)[:config.data_num]
+            syn_labels = np.concatenate(syn_labels)[:config.data_num]
             
             # Save the synthetic data and labels to a .npz file
             np.savez(os.path.join(config.log_dir, "gen.npz"), x=syn_data, y=syn_labels)
