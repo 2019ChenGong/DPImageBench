@@ -9,13 +9,17 @@ setup:
   omp_n_threads: 8
   workdir: null
 public_data:
-  name: null
+  name: central_mean
   num_channels: 3
   resolution: 64
   n_classes: 1000
   train_path: null
   selective:
     ratio: 1.0
+  central:
+    batch_size: 12000
+    sigma: 10
+    sample_num: 250
 sensitive_data:
   name: celeba_male_64
   num_channels: 3

@@ -149,11 +149,12 @@ class CentralDataset(Dataset):
         super().__init__()
 
         self.trans = random_aug(magnitude=9, num_ops=2)
+        self.privacy_history = [sigma, batch_size/len(sensitive_dataset), sample_num]
 
         if c_type == 'mean':
-            self.central_x, self.central_y = self.query_mean_image(sensitive_dataset, sample_num // num_classes, sigma, batch_size, num_classes)
+            self.central_x, self.central_y = self.query_mean_image(sensitive_dataset, sample_num, sigma, batch_size, num_classes)
         else:
-            self.central_x, self.central_y = self.query_mode_image(sensitive_dataset, sample_num // num_classes, sigma, batch_size, num_classes)
+            self.central_x, self.central_y = self.query_mode_image(sensitive_dataset, sample_num, sigma, batch_size, num_classes)
     
     def query_mean_image(self, sensitive_dataset, sample_num, sigma, batch_size, num_classes):
         c = 0
@@ -309,13 +310,10 @@ def load_data(config):
             else:
                 public_train_set = SpecificClassEMNIST(public_train_set_, specific_class)
         elif "central" in config.public_data.name:
-            sigma = 5
-            batch_size = 12000
-            sample_num = 1
-            public_train_set = CentralDataset(sensitive_train_loader.dataset, num_classes=config.sensitive_data.n_classes, c_type=config.public_data.name.split('_')[-1], sigma=sigma, sample_num=sample_num, batch_size=batch_size)
-            config.train.dp['privacy_history'] = [[sigma, batch_size/len(sensitive_train_loader.dataset), sample_num]]
+            public_train_set = CentralDataset(sensitive_train_loader.dataset, num_classes=config.sensitive_data.n_classes, c_type=config.public_data.name.split('_')[-1], **config.public_data.central)
+            config.train.dp['privacy_history'] = [public_train_set.privacy_history]
             if config.setup.global_rank == 0:
-                logging.info("Additional privacy cost: {}".format(str([sigma, batch_size/len(sensitive_train_loader.dataset), sample_num])))
+                logging.info("Additional privacy cost: {}".format(str(public_train_set.privacy_history)))
         else:
             raise NotImplementedError('public data {} is not yet implemented.'.format(config.public_data.name))
     

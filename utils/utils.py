@@ -126,6 +126,6 @@ def parse_config(opt, unknown):
         return config
     config.model.private_num_classes = config.sensitive_data.n_classes
     config.model.public_num_classes = config.public_data.n_classes
-    if config.public_data.name is None:
+    if config.public_data.name is None or opt.method in ['PrivImage', 'DP-FETA']:
         config.model.public_num_classes = config.model.private_num_classes
     return config

@@ -9,34 +9,38 @@ setup:
   omp_n_threads: 8
   workdir: null
 public_data:
-  name: null
+  name: central_mean
   num_channels: 3
-  resolution: 64
+  resolution: 128
   n_classes: 1000
   train_path: null
   selective:
     ratio: 1.0
+  central:
+    batch_size: 12000
+    sigma: 10
+    sample_num: 250
 sensitive_data:
-  name: celeba_male_64
+  name: celeba_male_128
   num_channels: 3
-  resolution: 64
+  resolution: 128
   n_classes: 2
-  train_path: dataset/celeba/train_64_Male.zip
-  test_path: dataset/celeba/test_64_Male.zip
-  fid_stats: dataset/celeba/fid_stats_64.npz
+  train_path: dataset/celeba/train_128_Male.zip
+  test_path: dataset/celeba/test_128_Male.zip
+  fid_stats: dataset/celeba/fid_stats_128.npz
 model:
   ckpt: null
   denoiser_name: edm
   denoiser_network: song
   ema_rate: 0.999
   network:
-    image_size: 64
+    image_size: 128
     num_in_channels: 3
     num_out_channels: 3
     label_dim: 1000
     attn_resolutions:
+    - 64
     - 32
-    - 16
     ch_mult:
     - 1
     - 2

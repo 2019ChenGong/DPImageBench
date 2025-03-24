@@ -9,38 +9,40 @@ setup:
   omp_n_threads: 8
   workdir: null
 public_data:
-  name: null
-  num_channels: 3
-  resolution: 64
+  name: central_mean
+  num_channels: 1
+  resolution: 28
   n_classes: 1000
-  train_path: null
+  train_path: dataset/imagenet/imagenet_32
   selective:
     ratio: 1.0
+  central:
+    batch_size: 6000
+    sigma: 5
+    sample_num: 5
 sensitive_data:
-  name: celeba_male_64
-  num_channels: 3
-  resolution: 64
-  n_classes: 2
-  train_path: dataset/celeba/train_64_Male.zip
-  test_path: dataset/celeba/test_64_Male.zip
-  fid_stats: dataset/celeba/fid_stats_64.npz
+  name: mnist
+  num_channels: 1
+  resolution: 28
+  n_classes: 10
+  train_path: dataset/mnist/train_28.zip
+  test_path: dataset/mnist/test_28.zip
+  fid_stats: dataset/mnist/fid_stats_28.npz
 model:
   ckpt: null
   denoiser_name: edm
   denoiser_network: song
   ema_rate: 0.999
   network:
-    image_size: 64
-    num_in_channels: 3
-    num_out_channels: 3
+    image_size: 28
+    num_in_channels: 1
+    num_out_channels: 1
     label_dim: 1000
     attn_resolutions:
-    - 32
-    - 16
+    - 14
     ch_mult:
-    - 1
     - 2
-    - 4
+    - 2
   sampler:
     type: ddim
     stochastic: false
@@ -52,22 +54,27 @@ model:
     snapshot_batch_size: 80
     fid_batch_size: 256
   sampler_fid:
-    type: ddim
-    stochastic: false
-    num_steps: 250
+    type: edm
+    s_churn: 100
+    s_min: 0.05
+    s_max: 50
+    num_steps: 1000
     tmin: 0.002
     tmax: 80.0
     rho: 7.0
     guid_scale: 0.0
   sampler_acc:
-    type: ddim
-    stochastic: false
-    num_steps: 250
+    type: edm
+    s_churn: 10
+    s_min: 0.1
+    s_max: 50
+    num_steps: 1000
     tmin: 0.002
     tmax: 80.0
     rho: 7.0
     guid_scale: 0.0
-  private_num_classes: 2
+    labels: 10
+  private_num_classes: 10
   public_num_classes: 1000
 pretrain:
   log_dir: null
@@ -98,7 +105,7 @@ train:
   log_dir: null
   seed: 0
   batch_size: 4096
-  n_epochs: 100
+  n_epochs: 150
   partly_finetune: false
   log_freq: 100
   snapshot_freq: 2000
@@ -120,15 +127,15 @@ train:
     version: edm
     p_mean: -1.2
     p_std: 1.2
-    n_noise_samples: 4
-    n_classes: 2
+    n_noise_samples: 32
+    n_classes: 10
   dp:
-    max_grad_norm: 0.001
-    delta: 1e-6
-    epsilon: 10.0
-    max_physical_batch_size: 8192
     privacy_history: null
-  n_splits: 64
+    max_grad_norm: 0.001
+    delta: 1e-5
+    epsilon: 1.0
+    max_physical_batch_size: 8192
+  n_splits: 32
 gen:
   data_num: 60000
   batch_size: 1000
