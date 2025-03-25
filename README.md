@@ -430,6 +430,10 @@ python run.py setup.n_gpus_per_node=4 --method DPDM --data_name cifar10_32 \
  --exp_description pretrain_imagenet_5perc 
 ```
 
+> [!Note]
+>
+> If users wish to combine warm-up training in DP-FETA with other methods, you should set the `public_data.name=central_mean`.
+
 #### 4.3.3 Training Using Checkpoints
 
 DPImageBench also supports training synthesizers from the checkpoints. As mentioned in the [results structure](#451-results-structure), we provide `snapshot_checkpoint.pth` to store the synthesizer's parameters at the current epoch after each iteration. If users wish to finetune the synthesizers using pretrained models, they should: (1) set `public_data.name=null`, and (2) load the pretrained synthesizers through `model.ckpt`. For example, the pretrained synthesizer can be sourced from other algorithms. Readers can refer to the [file structure](./exp/README.md) for more details about loading pretrained models like
