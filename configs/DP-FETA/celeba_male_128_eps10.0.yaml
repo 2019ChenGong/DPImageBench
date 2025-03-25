@@ -76,14 +76,14 @@ model:
 pretrain:
   log_dir: null
   seed: 0
-  batch_size: 1024
-  n_epochs: 160
+  batch_size: 50
+  n_epochs: 1000
   log_freq: 100
-  snapshot_freq: 2000
+  snapshot_freq: 100
   snapshot_threshold: 1
   save_freq: 100000
   save_threshold: 1
-  fid_freq: 2000
+  fid_freq: 100
   fid_samples: 5000
   fid_threshold: 1
   optim:
