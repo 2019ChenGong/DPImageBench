@@ -255,7 +255,7 @@ Users should first activate the conda environment.
 conda activate dpimagebench
 cd DPImageBench
 ```
-#### For the implementation of results reported in Table 5, 6, 7, and 9 (RQ1). 
+#### For the implementation of results reported in Table 6, 7, 8, 9 and 10 (RQ1). 
 
 We list an example as follows. Users can modify the configuration files in [configs](./configs) as their preference. 
 
@@ -305,7 +305,7 @@ CUDA_VISIBLE_DEVICES=0,1,2 python run.py \
  --exp_description pretrain_imagenet32
 ```
 
-#### For the implementation of the results reported in Figures 5, 6, and 9 (RQ2), the performance is analyzed by varying the epsilon and model size.
+#### For the implementation of the results reported in Figures 5, 6, and Table 11 (RQ2), the performance is analyzed by varying the epsilon and model size.
 
 If users wish to change the size of the synthesizer, the following parameters should be considered.
 
@@ -418,7 +418,7 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \
  --exp_description pretrain_places365_unconditional 
 ```
 
-If users wish to use select the public dataset for pretraining like PrivImage in Table 12, you should set the `public_data.selective.ratio`.
+If users wish to use select the public dataset for pretraining like PrivImage in Table 13, you should set the `public_data.selective.ratio`.
 
 For example, use 5% ImageNet to pretrain DPDM.
 ```
