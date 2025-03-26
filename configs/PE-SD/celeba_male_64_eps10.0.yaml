@@ -1,0 +1,85 @@
+setup:
+  method: PE
+  run_type: normal
+  n_gpus_per_node: 1
+  n_nodes: 1
+  node_rank: 0
+  master_address: 127.0.0.1
+  master_port: 6025
+  omp_n_threads: 8
+  workdir: null
+public_data:
+  name: null
+  train_path: null
+sensitive_data:
+  name: celeba_male_64
+  num_channels: 3
+  resolution: 64
+  n_classes: 2
+  train_path: dataset/celeba/train_64_Male.zip
+  test_path: dataset/celeba/test_64_Male.zip
+  fid_stats: dataset/celeba/fid_stats_64.npz
+model:
+  api: improved_diffusion
+  feature_extractor: inception_v3
+  api_params:
+    model_image_size: 64
+    num_channels: 192
+    num_res_blocks: 3
+    learn_sigma: true
+    class_cond: true
+    diffusion_steps: 4000
+    noise_schedule: cosine
+    rescale_learned_sigmas: false
+    rescale_timesteps: false
+    use_ddim: true
+    timestep_respacing: 100
+    batch_size: 2000
+    model_path: models/pretrained_models/imagenet64_cond_270M_250K.pt
+  private_num_classes: 2
+  public_num_classes: 1000
+  ckpt: null
+pretrain:
+  log_dir: null
+  cond: true
+train:
+  batch_size: 2000
+  feature_extractor_batch_size: 500
+  private_image_size: 64
+  private_num_classes: 2
+  num_samples_schedule:
+  - 60000
+  - 60000
+  - 60000
+  - 60000
+  - 60000
+  - 60000
+  variation_degree_schedule:
+  - 0
+  - 2
+  - 4
+  - 6
+  - 8
+  - 10
+  initial_prompt: null
+  image_size: 64x64
+  lookahead_degree: 8
+  num_nearest_neighbor: 1
+  nn_mode: L2
+  count_threshold: 2.0
+  log_dir: null
+  tmp_folder: dataset/celeba/pe_tmp
+  dp:
+    epsilon: 10.0
+    delta: 1e-5
+    privacy_history: null
+  n_splits: 1
+gen:
+  data_num: 60000
+  batch_size: 1000
+  log_dir: null
+  num_channels: 3
+  resolution: 64
+eval:
+  batch_size: 1000
+  mode: val

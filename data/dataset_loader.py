@@ -3,6 +3,7 @@ import torch
 import torch.nn.functional as F
 import torchvision
 from torch.utils.data import random_split, Dataset, DataLoader
+from opacus.data_loader import DPDataLoader, switch_generator
 from torchvision import transforms
 import numpy as np
 import logging
@@ -160,14 +161,16 @@ class CentralDataset(Dataset):
         c = 0
         central_x, central_y = [], []
         ds = 0.5
-        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=16)
+        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, num_workers=16)
+        dataloader = DPDataLoader.from_data_loader(dataloader)
         for _ in range(10000):
             for x, y in dataloader:
                 for cls in range(num_classes):
                     
                     x_cls = x if num_classes==1 else x[y==cls]
+                    # logging.info('{} {} {}'.format(c, cls, x_cls.shape[0]))
 
-                    sensitivity_m = np.sqrt((ds**2) * np.prod(x_cls.shape[1:])) / x_cls.shape[0]
+                    sensitivity_m = np.sqrt((ds**2) * np.prod(x_cls.shape[1:])) / (batch_size//num_classes)
 
                     xm = torch.mean(x_cls, dim=0, keepdim=True)
                     xm = F.interpolate(xm, scale_factor=ds)
@@ -193,7 +196,8 @@ class CentralDataset(Dataset):
         c = 0
         central_x, central_y = [], []
         ds = 0.5
-        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=16)
+        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, num_workers=16)
+        dataloader = DPDataLoader.from_data_loader(dataloader, generator=self.secure_rng, distributed=True)
         for _ in range(10000):
             for x, y in dataloader:
                 if x.shape[-1] == 28:
