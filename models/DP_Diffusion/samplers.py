@@ -54,10 +54,21 @@ def edm_sampler(x, y, denoiser, num_steps, tmin, tmax, rho, guid_scale=None, s_n
     return D
 
 
-def ddim_sampler(x, y, denoiser, num_steps, tmin, tmax, rho, guid_scale=None, stochastic=False, **kwargs):
+def ddim_sampler(x, y, denoiser, num_steps, tmin, tmax, rho, guid_scale=None, stochastic=False, start_sigma=None, start_t=None, **kwargs):
     t_steps = torch.linspace(tmax ** (1. / rho), tmin **
                              (1. / rho), steps=num_steps, device=x.device) ** rho
-    x = x * t_steps[0]
+    if start_t is not None:
+        start_t = int(start_t * t_steps.shape[0])
+        t_steps = t_steps[start_t:]
+        x = x + torch.randn_like(x) * t_steps[0]
+    elif start_sigma is not None:
+        for i in range(t_steps.shape[0]):
+            if start_sigma >= t_steps[i]:
+                break
+        t_steps = t_steps[i:]
+        x = x + torch.randn_like(x) * t_steps[0]
+    else:  
+        x = x * t_steps[0]
 
     if guid_scale is not None:
         denoiser = guidance_wrapper(denoiser, guid_scale)

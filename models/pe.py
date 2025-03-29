@@ -15,6 +15,7 @@ from models.PE.pe.metrics import compute_fid
 from models.PE.pe.dp_counter import dp_nn_histogram
 from models.PE.pe.arg_utils import str2bool
 from models.PE.apis import get_api_class_from_name
+from fld.metrics.FID import FID
 import torch.nn.functional as F
 
 import logging
@@ -64,11 +65,14 @@ class PE(DPSynther):
         """
         super().__init__()  # Call the constructor of the parent class
         api_class = get_api_class_from_name(config.api)  # Get the API class based on the name provided in the config
-        api_args = []  # Initialize an empty list to hold API arguments
-        for k in config.api_params:  # Iterate over the API parameters in the configuration
-            api_args.append('--' + k)  # Append the parameter key as a command-line argument
-            api_args.append(str(config.api_params[k]))  # Append the parameter value as a command-line argument
-        self.api = api_class.from_command_line_args(api_args)  # Initialize the API with the constructed command-line arguments
+        if config.api == 'sd':
+            self.api = api_class.from_dict_args(config.api_params)
+        else:
+            api_args = []  # Initialize an empty list to hold API arguments
+            for k in config.api_params:  # Iterate over the API parameters in the configuration
+                api_args.append('--' + k)  # Append the parameter key as a command-line argument
+                api_args.append(str(config.api_params[k]))  # Append the parameter value as a command-line argument
+            self.api = api_class.from_command_line_args(api_args)  # Initialize the API with the constructed command-line arguments
         self.feature_extractor = config.feature_extractor  # Set the feature extractor from the configuration
         self.samples = None  # Initialize the samples attribute to None
         self.labels = None  # Initialize the labels attribute to None
@@ -125,7 +129,7 @@ class PE(DPSynther):
             model_name=self.feature_extractor,
             num_workers=2,
             res=config.private_image_size,
-            batch_size=config.feature_extractor_batch_size
+            batch_size=config.feature_extractor_batch_size,
         )
         logging.info(f'all_private_features.shape: {all_private_features.shape}')
 
@@ -238,14 +242,25 @@ class PE(DPSynther):
             )
             samples = np.squeeze(samples, axis=1)
 
-            # Log the final samples if this is the last iteration
-            if t == len(config.num_samples_schedule) - 1:
-                log_samples(
-                    samples=samples,
-                    additional_info=additional_info,
-                    folder=f'{config.log_dir}/{t}',
-                    plot_images=False
+            packed_features = extract_features(
+                    data=samples,
+                    tmp_folder=tmp_folder,
+                    num_workers=2,
+                    model_name=self.feature_extractor,
+                    res=config.private_image_size,
+                    batch_size=config.feature_extractor_batch_size
                 )
+            fid = FID().compute_metric(torch.Tensor(all_private_features), None, torch.Tensor(packed_features))
+            logging.info("cuurent fid: {}".format(fid))
+
+            # Log the final samples if this is the last iteration
+            # if t == len(config.num_samples_schedule) - 1:
+            #     log_samples(
+            #         samples=samples,
+            #         additional_info=additional_info,
+            #         folder=f'{config.log_dir}/{t}',
+            #         plot_images=False
+            #     )
 
         # Store the final samples and labels
         self.samples = np.transpose(samples.astype('float'), (0, 3, 1, 2)) / 255.

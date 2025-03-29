@@ -121,7 +121,8 @@ def parse_config(opt, unknown):
         config.sensitive_data.train_path = os.path.join("dataset", opt.data_name, "train_32.zip")
         config.sensitive_data.test_path = os.path.join("dataset", opt.data_name, "test_32.zip")
         config.sensitive_data.fid_stats = os.path.join("dataset", opt.data_name, "fid_stats_32.npz")
-    if opt.method == "PE":
+    if opt.method in ["PE", "PE-SD"]:
+        config.train.tmp_folder = config.sensitive_data.name
         config.train.private_num_classes = config.sensitive_data.n_classes
         return config
     config.model.private_num_classes = config.sensitive_data.n_classes

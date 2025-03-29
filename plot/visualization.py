@@ -27,7 +27,7 @@ def visualize_main():
     row_per_method = 1
     img_size = 32
     datasets = ["MNIST", "F-MNIST", "CIFAR-10", "CIFAR-100", "EuroSAT", "CelebA", "Camelyon"]
-    methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "GS-WGAN", "DPGAN", "DPDM", "PDP-Diffusion", "DP-LDM (SD)", "DP-LDM", "DP-L0RA", "PrivImage", "Real"]
+    methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "GS-WGAN", "DPGAN", "DPDM", "DP-FETA", "PDP-Diffusion", "DP-LDM (SD)", "DP-LDM", "DP-L0RA", "PrivImage", "Real"]
     width_per_patch = img_size * column_per_dataset
     height_per_patch = img_size * row_per_method
 
@@ -97,6 +97,15 @@ def visualize_main():
         "/DPImageBench/exp/dpdm/eurosat_32_eps10.0trainval-2024-10-24-12-56-31/gen/gen.npz",
         "/DPImageBench/exp/dpdm/celeba_male_32_eps10.0trainval-2024-10-24-00-28-59/gen/gen.npz",
         "/DPImageBench/exp/dpdm/camelyon_32_eps10.0trainval-2024-10-25-02-30-03/gen/gen.npz"
+    ],
+    [
+        "/DPImageBench/exp/dp-feta/mnist_28_eps10.0val_central_mean-2025-03-19-07-56-07/gen/gen.npz",
+        "/DPImageBench/exp/dp-feta/fmnist_28_eps10.0val_central_mean-2025-03-20-06-25-53/gen/gen.npz",
+        "/DPImageBench/exp/dp-feta/cifar10_32_eps10.0val_central_mean-2025-03-23-07-47-44/gen/gen.npz",
+        "/DPImageBench/exp/dp-feta/cifar100_32_eps10.0val_central_mean-2025-03-22-08-43-07/gen/gen.npz",
+        "/DPImageBench/exp/dp-feta/eurosat_32_eps10.0val_central_mean-2025-03-22-11-11-55/gen/gen.npz",
+        "/DPImageBench/exp/dp-feta/celeba_male_32_eps10.0sen_central_mean-2025-03-19-04-42-04/gen/gen.npz",
+        "/DPImageBench/exp/dp-feta/camelyon_32_eps10.0sen_central_mean-2025-03-19-04-42-04/gen/gen.npz"
     ],
     [
         "/DPImageBench/exp/pdp-diffusion/mnist_28_eps10.0val_cn1e-3-2024-11-29-07-04-47/gen/gen.npz",
