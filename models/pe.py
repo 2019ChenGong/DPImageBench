@@ -251,7 +251,7 @@ class PE(DPSynther):
                     batch_size=config.feature_extractor_batch_size
                 )
             fid = FID().compute_metric(torch.Tensor(all_private_features), None, torch.Tensor(packed_features))
-            logging.info("cuurent fid: {}".format(fid))
+            logging.info("current fid: {}".format(fid))
 
             # Log the final samples if this is the last iteration
             # if t == len(config.num_samples_schedule) - 1:

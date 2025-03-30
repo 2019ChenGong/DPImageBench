@@ -71,9 +71,10 @@ class SDAPI(API):
         self._diffusion = create_gaussian_diffusion(
             steps=1000,
             learn_sigma=True,
-            noise_schedule="cosine",)
+            noise_schedule="cosine",
+            timestep_respacing=str(sampler.num_steps),)
         self._sigma_list = self._diffusion.sqrt_one_minus_alphas_cumprod / self._diffusion.sqrt_alphas_cumprod
-        # print(self._sigma_list)
+        # logging.info(str(self._sigma_list))
 
     def image_random_sampling(self, num_samples, size, prompts, labels=None):
         """
@@ -106,6 +107,7 @@ class SDAPI(API):
         with torch.no_grad():
             for i in range(num_samples//self._batch_size+1):
                 x, y = generate_batch(self._sampler, sampling_shape, dist_util.dev(), self.network.label_dim, self.network.label_dim)
+                # x, y = generate_batch(self._sampler, sampling_shape, dist_util.dev(), 10, 10)
                 samples.append(x.detach().cpu())
                 labels.append(y.detach().cpu())
                 logging.info(f"Created {(i+1)*self._batch_size} samples")
@@ -178,7 +180,7 @@ class SDAPI(API):
         for i in range(len(images_list)):
             with torch.no_grad():
                 # x = self._sampler(images_list[i].to(dist_util.dev()), labels_list[i].to(dist_util.dev()), start_t=variation_degree/1000)
-                x = self._sampler(images_list[i].to(dist_util.dev()), labels_list[i].to(dist_util.dev()), start_sigma=self._sigma_list[999-variation_degree])
+                x = self._sampler(images_list[i].to(dist_util.dev()), labels_list[i].to(dist_util.dev()), start_sigma=self._sigma_list[len(self._sigma_list)-1-variation_degree])
             samples.append(x.detach().cpu())
             logging.info(f"Created {(i+1)*self._batch_size} samples")
         samples = torch.cat(samples).clamp(-1., 1.).numpy()
