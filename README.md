@@ -91,7 +91,8 @@ DPImageBench/
 │   ├── DP-MERF      
 │   ├── DP-NTK       
 │   ├── DP-Kernel
-│   ├── PE            
+│   ├── PE
+│   ├── PE-SD                    # Using PE with their own pretrained diffusion models           
 │   ├── DP-GAN         
 │   ├── DPDM        
 │   ├── DP-FETA        
@@ -420,6 +421,8 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \
  --exp_description pretrain_places365_unconditional 
 ```
 
+#### For the implementation of the results reported in RQ4.
+
 If users wish to use select the public dataset for pretraining like PrivImage in Table 13, you should set the `public_data.selective.ratio`.
 
 For example, use 5% ImageNet to pretrain DPDM.
@@ -444,6 +447,18 @@ python run.py setup.n_gpus_per_node=1 --method DP-MERF --data_name mnist_28 \
  public_data.central.sample_num=50 \
  pretrain.cond=true \
  --exp_description pretrain_central 
+```
+
+> [!Note]
+>
+> If users wish to use PE with their own pretrained diffusion models, they can use the method PE-SD.
+
+For example, use the chechpoint from PDP-Diffusion to implement PE.
+```
+python run.py --method PE-SD --data_name cifar10_32 \
+ --epsilon 10.0 eval.mode=val \
+ model.api_params.ckpt=./exp/pdp-diffusion/<the-name-of-scripts>/pretrain/checkpoints/snapshot_checkpoint.pth \
+ --exp_description model_from_pdp 
 ```
 
 #### 4.3.3 Training Using Checkpoints
