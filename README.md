@@ -67,6 +67,7 @@ We list currently supported DP image synthesis methods as follows.
   | GS-WGAN            |  [\[NeuriPS 2020\] GS-WGAN: A Gradient-Sanitized Approach for Learning Differentially Private Generators](https://arxiv.org/pdf/2006.08265) |
   | DP-GAN            |  [\[arXiv 2020\] Differentially Private Generative Adversarial Network (arxiv.org)](https://arxiv.org/abs/1802.06739) |
   | DPDM          |  [\[TMLR 2023\] Differentially Private Diffusion Models](https://openreview.net/forum?id=ZPpQk7FJXF) |
+  | DP-FETA          |  [\[SP 2025\] From Easy to Hard: Building a Shortcut for Differentially Private Image Synthesis]() |
   | PDP-Diffusion       | [\[2302.13861\] Differentially Private Diffusion Models Generate Useful Synthetic Images (arxiv.org)](https://arxiv.org/abs/2302.13861) |
   | DP-LDM            | [\[TMLR 2024\] Differentially Private Latent Diffusion Models](https://arxiv.org/abs/2305.15759) |
   | DP-LoRA           | [\[arXiv 2024\] Differentially Private Fine-Tuning of Diffusion Models](https://arxiv.org/abs/2406.01355) |
@@ -93,6 +94,7 @@ DPImageBench/
 │   ├── PE            
 │   ├── DP-GAN         
 │   ├── DPDM        
+│   ├── DP-FETA        
 │   ├── PDP-Diffusion      
 │   ├── DP-LDM-SD
 │   ├── DP-LDM
@@ -228,7 +230,7 @@ We list the key hyper-parameters below, including their explanations and availab
 - `setup.master_port`: a configuration parameter specifying the port number on the master node (or primary process) that other processes or nodes use to communicate within a distributed system.
 - `pretrain.n_epochs`: the number of epoch for pretraining.
 - `train.n_epochs`: the number of epoch for finetuning on sensitive datasets.
-- `train.dp.n_split`: the number of gradient accumulations for saving GPU memory usage.
+- `train.n_split`: the number of gradient accumulations for saving GPU memory usage.
 
 > [!Note]
 >
@@ -238,7 +240,7 @@ We list the key hyper-parameters below, including their explanations and availab
 >
 > Experiments such as pretraining or using DPSGD require significant computational resources, as shown in Table 17 of our paper. We recommend to use 4 NVIDIA GeForce A6000 Ada GPUs and 512GB of memory. Here are some tips to help users efficiently reduce computational resource usage and running time in an appropriate way:
 > - Reduce `pretrain.n_epochs` and `train.n_epochs`: Reducing the number of pretraining and fine-tuning steps can decrease running time but may also impact the performance of synthetic images.
-> - Increase `train.dp.n_split`: Increasing `train.dp.n_split` enables jobs to run even when GPU memory is insufficient. However, this adjustment will lead to longer running times.
+> - Increase `train.n_split`: Increasing `train.n_split` enables jobs to run even when GPU memory is insufficient. However, this adjustment will lead to longer running times.
 > - Share the pretraing models: Some algorithms can share the same pretrained models, `PDP-Diffusion` and `DP-LDM-SD`, as well as `DP-LoRA and DP-LDM`. Additionally, for certain algorithms, different sensitive datasets can also share the same pretrained model. For detailed instructions on using pretrained synthesizers, please refer to the section "Directly use the pretrained synthesizers" in [4.3.2 How to run](#432-how-to-run). Sharing pretrained models eliminates the need for additional pretraining, helping to save computational resources.
 
 
@@ -309,7 +311,7 @@ CUDA_VISIBLE_DEVICES=0,1,2 python run.py \
 
 If users wish to change the size of the synthesizer, the following parameters should be considered.
 
-- `train.dp.n_split`: the number of gradient accumulations for saving GPU memory usage. For example, if your server allows to train a 4M DPDM with `batch_size=4096` and `train.dp.n_split=32`. When you want to train an 80M DPDM with the same `batch_size`, you may need to increase `train.dp.n_split` into 512,
+- `train.n_split`: the number of gradient accumulations for saving GPU memory usage. For example, if your server allows to train a 4M DPDM with `batch_size=4096` and `train.n_split=32`. When you want to train an 80M DPDM with the same `batch_size`, you may need to increase `train.n_split` into 512,
 - Change the model size: For diffusion based model, please change `model.network.ch_mult`, `model.network.attn_resolutions` and `model.network.nf` to adjust the synthesizer size. For GAN based model, please change `model.Generator.g_conv_dim` to adjust the synthesizer size.
 
 In our experiments, we list the model sizes and corresponding hyper-parameter settings as follows.
@@ -352,7 +354,7 @@ python run.py setup.n_gpus_per_node=4 --method DPDM --data_name mnist_28 --epsil
  model.network.ch_mult=[1,2,2,4] \
  model.network.attn_resolutions=[16,8,4]
  model.network.nf=128 \
- train.dp.n_split=512 \
+ train.n_split=512 \
  --exp_description 80M 
 ```
 
@@ -364,7 +366,7 @@ python run.py setup.n_gpus_per_node=1 --method DP-LDM --data_name mnist_28 --eps
  model.network.ch_mult=[1,1,2,4] \
  model.network.attn_resolutions=[16,8,4]
  model.network.nf=128 \
- train.dp.n_split=16 \
+ train.n_split=16 \
  --exp_description 80M 
 ```
 
@@ -432,7 +434,17 @@ python run.py setup.n_gpus_per_node=4 --method DPDM --data_name cifar10_32 \
 
 > [!Note]
 >
-> If users wish to combine warm-up training in DP-FETA with other methods, you should set the `public_data.name=central_mean`.
+> If users wish to combine warm-up training in DP-FETA with other methods, you should set the `public_data.name=central_mean`. Optional hyper-parameters  are `public_data.central.sample_num`, `public_data.central.sigma`, and `public_data.central.batch_size` with the default value 50, 5, and 6000, respectively.
+
+For example, query 50 central images to pretrain DP-MERF.
+```
+python run.py setup.n_gpus_per_node=1 --method DP-MERF --data_name mnist_28 \
+ --epsilon 10.0 eval.mode=val \
+ public_data.name=central_mean \
+ public_data.central.sample_num=50 \
+ pretrain.cond=true \
+ --exp_description pretrain_central 
+```
 
 #### 4.3.3 Training Using Checkpoints
 

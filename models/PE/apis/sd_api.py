@@ -106,8 +106,8 @@ class SDAPI(API):
         sampling_shape = (self._batch_size, self.network.num_in_channels, self._image_size, self._image_size)
         with torch.no_grad():
             for i in range(num_samples//self._batch_size+1):
-                x, y = generate_batch(self._sampler, sampling_shape, dist_util.dev(), self.network.label_dim, self.network.label_dim)
-                # x, y = generate_batch(self._sampler, sampling_shape, dist_util.dev(), 10, 10)
+                # x, y = generate_batch(self._sampler, sampling_shape, dist_util.dev(), self.network.label_dim, self.network.label_dim)
+                x, y = generate_batch(self._sampler, sampling_shape, dist_util.dev(), 10, 10)
                 samples.append(x.detach().cpu())
                 labels.append(y.detach().cpu())
                 logging.info(f"Created {(i+1)*self._batch_size} samples")

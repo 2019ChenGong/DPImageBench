@@ -314,7 +314,10 @@ def load_data(config):
             else:
                 public_train_set = SpecificClassEMNIST(public_train_set_, specific_class)
         elif "central" in config.public_data.name:
-            public_train_set = CentralDataset(sensitive_train_loader.dataset, num_classes=config.sensitive_data.n_classes, c_type=config.public_data.name.split('_')[-1], **config.public_data.central)
+            if 'central' in config.public_data:
+                public_train_set = CentralDataset(sensitive_train_loader.dataset, num_classes=config.sensitive_data.n_classes, c_type=config.public_data.name.split('_')[-1], **config.public_data.central)
+            else:
+                public_train_set = CentralDataset(sensitive_train_loader.dataset, num_classes=config.sensitive_data.n_classes, c_type=config.public_data.name.split('_')[-1])
             config.train.dp['privacy_history'] = [public_train_set.privacy_history]
             if config.setup.global_rank == 0:
                 logging.info("Additional privacy cost: {}".format(str(public_train_set.privacy_history)))
