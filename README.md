@@ -258,7 +258,7 @@ Users should first activate the conda environment.
 conda activate dpimagebench
 cd DPImageBench
 ```
-#### For the implementation of results reported in Table 6, 7, 8, 9 and 10 (RQ1). 
+#### RQ1. For the implementation of results reported in Table 6, 7, 8, 9 and 10. 
 
 We list an example as follows. Users can modify the configuration files in [configs](./configs) as their preference. 
 
@@ -308,7 +308,7 @@ CUDA_VISIBLE_DEVICES=0,1,2 python run.py \
  --exp_description pretrain_imagenet32
 ```
 
-#### For the implementation of the results reported in Figures 5, 6, and Table 11 (RQ2), the performance is analyzed by varying the epsilon and model size.
+#### RQ2. For the implementation of the results reported in Figures 5, 6, and Table 11, the performance is analyzed by varying the epsilon and model size.
 
 If users wish to change the size of the synthesizer, the following parameters should be considered.
 
@@ -382,7 +382,7 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 --epsi
 
 We provide more implementation examples of edit the model size of synthesizers in the [scripts](./scripts/rq2.sh).
 
-#### For the implementation of the results reported in RQ3.
+#### RQ3. For the implementation of the results reported in RQ3.
 
 Users can set the `pretrain.cond` and `public_data.name` to choose between conditional and unconditional pretraining or to enable or disable pretraining. `public_data.name=null` indicates that pretraining is excluded. If users wish to use Places365 or a pretraining dataset, please take note of the following key parameters.
 
@@ -421,7 +421,7 @@ python run.py setup.n_gpus_per_node=4 --method DPGAN --data_name mnist_28 \
  --exp_description pretrain_places365_unconditional 
 ```
 
-#### For the implementation of the results reported in RQ4.
+#### RQ4. For the implementation of the results reported in RQ4.
 
 If users wish to use select the public dataset for pretraining like PrivImage in Table 13, you should set the `public_data.selective.ratio`.
 
