@@ -234,7 +234,7 @@ class DP_Diffusion(DPSynther):
                         ema.restore(model.parameters())
 
                         if self.global_rank == 0:
-                            logging.info('FID at iteration %d: %.6f' % (state['step'], fid))
+                            logging.info('FID between synthetic images and sensitive images at iteration %d: %.6f' % (state['step'], fid))
                     model.train()
                 dist.barrier()
 
