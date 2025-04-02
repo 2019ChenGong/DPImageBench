@@ -161,7 +161,7 @@ class CentralDataset(Dataset):
         c = 0
         central_x, central_y = [], []
         ds = 0.5
-        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, num_workers=16)
+        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True)
         dataloader = DPDataLoader.from_data_loader(dataloader)
         for _ in range(10000):
             for x, y in dataloader:
@@ -196,8 +196,8 @@ class CentralDataset(Dataset):
         c = 0
         central_x, central_y = [], []
         ds = 0.5
-        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True, num_workers=16)
-        dataloader = DPDataLoader.from_data_loader(dataloader, generator=self.secure_rng, distributed=True)
+        dataloader = DataLoader(sensitive_dataset, batch_size=batch_size, shuffle=True)
+        dataloader = DPDataLoader.from_data_loader(dataloader)
         for _ in range(10000):
             for x, y in dataloader:
                 if x.shape[-1] == 28:
@@ -264,6 +264,7 @@ class CentralDataset(Dataset):
         x, y = self.central_x[index:index+1], self.central_y[index]
 
         return self.trans(x)[0].float() / 255., y
+        # return x[0].float() / 255., y
 
 
 

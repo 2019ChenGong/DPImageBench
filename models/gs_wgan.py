@@ -224,8 +224,8 @@ class GS_WGAN(DPSynther):
             torch.cuda.empty_cache()
 
         # Save the trained models
-        torch.save(self.netG.state_dict(), os.path.join(config.log_dir, "checkponts", 'netG.pth'))
-        torch.save(self.netGS.state_dict(), os.path.join(config.log_dir, "checkponts", 'netGS.pth'))
+        torch.save(self.netG.state_dict(), os.path.join(config.log_dir, "checkpoints", 'netG.pth'))
+        torch.save(self.netGS.state_dict(), os.path.join(config.log_dir, "checkpoints", 'netGS.pth'))
 
     
     def warmup_training(self, config):

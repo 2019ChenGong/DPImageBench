@@ -479,8 +479,8 @@ class DP_Diffusion(DPSynther):
                         state['ema'].update(model.parameters())
 
                 # Log the epsilon value after each epoch.
-                logging.info('Eps-value after %d epochs: %.4f' %
-                            (epoch + 1, privacy_engine.get_epsilon(config.dp.delta)))
+                if (state['step'] + 1) % config.log_freq == 0 and self.global_rank == 0:
+                    logging.info('Eps-value after %d epochs: %.4f' % (epoch + 1, privacy_engine.get_epsilon(config.dp.delta)))
 
         if self.global_rank == 0:
             # Save the final checkpoint.

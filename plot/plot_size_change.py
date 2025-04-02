@@ -27,14 +27,18 @@ gan_fids = '''175.6	210.4	188.0	207.0	204.4
 209.6	205.6	223.9	205.5	236.0
 111.9	139.7	133.6	132.0	144.6'''
 
-dif_accs = '''36.8	41.0	41.0	41.5	42.8
+dif_accs = '''54.7	68.3	71.1	73.4	73.4
+36.8	41.0	41.0	41.5	42.8
+43.3	46.2	42.7	46.9	50.6
 70.1	76.2	80.1	80.2	80.7
 69.9	76.0	79.1	80.3	77.8
 64.8	71.2	74.2	73.4	75.0
 77.2	75.0	76.2	76.3	78.5
 78.4	78.2	76.0	79.5	78.3'''
 
-dif_fids = '''110.1	113.8	110.3	103.2	103.8
+dif_fids = '''17.8	11.4	9	7.8	7.3
+110.1	113.8	110.3	103.2	103.8
+95.3	88.6	88.3	83.1	81.2
 18.4	11.9	12.5	10.1	8.8
 19.8	13.5	13.4	10.8	10.0
 47.4	31.1	29.7	26.8	26.0
@@ -83,9 +87,9 @@ fig.savefig("gan_size_change.pdf", bbox_inches='tight')
 fig.clf()
 axs = fig.subplots(1, 2)
 
-methods = ["DPDM", "PDP-Diffusion", "DP-LDM (SD)", "DP-LDM", "DP-LoRA", "PrivImage"]
-colors= ['#B1CE46','#8E8BFE','#FEB2B4','#FF8C42','#6DCFF6','#2F7FC1']
-markers=['*', 'H', '>', '+', 'p', '<']
+methods = ["PE", "DPDM", "DP-FETA", "PDP-Diffusion", "DP-LDM (SD)", "DP-LDM", "DP-LoRA", "PrivImage"]
+colors= ['#9E9E9E', '#B1CE46', '#FFD700', '#8E8BFE','#FEB2B4','#FF8C42','#6DCFF6','#2F7FC1']
+markers=['P', '*', 'd', 'H', '>', '+', 'p', '<']
 
 for idx in range(len(dif_accs)):
     method = methods[idx]
