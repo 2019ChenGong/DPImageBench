@@ -46,6 +46,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Updates 
 
+- 🎉 **(2025.04.05)** We add a new SOTA DP image synthesizer [DP-LORA](https://arxiv.org/abs/2504.01395) to DPImageBench! Please try it out!
 - 🎉 **(2025.03.30)** We imporve the PE by providing the option of using our own pretrained diffusion models, unrestricted by fixed APIs.
 - 🎉 **(2025.03.18)** We release our paper [DPImageBench](http://arxiv.org/abs/2503.14681).
 - 🎉 **(2025.01.23)** We add a new SOTA DP image synthesizer [DP-LORA](https://arxiv.org/abs/2406.01355) to DPImageBench! Please try it out!

@@ -79,6 +79,7 @@ flds_pretrain = np.array([27.3, 36.2, 17.7, 28.7, 21.8, 4.9, 11.7, 15.4, 14.8, 4
 flds_nonpretrain = np.array([29.2, 36.4, 21.3, 28.1, 23.9, 6.6, 120.1, 118.3, 124.6, 4.9])
 
 plot_pre_nonpre_fig(axs[0], accs_pretrain, 'w/ pretrain', accs_nonpretrain, 'w/o pretrain', 'Acc (%)')
+axs[0].set_xticks([0.0,30.0,60.0,90.0,120.0])
 plot_pre_nonpre_fig(axs[1], flds_pretrain, 'w/ pretrain', flds_nonpretrain, 'w/o pretrain', 'FLD', yticks=False)
 axs[1].set_xticks([0.0,30.0,60.0,90.0,120.0,150.0])
 

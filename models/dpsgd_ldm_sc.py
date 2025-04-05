@@ -162,6 +162,8 @@ class DP_LDM(DPSynther):
             data_target = 'data.SpecificImagenet.SpecificClassImagenet_ldm'
         elif 'places' in self.config.public_data.train_path:
             data_target = 'data.SpecificPlaces365.SpecificClassPlaces365_ldm'
+        else:
+            data_target = 'data.dataset_loader.FolderData_ldm'
 
         # Determine if a specific class is selected
         if self.config.public_data.selective.ratio == 1.0:
@@ -251,7 +253,7 @@ class DP_LDM(DPSynther):
             'model.params.dp_config.delta={}'.format(config.dp.delta),  # Delta value for differential privacy.
             'model.params.dp_config.max_grad_norm={}'.format(config.dp.max_grad_norm),  # Maximum gradient norm for clipping.
             'model.params.dp_config.max_batch_size={}'.format(config.batch_size // config.n_splits),  # Maximum batch size for differential privacy.
-            'model.params.dp_config.privacy_history={}'.format('None' if config.dp.sdq is None else str(config.dp.privacy_history)),  # privacy_history.
+            'model.params.dp_config.privacy_history={}'.format('None' if config.dp.privacy_history is None else str(config.dp.privacy_history)),  # privacy_history.
             'data.params.batch_size={}'.format(config.batch_size),  # Batch size for training.
             'lightning.trainer.max_epochs={}'.format(config.n_epochs),  # Number of epochs to train.
             'data.params.train.params.path={}'.format(self.config.sensitive_data.train_path),  # Path to the training dataset.

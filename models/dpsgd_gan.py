@@ -141,7 +141,7 @@ class DPGAN(DPSynther):
             sampler=DistributedSampler(public_dataloader.dataset),
             pin_memory=True,
             drop_last=True,
-            num_workers=16
+            num_workers=16 if config.batch_size // self.global_size > 100 else 0
         )
 
         # Initialize Inception model for FID score calculation
@@ -458,15 +458,9 @@ class DPGAN(DPSynther):
         # Log the start of the generation process and the number of samples to be generated
         logging.info("Start to generate {} samples".format(config.data_num))
         
-        # Define the working directory and sample directory paths
-        workdir = os.path.join(config.log_dir, 'samples{}_acc'.format(config.data_num))
-        sample_dir = os.path.join(workdir, 'samples/')
-        
         # Create necessary directories if the current rank is 0
         if self.global_rank == 0:
             make_dir(config.log_dir)
-            make_dir(workdir)
-            make_dir(sample_dir)
         
         # Synchronize all processes after directory creation
         dist.barrier()

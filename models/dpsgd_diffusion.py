@@ -58,6 +58,7 @@ class DP_Diffusion(DPSynther):
         self.public_num_classes = config.public_num_classes  # Number of public classes
         label_dim = max(self.private_num_classes, self.public_num_classes)  # Determine the maximum label dimension
         self.network.label_dim = label_dim  # Set the label dimension for the network
+        # self.network.label_dim = 10
 
         # Initialize the denoiser based on the specified name and network
         if self.denoiser_name == 'edm':
@@ -165,7 +166,7 @@ class DP_Diffusion(DPSynther):
             sampler=DistributedSampler(public_dataloader.dataset), 
             pin_memory=True, 
             drop_last=True, 
-            num_workers=16
+            num_workers=16 if config.batch_size // self.global_size > 100 else 0
         )
 
         # Initialize the loss function based on the configuration.
@@ -479,7 +480,7 @@ class DP_Diffusion(DPSynther):
                         state['ema'].update(model.parameters())
 
                 # Log the epsilon value after each epoch.
-                if (state['step'] + 1) % config.log_freq == 0 and self.global_rank == 0:
+                if self.global_rank == 0:
                     logging.info('Eps-value after %d epochs: %.4f' % (epoch + 1, privacy_engine.get_epsilon(config.dp.delta)))
 
         if self.global_rank == 0:

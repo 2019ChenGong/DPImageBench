@@ -7,7 +7,6 @@ from opacus.data_loader import DPDataLoader, switch_generator
 from torchvision import transforms
 import numpy as np
 import logging
-from PIL import Image
 import cv2
 
 
@@ -65,7 +64,6 @@ def load_sensitive_data(config):
     sensitive_test_loader = torch.utils.data.DataLoader(dataset=sensitive_test_set, shuffle=False, drop_last=False, batch_size=config.eval.batch_size)
 
     return sensitive_train_loader, sensitive_val_loader, sensitive_test_loader
-
 
 def semantic_query(sensitive_train_loader, config):
 
@@ -333,3 +331,18 @@ def load_data(config):
         sensitive_test_loader = None
 
     return sensitive_train_loader, sensitive_val_loader, sensitive_test_loader, public_train_loader, config
+
+
+def FolderData_ldm(root, split, image_size, c, specific_class=None):
+    if specific_class is not None:
+        specific_class = torch.load(specific_class)
+    trans = [
+            transforms.Resize(image_size),
+            random_aug(magnitude=9, num_ops=2),
+            transforms.ToTensor(),
+        ]
+    if c == 1:
+        trans = [transforms.Grayscale(num_output_channels=1)] + trans
+    trans = transforms.Compose(trans)
+    public_train_set = torchvision.datasets.ImageFolder(root=root, transform=trans)
+    return public_train_set
