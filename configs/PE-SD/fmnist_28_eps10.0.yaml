@@ -19,22 +19,32 @@ sensitive_data:
   test_path: dataset/fmnist/test_28.zip
   fid_stats: dataset/fmnist/fid_stats_28.npz
 model:
-  api: improved_diffusion
+  api: sd
   feature_extractor: inception_v3
   api_params:
-    model_image_size: 64
-    num_channels: 192
-    num_res_blocks: 3
-    learn_sigma: true
-    class_cond: true
-    diffusion_steps: 4000
-    noise_schedule: cosine
-    rescale_learned_sigmas: false
-    rescale_timesteps: false
-    use_ddim: true
-    timestep_respacing: 10
+    ckpt: null
+    denoiser_name: edm
+    denoiser_network: song
+    ema_rate: 0.999
     batch_size: 2000
-    model_path: models/pretrained_models/imagenet64_cond_270M_250K.pt
+    network:
+      image_size: 28
+      num_in_channels: 1
+      num_out_channels: 1
+      label_dim: 1000
+      attn_resolutions:
+      - 14
+      ch_mult:
+      - 2
+      - 2
+    sampler:
+      type: ddim
+      stochastic: false
+      num_steps: 100
+      tmin: 0.002
+      tmax: 80.0
+      rho: 7.0
+      guid_scale: 0.0
   private_num_classes: 10
   public_num_classes: 1000
   ckpt: null

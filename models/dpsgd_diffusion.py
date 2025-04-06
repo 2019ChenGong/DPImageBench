@@ -58,7 +58,7 @@ class DP_Diffusion(DPSynther):
         self.public_num_classes = config.public_num_classes  # Number of public classes
         label_dim = max(self.private_num_classes, self.public_num_classes)  # Determine the maximum label dimension
         self.network.label_dim = label_dim  # Set the label dimension for the network
-        # self.network.label_dim = 10
+        self.network.label_dim = 1000
 
         # Initialize the denoiser based on the specified name and network
         if self.denoiser_name == 'edm':
