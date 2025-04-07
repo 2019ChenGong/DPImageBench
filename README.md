@@ -55,7 +55,7 @@ We list currently supported DP image synthesis methods as follows.
   | GS-WGAN            |  [\[NeuriPS 2020\] GS-WGAN: A Gradient-Sanitized Approach for Learning Differentially Private Generators](https://arxiv.org/pdf/2006.08265) |
   | DP-GAN            |  [\[arXiv 2020\] Differentially Private Generative Adversarial Network (arxiv.org)](https://arxiv.org/abs/1802.06739) |
   | DPDM          |  [\[TMLR 2023\] Differentially Private Diffusion Models](https://openreview.net/forum?id=ZPpQk7FJXF) |
-  | DP-FETA          |  [\[SP 2025\] From Easy to Hard: Building a Shortcut for Differentially Private Image Synthesis]() |
+  | DP-FETA          |  [\[S&P 2025\] From Easy to Hard: Building a Shortcut for Differentially Private Image Synthesis]() |
   | PDP-Diffusion       | [\[2302.13861\] Differentially Private Diffusion Models Generate Useful Synthetic Images (arxiv.org)](https://arxiv.org/abs/2302.13861) |
   | DP-LDM            | [\[TMLR 2024\] Differentially Private Latent Diffusion Models](https://arxiv.org/abs/2305.15759) |
   | DP-LoRA           | [\[arXiv 2024\] Differentially Private Fine-Tuning of Diffusion Models](https://arxiv.org/abs/2406.01355) |
