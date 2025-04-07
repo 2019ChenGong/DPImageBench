@@ -3,8 +3,6 @@
 # DPImageBench: A Unified Benchmark for Differentially Private Image Synthesis Algorithms
 </div>
 
-Authors: [Chen Gong*](https://2019chengong.github.io/), [Kecen Li*](https://scholar.google.com/citations?user=vY5GC2gAAAAJ&hl=zh-CN), [Zinan Li](https://zinanlin.me/), [Tianhao Wang](https://tianhao.wang/). 
-
 "*" means equal contributions.
 
 DPImageBench is an open-source toolkit developed to facilitate the research and application of DP image synthesis. DPImageBench simplifies the access, understanding, and assessment of DP image synthesis, making it accessible to both researchers and the broader community. The strengths of DPImageBench are presented as follows. 
@@ -40,17 +38,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
     - [4.5 Results Visualization](#45-results-visualization)
   - [5. Customization](#5-customization)
   - [6. Main Results](#6-main-results)
-  - [7. Contacts](#7-contacts)
-  - [8. Citation](#8-citation)
   - [Acknowledgment](#acknowledgement)
-
-### Updates 
-
-- 🎉 **(2025.04.05)** We add a new SOTA DP image synthesizer [DP-LORA](https://arxiv.org/abs/2504.01395) to DPImageBench! Please try it out!
-- 🎉 **(2025.03.30)** We imporve the PE by providing the option of using our own pretrained diffusion models, unrestricted by fixed APIs.
-- 🎉 **(2025.03.18)** We release our paper [DPImageBench](http://arxiv.org/abs/2503.14681).
-- 🎉 **(2025.01.23)** We add a new SOTA DP image synthesizer [DP-LORA](https://arxiv.org/abs/2406.01355) to DPImageBench! Please try it out!
-- 🎉 **(2024.11.19)** We're thrilled to announce the release of initial version of DPImageBench!
 
 ### Todo
 
@@ -794,26 +782,6 @@ Fidelity evaluations of synthetic Camelyon images under eps = 10.0.
 | DP-LoRA       | 36.8   | 1.94   | 0.35   | 0.51   | -5.09  | -1.91  |
 | PrivImage     | 10.1   | 2.17   | 0.50   | 0.71   | -4.76  | -1.88  |
 
-
-
-## 7. Contacts
-If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
-
-- Chen Gong (ChenG_abc@outlook.com)
-
-- Kecen Li (likecen2023@ia.ac.cn)
-
-
-## 8. Citation
-
-```text
-@article{dpimagebench,
-  author = {Chen Gong and Kecen Li and Zinan Lin and Tianhao Wang},
-  title = {DPImageBench: A Unified Benchmark for Differentially Private Image Synthesis},
-  year = {2025},
-  journal={arXiv preprint arXiv:2503.14681}
-}
-```
 
 ## Acknowledgement
  
