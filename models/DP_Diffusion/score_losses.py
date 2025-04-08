@@ -19,10 +19,13 @@ def dropout_label_for_cfg_training(y, n_noise_samples, n_classes, p, device):
             raise ValueError
         else:
             with torch.no_grad():
-                boolean_ = torch.bernoulli(
-                    p * torch.ones_like(y, device=device)).bool()
-                no_class_label = n_classes * torch.ones_like(y, device=device)
-                y = torch.where(boolean_, no_class_label, y)
+                if p == 1.0:
+                    y = 0 * y
+                else:
+                    boolean_ = torch.bernoulli(
+                        p * torch.ones_like(y, device=device)).bool()
+                    no_class_label = n_classes * torch.ones_like(y, device=device)
+                    y = torch.where(boolean_, no_class_label, y)
                 y = y.repeat_interleave(n_noise_samples)
                 return y
     else:
