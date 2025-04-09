@@ -129,4 +129,9 @@ def parse_config(opt, unknown):
     config.model.public_num_classes = config.public_data.n_classes
     if config.public_data.name is None or opt.method in ['PrivImage', 'DP-FETA']:
         config.model.public_num_classes = config.model.private_num_classes
+    nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+    if opt.resume_exp is not None:
+        config.setup.workdir = "exp/{}/{}".format(str.lower(opt.method), opt.resume_exp)
+    else:
+        config.setup.workdir = "exp/{}/{}_eps{}{}{}-{}".format(str.lower(opt.method), opt.data_name, opt.epsilon, opt.config_suffix, opt.exp_description, nowTime)
     return config

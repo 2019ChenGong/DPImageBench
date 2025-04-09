@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.ticker import FormatStrFormatter
 
-methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "GS-WGAN", "DP-GAN", "DP-FETA", "PDP-Diffusion", "DP-LDM (SD)", "DP-LDM", "DP-LORA", "PrivImage"]
+methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "GS-WGAN", "DP-GAN", "DP-FETA", "PDP-Diffusion", "DP-LDM (SD)", "DP-LDM", "DP-LORA", "PrivImage"]
 
 def plot_cifar(ax, data1, label1, data2, label2, xlabel, yticks=True):
     diff = data1 - data2
@@ -72,11 +72,11 @@ axs = fig.subplots(1, 2)
 
 colors= ['#A1A9D0', '#2F7FC1']
 
-accs_fmnist_imagenet = np.array([71.2, 66.6, 77.1, 62.1, 71.1, 85.0, 85.4, 81.6, 86.3, 83.8, 87.1])
-accs_fmnist_places365 = np.array([69.2, 68.6, 78.6, 62.3, 69.9, 85.3, 85.7, 79.9, 83.2, 80.2, 84.0])
+accs_fmnist_imagenet = np.array([71.2, 66.6, 77.1, 45.4, 62.1, 71.1, 85.0, 85.4, 81.6, 86.3, 83.8, 87.1])
+accs_fmnist_places365 = np.array([69.2, 68.6, 78.6, 29.2, 62.3, 69.9, 85.3, 85.7, 79.9, 83.2, 80.2, 84.0])
 
-flds_fmnist_imagenet = np.array([27.3, 36.2, 17.7, 28.7, 21.8, 4.7, 4.9, 11.7, 15.4, 14.8, 4.3])
-flds_fmnist_places365 = np.array([30.3, 38.6, 18.2, 27.7, 24.3, 5.1, 4.4, 13.1, 21.6, 19.1, 5.2])
+flds_fmnist_imagenet = np.array([27.3, 36.2, 17.7, 33.7, 28.7, 21.8, 4.7, 4.9, 11.7, 15.4, 14.8, 4.3])
+flds_fmnist_places365 = np.array([30.3, 38.6, 18.2, 35.9, 27.7, 24.3, 5.1, 4.4, 13.1, 21.6, 19.1, 5.2])
 
 plot_fmnist(axs[0], accs_fmnist_imagenet, 'imagenet', accs_fmnist_places365, 'places365', 'Acc (%)')
 axs[0].set_xticks([0.0,20.0,40.0,60.0,80.0,100.0]) 
@@ -93,11 +93,11 @@ fig.savefig("fmnist_place_imagenet.pdf", bbox_inches='tight')
 fig.clf()
 axs = fig.subplots(1, 2)
 
-accs_cifar10_imagenet = np.array([26.1, 20.0, 24.0, 18.5, 35.2, 61.6, 70.1, 69.9, 64.8, 77.2, 78.4])
-accs_cifar10_places365 = np.array([28.1, 20.8, 26.7, 20.5, 23.3, 54.9, 60.1, 61.2, 51.3, 57.5, 63.3])
+accs_cifar10_imagenet = np.array([26.1, 20.0, 24.0, 54.7, 18.5, 35.2, 61.6, 70.1, 69.9, 64.8, 77.2, 78.4])
+accs_cifar10_places365 = np.array([28.1, 20.8, 26.7, 41.0, 20.5, 23.3, 54.9, 60.1, 61.2, 51.3, 57.5, 63.3])
 
-flds_cifar10_imagenet = np.array([28.4, 50.0, 40.0, 33.2, 25.3, 10.6, 7.2, 9.0, 14.1, 9.3, 5.1])
-flds_cifar10_places365 = np.array([29.1, 49.5, 30.8, 30.8, 27.3, 13.4, 8.8, 12.9, 16.4, 14.7, 10.5])
+flds_cifar10_imagenet = np.array([28.4, 50.0, 40.0, 8.5, 33.2, 25.3, 10.6, 7.2, 9.0, 14.1, 9.3, 5.1])
+flds_cifar10_places365 = np.array([29.1, 49.5, 30.8, 15.7, 30.8, 27.3, 13.4, 8.8, 12.9, 16.4, 14.7, 10.5])
 
 plot_cifar(axs[0], accs_cifar10_imagenet, 'imagenet', accs_cifar10_places365, 'places365', 'Acc (%)')
 axs[0].set_xticks([0.0,20.0,40.0,60.0,80.0,100.0]) 

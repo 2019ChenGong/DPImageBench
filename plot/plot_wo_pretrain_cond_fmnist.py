@@ -83,8 +83,6 @@ axs[0].set_xticks([0.0,30.0,60.0,90.0,120.0])
 plot_pre_nonpre_fig(axs[1], flds_pretrain, 'w/ pretrain', flds_nonpretrain, 'w/o pretrain', 'FLD', yticks=False)
 axs[1].set_xticks([0.0,30.0,60.0,90.0,120.0,150.0])
 axs[1].legend(fontsize=11)
-axs[1].set_xticks([0.0,20.0,40.0,60.0,80.0])
-
 fig.subplots_adjust(wspace=0.07, hspace=0.3)
 
 fig.savefig("fmnist_wo_pretrain.png", bbox_inches='tight')
@@ -92,12 +90,12 @@ fig.savefig("fmnist_wo_pretrain.pdf", bbox_inches='tight')
 
 fig.clf()
 axs = fig.subplots(1, 2)
+methods = ["DP-MERF", "DP-NTK", "DP-Kernel", "PE", "GS-WGAN", "DP-GAN", "DP-FETA", "PDP-Diffusion", "DP-LDM (SD)", "DP-LDM", "DP-LoRA", "PrivImage"]
+accs_condi = np.array([71.2, 66.6, 77.1, 45.4, 62.1, 71.1, 85.0, 85.4, 81.6, 86.3, 83.8, 87.1])
+accs_uncondi = np.array([62.6, 56.3, 75.4, 26.8, 61.4, 20.1, 84.8, 84.3, 74.2, 84.6, 83.6, 79.5])
 
-accs_condi = np.array([71.2, 66.6, 77.1, 62.1, 71.1, 85.0, 85.4, 81.6, 86.3, 83.8, 87.1])
-accs_uncondi = np.array([62.6, 56.3, 75.4, 61.4, 20.1, 84.8, 84.3, 74.2, 84.6, 83.6, 79.5])
-
-flds_condi = np.array([27.3, 36.2, 17.7, 28.7, 21.8, 4.7, 4.9, 11.7, 15.4, 14.8, 4.3])
-flds_uncondi = np.array([30.6, 42.2, 19.4, 34.3, 67.4, 4.8, 5.5, 14.6, 17.5, 14.0, 6.1 ])
+flds_condi = np.array([27.3, 36.2, 17.7, 33.7, 28.7, 21.8, 4.7, 4.9, 11.7, 15.4, 14.8, 4.3])
+flds_uncondi = np.array([30.6, 42.2, 19.4, 37.3, 34.3, 67.4, 4.8, 5.5, 14.6, 17.5, 14.0, 6.1 ])
 
 plot_con_uncon_fig(axs[0], accs_condi, 'cond.', accs_uncondi, 'uncond.', 'Acc (%)')
 axs[0].set_xticks([0.0,20.0,40.0,60.0,80.0,100.0]) 

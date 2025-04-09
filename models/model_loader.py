@@ -30,12 +30,12 @@ def load_model(config, sess=None):
     elif config.setup.method == 'dpsgd-lora':
         from models.dpsgd_lora_sc import DP_LORA
         model = DP_LORA(config, config.setup.local_rank)
-    elif config.setup.method == 'dp-promise':
-        from models.dp_promise import DP_Promise
-        model = DP_Promise(config.model, config.setup.local_rank)
-    elif config.setup.method == 'G-PATE':
-        from models.g_pate import G_PATE
-        model = G_PATE(config.model, config.setup.local_rank, sess)
+    # elif config.setup.method == 'dp-promise':
+    #     from models.dp_promise import DP_Promise
+    #     model = DP_Promise(config.model, config.setup.local_rank)
+    # elif config.setup.method == 'G-PATE':
+    #     from models.g_pate import G_PATE
+    #     model = G_PATE(config.model, config.setup.local_rank, sess)
     elif config.setup.method == 'DataLens':
         from models.datalens import DataLens
         model = DataLens(config.model, config.setup.local_rank, sess)

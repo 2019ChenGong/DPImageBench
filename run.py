@@ -42,10 +42,4 @@ if __name__ == '__main__':
 
     config = parse_config(opt, unknown)
 
-    nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    if opt.resume_exp is not None:
-        config.setup.workdir = "exp/{}/{}".format(str.lower(opt.method), opt.resume_exp)
-    else:
-        config.setup.workdir = "exp/{}/{}_eps{}{}{}-{}".format(str.lower(opt.method), opt.data_name, opt.epsilon, opt.config_suffix, opt.exp_description, nowTime)
-
     run(main, config)

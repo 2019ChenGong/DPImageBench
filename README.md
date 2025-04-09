@@ -171,7 +171,7 @@ DPImageBench/
 Clone repo and setup the environment:
 
  ```
-git clone git@github.com:2019ChenGong/DPImageBench.git
+git clone https://github.com/2019ChenGong/DPImageBench.git
 sh install.sh
  ```
 
