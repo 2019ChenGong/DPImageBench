@@ -142,7 +142,7 @@ DPImageBench/
 │   └── synthesizer.py  
 ├── opacus/                     # Implementation of DPSGD
 ├── plot/                       # Figures and plots in our paper
-│   ├── plot_eps_change.py                           # Plotting for Figure 5 and 10
+│   ├── plot_eps_change.py                           # Plotting for Figure 5
 │   ├── plot_size_change.py                          # Plotting for Figure 6
 │   ├── plot_wo_pretrain_cond_cifar10.py             # Plotting for Figure 7
 │   ├── plot_wo_pretrain_cond_fmnist.py              # Plotting for Figure 9
