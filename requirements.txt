@@ -9,7 +9,7 @@ requests==2.31.0
 scikit-learn==1.0.2
 scipy==1.10.1
 six==1.16.0
-tensorboard==1.14.0
+tensorboard
 tqdm==4.66.5
 gdown==4.7.3
 pytorch-lightning==1.4.2
@@ -19,5 +19,6 @@ opencv-python
 image-reward
 diffusers==0.30.3
 test-tube==0.7.5
+gdown
 git+https://github.com/marcojira/fld.git
 -e git+https://github.com/CompVis/taming-transformers.git@master#egg=taming-transformers
