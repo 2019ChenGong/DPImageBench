@@ -22,10 +22,6 @@ imagenet*
 configs_old
 configs/G-PATE/
 configs/DP-Promise/
-!configs/DP-LDM/
-!configs/GS-WGAN/
-!configs/DP-LDM-SD/
-!configs/DP-LORA/
 models_old
 dataset
 models/pretrained_models
