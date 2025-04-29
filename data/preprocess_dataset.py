@@ -256,84 +256,93 @@ def fid_save(fid_path, dataset, batch_size):
     np.savez(fid_path, mu=mu, sigma=sigma)
 
 def main(config):
-    for data_name in config.data_name:   
-        train_name = "train_{}".format(config.resolution)
-        test_name = "test_{}".format(config.resolution)
-        fid_name = "fid_stats_{}".format(config.resolution)
-
-        data_dir = os.path.join(config.data_dir, data_name)
-        os.makedirs(data_dir, exist_ok=True)
-        if data_name == "mnist":
-            sensitive_train_set = torchvision.datasets.MNIST(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
-            sensitive_test_set = torchvision.datasets.MNIST(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
-        elif data_name == "fmnist":
-            sensitive_train_set = torchvision.datasets.FashionMNIST(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
-            sensitive_test_set = torchvision.datasets.FashionMNIST(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
-        elif data_name == "eurosat":
-            sensitive_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "EuroSAT_RGB"), transform=transforms.ToTensor())
-            torch.manual_seed(0)
-            train_size = 23000
-            test_size = 4000
-            sensitive_train_set, sensitive_test_set = torch.utils.data.random_split(sensitive_set, [train_size, test_size])
-        elif data_name == "cifar10":
-            sensitive_train_set = torchvision.datasets.CIFAR10(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
-            sensitive_test_set = torchvision.datasets.CIFAR10(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
-        elif data_name == "cifar100":
-            sensitive_train_set = torchvision.datasets.CIFAR100(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
-            sensitive_test_set = torchvision.datasets.CIFAR100(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
-        elif data_name == "celeba":
-            train_name = train_name + '_' + config.celeba_attr
-            test_name = test_name + '_' + config.celeba_attr
-
-            with open(os.path.join(data_dir, "celeba", "list_attr_celeba.txt"), 'r') as f:
-                attr_index = f.readlines()[1].strip().split().index(config.celeba_attr)
-            target_transform = target_trans(attr_index)
-            sensitive_train_set = torchvision.datasets.CelebA(root=data_dir, split="train",  download=False, transform=transforms.ToTensor(), target_transform=target_transform)
-            sensitive_test_set = torchvision.datasets.CelebA(root=data_dir, split="test", download=False, transform=transforms.ToTensor(), target_transform=target_transform)
-        elif data_name == "camelyon":
-            sensitive_train_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "camelyon17_32", "train"), transform=transforms.ToTensor())
-            sensitive_test_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "camelyon17_32", "test"), transform=transforms.ToTensor())
-        elif data_name == "places365":
-            # _ = torchvision.datasets.Places365(root=data_dir, small=True, download=True)
-            resize_images(os.path.join(data_dir, "data_256_standard"), os.path.join(data_dir, "data_{}_standard".format(config.resolution)), (config.resolution, config.resolution))
-            return
-        elif data_name == "emnist":
-            _ = torchvision.datasets.EMNIST(root=data_dir, train=True, split="letters", download=True)
-            return
-        elif config.train_path != '' and config.test_path != '':
-            sensitive_train_set = torchvision.datasets.ImageFolder(root=config.train_path, transform=transforms.ToTensor())
-            sensitive_test_set = torchvision.datasets.ImageFolder(root=config.test_path, transform=transforms.ToTensor())
+    for data_name in config.data_name:
+        if data_name == 'celeba':
+            res_list = [32, 64, 128]
+        elif 'mnist' in data_name:
+            res_list = [28]
         else:
-            raise NotImplementedError('{} is not yet implemented.'.format(data_name))
+            res_list = [32]
 
-        sensitive_train_loader = torch.utils.data.DataLoader(dataset=sensitive_train_set, batch_size=1)
-        sensitive_test_loader = torch.utils.data.DataLoader(dataset=sensitive_test_set, batch_size=1)
+        for res in res_list:
+            config.resolution = res
+            train_name = "train_{}".format(config.resolution)
+            test_name = "test_{}".format(config.resolution)
+            fid_name = "fid_stats_{}".format(config.resolution)
 
-        if config.max_image is None:
-            max_idx = len(sensitive_train_set)
-        else:
-            max_idx = min(config.max_image, len(sensitive_train_set))
+            data_dir = os.path.join(config.data_dir, data_name)
+            os.makedirs(data_dir, exist_ok=True)
+            if data_name == "mnist":
+                sensitive_train_set = torchvision.datasets.MNIST(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
+                sensitive_test_set = torchvision.datasets.MNIST(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
+            elif data_name == "fmnist":
+                sensitive_train_set = torchvision.datasets.FashionMNIST(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
+                sensitive_test_set = torchvision.datasets.FashionMNIST(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
+            elif data_name == "eurosat":
+                sensitive_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "EuroSAT_RGB"), transform=transforms.ToTensor())
+                torch.manual_seed(0)
+                train_size = 23000
+                test_size = 4000
+                sensitive_train_set, sensitive_test_set = torch.utils.data.random_split(sensitive_set, [train_size, test_size])
+            elif data_name == "cifar10":
+                sensitive_train_set = torchvision.datasets.CIFAR10(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
+                sensitive_test_set = torchvision.datasets.CIFAR10(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
+            elif data_name == "cifar100":
+                sensitive_train_set = torchvision.datasets.CIFAR100(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
+                sensitive_test_set = torchvision.datasets.CIFAR100(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
+            elif data_name == "celeba":
+                train_name = train_name + '_' + config.celeba_attr
+                test_name = test_name + '_' + config.celeba_attr
 
-        transform_image = make_transform(config.transform, config.resolution, config.resolution)
-        
-        if config.max_image is None:
-            max_idx = len(sensitive_train_set)
-        else:
-            max_idx = min(config.max_image, len(sensitive_train_set))
-        archive_root_dir, save_bytes, close_dest = open_dest(os.path.join(data_dir, train_name + '.zip'))
-        data_save(sensitive_train_loader, max_idx, transform_image, archive_root_dir, save_bytes, close_dest)
+                with open(os.path.join(data_dir, "celeba", "list_attr_celeba.txt"), 'r') as f:
+                    attr_index = f.readlines()[1].strip().split().index(config.celeba_attr)
+                target_transform = target_trans(attr_index)
+                sensitive_train_set = torchvision.datasets.CelebA(root=data_dir, split="train",  download=False, transform=transforms.ToTensor(), target_transform=target_transform)
+                sensitive_test_set = torchvision.datasets.CelebA(root=data_dir, split="test", download=False, transform=transforms.ToTensor(), target_transform=target_transform)
+            elif data_name == "camelyon":
+                sensitive_train_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "camelyon17_32", "train"), transform=transforms.ToTensor())
+                sensitive_test_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "camelyon17_32", "test"), transform=transforms.ToTensor())
+            elif data_name == "places365":
+                # _ = torchvision.datasets.Places365(root=data_dir, small=True, download=True)
+                resize_images(os.path.join(data_dir, "data_256_standard"), os.path.join(data_dir, "data_{}_standard".format(config.resolution)), (config.resolution, config.resolution))
+                return
+            elif data_name == "emnist":
+                _ = torchvision.datasets.EMNIST(root=data_dir, train=True, split="letters", download=True)
+                return
+            elif config.train_path != '' and config.test_path != '':
+                sensitive_train_set = torchvision.datasets.ImageFolder(root=config.train_path, transform=transforms.ToTensor())
+                sensitive_test_set = torchvision.datasets.ImageFolder(root=config.test_path, transform=transforms.ToTensor())
+            else:
+                raise NotImplementedError('{} is not yet implemented.'.format(data_name))
 
-        if config.max_image is None:
-            max_idx = len(sensitive_test_set)
-        else:
-            max_idx = min(config.max_image, len(sensitive_test_set))
-        archive_root_dir, save_bytes, close_dest = open_dest(os.path.join(data_dir, test_name + '.zip'))
-        data_save(sensitive_test_loader, max_idx, transform_image, archive_root_dir, save_bytes, close_dest)
+            sensitive_train_loader = torch.utils.data.DataLoader(dataset=sensitive_train_set, batch_size=1)
+            sensitive_test_loader = torch.utils.data.DataLoader(dataset=sensitive_test_set, batch_size=1)
 
-        dataset = ImageFolderDataset(os.path.join(data_dir, train_name + '.zip'))
+            if config.max_image is None:
+                max_idx = len(sensitive_train_set)
+            else:
+                max_idx = min(config.max_image, len(sensitive_train_set))
 
-        # calculate the feature of training image for FID metric
-        fid_save(os.path.join(data_dir, fid_name + '.npz'), dataset, config.fid_batch_size)
+            transform_image = make_transform(config.transform, config.resolution, config.resolution)
+            
+            if config.max_image is None:
+                max_idx = len(sensitive_train_set)
+            else:
+                max_idx = min(config.max_image, len(sensitive_train_set))
+            archive_root_dir, save_bytes, close_dest = open_dest(os.path.join(data_dir, train_name + '.zip'))
+            data_save(sensitive_train_loader, max_idx, transform_image, archive_root_dir, save_bytes, close_dest)
+
+            if config.max_image is None:
+                max_idx = len(sensitive_test_set)
+            else:
+                max_idx = min(config.max_image, len(sensitive_test_set))
+            archive_root_dir, save_bytes, close_dest = open_dest(os.path.join(data_dir, test_name + '.zip'))
+            data_save(sensitive_test_loader, max_idx, transform_image, archive_root_dir, save_bytes, close_dest)
+
+            dataset = ImageFolderDataset(os.path.join(data_dir, train_name + '.zip'))
+
+            # calculate the feature of training image for FID metric
+            fid_save(os.path.join(data_dir, fid_name + '.npz'), dataset, config.fid_batch_size)
     
 
 
