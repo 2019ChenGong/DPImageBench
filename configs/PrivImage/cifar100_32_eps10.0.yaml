@@ -15,7 +15,7 @@ public_data:
   n_classes: 1000
   train_path: dataset/imagenet/imagenet_32
   selective:
-    ratio: 0.05
+    ratio: 0.1
     sigma: 50
     batch_size: 1000
 sensitive_data:
