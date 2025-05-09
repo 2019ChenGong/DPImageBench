@@ -183,7 +183,7 @@ We also provide the [Docker](./docker/Dockerfile) file.
 sh data_preparation.sh
  ```
 
-After running, we can found the folder `dataset`:
+After running, we can find the folder `dataset`:
 
   ```plaintext
 dataset/                                  
@@ -193,7 +193,7 @@ dataset/
 ...
 ```
 
-Since ImageNet 64x64 and 32x32 are two large, you need to download and preprocess them locally.
+Since ImageNet 64x64 and 128x128 are two large, you need to download and preprocess them locally.
 
 First, download the original ImageNet
 
@@ -208,7 +208,7 @@ Then, unzip it
 mkdir train && tar -xvf ILSVRC2012_img_train.tar -C train && for x in `ls train/*tar`; do fn=train/`basename $x .tar`; mkdir $fn; tar -xvf $x -C $fn; rm -f $fn.tar; done
 ```
 
-After running, we can found the folder `ImageNet`:
+After running, we can find the folder `ImageNet`:
 
 ```plaintext
 ImageNet/
@@ -224,8 +224,6 @@ Finally, rescale the ImageNet into the needed relolution using `./data/process_i
 cd ./data
 sh process_imagenet.sh
 ```
-
-
 
 
 ### 4.3 Running
