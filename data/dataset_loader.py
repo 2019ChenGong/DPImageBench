@@ -47,6 +47,8 @@ def load_sensitive_data(config):
             train_size = 145064
         elif "camelyon" in config.sensitive_data.name:
             train_size = 269538
+        elif "imagenet" in config.sensitive_data.name:
+            train_size = 1000000
         else:
             raise NotImplementedError
 

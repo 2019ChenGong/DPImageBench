@@ -22,6 +22,7 @@ import torch
 import torchvision
 from torchvision import transforms
 
+from SpecificImagenet import SpecificClassImagenet
 from fld.features.InceptionFeatureExtractor import InceptionFeatureExtractor
 
 new_cwd = os.path.dirname(os.getcwd())
@@ -309,6 +310,9 @@ def main(config):
             elif data_name == "emnist":
                 _ = torchvision.datasets.EMNIST(root=data_dir, train=True, split="letters", download=True)
                 return
+            elif data_name == 'imagenet':
+                sensitive_train_set = SpecificClassImagenet(root=config.train_path, split='train', transform=transforms.ToTensor())
+                sensitive_test_set = SpecificClassImagenet(root=config.test_path, split='val', transform=transforms.ToTensor())
             elif config.train_path != '' and config.test_path != '':
                 sensitive_train_set = torchvision.datasets.ImageFolder(root=config.train_path, transform=transforms.ToTensor())
                 sensitive_test_set = torchvision.datasets.ImageFolder(root=config.test_path, transform=transforms.ToTensor())
