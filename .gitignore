@@ -34,6 +34,7 @@ models/DP_Promise
 models/g_pate.py
 models/dp_promise.py
 
+
 requirements_old.txt
 multi_node_run.sh
 golden_pretrain.sh
@@ -41,7 +42,6 @@ golden_pretrain.sh
 eps10_visual*
 visualization.py
 
-cifar10_32*
 
 Instruction*
 
