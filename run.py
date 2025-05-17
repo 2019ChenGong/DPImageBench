@@ -25,6 +25,7 @@ def main(config):
 
     evaluator = Evaluator(config)
     evaluator.eval(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
+    # evaluator.eval_fidelity(syn_data, syn_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader)
     
 
 

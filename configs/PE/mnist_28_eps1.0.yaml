@@ -27,7 +27,7 @@ model:
     num_res_blocks: 3
     learn_sigma: true
     class_cond: true
-    diffusion_steps: 4000
+    diffusion_steps: 100
     noise_schedule: cosine
     rescale_learned_sigmas: false
     rescale_timesteps: false
@@ -58,9 +58,7 @@ train:
   - 60000
   - 60000
   - 60000
-  - 60000
   variation_degree_schedule:
-  - 0
   - 0
   - 0
   - 0
