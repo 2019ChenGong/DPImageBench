@@ -623,7 +623,28 @@ This part introduces how to apply DPImageBench for your own sensitive dataset or
 
 ### 5.1 Data Preparation
 
-First, you need to organize your own dataset like:
+If the dataset has been supported by `torchvision.datasets`, you can add iy by adding a few lines of code to `data/preprocess_dataset.py`. For example, If you want ti add `LSUN`, you can change `data/preprocess_dataset.py` as
+
+```python
+288 elif data_name == "cifar10":
+289     sensitive_train_set = torchvision.datasets.CIFAR10(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
+290     sensitive_test_set = torchvision.datasets.CIFAR10(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
+291 elif data_name == "cifar100":
+292     sensitive_train_set = torchvision.datasets.CIFAR100(root=data_dir, train=True, download=True, transform=transforms.ToTensor())
+293     sensitive_test_set = torchvision.datasets.CIFAR100(root=data_dir, train=False, download=True, transform=transforms.ToTensor())
+new elif data_name == "lsun":
+new     sensitive_train_set = torchvision.datasets.LSUN(root=data_dir, classes="bedroom_train")
+new     sensitive_test_set = torchvision.datasets.LSUN(root=data_dir, classes="bedroom_test")
+294 elif data_name == "celeba":
+```
+
+And run:
+
+```
+cd data; python preprocess_dataset.py --data_name lsun_bedroom
+```
+
+If the dataset is constructed in other formats, you need to organize your own dataset like:
 
   ```{data_name}
 train/                                  
@@ -658,7 +679,7 @@ configs/
 ...
 ```
 
-Please refer to `./configs/DP-MERF/mnist_28_eps10.0.yaml` for the config file structure.
+Please refer to `./configs/<name-of-your-algorithm>/mnist_28_eps10.0.yaml` for the config file structure.
 
 #### 5.2.2 Functions File
 
