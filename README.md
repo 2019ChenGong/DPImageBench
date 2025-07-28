@@ -378,6 +378,9 @@ In our experiments, we list the model sizes and corresponding hyper-parameter se
 | 14.3M |  `model.Generator.g_conv_dim=100` |
 | 19.4M |  `model.Generator.g_conv_dim=120` |
 
+If users wish to change the epsilon, only `--epsilon` should be considered.
+
+
 > [!Note]
 >
 > It is hard to control synthesizers with different foundational models so that they have exactly the same parameter sizes.
