@@ -198,10 +198,60 @@ class Evaluator(object):
         is_mean, _ = compute_inception_score_from_logits(gen_logit)
         fid = FID().compute_metric(train_feat, None, gen_feat)
         fld = FLD(eval_feat="train").compute_metric(train_feat, test_feat, gen_feat)
-        p = PrecisionRecall(mode="Precision").compute_metric(train_feat, None, gen_feat) # Default precision
-        r = PrecisionRecall(mode="Recall", num_neighbors=5).compute_metric(train_feat, None, gen_feat)
+        p = PrecisionRecall(mode="Precision", num_neighbors=4).compute_metric(train_feat, None, gen_feat) # Default precision
+        r = PrecisionRecall(mode="Recall", num_neighbors=4).compute_metric(train_feat, None, gen_feat)
 
         return fid, is_mean, fld, p, r, ir
+
+    def pr_varying_k(self, synthetic_images, synthetic_labels, sensitive_train_loader, sensitive_val_loader, sensitive_test_loader):
+        # Proceed only if this is the main process and a test loader is provided.
+        if str(self.device) != 'cuda:0' or sensitive_test_loader is None:
+            return
+        
+        # Check if the synthetic images have the expected resolution.
+        if synthetic_images.shape[-1] != self.config.sensitive_data.resolution:
+            synthetic_images = F.interpolate(torch.from_numpy(synthetic_images), size=[self.config.sensitive_data.resolution, self.config.sensitive_data.resolution]).numpy()
+        
+        # If the images are in color but only one channel is expected, convert to grayscale.
+        if synthetic_images.shape[1] == 3 and self.config.sensitive_data.num_channels == 1:
+            synthetic_images = 0.299 * synthetic_images[:, 2:, ...] + 0.587 * synthetic_images[:, 1:2, ...] + 0.114 * synthetic_images[:, :1, ...]
+        
+        # Create an inception-based feature extractor. The save_path is based on the dataset name and resolution.
+        feature_extractor = InceptionFeatureExtractor(save_path="dataset/{}_{}/".format(self.config.sensitive_data.name, self.config.sensitive_data.resolution))
+
+        gen_images = torch.from_numpy(synthetic_images)
+
+        # If the images have one channel, replicate it to create three channels.
+        if gen_images.shape[1] == 1:
+            gen_images = gen_images.repeat(1, 3, 1, 1)
+        
+        # Extract features from the synthetic images using the feature extractor.
+        gen_feat = feature_extractor.get_tensor_features(gen_images)
+
+        # Try to obtain train and test features with a placeholder tensor.
+        try:
+            train_feat = feature_extractor.get_tensor_features(torch.tensor([0]), name="train")
+        except:
+        # If the placeholder method fails, load images from the sensitive loaders.
+            train_images = []
+            for x, _ in sensitive_train_loader:
+                train_images.append(x.float())
+
+            # Concatenate the loaded images into tensors.
+            train_images = torch.cat(train_images)
+
+            # If the images have one channel, replicate it to get three channels.
+            if train_images.shape[1] == 1:
+                train_images = train_images.repeat(1, 3, 1, 1)
+            
+            # Extract features from the train and test images.
+            train_feat = feature_extractor.get_tensor_features(train_images, name="train")
+
+
+        for k in [2, 7]:
+            p = PrecisionRecall(mode="Precision", num_neighbors=k).compute_metric(train_feat, None, gen_feat) # Default precision
+            r = PrecisionRecall(mode="Recall", num_neighbors=k).compute_metric(train_feat, None, gen_feat)
+            logging.info("The Precision and Recall of synthetic images is {} and {} at k = {}".format(p, r, k))
     
     def cal_acc(self, model_name, synthetic_images, synthetic_labels, sensitive_val_loader, sensitive_test_loader):
 
@@ -374,7 +424,8 @@ class Evaluator(object):
         return best_acc, best_test_acc_on_val, best_test_acc_on_test, best_noisy_acc, best_test_acc_on_noisy_val
     
     def cal_acc_no_dp(self, sensitive_train_loader, sensitive_test_loader):
-        if self.device != 0 or sensitive_test_loader is None or sensitive_train_loader is None:
+        print(sensitive_train_loader, sensitive_test_loader)
+        if sensitive_test_loader is None or sensitive_train_loader is None:
             return
         
         batch_size = 128
@@ -397,7 +448,7 @@ class Evaluator(object):
 
             if 'cifar' in self.config.sensitive_data.name:
 
-                batch_size = 126
+                batch_size = 256
                 max_epoch = 200
 
                 if model_name == "wrn":
@@ -444,7 +495,6 @@ class Evaluator(object):
                 for inputs, labels in train_loader:
                     inputs, labels = inputs.to(self.device), labels.to(self.device)
                     inputs = inputs.float() * 2. - 1.
-                    labels = torch.argmax(labels, dim=1)
                     # Zero the parameter gradients
                     optimizer.zero_grad()
                     # Forward pass
@@ -472,7 +522,6 @@ class Evaluator(object):
                     for inputs, labels in test_loader:
                         inputs, labels = inputs.to(self.device), labels.to(self.device)
                         inputs = inputs.float() * 2. - 1.
-                        labels = torch.argmax(labels, dim=1)
                         outputs = model(inputs)
                         _, predicted = outputs.max(1)
                         total += labels.size(0)
