@@ -63,6 +63,7 @@ train:
     delta: 1e-6
     privacy_history: null
   n_splits: 32
+  half_sensitivity: false
 gen:
   data_num: 60000
   batch_size: 500

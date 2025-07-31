@@ -63,6 +63,7 @@ train:
     epsilon: 10.0
     delta: 1e-5
     privacy_history: null
+  half_sensitivity: false
 gen:
   data_num: 60000
   batch_size: 1000

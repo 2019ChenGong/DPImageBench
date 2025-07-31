@@ -269,6 +269,7 @@ We list the key hyper-parameters below, including their explanations and availab
 - `pretrain.n_epochs`: the number of epoch for pretraining.
 - `train.n_epochs`: the number of epoch for finetuning on sensitive datasets.
 - `train.n_split`: the number of gradient accumulations for saving GPU memory usage.
+- `train.half_sensitivity`: whether to use sensitivity 1/m instead of 2/m for [`DP-NTK`, `DP-Kernel`, `DP-MERF`], assuming the dataset size m is public knowledge.
 
 > [!Note]
 >
