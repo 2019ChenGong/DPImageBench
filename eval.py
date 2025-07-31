@@ -30,7 +30,7 @@ if __name__ == '__main__':
     parser.add_argument('--config_dir', default="configs")
     parser.add_argument('--method', '-m', default="DP-LDM")
     parser.add_argument('--epsilon', '-e', default="10.0")
-    parser.add_argument('--data_name', '-dn', default="celeba_male_128")
+    parser.add_argument('--data_name', '-dn', default="cifar10_32")
     parser.add_argument('--config_suffix', '-cs', default="")
     parser.add_argument('--resume_exp', '-re', default=None)
     parser.add_argument('--exp_description', '-ed', default="")

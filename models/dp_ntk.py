@@ -160,7 +160,7 @@ class DP_NTK(DPSynther):
             sample_rate=1., 
             epochs=1,
             account_history=account_history,
-        )
+        ) / 2
         
         # Log the noise factor
         logging.info("The noise factor is {}".format(self.noise_factor))
