@@ -36,6 +36,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
       - [4.3.1 Key hyper-parameter introductions](#431-key-hyper-parameter-introductions)
       - [4.3.2 How to run](#432-how-to-run)
       - [4.3.3 Training using checkpoints](#433-training-using-checkpoints)
+      - [4.3.4 Synthesizing Using Checkpoints](#434-synthesizing-using-checkpoints)
     - [4.4 Results](#44-results)
       - [4.4.1 Results Structure](#441-results-structure)
       - [4.4.2 Results Explanation](#442-results-explanation)

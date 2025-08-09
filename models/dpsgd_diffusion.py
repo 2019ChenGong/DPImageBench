@@ -108,7 +108,7 @@ class DP_Diffusion(DPSynther):
             public_dataloader (DataLoader): The dataloader for the public dataset.
             config (dict): Configuration dictionary containing various settings and hyperparameters.
         """
-        if public_dataloader is None:
+        if public_dataloader is None or config.n_epochs == 0:
             # If no public dataloader is provided, return.
             return
         
