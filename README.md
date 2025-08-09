@@ -522,6 +522,14 @@ python run.py setup.n_gpus_per_node=3 public_data.name=imagenet eval.mode=val \
 
 Currently, only diffuisn-based methods are supported, because GAN-based methods usually do not benefit from pretraining and their training is fast.
 
+#### 4.3.4 Synthesizing Using Checkpoints
+
+DPImageBench also supports synthesizing data from the checkpoints. As mentioned in the [results structure](#451-results-structure), we provide `final_checkpoint.pth` to store the synthesizer's parameters after the training. If users wish to generate data using trained models, they should: (1) set `pretrain.n_epochs=0` and `train.n_epochs=0`, (2) load the synthesizers through `model.ckpt`, and (3) set the work directory through `--resume_exp`. 
+For example, 
+
+```
+python run.py setup.n_gpus_per_node=4 model.ckpt=./exp/pdp-diffusion/<the-name-of-scripts>/train/checkpoints/final_checkpoint.pth pretrain.n_epochs=0 train.n_epochs=0 --method PDP-Diffusion --data_name fmnist_28 -e 10.0 --resume_exp <the-name-of-scripts>
+```
 
 ### 4.4 Results
 We can find the `stdout.txt` files in the result folder, which record the training and evaluation processes. The results for utility and fidelity evaluations are available in `stdout.txt`. The result folder name consists of `<data_name>_eps<epsilon><notes>-<starting-time>`, e.g., `mnist_28_eps1.0-2024-10-25-23-09-18`.
