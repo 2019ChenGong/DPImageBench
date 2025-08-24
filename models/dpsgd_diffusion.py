@@ -355,7 +355,7 @@ class DP_Diffusion(DPSynther):
             logging.info('Starting training at step %d' % state['step'])
 
         # Initialize the Privacy Engine for differential privacy.
-        privacy_engine = PrivacyEngine()
+        privacy_engine = PrivacyEngine(accountant='rdp' if 'accountant' not in config else config.accountant)
         if config.dp.privacy_history is None:
             account_history = None
         else:

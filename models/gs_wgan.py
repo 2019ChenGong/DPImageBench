@@ -369,7 +369,8 @@ class GS_WGAN(DPSynther):
             target_epsilon=config.dp.epsilon, 
             target_delta=config.dp.delta, 
             sample_rate=1. / self.num_discriminators, 
-            steps=config.iterations
+            steps=config.iterations,
+            accountant='rdp' if 'accountant' not in config else config.accountant
         )
         global noise_multiplier
         noise_multiplier = self.noise_factor

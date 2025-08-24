@@ -160,6 +160,7 @@ class DP_NTK(DPSynther):
             sample_rate=1., 
             epochs=1,
             account_history=account_history,
+            accountant='rdp' if 'accountant' not in config else config.accountant,
         ) / 2
         
         # Log the noise factor

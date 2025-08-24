@@ -523,7 +523,17 @@ python run.py setup.n_gpus_per_node=3 public_data.name=imagenet eval.mode=val \
 
 Currently, only diffuisn-based methods are supported, because GAN-based methods usually do not benefit from pretraining and their training is fast.
 
-#### 4.3.4 Synthesizing Using Checkpoints
+
+#### 4.3.4 Other Privacy Accountant
+
+By default, DPImageBench uses RDP to calculate the privacy loss. DPImageBench also supports Privacy loss Random Variables (PRV) accountant that usually performs better than RDP through setting `train.accountant=prv`.
+For example,
+
+```
+python run.py setup.n_gpus_per_node=4 train.accountant=prv --method DPDM --data_name fmnist_28 -e 10.0
+```
+
+#### 4.3.5 Synthesizing Using Checkpoints
 
 DPImageBench also supports synthesizing data from the checkpoints. As mentioned in the [results structure](#451-results-structure), we provide `final_checkpoint.pth` to store the synthesizer's parameters after the training. If users wish to generate data using trained models, they should: (1) set `pretrain.n_epochs=0` and `train.n_epochs=0`, (2) load the synthesizers through `model.ckpt`, and (3) set the work directory through `--resume_exp`. 
 For example, 

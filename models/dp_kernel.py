@@ -151,7 +151,8 @@ class DP_Kernel(DPSynther):
             target_delta=config.dp.delta, 
             sample_rate=1/len(sensitive_dataloader), 
             steps=config.max_iter,
-            account_history=account_history
+            account_history=account_history,
+            accountant='rdp' if 'accountant' not in config else config.accountant
         ) / 2
 
         # Log the noise factor

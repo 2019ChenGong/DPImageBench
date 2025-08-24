@@ -303,7 +303,7 @@ class DPGAN(DPSynther):
         state = dict(G=G, D=D, emaG=ema, step=0)
 
         # Initialize the privacy engine
-        privacy_engine = PrivacyEngine()
+        privacy_engine = PrivacyEngine(accountant='rdp' if 'accountant' not in config else config.accountant)
         
         # Prepare privacy accounting history if differential privacy is enabled
         if config.dp.privacy_history is None:
