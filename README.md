@@ -177,7 +177,7 @@ Clone repo and setup the environment:
 
  ```
 git clone https://github.com/2019ChenGong/DPImageBench.git
-sh install.sh
+bash install.sh
  ```
 
 We also provide the [Docker](./docker/Dockerfile) file.
