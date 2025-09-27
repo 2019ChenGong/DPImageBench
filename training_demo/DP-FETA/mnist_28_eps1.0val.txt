@@ -1,0 +1,1097 @@
+INFO - utils.py - 2025-03-19 07:56:08,267 - {'setup': {'method': 'dpsgd-diffusion', 'run_type': 'torchmp', 'n_gpus_per_node': 4, 'n_nodes': 1, 'node_rank': 0, 'master_address': '127.0.0.1', 'master_port': 6025, 'omp_n_threads': 8, 'workdir': 'exp/dpdm/mnist_28_eps1.0val_central_mean-2025-03-19-07-56-01', 'local_rank': 0, 'global_rank': 0, 'global_size': 4, 'root_folder': '.'}, 'public_data': {'name': None, 'num_channels': 1, 'resolution': 28, 'n_classes': 1000, 'train_path': 'dataset/imagenet/imagenet_32', 'selective': {'ratio': 1.0}}, 'sensitive_data': {'name': 'mnist', 'num_channels': 1, 'resolution': 28, 'n_classes': 10, 'train_path': 'dataset/mnist/train_28.zip', 'test_path': 'dataset/mnist/test_28.zip', 'fid_stats': 'dataset/mnist/fid_stats_28.npz'}, 'model': {'ckpt': '/p/fzv6enresearch/DPImageBench/exp/dpdm/mnist_28_eps1.0val_central_pre-2025-03-19-03-43-23/pretrain/checkpoints/final_checkpoint.pth', 'denoiser_name': 'edm', 'denoiser_network': 'song', 'ema_rate': 0.999, 'network': {'image_size': 28, 'num_in_channels': 1, 'num_out_channels': 1, 'label_dim': 1000, 'attn_resolutions': [14], 'ch_mult': [2, 2]}, 'sampler': {'type': 'ddim', 'stochastic': False, 'num_steps': 50, 'tmin': 0.002, 'tmax': 80.0, 'rho': 7.0, 'guid_scale': 0.0, 'snapshot_batch_size': 80, 'fid_batch_size': 256}, 'sampler_fid': {'type': 'edm', 's_churn': 100, 's_min': 0.05, 's_max': 50, 'num_steps': 1000, 'tmin': 0.002, 'tmax': 80.0, 'rho': 7.0, 'guid_scale': 0.0}, 'sampler_acc': {'type': 'edm', 's_churn': 10, 's_min': 0.1, 's_max': 50, 'num_steps': 1000, 'tmin': 0.002, 'tmax': 80.0, 'rho': 7.0, 'guid_scale': 0.0, 'labels': 10}, 'private_num_classes': 10, 'public_num_classes': 10, 'local_rank': 0, 'global_rank': 0, 'global_size': 4, 'fid_stats': 'dataset/mnist/fid_stats_28.npz'}, 'pretrain': {'log_dir': 'exp/dpdm/mnist_28_eps1.0val_central_mean-2025-03-19-07-56-01/pretrain', 'seed': 0, 'batch_size': 1024, 'n_epochs': 160, 'log_freq': 100, 'snapshot_freq': 2000, 'snapshot_threshold': 1, 'save_freq': 100000, 'save_threshold': 1, 'fid_freq': 2000, 'fid_samples': 5000, 'fid_threshold': 1, 'optim': {'optimizer': 'Adam', 'params': {'lr': 0.0003, 'weight_decay': 0.0}}, 'loss': {'version': 'edm', 'p_mean': -1.2, 'p_std': 1.2, 'n_noise_samples': 1, 'n_classes': 1000}, 'cond': True}, 'train': {'log_dir': 'exp/dpdm/mnist_28_eps1.0val_central_mean-2025-03-19-07-56-01/train', 'seed': 0, 'batch_size': 4096, 'n_epochs': 150, 'partly_finetune': False, 'log_freq': 100, 'snapshot_freq': 2000, 'snapshot_threshold': 1, 'save_freq': 100000, 'save_threshold': 1, 'fid_freq': 2000, 'fid_samples': 5000, 'final_fid_samples': 60000, 'fid_threshold': 1, 'gen': False, 'gen_batch_size': 8192, 'optim': {'optimizer': 'Adam', 'params': {'lr': 0.0003, 'weight_decay': 0.0}}, 'loss': {'version': 'edm', 'p_mean': -1.2, 'p_std': 1.2, 'n_noise_samples': 32, 'n_classes': 10}, 'dp': {'privacy_history': [[5, 0.11, 5]], 'max_grad_norm': 0.001, 'delta': 1e-05, 'epsilon': 1.0, 'max_physical_batch_size': 8192}, 'n_splits': 32}, 'gen': {'data_num': 60000, 'batch_size': 1000, 'log_dir': 'exp/dpdm/mnist_28_eps1.0val_central_mean-2025-03-19-07-56-01/gen', 'n_classes': 10}, 'eval': {'batch_size': 1000, 'mode': 'val'}}
+INFO - dpsgd_diffusion.py - 2025-03-19 07:56:09,424 - <All keys matched successfully>
+INFO - dataset_loader.py - 2025-03-19 07:56:10,460 - train size: 55000 val size: 5000
+INFO - dataset_loader.py - 2025-03-19 07:56:10,461 - delta is reset as 1.6657508770018431e-06
+INFO - dpsgd_diffusion.py - 2025-03-19 07:56:11,408 - Number of trainable parameters in model: 1485217
+INFO - dpsgd_diffusion.py - 2025-03-19 07:56:11,408 - Number of total epochs: 150
+INFO - dpsgd_diffusion.py - 2025-03-19 07:56:11,408 - Starting training at step 0
+INFO - dpsgd_diffusion.py - 2025-03-19 07:58:10,910 - Loss: 0.3064, step: 100
+INFO - dpsgd_diffusion.py - 2025-03-19 07:59:47,438 - Loss: 0.2488, step: 200
+INFO - dpsgd_diffusion.py - 2025-03-19 08:01:24,090 - Loss: 0.2360, step: 300
+INFO - dpsgd_diffusion.py - 2025-03-19 08:02:58,724 - Loss: 0.2183, step: 400
+INFO - dpsgd_diffusion.py - 2025-03-19 08:03:42,272 - Eps-value after 1 epochs: 0.1420
+INFO - dpsgd_diffusion.py - 2025-03-19 08:04:30,256 - Loss: 0.2073, step: 500
+INFO - dpsgd_diffusion.py - 2025-03-19 08:06:01,618 - Loss: 0.2144, step: 600
+INFO - dpsgd_diffusion.py - 2025-03-19 08:07:38,088 - Loss: 0.1952, step: 700
+INFO - dpsgd_diffusion.py - 2025-03-19 08:09:10,336 - Loss: 0.2029, step: 800
+INFO - dpsgd_diffusion.py - 2025-03-19 08:10:40,323 - Eps-value after 2 epochs: 0.1522
+INFO - dpsgd_diffusion.py - 2025-03-19 08:10:44,064 - Loss: 0.1912, step: 900
+INFO - dpsgd_diffusion.py - 2025-03-19 08:12:16,162 - Loss: 0.2037, step: 1000
+INFO - dpsgd_diffusion.py - 2025-03-19 08:13:48,142 - Loss: 0.1880, step: 1100
+INFO - dpsgd_diffusion.py - 2025-03-19 08:15:24,953 - Loss: 0.1890, step: 1200
+INFO - dpsgd_diffusion.py - 2025-03-19 08:16:56,172 - Loss: 0.1993, step: 1300
+INFO - dpsgd_diffusion.py - 2025-03-19 08:17:37,824 - Eps-value after 3 epochs: 0.1624
+INFO - dpsgd_diffusion.py - 2025-03-19 08:18:28,692 - Loss: 0.1876, step: 1400
+INFO - dpsgd_diffusion.py - 2025-03-19 08:20:03,105 - Loss: 0.1617, step: 1500
+INFO - dpsgd_diffusion.py - 2025-03-19 08:21:35,337 - Loss: 0.1925, step: 1600
+INFO - dpsgd_diffusion.py - 2025-03-19 08:23:06,877 - Loss: 0.1865, step: 1700
+INFO - dpsgd_diffusion.py - 2025-03-19 08:24:33,056 - Eps-value after 4 epochs: 0.1726
+INFO - dpsgd_diffusion.py - 2025-03-19 08:24:40,312 - Loss: 0.1714, step: 1800
+INFO - dpsgd_diffusion.py - 2025-03-19 08:26:12,375 - Loss: 0.1811, step: 1900
+INFO - dpsgd_diffusion.py - 2025-03-19 08:27:43,627 - Loss: 0.1681, step: 2000
+INFO - dpsgd_diffusion.py - 2025-03-19 08:27:43,694 - Saving snapshot checkpoint and sampling single batch at iteration 2000.
+WARNING - image.py - 2025-03-19 08:27:44,523 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 08:28:12,080 - FID at iteration 2000: 109.900763
+INFO - dpsgd_diffusion.py - 2025-03-19 08:29:45,817 - Loss: 0.1788, step: 2100
+INFO - dpsgd_diffusion.py - 2025-03-19 08:31:18,744 - Loss: 0.1869, step: 2200
+INFO - dpsgd_diffusion.py - 2025-03-19 08:31:55,793 - Eps-value after 5 epochs: 0.1828
+INFO - dpsgd_diffusion.py - 2025-03-19 08:32:50,726 - Loss: 0.1800, step: 2300
+INFO - dpsgd_diffusion.py - 2025-03-19 08:34:23,198 - Loss: 0.1705, step: 2400
+INFO - dpsgd_diffusion.py - 2025-03-19 08:35:55,210 - Loss: 0.1634, step: 2500
+INFO - dpsgd_diffusion.py - 2025-03-19 08:37:26,259 - Loss: 0.1632, step: 2600
+INFO - dpsgd_diffusion.py - 2025-03-19 08:38:47,494 - Eps-value after 6 epochs: 0.1930
+INFO - dpsgd_diffusion.py - 2025-03-19 08:38:58,986 - Loss: 0.1659, step: 2700
+INFO - dpsgd_diffusion.py - 2025-03-19 08:40:31,019 - Loss: 0.1726, step: 2800
+INFO - dpsgd_diffusion.py - 2025-03-19 08:42:03,002 - Loss: 0.1532, step: 2900
+INFO - dpsgd_diffusion.py - 2025-03-19 08:43:34,550 - Loss: 0.1680, step: 3000
+INFO - dpsgd_diffusion.py - 2025-03-19 08:45:06,200 - Loss: 0.1574, step: 3100
+INFO - dpsgd_diffusion.py - 2025-03-19 08:45:39,670 - Eps-value after 7 epochs: 0.2032
+INFO - dpsgd_diffusion.py - 2025-03-19 08:46:39,093 - Loss: 0.1651, step: 3200
+INFO - dpsgd_diffusion.py - 2025-03-19 08:48:09,096 - Loss: 0.1732, step: 3300
+INFO - dpsgd_diffusion.py - 2025-03-19 08:49:39,826 - Loss: 0.1690, step: 3400
+INFO - dpsgd_diffusion.py - 2025-03-19 08:51:10,517 - Loss: 0.1698, step: 3500
+INFO - dpsgd_diffusion.py - 2025-03-19 08:52:26,592 - Eps-value after 8 epochs: 0.2134
+INFO - dpsgd_diffusion.py - 2025-03-19 08:52:41,005 - Loss: 0.1662, step: 3600
+INFO - dpsgd_diffusion.py - 2025-03-19 08:54:12,543 - Loss: 0.1589, step: 3700
+INFO - dpsgd_diffusion.py - 2025-03-19 08:55:44,143 - Loss: 0.1691, step: 3800
+INFO - dpsgd_diffusion.py - 2025-03-19 08:57:20,570 - Loss: 0.1592, step: 3900
+INFO - dpsgd_diffusion.py - 2025-03-19 08:58:52,512 - Loss: 0.1544, step: 4000
+INFO - dpsgd_diffusion.py - 2025-03-19 08:58:52,528 - Saving snapshot checkpoint and sampling single batch at iteration 4000.
+WARNING - image.py - 2025-03-19 08:58:53,199 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 08:59:20,851 - FID at iteration 4000: 88.270203
+INFO - dpsgd_diffusion.py - 2025-03-19 08:59:52,188 - Eps-value after 9 epochs: 0.2236
+INFO - dpsgd_diffusion.py - 2025-03-19 09:00:54,453 - Loss: 0.1652, step: 4100
+INFO - dpsgd_diffusion.py - 2025-03-19 09:02:26,949 - Loss: 0.1563, step: 4200
+INFO - dpsgd_diffusion.py - 2025-03-19 09:03:58,475 - Loss: 0.1761, step: 4300
+INFO - dpsgd_diffusion.py - 2025-03-19 09:05:30,349 - Loss: 0.1599, step: 4400
+INFO - dpsgd_diffusion.py - 2025-03-19 09:06:42,563 - Eps-value after 10 epochs: 0.2338
+INFO - dpsgd_diffusion.py - 2025-03-19 09:07:01,600 - Loss: 0.1455, step: 4500
+INFO - dpsgd_diffusion.py - 2025-03-19 09:08:33,515 - Loss: 0.1564, step: 4600
+INFO - dpsgd_diffusion.py - 2025-03-19 09:10:05,461 - Loss: 0.1603, step: 4700
+INFO - dpsgd_diffusion.py - 2025-03-19 09:11:37,259 - Loss: 0.1633, step: 4800
+INFO - dpsgd_diffusion.py - 2025-03-19 09:13:09,552 - Loss: 0.1589, step: 4900
+INFO - dpsgd_diffusion.py - 2025-03-19 09:13:35,373 - Eps-value after 11 epochs: 0.2441
+INFO - dpsgd_diffusion.py - 2025-03-19 09:14:41,714 - Loss: 0.1466, step: 5000
+INFO - dpsgd_diffusion.py - 2025-03-19 09:16:14,211 - Loss: 0.1498, step: 5100
+INFO - dpsgd_diffusion.py - 2025-03-19 09:17:45,380 - Loss: 0.1779, step: 5200
+INFO - dpsgd_diffusion.py - 2025-03-19 09:19:16,278 - Loss: 0.1598, step: 5300
+INFO - dpsgd_diffusion.py - 2025-03-19 09:20:24,906 - Eps-value after 12 epochs: 0.2543
+INFO - dpsgd_diffusion.py - 2025-03-19 09:20:47,048 - Loss: 0.1674, step: 5400
+INFO - dpsgd_diffusion.py - 2025-03-19 09:22:20,007 - Loss: 0.1500, step: 5500
+INFO - dpsgd_diffusion.py - 2025-03-19 09:23:52,061 - Loss: 0.1573, step: 5600
+INFO - dpsgd_diffusion.py - 2025-03-19 09:25:27,581 - Loss: 0.1735, step: 5700
+INFO - dpsgd_diffusion.py - 2025-03-19 09:26:57,912 - Loss: 0.1755, step: 5800
+INFO - dpsgd_diffusion.py - 2025-03-19 09:27:19,534 - Eps-value after 13 epochs: 0.2645
+INFO - dpsgd_diffusion.py - 2025-03-19 09:28:28,841 - Loss: 0.1473, step: 5900
+INFO - dpsgd_diffusion.py - 2025-03-19 09:29:59,255 - Loss: 0.1624, step: 6000
+INFO - dpsgd_diffusion.py - 2025-03-19 09:29:59,266 - Saving snapshot checkpoint and sampling single batch at iteration 6000.
+WARNING - image.py - 2025-03-19 09:29:59,921 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 09:30:25,030 - FID at iteration 6000: 75.202607
+INFO - dpsgd_diffusion.py - 2025-03-19 09:32:00,172 - Loss: 0.1519, step: 6100
+INFO - dpsgd_diffusion.py - 2025-03-19 09:33:31,332 - Loss: 0.1648, step: 6200
+INFO - dpsgd_diffusion.py - 2025-03-19 09:34:37,291 - Eps-value after 14 epochs: 0.2747
+INFO - dpsgd_diffusion.py - 2025-03-19 09:35:02,486 - Loss: 0.1442, step: 6300
+INFO - dpsgd_diffusion.py - 2025-03-19 09:36:32,885 - Loss: 0.1537, step: 6400
+INFO - dpsgd_diffusion.py - 2025-03-19 09:38:07,517 - Loss: 0.1524, step: 6500
+INFO - dpsgd_diffusion.py - 2025-03-19 09:39:40,787 - Loss: 0.1525, step: 6600
+INFO - dpsgd_diffusion.py - 2025-03-19 09:41:13,711 - Loss: 0.1608, step: 6700
+INFO - dpsgd_diffusion.py - 2025-03-19 09:41:31,756 - Eps-value after 15 epochs: 0.2848
+INFO - dpsgd_diffusion.py - 2025-03-19 09:42:43,959 - Loss: 0.1401, step: 6800
+INFO - dpsgd_diffusion.py - 2025-03-19 09:44:15,531 - Loss: 0.1416, step: 6900
+INFO - dpsgd_diffusion.py - 2025-03-19 09:45:47,402 - Loss: 0.1672, step: 7000
+INFO - dpsgd_diffusion.py - 2025-03-19 09:47:20,354 - Loss: 0.1545, step: 7100
+INFO - dpsgd_diffusion.py - 2025-03-19 09:48:22,333 - Eps-value after 16 epochs: 0.2947
+INFO - dpsgd_diffusion.py - 2025-03-19 09:48:52,831 - Loss: 0.1496, step: 7200
+INFO - dpsgd_diffusion.py - 2025-03-19 09:50:25,342 - Loss: 0.1566, step: 7300
+INFO - dpsgd_diffusion.py - 2025-03-19 09:51:56,326 - Loss: 0.1546, step: 7400
+INFO - dpsgd_diffusion.py - 2025-03-19 09:53:27,687 - Loss: 0.1491, step: 7500
+INFO - dpsgd_diffusion.py - 2025-03-19 09:54:59,637 - Loss: 0.1638, step: 7600
+INFO - dpsgd_diffusion.py - 2025-03-19 09:55:14,415 - Eps-value after 17 epochs: 0.3043
+INFO - dpsgd_diffusion.py - 2025-03-19 09:56:31,477 - Loss: 0.1509, step: 7700
+INFO - dpsgd_diffusion.py - 2025-03-19 09:58:01,990 - Loss: 0.1461, step: 7800
+INFO - dpsgd_diffusion.py - 2025-03-19 09:59:33,828 - Loss: 0.1628, step: 7900
+INFO - dpsgd_diffusion.py - 2025-03-19 10:01:05,873 - Loss: 0.1538, step: 8000
+INFO - dpsgd_diffusion.py - 2025-03-19 10:01:05,890 - Saving snapshot checkpoint and sampling single batch at iteration 8000.
+WARNING - image.py - 2025-03-19 10:01:06,546 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 10:01:32,467 - FID at iteration 8000: 65.515005
+INFO - dpsgd_diffusion.py - 2025-03-19 10:02:34,021 - Eps-value after 18 epochs: 0.3136
+INFO - dpsgd_diffusion.py - 2025-03-19 10:03:07,384 - Loss: 0.1446, step: 8100
+INFO - dpsgd_diffusion.py - 2025-03-19 10:04:40,500 - Loss: 0.1648, step: 8200
+INFO - dpsgd_diffusion.py - 2025-03-19 10:06:13,297 - Loss: 0.1601, step: 8300
+INFO - dpsgd_diffusion.py - 2025-03-19 10:07:45,251 - Loss: 0.1493, step: 8400
+INFO - dpsgd_diffusion.py - 2025-03-19 10:09:18,138 - Loss: 0.1547, step: 8500
+INFO - dpsgd_diffusion.py - 2025-03-19 10:09:29,350 - Eps-value after 19 epochs: 0.3227
+INFO - dpsgd_diffusion.py - 2025-03-19 10:10:50,895 - Loss: 0.1613, step: 8600
+INFO - dpsgd_diffusion.py - 2025-03-19 10:12:23,621 - Loss: 0.1524, step: 8700
+INFO - dpsgd_diffusion.py - 2025-03-19 10:13:55,479 - Loss: 0.1596, step: 8800
+INFO - dpsgd_diffusion.py - 2025-03-19 10:15:26,820 - Loss: 0.1513, step: 8900
+INFO - dpsgd_diffusion.py - 2025-03-19 10:16:22,703 - Eps-value after 20 epochs: 0.3316
+INFO - dpsgd_diffusion.py - 2025-03-19 10:16:58,852 - Loss: 0.1698, step: 9000
+INFO - dpsgd_diffusion.py - 2025-03-19 10:18:31,007 - Loss: 0.1493, step: 9100
+INFO - dpsgd_diffusion.py - 2025-03-19 10:20:03,017 - Loss: 0.1508, step: 9200
+INFO - dpsgd_diffusion.py - 2025-03-19 10:21:33,685 - Loss: 0.1511, step: 9300
+INFO - dpsgd_diffusion.py - 2025-03-19 10:23:03,916 - Loss: 0.1539, step: 9400
+INFO - dpsgd_diffusion.py - 2025-03-19 10:23:11,164 - Eps-value after 21 epochs: 0.3403
+INFO - dpsgd_diffusion.py - 2025-03-19 10:24:35,750 - Loss: 0.1493, step: 9500
+INFO - dpsgd_diffusion.py - 2025-03-19 10:26:07,213 - Loss: 0.1596, step: 9600
+INFO - dpsgd_diffusion.py - 2025-03-19 10:27:37,664 - Loss: 0.1430, step: 9700
+INFO - dpsgd_diffusion.py - 2025-03-19 10:29:09,237 - Loss: 0.1575, step: 9800
+INFO - dpsgd_diffusion.py - 2025-03-19 10:30:01,326 - Eps-value after 22 epochs: 0.3487
+INFO - dpsgd_diffusion.py - 2025-03-19 10:30:41,247 - Loss: 0.1477, step: 9900
+INFO - dpsgd_diffusion.py - 2025-03-19 10:32:12,683 - Loss: 0.1538, step: 10000
+INFO - dpsgd_diffusion.py - 2025-03-19 10:32:12,694 - Saving snapshot checkpoint and sampling single batch at iteration 10000.
+WARNING - image.py - 2025-03-19 10:32:13,351 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 10:32:41,075 - FID at iteration 10000: 59.636348
+INFO - dpsgd_diffusion.py - 2025-03-19 10:34:12,190 - Loss: 0.1438, step: 10100
+INFO - dpsgd_diffusion.py - 2025-03-19 10:35:43,571 - Loss: 0.1591, step: 10200
+INFO - dpsgd_diffusion.py - 2025-03-19 10:37:14,316 - Loss: 0.1463, step: 10300
+INFO - dpsgd_diffusion.py - 2025-03-19 10:37:17,969 - Eps-value after 23 epochs: 0.3570
+INFO - dpsgd_diffusion.py - 2025-03-19 10:38:47,530 - Loss: 0.1462, step: 10400
+INFO - dpsgd_diffusion.py - 2025-03-19 10:40:20,054 - Loss: 0.1533, step: 10500
+INFO - dpsgd_diffusion.py - 2025-03-19 10:41:52,043 - Loss: 0.1422, step: 10600
+INFO - dpsgd_diffusion.py - 2025-03-19 10:43:23,228 - Loss: 0.1610, step: 10700
+INFO - dpsgd_diffusion.py - 2025-03-19 10:44:10,659 - Eps-value after 24 epochs: 0.3652
+INFO - dpsgd_diffusion.py - 2025-03-19 10:44:54,212 - Loss: 0.1423, step: 10800
+INFO - dpsgd_diffusion.py - 2025-03-19 10:46:24,278 - Loss: 0.1469, step: 10900
+INFO - dpsgd_diffusion.py - 2025-03-19 10:47:58,198 - Loss: 0.1520, step: 11000
+INFO - dpsgd_diffusion.py - 2025-03-19 10:49:30,386 - Loss: 0.1494, step: 11100
+INFO - dpsgd_diffusion.py - 2025-03-19 10:51:01,815 - Loss: 0.1600, step: 11200
+INFO - dpsgd_diffusion.py - 2025-03-19 10:51:01,835 - Eps-value after 25 epochs: 0.3731
+INFO - dpsgd_diffusion.py - 2025-03-19 10:52:34,837 - Loss: 0.1446, step: 11300
+INFO - dpsgd_diffusion.py - 2025-03-19 10:54:06,807 - Loss: 0.1549, step: 11400
+INFO - dpsgd_diffusion.py - 2025-03-19 10:55:38,431 - Loss: 0.1452, step: 11500
+INFO - dpsgd_diffusion.py - 2025-03-19 10:57:09,751 - Loss: 0.1463, step: 11600
+INFO - dpsgd_diffusion.py - 2025-03-19 10:57:53,218 - Eps-value after 26 epochs: 0.3810
+INFO - dpsgd_diffusion.py - 2025-03-19 10:58:41,605 - Loss: 0.1314, step: 11700
+INFO - dpsgd_diffusion.py - 2025-03-19 11:00:14,553 - Loss: 0.1463, step: 11800
+INFO - dpsgd_diffusion.py - 2025-03-19 11:01:47,044 - Loss: 0.1561, step: 11900
+INFO - dpsgd_diffusion.py - 2025-03-19 11:03:17,018 - Loss: 0.1677, step: 12000
+INFO - dpsgd_diffusion.py - 2025-03-19 11:03:17,036 - Saving snapshot checkpoint and sampling single batch at iteration 12000.
+WARNING - image.py - 2025-03-19 11:03:17,708 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 11:03:45,527 - FID at iteration 12000: 55.133594
+INFO - dpsgd_diffusion.py - 2025-03-19 11:05:14,076 - Eps-value after 27 epochs: 0.3886
+INFO - dpsgd_diffusion.py - 2025-03-19 11:05:17,754 - Loss: 0.1421, step: 12100
+INFO - dpsgd_diffusion.py - 2025-03-19 11:06:50,062 - Loss: 0.1491, step: 12200
+INFO - dpsgd_diffusion.py - 2025-03-19 11:08:23,061 - Loss: 0.1448, step: 12300
+INFO - dpsgd_diffusion.py - 2025-03-19 11:09:55,897 - Loss: 0.1414, step: 12400
+INFO - dpsgd_diffusion.py - 2025-03-19 11:11:26,832 - Loss: 0.1356, step: 12500
+INFO - dpsgd_diffusion.py - 2025-03-19 11:12:06,512 - Eps-value after 28 epochs: 0.3962
+INFO - dpsgd_diffusion.py - 2025-03-19 11:12:57,434 - Loss: 0.1549, step: 12600
+INFO - dpsgd_diffusion.py - 2025-03-19 11:14:28,687 - Loss: 0.1519, step: 12700
+INFO - dpsgd_diffusion.py - 2025-03-19 11:16:01,443 - Loss: 0.1503, step: 12800
+INFO - dpsgd_diffusion.py - 2025-03-19 11:17:35,218 - Loss: 0.1438, step: 12900
+INFO - dpsgd_diffusion.py - 2025-03-19 11:19:00,777 - Eps-value after 29 epochs: 0.4036
+INFO - dpsgd_diffusion.py - 2025-03-19 11:19:08,128 - Loss: 0.1494, step: 13000
+INFO - dpsgd_diffusion.py - 2025-03-19 11:20:38,887 - Loss: 0.1458, step: 13100
+INFO - dpsgd_diffusion.py - 2025-03-19 11:22:10,597 - Loss: 0.1485, step: 13200
+INFO - dpsgd_diffusion.py - 2025-03-19 11:23:42,478 - Loss: 0.1445, step: 13300
+INFO - dpsgd_diffusion.py - 2025-03-19 11:25:14,454 - Loss: 0.1460, step: 13400
+INFO - dpsgd_diffusion.py - 2025-03-19 11:25:51,526 - Eps-value after 30 epochs: 0.4109
+INFO - dpsgd_diffusion.py - 2025-03-19 11:26:46,577 - Loss: 0.1446, step: 13500
+INFO - dpsgd_diffusion.py - 2025-03-19 11:28:18,844 - Loss: 0.1420, step: 13600
+INFO - dpsgd_diffusion.py - 2025-03-19 11:29:50,244 - Loss: 0.1364, step: 13700
+INFO - dpsgd_diffusion.py - 2025-03-19 11:31:22,355 - Loss: 0.1465, step: 13800
+INFO - dpsgd_diffusion.py - 2025-03-19 11:32:43,007 - Eps-value after 31 epochs: 0.4182
+INFO - dpsgd_diffusion.py - 2025-03-19 11:32:54,084 - Loss: 0.1579, step: 13900
+INFO - dpsgd_diffusion.py - 2025-03-19 11:34:26,757 - Loss: 0.1478, step: 14000
+INFO - dpsgd_diffusion.py - 2025-03-19 11:34:26,849 - Saving snapshot checkpoint and sampling single batch at iteration 14000.
+WARNING - image.py - 2025-03-19 11:34:27,517 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 11:34:54,989 - FID at iteration 14000: 51.203646
+INFO - dpsgd_diffusion.py - 2025-03-19 11:36:26,325 - Loss: 0.1395, step: 14100
+INFO - dpsgd_diffusion.py - 2025-03-19 11:37:57,561 - Loss: 0.1557, step: 14200
+INFO - dpsgd_diffusion.py - 2025-03-19 11:39:30,580 - Loss: 0.1531, step: 14300
+INFO - dpsgd_diffusion.py - 2025-03-19 11:40:03,349 - Eps-value after 32 epochs: 0.4252
+INFO - dpsgd_diffusion.py - 2025-03-19 11:41:01,589 - Loss: 0.1405, step: 14400
+INFO - dpsgd_diffusion.py - 2025-03-19 11:42:34,015 - Loss: 0.1362, step: 14500
+INFO - dpsgd_diffusion.py - 2025-03-19 11:44:07,028 - Loss: 0.1505, step: 14600
+INFO - dpsgd_diffusion.py - 2025-03-19 11:45:38,969 - Loss: 0.1357, step: 14700
+INFO - dpsgd_diffusion.py - 2025-03-19 11:46:55,163 - Eps-value after 33 epochs: 0.4322
+INFO - dpsgd_diffusion.py - 2025-03-19 11:47:09,523 - Loss: 0.1422, step: 14800
+INFO - dpsgd_diffusion.py - 2025-03-19 11:48:41,580 - Loss: 0.1520, step: 14900
+INFO - dpsgd_diffusion.py - 2025-03-19 11:50:13,483 - Loss: 0.1477, step: 15000
+INFO - dpsgd_diffusion.py - 2025-03-19 11:51:47,917 - Loss: 0.1641, step: 15100
+INFO - dpsgd_diffusion.py - 2025-03-19 11:53:19,318 - Loss: 0.1360, step: 15200
+INFO - dpsgd_diffusion.py - 2025-03-19 11:53:48,914 - Eps-value after 34 epochs: 0.4392
+INFO - dpsgd_diffusion.py - 2025-03-19 11:54:52,772 - Loss: 0.1391, step: 15300
+INFO - dpsgd_diffusion.py - 2025-03-19 11:56:23,883 - Loss: 0.1447, step: 15400
+INFO - dpsgd_diffusion.py - 2025-03-19 11:57:53,650 - Loss: 0.1412, step: 15500
+INFO - dpsgd_diffusion.py - 2025-03-19 11:59:26,370 - Loss: 0.1482, step: 15600
+INFO - dpsgd_diffusion.py - 2025-03-19 12:00:40,192 - Eps-value after 35 epochs: 0.4459
+INFO - dpsgd_diffusion.py - 2025-03-19 12:00:58,673 - Loss: 0.1417, step: 15700
+INFO - dpsgd_diffusion.py - 2025-03-19 12:02:31,267 - Loss: 0.1518, step: 15800
+INFO - dpsgd_diffusion.py - 2025-03-19 12:04:02,650 - Loss: 0.1495, step: 15900
+INFO - dpsgd_diffusion.py - 2025-03-19 12:05:31,900 - Loss: 0.1304, step: 16000
+INFO - dpsgd_diffusion.py - 2025-03-19 12:05:31,916 - Saving snapshot checkpoint and sampling single batch at iteration 16000.
+WARNING - image.py - 2025-03-19 12:05:32,573 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 12:05:59,505 - FID at iteration 16000: 48.633420
+INFO - dpsgd_diffusion.py - 2025-03-19 12:07:32,859 - Loss: 0.1506, step: 16100
+INFO - dpsgd_diffusion.py - 2025-03-19 12:07:58,009 - Eps-value after 36 epochs: 0.4527
+INFO - dpsgd_diffusion.py - 2025-03-19 12:09:04,299 - Loss: 0.1548, step: 16200
+INFO - dpsgd_diffusion.py - 2025-03-19 12:10:36,777 - Loss: 0.1536, step: 16300
+INFO - dpsgd_diffusion.py - 2025-03-19 12:12:08,227 - Loss: 0.1418, step: 16400
+INFO - dpsgd_diffusion.py - 2025-03-19 12:13:40,149 - Loss: 0.1413, step: 16500
+INFO - dpsgd_diffusion.py - 2025-03-19 12:14:49,934 - Eps-value after 37 epochs: 0.4593
+INFO - dpsgd_diffusion.py - 2025-03-19 12:15:11,523 - Loss: 0.1420, step: 16600
+INFO - dpsgd_diffusion.py - 2025-03-19 12:16:44,640 - Loss: 0.1391, step: 16700
+INFO - dpsgd_diffusion.py - 2025-03-19 12:18:17,789 - Loss: 0.1447, step: 16800
+INFO - dpsgd_diffusion.py - 2025-03-19 12:19:50,180 - Loss: 0.1433, step: 16900
+INFO - dpsgd_diffusion.py - 2025-03-19 12:21:19,382 - Loss: 0.1466, step: 17000
+INFO - dpsgd_diffusion.py - 2025-03-19 12:21:41,305 - Eps-value after 38 epochs: 0.4658
+INFO - dpsgd_diffusion.py - 2025-03-19 12:22:51,794 - Loss: 0.1385, step: 17100
+INFO - dpsgd_diffusion.py - 2025-03-19 12:24:24,209 - Loss: 0.1392, step: 17200
+INFO - dpsgd_diffusion.py - 2025-03-19 12:25:58,811 - Loss: 0.1407, step: 17300
+INFO - dpsgd_diffusion.py - 2025-03-19 12:27:29,989 - Loss: 0.1480, step: 17400
+INFO - dpsgd_diffusion.py - 2025-03-19 12:28:35,170 - Eps-value after 39 epochs: 0.4723
+INFO - dpsgd_diffusion.py - 2025-03-19 12:29:00,996 - Loss: 0.1465, step: 17500
+INFO - dpsgd_diffusion.py - 2025-03-19 12:30:35,027 - Loss: 0.1480, step: 17600
+INFO - dpsgd_diffusion.py - 2025-03-19 12:32:08,187 - Loss: 0.1495, step: 17700
+INFO - dpsgd_diffusion.py - 2025-03-19 12:33:40,220 - Loss: 0.1502, step: 17800
+INFO - dpsgd_diffusion.py - 2025-03-19 12:35:11,756 - Loss: 0.1421, step: 17900
+INFO - dpsgd_diffusion.py - 2025-03-19 12:35:30,137 - Eps-value after 40 epochs: 0.4787
+INFO - dpsgd_diffusion.py - 2025-03-19 12:36:42,945 - Loss: 0.1389, step: 18000
+INFO - dpsgd_diffusion.py - 2025-03-19 12:36:43,009 - Saving snapshot checkpoint and sampling single batch at iteration 18000.
+WARNING - image.py - 2025-03-19 12:36:43,666 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 12:37:11,134 - FID at iteration 18000: 44.330405
+INFO - dpsgd_diffusion.py - 2025-03-19 12:38:43,360 - Loss: 0.1410, step: 18100
+INFO - dpsgd_diffusion.py - 2025-03-19 12:40:16,371 - Loss: 0.1482, step: 18200
+INFO - dpsgd_diffusion.py - 2025-03-19 12:41:47,815 - Loss: 0.1490, step: 18300
+INFO - dpsgd_diffusion.py - 2025-03-19 12:42:52,241 - Eps-value after 41 epochs: 0.4849
+INFO - dpsgd_diffusion.py - 2025-03-19 12:43:21,602 - Loss: 0.1489, step: 18400
+INFO - dpsgd_diffusion.py - 2025-03-19 12:44:52,543 - Loss: 0.1525, step: 18500
+INFO - dpsgd_diffusion.py - 2025-03-19 12:46:24,149 - Loss: 0.1468, step: 18600
+INFO - dpsgd_diffusion.py - 2025-03-19 12:47:55,309 - Loss: 0.1385, step: 18700
+INFO - dpsgd_diffusion.py - 2025-03-19 12:49:26,207 - Loss: 0.1407, step: 18800
+INFO - dpsgd_diffusion.py - 2025-03-19 12:49:40,643 - Eps-value after 42 epochs: 0.4912
+INFO - dpsgd_diffusion.py - 2025-03-19 12:50:58,194 - Loss: 0.1428, step: 18900
+INFO - dpsgd_diffusion.py - 2025-03-19 12:52:30,511 - Loss: 0.1443, step: 19000
+INFO - dpsgd_diffusion.py - 2025-03-19 12:54:02,301 - Loss: 0.1491, step: 19100
+INFO - dpsgd_diffusion.py - 2025-03-19 12:55:35,904 - Loss: 0.1462, step: 19200
+INFO - dpsgd_diffusion.py - 2025-03-19 12:56:34,649 - Eps-value after 43 epochs: 0.4974
+INFO - dpsgd_diffusion.py - 2025-03-19 12:57:07,138 - Loss: 0.1393, step: 19300
+INFO - dpsgd_diffusion.py - 2025-03-19 12:58:38,228 - Loss: 0.1580, step: 19400
+INFO - dpsgd_diffusion.py - 2025-03-19 13:00:10,212 - Loss: 0.1432, step: 19500
+INFO - dpsgd_diffusion.py - 2025-03-19 13:01:43,126 - Loss: 0.1346, step: 19600
+INFO - dpsgd_diffusion.py - 2025-03-19 13:03:15,533 - Loss: 0.1425, step: 19700
+INFO - dpsgd_diffusion.py - 2025-03-19 13:03:26,729 - Eps-value after 44 epochs: 0.5035
+INFO - dpsgd_diffusion.py - 2025-03-19 13:04:49,873 - Loss: 0.1461, step: 19800
+INFO - dpsgd_diffusion.py - 2025-03-19 13:06:20,833 - Loss: 0.1466, step: 19900
+INFO - dpsgd_diffusion.py - 2025-03-19 13:07:52,819 - Loss: 0.1481, step: 20000
+INFO - dpsgd_diffusion.py - 2025-03-19 13:07:52,837 - Saving snapshot checkpoint and sampling single batch at iteration 20000.
+WARNING - image.py - 2025-03-19 13:07:53,494 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 13:08:18,014 - FID at iteration 20000: 42.962588
+INFO - dpsgd_diffusion.py - 2025-03-19 13:09:52,030 - Loss: 0.1455, step: 20100
+INFO - dpsgd_diffusion.py - 2025-03-19 13:10:48,085 - Eps-value after 45 epochs: 0.5095
+INFO - dpsgd_diffusion.py - 2025-03-19 13:11:25,093 - Loss: 0.1486, step: 20200
+INFO - dpsgd_diffusion.py - 2025-03-19 13:12:57,146 - Loss: 0.1578, step: 20300
+INFO - dpsgd_diffusion.py - 2025-03-19 13:14:28,078 - Loss: 0.1387, step: 20400
+INFO - dpsgd_diffusion.py - 2025-03-19 13:15:58,883 - Loss: 0.1443, step: 20500
+INFO - dpsgd_diffusion.py - 2025-03-19 13:17:30,817 - Loss: 0.1486, step: 20600
+INFO - dpsgd_diffusion.py - 2025-03-19 13:17:38,094 - Eps-value after 46 epochs: 0.5155
+INFO - dpsgd_diffusion.py - 2025-03-19 13:19:02,114 - Loss: 0.1359, step: 20700
+INFO - dpsgd_diffusion.py - 2025-03-19 13:20:35,518 - Loss: 0.1488, step: 20800
+INFO - dpsgd_diffusion.py - 2025-03-19 13:22:07,627 - Loss: 0.1384, step: 20900
+INFO - dpsgd_diffusion.py - 2025-03-19 13:23:40,765 - Loss: 0.1313, step: 21000
+INFO - dpsgd_diffusion.py - 2025-03-19 13:24:33,678 - Eps-value after 47 epochs: 0.5214
+INFO - dpsgd_diffusion.py - 2025-03-19 13:25:15,245 - Loss: 0.1435, step: 21100
+INFO - dpsgd_diffusion.py - 2025-03-19 13:26:47,455 - Loss: 0.1644, step: 21200
+INFO - dpsgd_diffusion.py - 2025-03-19 13:28:20,554 - Loss: 0.1466, step: 21300
+INFO - dpsgd_diffusion.py - 2025-03-19 13:29:54,217 - Loss: 0.1403, step: 21400
+INFO - dpsgd_diffusion.py - 2025-03-19 13:31:26,629 - Loss: 0.1378, step: 21500
+INFO - dpsgd_diffusion.py - 2025-03-19 13:31:30,424 - Eps-value after 48 epochs: 0.5273
+INFO - dpsgd_diffusion.py - 2025-03-19 13:32:58,007 - Loss: 0.1523, step: 21600
+INFO - dpsgd_diffusion.py - 2025-03-19 13:34:29,967 - Loss: 0.1432, step: 21700
+INFO - dpsgd_diffusion.py - 2025-03-19 13:36:01,675 - Loss: 0.1414, step: 21800
+INFO - dpsgd_diffusion.py - 2025-03-19 13:37:35,370 - Loss: 0.1357, step: 21900
+INFO - dpsgd_diffusion.py - 2025-03-19 13:38:23,397 - Eps-value after 49 epochs: 0.5331
+INFO - dpsgd_diffusion.py - 2025-03-19 13:39:06,944 - Loss: 0.1392, step: 22000
+INFO - dpsgd_diffusion.py - 2025-03-19 13:39:06,955 - Saving snapshot checkpoint and sampling single batch at iteration 22000.
+WARNING - image.py - 2025-03-19 13:39:07,654 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 13:39:35,210 - FID at iteration 22000: 39.832322
+INFO - dpsgd_diffusion.py - 2025-03-19 13:41:05,952 - Loss: 0.1458, step: 22100
+INFO - dpsgd_diffusion.py - 2025-03-19 13:42:36,267 - Loss: 0.1436, step: 22200
+INFO - dpsgd_diffusion.py - 2025-03-19 13:44:06,585 - Loss: 0.1452, step: 22300
+INFO - dpsgd_diffusion.py - 2025-03-19 13:45:37,970 - Loss: 0.1424, step: 22400
+INFO - dpsgd_diffusion.py - 2025-03-19 13:45:37,990 - Eps-value after 50 epochs: 0.5389
+INFO - dpsgd_diffusion.py - 2025-03-19 13:47:10,467 - Loss: 0.1412, step: 22500
+INFO - dpsgd_diffusion.py - 2025-03-19 13:48:43,194 - Loss: 0.1436, step: 22600
+INFO - dpsgd_diffusion.py - 2025-03-19 13:50:15,858 - Loss: 0.1533, step: 22700
+INFO - dpsgd_diffusion.py - 2025-03-19 13:51:47,805 - Loss: 0.1509, step: 22800
+INFO - dpsgd_diffusion.py - 2025-03-19 13:52:31,882 - Eps-value after 51 epochs: 0.5445
+INFO - dpsgd_diffusion.py - 2025-03-19 13:53:20,033 - Loss: 0.1448, step: 22900
+INFO - dpsgd_diffusion.py - 2025-03-19 13:54:53,704 - Loss: 0.1393, step: 23000
+INFO - dpsgd_diffusion.py - 2025-03-19 13:56:25,196 - Loss: 0.1417, step: 23100
+INFO - dpsgd_diffusion.py - 2025-03-19 13:57:55,608 - Loss: 0.1464, step: 23200
+INFO - dpsgd_diffusion.py - 2025-03-19 13:59:24,246 - Eps-value after 52 epochs: 0.5502
+INFO - dpsgd_diffusion.py - 2025-03-19 13:59:27,964 - Loss: 0.1519, step: 23300
+INFO - dpsgd_diffusion.py - 2025-03-19 14:00:58,959 - Loss: 0.1397, step: 23400
+INFO - dpsgd_diffusion.py - 2025-03-19 14:02:30,030 - Loss: 0.1448, step: 23500
+INFO - dpsgd_diffusion.py - 2025-03-19 14:04:01,254 - Loss: 0.1450, step: 23600
+INFO - dpsgd_diffusion.py - 2025-03-19 14:05:33,495 - Loss: 0.1329, step: 23700
+INFO - dpsgd_diffusion.py - 2025-03-19 14:06:13,896 - Eps-value after 53 epochs: 0.5558
+INFO - dpsgd_diffusion.py - 2025-03-19 14:07:05,796 - Loss: 0.1427, step: 23800
+INFO - dpsgd_diffusion.py - 2025-03-19 14:08:39,659 - Loss: 0.1398, step: 23900
+INFO - dpsgd_diffusion.py - 2025-03-19 14:10:12,570 - Loss: 0.1489, step: 24000
+INFO - dpsgd_diffusion.py - 2025-03-19 14:10:12,587 - Saving snapshot checkpoint and sampling single batch at iteration 24000.
+WARNING - image.py - 2025-03-19 14:10:13,244 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 14:10:41,303 - FID at iteration 24000: 39.582438
+INFO - dpsgd_diffusion.py - 2025-03-19 14:12:13,943 - Loss: 0.1458, step: 24100
+INFO - dpsgd_diffusion.py - 2025-03-19 14:13:37,937 - Eps-value after 54 epochs: 0.5613
+INFO - dpsgd_diffusion.py - 2025-03-19 14:13:45,309 - Loss: 0.1413, step: 24200
+INFO - dpsgd_diffusion.py - 2025-03-19 14:15:17,258 - Loss: 0.1411, step: 24300
+INFO - dpsgd_diffusion.py - 2025-03-19 14:16:46,682 - Loss: 0.1439, step: 24400
+INFO - dpsgd_diffusion.py - 2025-03-19 14:18:18,960 - Loss: 0.1386, step: 24500
+INFO - dpsgd_diffusion.py - 2025-03-19 14:19:51,558 - Loss: 0.1489, step: 24600
+INFO - dpsgd_diffusion.py - 2025-03-19 14:20:29,504 - Eps-value after 55 epochs: 0.5668
+INFO - dpsgd_diffusion.py - 2025-03-19 14:21:26,130 - Loss: 0.1448, step: 24700
+INFO - dpsgd_diffusion.py - 2025-03-19 14:22:59,865 - Loss: 0.1265, step: 24800
+INFO - dpsgd_diffusion.py - 2025-03-19 14:24:32,428 - Loss: 0.1326, step: 24900
+INFO - dpsgd_diffusion.py - 2025-03-19 14:26:05,388 - Loss: 0.1481, step: 25000
+INFO - dpsgd_diffusion.py - 2025-03-19 14:27:26,838 - Eps-value after 56 epochs: 0.5723
+INFO - dpsgd_diffusion.py - 2025-03-19 14:27:38,166 - Loss: 0.1443, step: 25100
+INFO - dpsgd_diffusion.py - 2025-03-19 14:29:10,692 - Loss: 0.1407, step: 25200
+INFO - dpsgd_diffusion.py - 2025-03-19 14:30:43,243 - Loss: 0.1442, step: 25300
+INFO - dpsgd_diffusion.py - 2025-03-19 14:32:17,554 - Loss: 0.1297, step: 25400
+INFO - dpsgd_diffusion.py - 2025-03-19 14:33:50,414 - Loss: 0.1461, step: 25500
+INFO - dpsgd_diffusion.py - 2025-03-19 14:34:23,864 - Eps-value after 57 epochs: 0.5777
+INFO - dpsgd_diffusion.py - 2025-03-19 14:35:22,447 - Loss: 0.1393, step: 25600
+INFO - dpsgd_diffusion.py - 2025-03-19 14:36:54,579 - Loss: 0.1411, step: 25700
+INFO - dpsgd_diffusion.py - 2025-03-19 14:38:26,859 - Loss: 0.1376, step: 25800
+INFO - dpsgd_diffusion.py - 2025-03-19 14:39:57,392 - Loss: 0.1399, step: 25900
+INFO - dpsgd_diffusion.py - 2025-03-19 14:41:14,282 - Eps-value after 58 epochs: 0.5831
+INFO - dpsgd_diffusion.py - 2025-03-19 14:41:28,696 - Loss: 0.1399, step: 26000
+INFO - dpsgd_diffusion.py - 2025-03-19 14:41:28,735 - Saving snapshot checkpoint and sampling single batch at iteration 26000.
+WARNING - image.py - 2025-03-19 14:41:29,391 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 14:41:56,769 - FID at iteration 26000: 37.794893
+INFO - dpsgd_diffusion.py - 2025-03-19 14:43:29,677 - Loss: 0.1528, step: 26100
+INFO - dpsgd_diffusion.py - 2025-03-19 14:45:00,032 - Loss: 0.1376, step: 26200
+INFO - dpsgd_diffusion.py - 2025-03-19 14:46:32,910 - Loss: 0.1384, step: 26300
+INFO - dpsgd_diffusion.py - 2025-03-19 14:48:06,009 - Loss: 0.1445, step: 26400
+INFO - dpsgd_diffusion.py - 2025-03-19 14:48:35,744 - Eps-value after 59 epochs: 0.5884
+INFO - dpsgd_diffusion.py - 2025-03-19 14:49:38,784 - Loss: 0.1378, step: 26500
+INFO - dpsgd_diffusion.py - 2025-03-19 14:51:10,573 - Loss: 0.1386, step: 26600
+INFO - dpsgd_diffusion.py - 2025-03-19 14:52:42,675 - Loss: 0.1421, step: 26700
+INFO - dpsgd_diffusion.py - 2025-03-19 14:54:14,873 - Loss: 0.1448, step: 26800
+INFO - dpsgd_diffusion.py - 2025-03-19 14:55:29,182 - Eps-value after 60 epochs: 0.5937
+INFO - dpsgd_diffusion.py - 2025-03-19 14:55:47,130 - Loss: 0.1434, step: 26900
+INFO - dpsgd_diffusion.py - 2025-03-19 14:57:16,204 - Loss: 0.1536, step: 27000
+INFO - dpsgd_diffusion.py - 2025-03-19 14:58:47,571 - Loss: 0.1357, step: 27100
+INFO - dpsgd_diffusion.py - 2025-03-19 15:00:20,473 - Loss: 0.1430, step: 27200
+INFO - dpsgd_diffusion.py - 2025-03-19 15:01:53,986 - Loss: 0.1453, step: 27300
+INFO - dpsgd_diffusion.py - 2025-03-19 15:02:20,292 - Eps-value after 61 epochs: 0.5990
+INFO - dpsgd_diffusion.py - 2025-03-19 15:03:27,417 - Loss: 0.1451, step: 27400
+INFO - dpsgd_diffusion.py - 2025-03-19 15:04:58,445 - Loss: 0.1424, step: 27500
+INFO - dpsgd_diffusion.py - 2025-03-19 15:06:30,860 - Loss: 0.1486, step: 27600
+INFO - dpsgd_diffusion.py - 2025-03-19 15:08:03,194 - Loss: 0.1377, step: 27700
+INFO - dpsgd_diffusion.py - 2025-03-19 15:09:13,478 - Eps-value after 62 epochs: 0.6041
+INFO - dpsgd_diffusion.py - 2025-03-19 15:09:35,976 - Loss: 0.1566, step: 27800
+INFO - dpsgd_diffusion.py - 2025-03-19 15:11:08,804 - Loss: 0.1374, step: 27900
+INFO - dpsgd_diffusion.py - 2025-03-19 15:12:40,998 - Loss: 0.1343, step: 28000
+INFO - dpsgd_diffusion.py - 2025-03-19 15:12:41,014 - Saving snapshot checkpoint and sampling single batch at iteration 28000.
+WARNING - image.py - 2025-03-19 15:12:41,690 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 15:13:08,752 - FID at iteration 28000: 35.584255
+INFO - dpsgd_diffusion.py - 2025-03-19 15:14:40,777 - Loss: 0.1385, step: 28100
+INFO - dpsgd_diffusion.py - 2025-03-19 15:16:15,397 - Loss: 0.1380, step: 28200
+INFO - dpsgd_diffusion.py - 2025-03-19 15:16:37,568 - Eps-value after 63 epochs: 0.6092
+INFO - dpsgd_diffusion.py - 2025-03-19 15:17:47,626 - Loss: 0.1396, step: 28300
+INFO - dpsgd_diffusion.py - 2025-03-19 15:19:19,829 - Loss: 0.1468, step: 28400
+INFO - dpsgd_diffusion.py - 2025-03-19 15:20:50,305 - Loss: 0.1486, step: 28500
+INFO - dpsgd_diffusion.py - 2025-03-19 15:22:22,680 - Loss: 0.1592, step: 28600
+INFO - dpsgd_diffusion.py - 2025-03-19 15:23:28,521 - Eps-value after 64 epochs: 0.6144
+INFO - dpsgd_diffusion.py - 2025-03-19 15:23:54,281 - Loss: 0.1410, step: 28700
+INFO - dpsgd_diffusion.py - 2025-03-19 15:25:27,220 - Loss: 0.1448, step: 28800
+INFO - dpsgd_diffusion.py - 2025-03-19 15:26:56,749 - Loss: 0.1347, step: 28900
+INFO - dpsgd_diffusion.py - 2025-03-19 15:28:29,829 - Loss: 0.1361, step: 29000
+INFO - dpsgd_diffusion.py - 2025-03-19 15:30:00,833 - Loss: 0.1452, step: 29100
+INFO - dpsgd_diffusion.py - 2025-03-19 15:30:18,841 - Eps-value after 65 epochs: 0.6195
+INFO - dpsgd_diffusion.py - 2025-03-19 15:31:32,719 - Loss: 0.1394, step: 29200
+INFO - dpsgd_diffusion.py - 2025-03-19 15:33:03,977 - Loss: 0.1477, step: 29300
+INFO - dpsgd_diffusion.py - 2025-03-19 15:34:37,044 - Loss: 0.1423, step: 29400
+INFO - dpsgd_diffusion.py - 2025-03-19 15:36:09,652 - Loss: 0.1523, step: 29500
+INFO - dpsgd_diffusion.py - 2025-03-19 15:37:12,005 - Eps-value after 66 epochs: 0.6246
+INFO - dpsgd_diffusion.py - 2025-03-19 15:37:39,904 - Loss: 0.1518, step: 29600
+INFO - dpsgd_diffusion.py - 2025-03-19 15:39:12,181 - Loss: 0.1434, step: 29700
+INFO - dpsgd_diffusion.py - 2025-03-19 15:40:44,804 - Loss: 0.1507, step: 29800
+INFO - dpsgd_diffusion.py - 2025-03-19 15:42:14,262 - Loss: 0.1302, step: 29900
+INFO - dpsgd_diffusion.py - 2025-03-19 15:43:46,461 - Loss: 0.1315, step: 30000
+INFO - dpsgd_diffusion.py - 2025-03-19 15:43:46,526 - Saving snapshot checkpoint and sampling single batch at iteration 30000.
+WARNING - image.py - 2025-03-19 15:43:47,219 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 15:44:13,996 - FID at iteration 30000: 34.344073
+INFO - dpsgd_diffusion.py - 2025-03-19 15:44:30,320 - Eps-value after 67 epochs: 0.6295
+INFO - dpsgd_diffusion.py - 2025-03-19 15:45:48,400 - Loss: 0.1423, step: 30100
+INFO - dpsgd_diffusion.py - 2025-03-19 15:47:23,017 - Loss: 0.1431, step: 30200
+INFO - dpsgd_diffusion.py - 2025-03-19 15:48:56,751 - Loss: 0.1344, step: 30300
+INFO - dpsgd_diffusion.py - 2025-03-19 15:50:26,661 - Loss: 0.1420, step: 30400
+INFO - dpsgd_diffusion.py - 2025-03-19 15:51:26,354 - Eps-value after 68 epochs: 0.6345
+INFO - dpsgd_diffusion.py - 2025-03-19 15:51:59,028 - Loss: 0.1499, step: 30500
+INFO - dpsgd_diffusion.py - 2025-03-19 15:53:31,219 - Loss: 0.1356, step: 30600
+INFO - dpsgd_diffusion.py - 2025-03-19 15:55:03,016 - Loss: 0.1337, step: 30700
+INFO - dpsgd_diffusion.py - 2025-03-19 15:56:34,578 - Loss: 0.1356, step: 30800
+INFO - dpsgd_diffusion.py - 2025-03-19 15:58:06,296 - Loss: 0.1433, step: 30900
+INFO - dpsgd_diffusion.py - 2025-03-19 15:58:17,654 - Eps-value after 69 epochs: 0.6395
+INFO - dpsgd_diffusion.py - 2025-03-19 15:59:38,413 - Loss: 0.1514, step: 31000
+INFO - dpsgd_diffusion.py - 2025-03-19 16:01:09,163 - Loss: 0.1438, step: 31100
+INFO - dpsgd_diffusion.py - 2025-03-19 16:02:40,555 - Loss: 0.1355, step: 31200
+INFO - dpsgd_diffusion.py - 2025-03-19 16:04:09,633 - Loss: 0.1300, step: 31300
+INFO - dpsgd_diffusion.py - 2025-03-19 16:05:04,584 - Eps-value after 70 epochs: 0.6445
+INFO - dpsgd_diffusion.py - 2025-03-19 16:05:42,737 - Loss: 0.1373, step: 31400
+INFO - dpsgd_diffusion.py - 2025-03-19 16:07:15,269 - Loss: 0.1348, step: 31500
+INFO - dpsgd_diffusion.py - 2025-03-19 16:08:46,251 - Loss: 0.1370, step: 31600
+INFO - dpsgd_diffusion.py - 2025-03-19 16:10:17,693 - Loss: 0.1476, step: 31700
+INFO - dpsgd_diffusion.py - 2025-03-19 16:11:48,532 - Loss: 0.1330, step: 31800
+INFO - dpsgd_diffusion.py - 2025-03-19 16:11:55,778 - Eps-value after 71 epochs: 0.6493
+INFO - dpsgd_diffusion.py - 2025-03-19 16:13:20,748 - Loss: 0.1381, step: 31900
+INFO - dpsgd_diffusion.py - 2025-03-19 16:14:52,890 - Loss: 0.1320, step: 32000
+INFO - dpsgd_diffusion.py - 2025-03-19 16:14:52,907 - Saving snapshot checkpoint and sampling single batch at iteration 32000.
+WARNING - image.py - 2025-03-19 16:14:53,583 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 16:15:23,003 - FID at iteration 32000: 33.747449
+INFO - dpsgd_diffusion.py - 2025-03-19 16:16:55,805 - Loss: 0.1253, step: 32100
+INFO - dpsgd_diffusion.py - 2025-03-19 16:18:28,665 - Loss: 0.1361, step: 32200
+INFO - dpsgd_diffusion.py - 2025-03-19 16:19:21,496 - Eps-value after 72 epochs: 0.6541
+INFO - dpsgd_diffusion.py - 2025-03-19 16:20:01,390 - Loss: 0.1343, step: 32300
+INFO - dpsgd_diffusion.py - 2025-03-19 16:21:33,461 - Loss: 0.1436, step: 32400
+INFO - dpsgd_diffusion.py - 2025-03-19 16:23:04,424 - Loss: 0.1430, step: 32500
+INFO - dpsgd_diffusion.py - 2025-03-19 16:24:36,570 - Loss: 0.1388, step: 32600
+INFO - dpsgd_diffusion.py - 2025-03-19 16:26:06,912 - Loss: 0.1346, step: 32700
+INFO - dpsgd_diffusion.py - 2025-03-19 16:26:10,550 - Eps-value after 73 epochs: 0.6589
+INFO - dpsgd_diffusion.py - 2025-03-19 16:27:39,297 - Loss: 0.1335, step: 32800
+INFO - dpsgd_diffusion.py - 2025-03-19 16:29:13,554 - Loss: 0.1402, step: 32900
+INFO - dpsgd_diffusion.py - 2025-03-19 16:30:46,662 - Loss: 0.1276, step: 33000
+INFO - dpsgd_diffusion.py - 2025-03-19 16:32:19,797 - Loss: 0.1403, step: 33100
+INFO - dpsgd_diffusion.py - 2025-03-19 16:33:08,420 - Eps-value after 74 epochs: 0.6637
+INFO - dpsgd_diffusion.py - 2025-03-19 16:33:51,869 - Loss: 0.1322, step: 33200
+INFO - dpsgd_diffusion.py - 2025-03-19 16:35:23,496 - Loss: 0.1397, step: 33300
+INFO - dpsgd_diffusion.py - 2025-03-19 16:36:55,790 - Loss: 0.1399, step: 33400
+INFO - dpsgd_diffusion.py - 2025-03-19 16:38:29,684 - Loss: 0.1312, step: 33500
+INFO - dpsgd_diffusion.py - 2025-03-19 16:40:02,282 - Loss: 0.1376, step: 33600
+INFO - dpsgd_diffusion.py - 2025-03-19 16:40:02,301 - Eps-value after 75 epochs: 0.6685
+INFO - dpsgd_diffusion.py - 2025-03-19 16:41:32,521 - Loss: 0.1403, step: 33700
+INFO - dpsgd_diffusion.py - 2025-03-19 16:43:03,802 - Loss: 0.1371, step: 33800
+INFO - dpsgd_diffusion.py - 2025-03-19 16:44:34,273 - Loss: 0.1274, step: 33900
+INFO - dpsgd_diffusion.py - 2025-03-19 16:46:06,205 - Loss: 0.1416, step: 34000
+INFO - dpsgd_diffusion.py - 2025-03-19 16:46:06,243 - Saving snapshot checkpoint and sampling single batch at iteration 34000.
+WARNING - image.py - 2025-03-19 16:46:06,913 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 16:46:34,546 - FID at iteration 34000: 33.403066
+INFO - dpsgd_diffusion.py - 2025-03-19 16:47:17,266 - Eps-value after 76 epochs: 0.6733
+INFO - dpsgd_diffusion.py - 2025-03-19 16:48:05,616 - Loss: 0.1343, step: 34100
+INFO - dpsgd_diffusion.py - 2025-03-19 16:49:38,105 - Loss: 0.1425, step: 34200
+INFO - dpsgd_diffusion.py - 2025-03-19 16:51:10,255 - Loss: 0.1400, step: 34300
+INFO - dpsgd_diffusion.py - 2025-03-19 16:52:42,896 - Loss: 0.1315, step: 34400
+INFO - dpsgd_diffusion.py - 2025-03-19 16:54:12,818 - Eps-value after 77 epochs: 0.6779
+INFO - dpsgd_diffusion.py - 2025-03-19 16:54:16,421 - Loss: 0.1496, step: 34500
+INFO - dpsgd_diffusion.py - 2025-03-19 16:55:46,890 - Loss: 0.1556, step: 34600
+INFO - dpsgd_diffusion.py - 2025-03-19 16:57:17,716 - Loss: 0.1418, step: 34700
+INFO - dpsgd_diffusion.py - 2025-03-19 16:58:48,923 - Loss: 0.1425, step: 34800
+INFO - dpsgd_diffusion.py - 2025-03-19 17:00:21,459 - Loss: 0.1397, step: 34900
+INFO - dpsgd_diffusion.py - 2025-03-19 17:01:01,294 - Eps-value after 78 epochs: 0.6826
+INFO - dpsgd_diffusion.py - 2025-03-19 17:01:52,274 - Loss: 0.1477, step: 35000
+INFO - dpsgd_diffusion.py - 2025-03-19 17:03:23,632 - Loss: 0.1511, step: 35100
+INFO - dpsgd_diffusion.py - 2025-03-19 17:04:56,387 - Loss: 0.1378, step: 35200
+INFO - dpsgd_diffusion.py - 2025-03-19 17:06:26,055 - Loss: 0.1270, step: 35300
+INFO - dpsgd_diffusion.py - 2025-03-19 17:07:50,175 - Eps-value after 79 epochs: 0.6872
+INFO - dpsgd_diffusion.py - 2025-03-19 17:07:57,534 - Loss: 0.1357, step: 35400
+INFO - dpsgd_diffusion.py - 2025-03-19 17:09:28,348 - Loss: 0.1384, step: 35500
+INFO - dpsgd_diffusion.py - 2025-03-19 17:11:00,475 - Loss: 0.1407, step: 35600
+INFO - dpsgd_diffusion.py - 2025-03-19 17:12:31,689 - Loss: 0.1351, step: 35700
+INFO - dpsgd_diffusion.py - 2025-03-19 17:14:02,050 - Loss: 0.1391, step: 35800
+INFO - dpsgd_diffusion.py - 2025-03-19 17:14:38,479 - Eps-value after 80 epochs: 0.6919
+INFO - dpsgd_diffusion.py - 2025-03-19 17:15:32,996 - Loss: 0.1545, step: 35900
+INFO - dpsgd_diffusion.py - 2025-03-19 17:17:05,939 - Loss: 0.1501, step: 36000
+INFO - dpsgd_diffusion.py - 2025-03-19 17:17:05,956 - Saving snapshot checkpoint and sampling single batch at iteration 36000.
+WARNING - image.py - 2025-03-19 17:17:06,636 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 17:17:36,051 - FID at iteration 36000: 31.816489
+INFO - dpsgd_diffusion.py - 2025-03-19 17:19:08,486 - Loss: 0.1389, step: 36100
+INFO - dpsgd_diffusion.py - 2025-03-19 17:20:39,846 - Loss: 0.1499, step: 36200
+INFO - dpsgd_diffusion.py - 2025-03-19 17:22:01,432 - Eps-value after 81 epochs: 0.6965
+INFO - dpsgd_diffusion.py - 2025-03-19 17:22:12,208 - Loss: 0.1393, step: 36300
+INFO - dpsgd_diffusion.py - 2025-03-19 17:23:45,091 - Loss: 0.1426, step: 36400
+INFO - dpsgd_diffusion.py - 2025-03-19 17:25:14,685 - Loss: 0.1412, step: 36500
+INFO - dpsgd_diffusion.py - 2025-03-19 17:26:46,413 - Loss: 0.1441, step: 36600
+INFO - dpsgd_diffusion.py - 2025-03-19 17:28:18,809 - Loss: 0.1318, step: 36700
+INFO - dpsgd_diffusion.py - 2025-03-19 17:28:51,676 - Eps-value after 82 epochs: 0.7011
+INFO - dpsgd_diffusion.py - 2025-03-19 17:29:49,947 - Loss: 0.1498, step: 36800
+INFO - dpsgd_diffusion.py - 2025-03-19 17:31:21,011 - Loss: 0.1418, step: 36900
+INFO - dpsgd_diffusion.py - 2025-03-19 17:32:53,413 - Loss: 0.1402, step: 37000
+INFO - dpsgd_diffusion.py - 2025-03-19 17:34:25,708 - Loss: 0.1486, step: 37100
+INFO - dpsgd_diffusion.py - 2025-03-19 17:35:44,663 - Eps-value after 83 epochs: 0.7056
+INFO - dpsgd_diffusion.py - 2025-03-19 17:35:59,201 - Loss: 0.1327, step: 37200
+INFO - dpsgd_diffusion.py - 2025-03-19 17:37:30,166 - Loss: 0.1308, step: 37300
+INFO - dpsgd_diffusion.py - 2025-03-19 17:39:02,090 - Loss: 0.1572, step: 37400
+INFO - dpsgd_diffusion.py - 2025-03-19 17:40:34,154 - Loss: 0.1427, step: 37500
+INFO - dpsgd_diffusion.py - 2025-03-19 17:42:05,186 - Loss: 0.1428, step: 37600
+INFO - dpsgd_diffusion.py - 2025-03-19 17:42:34,172 - Eps-value after 84 epochs: 0.7101
+INFO - dpsgd_diffusion.py - 2025-03-19 17:43:37,078 - Loss: 0.1433, step: 37700
+INFO - dpsgd_diffusion.py - 2025-03-19 17:45:08,673 - Loss: 0.1325, step: 37800
+INFO - dpsgd_diffusion.py - 2025-03-19 17:46:41,690 - Loss: 0.1411, step: 37900
+INFO - dpsgd_diffusion.py - 2025-03-19 17:48:12,541 - Loss: 0.1334, step: 38000
+INFO - dpsgd_diffusion.py - 2025-03-19 17:48:12,552 - Saving snapshot checkpoint and sampling single batch at iteration 38000.
+WARNING - image.py - 2025-03-19 17:48:13,335 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 17:48:41,036 - FID at iteration 38000: 31.261690
+INFO - dpsgd_diffusion.py - 2025-03-19 17:49:55,756 - Eps-value after 85 epochs: 0.7146
+INFO - dpsgd_diffusion.py - 2025-03-19 17:50:14,885 - Loss: 0.1498, step: 38100
+INFO - dpsgd_diffusion.py - 2025-03-19 17:51:47,965 - Loss: 0.1350, step: 38200
+INFO - dpsgd_diffusion.py - 2025-03-19 17:53:19,141 - Loss: 0.1446, step: 38300
+INFO - dpsgd_diffusion.py - 2025-03-19 17:54:51,201 - Loss: 0.1342, step: 38400
+INFO - dpsgd_diffusion.py - 2025-03-19 17:56:24,564 - Loss: 0.1389, step: 38500
+INFO - dpsgd_diffusion.py - 2025-03-19 17:56:49,481 - Eps-value after 86 epochs: 0.7190
+INFO - dpsgd_diffusion.py - 2025-03-19 17:57:56,522 - Loss: 0.1412, step: 38600
+INFO - dpsgd_diffusion.py - 2025-03-19 17:59:28,593 - Loss: 0.1538, step: 38700
+INFO - dpsgd_diffusion.py - 2025-03-19 18:00:59,954 - Loss: 0.1543, step: 38800
+INFO - dpsgd_diffusion.py - 2025-03-19 18:02:30,768 - Loss: 0.1305, step: 38900
+INFO - dpsgd_diffusion.py - 2025-03-19 18:03:39,649 - Eps-value after 87 epochs: 0.7235
+INFO - dpsgd_diffusion.py - 2025-03-19 18:04:01,189 - Loss: 0.1423, step: 39000
+INFO - dpsgd_diffusion.py - 2025-03-19 18:05:33,119 - Loss: 0.1392, step: 39100
+INFO - dpsgd_diffusion.py - 2025-03-19 18:07:08,018 - Loss: 0.1404, step: 39200
+INFO - dpsgd_diffusion.py - 2025-03-19 18:08:39,477 - Loss: 0.1299, step: 39300
+INFO - dpsgd_diffusion.py - 2025-03-19 18:10:11,941 - Loss: 0.1353, step: 39400
+INFO - dpsgd_diffusion.py - 2025-03-19 18:10:34,324 - Eps-value after 88 epochs: 0.7280
+INFO - dpsgd_diffusion.py - 2025-03-19 18:11:45,601 - Loss: 0.1380, step: 39500
+INFO - dpsgd_diffusion.py - 2025-03-19 18:13:17,442 - Loss: 0.1347, step: 39600
+INFO - dpsgd_diffusion.py - 2025-03-19 18:14:48,537 - Loss: 0.1370, step: 39700
+INFO - dpsgd_diffusion.py - 2025-03-19 18:16:20,170 - Loss: 0.1481, step: 39800
+INFO - dpsgd_diffusion.py - 2025-03-19 18:17:28,289 - Eps-value after 89 epochs: 0.7324
+INFO - dpsgd_diffusion.py - 2025-03-19 18:17:53,462 - Loss: 0.1362, step: 39900
+INFO - dpsgd_diffusion.py - 2025-03-19 18:19:26,122 - Loss: 0.1368, step: 40000
+INFO - dpsgd_diffusion.py - 2025-03-19 18:19:26,139 - Saving snapshot checkpoint and sampling single batch at iteration 40000.
+WARNING - image.py - 2025-03-19 18:19:26,817 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 18:19:54,330 - FID at iteration 40000: 30.454022
+INFO - dpsgd_diffusion.py - 2025-03-19 18:21:25,476 - Loss: 0.1377, step: 40100
+INFO - dpsgd_diffusion.py - 2025-03-19 18:22:57,481 - Loss: 0.1457, step: 40200
+INFO - dpsgd_diffusion.py - 2025-03-19 18:24:28,256 - Loss: 0.1374, step: 40300
+INFO - dpsgd_diffusion.py - 2025-03-19 18:24:46,885 - Eps-value after 90 epochs: 0.7367
+INFO - dpsgd_diffusion.py - 2025-03-19 18:25:58,979 - Loss: 0.1389, step: 40400
+INFO - dpsgd_diffusion.py - 2025-03-19 18:27:30,629 - Loss: 0.1457, step: 40500
+INFO - dpsgd_diffusion.py - 2025-03-19 18:29:02,689 - Loss: 0.1360, step: 40600
+INFO - dpsgd_diffusion.py - 2025-03-19 18:30:34,727 - Loss: 0.1389, step: 40700
+INFO - dpsgd_diffusion.py - 2025-03-19 18:31:35,449 - Eps-value after 91 epochs: 0.7410
+INFO - dpsgd_diffusion.py - 2025-03-19 18:32:05,052 - Loss: 0.1485, step: 40800
+INFO - dpsgd_diffusion.py - 2025-03-19 18:33:39,015 - Loss: 0.1498, step: 40900
+INFO - dpsgd_diffusion.py - 2025-03-19 18:35:12,155 - Loss: 0.1443, step: 41000
+INFO - dpsgd_diffusion.py - 2025-03-19 18:36:45,775 - Loss: 0.1354, step: 41100
+INFO - dpsgd_diffusion.py - 2025-03-19 18:38:17,631 - Loss: 0.1404, step: 41200
+INFO - dpsgd_diffusion.py - 2025-03-19 18:38:32,324 - Eps-value after 92 epochs: 0.7453
+INFO - dpsgd_diffusion.py - 2025-03-19 18:39:49,668 - Loss: 0.1304, step: 41300
+INFO - dpsgd_diffusion.py - 2025-03-19 18:41:19,587 - Loss: 0.1384, step: 41400
+INFO - dpsgd_diffusion.py - 2025-03-19 18:42:53,697 - Loss: 0.1465, step: 41500
+INFO - dpsgd_diffusion.py - 2025-03-19 18:44:25,249 - Loss: 0.1385, step: 41600
+INFO - dpsgd_diffusion.py - 2025-03-19 18:45:24,571 - Eps-value after 93 epochs: 0.7497
+INFO - dpsgd_diffusion.py - 2025-03-19 18:45:57,476 - Loss: 0.1389, step: 41700
+INFO - dpsgd_diffusion.py - 2025-03-19 18:47:29,437 - Loss: 0.1350, step: 41800
+INFO - dpsgd_diffusion.py - 2025-03-19 18:49:01,223 - Loss: 0.1452, step: 41900
+INFO - dpsgd_diffusion.py - 2025-03-19 18:50:33,519 - Loss: 0.1430, step: 42000
+INFO - dpsgd_diffusion.py - 2025-03-19 18:50:33,557 - Saving snapshot checkpoint and sampling single batch at iteration 42000.
+WARNING - image.py - 2025-03-19 18:50:34,258 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 18:51:02,583 - FID at iteration 42000: 29.771942
+INFO - dpsgd_diffusion.py - 2025-03-19 18:52:35,729 - Loss: 0.1434, step: 42100
+INFO - dpsgd_diffusion.py - 2025-03-19 18:52:46,538 - Eps-value after 94 epochs: 0.7540
+INFO - dpsgd_diffusion.py - 2025-03-19 18:54:12,209 - Loss: 0.1498, step: 42200
+INFO - dpsgd_diffusion.py - 2025-03-19 18:55:43,956 - Loss: 0.1473, step: 42300
+INFO - dpsgd_diffusion.py - 2025-03-19 18:57:15,869 - Loss: 0.1397, step: 42400
+INFO - dpsgd_diffusion.py - 2025-03-19 18:58:48,602 - Loss: 0.1289, step: 42500
+INFO - dpsgd_diffusion.py - 2025-03-19 18:59:43,851 - Eps-value after 95 epochs: 0.7583
+INFO - dpsgd_diffusion.py - 2025-03-19 19:00:20,138 - Loss: 0.1418, step: 42600
+INFO - dpsgd_diffusion.py - 2025-03-19 19:01:51,674 - Loss: 0.1371, step: 42700
+INFO - dpsgd_diffusion.py - 2025-03-19 19:03:24,626 - Loss: 0.1363, step: 42800
+INFO - dpsgd_diffusion.py - 2025-03-19 19:04:56,376 - Loss: 0.1342, step: 42900
+INFO - dpsgd_diffusion.py - 2025-03-19 19:06:29,243 - Loss: 0.1444, step: 43000
+INFO - dpsgd_diffusion.py - 2025-03-19 19:06:36,997 - Eps-value after 96 epochs: 0.7626
+INFO - dpsgd_diffusion.py - 2025-03-19 19:08:04,241 - Loss: 0.1480, step: 43100
+INFO - dpsgd_diffusion.py - 2025-03-19 19:09:36,908 - Loss: 0.1330, step: 43200
+INFO - dpsgd_diffusion.py - 2025-03-19 19:11:09,012 - Loss: 0.1321, step: 43300
+INFO - dpsgd_diffusion.py - 2025-03-19 19:12:40,971 - Loss: 0.1397, step: 43400
+INFO - dpsgd_diffusion.py - 2025-03-19 19:13:32,450 - Eps-value after 97 epochs: 0.7667
+INFO - dpsgd_diffusion.py - 2025-03-19 19:14:12,494 - Loss: 0.1479, step: 43500
+INFO - dpsgd_diffusion.py - 2025-03-19 19:15:43,950 - Loss: 0.1328, step: 43600
+INFO - dpsgd_diffusion.py - 2025-03-19 19:17:16,912 - Loss: 0.1281, step: 43700
+INFO - dpsgd_diffusion.py - 2025-03-19 19:18:49,324 - Loss: 0.1479, step: 43800
+INFO - dpsgd_diffusion.py - 2025-03-19 19:20:20,628 - Loss: 0.1315, step: 43900
+INFO - dpsgd_diffusion.py - 2025-03-19 19:20:24,154 - Eps-value after 98 epochs: 0.7709
+INFO - dpsgd_diffusion.py - 2025-03-19 19:21:53,856 - Loss: 0.1318, step: 44000
+INFO - dpsgd_diffusion.py - 2025-03-19 19:21:53,875 - Saving snapshot checkpoint and sampling single batch at iteration 44000.
+WARNING - image.py - 2025-03-19 19:21:54,560 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 19:22:21,379 - FID at iteration 44000: 28.932960
+INFO - dpsgd_diffusion.py - 2025-03-19 19:23:54,237 - Loss: 0.1344, step: 44100
+INFO - dpsgd_diffusion.py - 2025-03-19 19:25:25,593 - Loss: 0.1345, step: 44200
+INFO - dpsgd_diffusion.py - 2025-03-19 19:26:56,960 - Loss: 0.1421, step: 44300
+INFO - dpsgd_diffusion.py - 2025-03-19 19:27:44,444 - Eps-value after 99 epochs: 0.7751
+INFO - dpsgd_diffusion.py - 2025-03-19 19:28:28,695 - Loss: 0.1228, step: 44400
+INFO - dpsgd_diffusion.py - 2025-03-19 19:29:59,894 - Loss: 0.1370, step: 44500
+INFO - dpsgd_diffusion.py - 2025-03-19 19:31:31,338 - Loss: 0.1457, step: 44600
+INFO - dpsgd_diffusion.py - 2025-03-19 19:33:04,667 - Loss: 0.1423, step: 44700
+INFO - dpsgd_diffusion.py - 2025-03-19 19:34:36,097 - Loss: 0.1354, step: 44800
+INFO - dpsgd_diffusion.py - 2025-03-19 19:34:36,117 - Eps-value after 100 epochs: 0.7792
+INFO - dpsgd_diffusion.py - 2025-03-19 19:36:08,510 - Loss: 0.1313, step: 44900
+INFO - dpsgd_diffusion.py - 2025-03-19 19:37:39,165 - Loss: 0.1258, step: 45000
+INFO - dpsgd_diffusion.py - 2025-03-19 19:39:10,450 - Loss: 0.1244, step: 45100
+INFO - dpsgd_diffusion.py - 2025-03-19 19:40:42,783 - Loss: 0.1432, step: 45200
+INFO - dpsgd_diffusion.py - 2025-03-19 19:41:28,400 - Eps-value after 101 epochs: 0.7834
+INFO - dpsgd_diffusion.py - 2025-03-19 19:42:16,582 - Loss: 0.1279, step: 45300
+INFO - dpsgd_diffusion.py - 2025-03-19 19:43:47,767 - Loss: 0.1429, step: 45400
+INFO - dpsgd_diffusion.py - 2025-03-19 19:45:19,076 - Loss: 0.1359, step: 45500
+INFO - dpsgd_diffusion.py - 2025-03-19 19:46:50,888 - Loss: 0.1329, step: 45600
+INFO - dpsgd_diffusion.py - 2025-03-19 19:48:19,557 - Eps-value after 102 epochs: 0.7876
+INFO - dpsgd_diffusion.py - 2025-03-19 19:48:23,384 - Loss: 0.1447, step: 45700
+INFO - dpsgd_diffusion.py - 2025-03-19 19:49:56,459 - Loss: 0.1441, step: 45800
+INFO - dpsgd_diffusion.py - 2025-03-19 19:51:28,055 - Loss: 0.1438, step: 45900
+INFO - dpsgd_diffusion.py - 2025-03-19 19:52:59,822 - Loss: 0.1370, step: 46000
+INFO - dpsgd_diffusion.py - 2025-03-19 19:52:59,888 - Saving snapshot checkpoint and sampling single batch at iteration 46000.
+WARNING - image.py - 2025-03-19 19:53:00,607 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 19:53:27,373 - FID at iteration 46000: 28.600400
+INFO - dpsgd_diffusion.py - 2025-03-19 19:54:59,756 - Loss: 0.1378, step: 46100
+INFO - dpsgd_diffusion.py - 2025-03-19 19:55:39,834 - Eps-value after 103 epochs: 0.7917
+INFO - dpsgd_diffusion.py - 2025-03-19 19:56:30,329 - Loss: 0.1468, step: 46200
+INFO - dpsgd_diffusion.py - 2025-03-19 19:58:01,273 - Loss: 0.1373, step: 46300
+INFO - dpsgd_diffusion.py - 2025-03-19 19:59:33,248 - Loss: 0.1363, step: 46400
+INFO - dpsgd_diffusion.py - 2025-03-19 20:01:04,847 - Loss: 0.1389, step: 46500
+INFO - dpsgd_diffusion.py - 2025-03-19 20:02:28,918 - Eps-value after 104 epochs: 0.7959
+INFO - dpsgd_diffusion.py - 2025-03-19 20:02:36,314 - Loss: 0.1317, step: 46600
+INFO - dpsgd_diffusion.py - 2025-03-19 20:04:09,528 - Loss: 0.1341, step: 46700
+INFO - dpsgd_diffusion.py - 2025-03-19 20:05:40,828 - Loss: 0.1392, step: 46800
+INFO - dpsgd_diffusion.py - 2025-03-19 20:07:12,517 - Loss: 0.1412, step: 46900
+INFO - dpsgd_diffusion.py - 2025-03-19 20:08:42,523 - Loss: 0.1408, step: 47000
+INFO - dpsgd_diffusion.py - 2025-03-19 20:09:19,136 - Eps-value after 105 epochs: 0.7999
+INFO - dpsgd_diffusion.py - 2025-03-19 20:10:15,549 - Loss: 0.1426, step: 47100
+INFO - dpsgd_diffusion.py - 2025-03-19 20:11:48,395 - Loss: 0.1340, step: 47200
+INFO - dpsgd_diffusion.py - 2025-03-19 20:13:20,955 - Loss: 0.1364, step: 47300
+INFO - dpsgd_diffusion.py - 2025-03-19 20:14:53,905 - Loss: 0.1503, step: 47400
+INFO - dpsgd_diffusion.py - 2025-03-19 20:16:14,654 - Eps-value after 106 epochs: 0.8039
+INFO - dpsgd_diffusion.py - 2025-03-19 20:16:26,013 - Loss: 0.1471, step: 47500
+INFO - dpsgd_diffusion.py - 2025-03-19 20:17:58,917 - Loss: 0.1326, step: 47600
+INFO - dpsgd_diffusion.py - 2025-03-19 20:19:31,602 - Loss: 0.1311, step: 47700
+INFO - dpsgd_diffusion.py - 2025-03-19 20:21:01,110 - Loss: 0.1410, step: 47800
+INFO - dpsgd_diffusion.py - 2025-03-19 20:22:32,688 - Loss: 0.1446, step: 47900
+INFO - dpsgd_diffusion.py - 2025-03-19 20:23:05,328 - Eps-value after 107 epochs: 0.8079
+INFO - dpsgd_diffusion.py - 2025-03-19 20:24:03,875 - Loss: 0.1268, step: 48000
+INFO - dpsgd_diffusion.py - 2025-03-19 20:24:03,893 - Saving snapshot checkpoint and sampling single batch at iteration 48000.
+WARNING - image.py - 2025-03-19 20:24:04,585 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 20:24:32,048 - FID at iteration 48000: 28.533062
+INFO - dpsgd_diffusion.py - 2025-03-19 20:26:05,158 - Loss: 0.1388, step: 48100
+INFO - dpsgd_diffusion.py - 2025-03-19 20:27:35,575 - Loss: 0.1423, step: 48200
+INFO - dpsgd_diffusion.py - 2025-03-19 20:29:08,714 - Loss: 0.1333, step: 48300
+INFO - dpsgd_diffusion.py - 2025-03-19 20:30:26,573 - Eps-value after 108 epochs: 0.8119
+INFO - dpsgd_diffusion.py - 2025-03-19 20:30:41,587 - Loss: 0.1323, step: 48400
+INFO - dpsgd_diffusion.py - 2025-03-19 20:32:12,863 - Loss: 0.1286, step: 48500
+INFO - dpsgd_diffusion.py - 2025-03-19 20:33:44,618 - Loss: 0.1515, step: 48600
+INFO - dpsgd_diffusion.py - 2025-03-19 20:35:16,169 - Loss: 0.1424, step: 48700
+INFO - dpsgd_diffusion.py - 2025-03-19 20:36:46,577 - Loss: 0.1244, step: 48800
+INFO - dpsgd_diffusion.py - 2025-03-19 20:37:15,219 - Eps-value after 109 epochs: 0.8159
+INFO - dpsgd_diffusion.py - 2025-03-19 20:38:17,429 - Loss: 0.1373, step: 48900
+INFO - dpsgd_diffusion.py - 2025-03-19 20:39:50,107 - Loss: 0.1382, step: 49000
+INFO - dpsgd_diffusion.py - 2025-03-19 20:41:23,199 - Loss: 0.1403, step: 49100
+INFO - dpsgd_diffusion.py - 2025-03-19 20:42:55,480 - Loss: 0.1408, step: 49200
+INFO - dpsgd_diffusion.py - 2025-03-19 20:44:08,241 - Eps-value after 110 epochs: 0.8199
+INFO - dpsgd_diffusion.py - 2025-03-19 20:44:26,242 - Loss: 0.1422, step: 49300
+INFO - dpsgd_diffusion.py - 2025-03-19 20:45:58,779 - Loss: 0.1300, step: 49400
+INFO - dpsgd_diffusion.py - 2025-03-19 20:47:32,481 - Loss: 0.1442, step: 49500
+INFO - dpsgd_diffusion.py - 2025-03-19 20:49:02,998 - Loss: 0.1413, step: 49600
+INFO - dpsgd_diffusion.py - 2025-03-19 20:50:35,654 - Loss: 0.1441, step: 49700
+INFO - dpsgd_diffusion.py - 2025-03-19 20:51:01,288 - Eps-value after 111 epochs: 0.8239
+INFO - dpsgd_diffusion.py - 2025-03-19 20:52:06,476 - Loss: 0.1339, step: 49800
+INFO - dpsgd_diffusion.py - 2025-03-19 20:53:37,306 - Loss: 0.1373, step: 49900
+INFO - dpsgd_diffusion.py - 2025-03-19 20:55:09,106 - Loss: 0.1373, step: 50000
+INFO - dpsgd_diffusion.py - 2025-03-19 20:55:09,119 - Saving snapshot checkpoint and sampling single batch at iteration 50000.
+WARNING - image.py - 2025-03-19 20:55:09,806 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 20:55:37,904 - FID at iteration 50000: 28.562412
+INFO - dpsgd_diffusion.py - 2025-03-19 20:57:12,528 - Loss: 0.1362, step: 50100
+INFO - dpsgd_diffusion.py - 2025-03-19 20:58:22,793 - Eps-value after 112 epochs: 0.8279
+INFO - dpsgd_diffusion.py - 2025-03-19 20:58:45,047 - Loss: 0.1408, step: 50200
+INFO - dpsgd_diffusion.py - 2025-03-19 21:00:17,105 - Loss: 0.1427, step: 50300
+INFO - dpsgd_diffusion.py - 2025-03-19 21:01:49,247 - Loss: 0.1390, step: 50400
+INFO - dpsgd_diffusion.py - 2025-03-19 21:03:20,815 - Loss: 0.1414, step: 50500
+INFO - dpsgd_diffusion.py - 2025-03-19 21:04:53,781 - Loss: 0.1498, step: 50600
+INFO - dpsgd_diffusion.py - 2025-03-19 21:05:15,394 - Eps-value after 113 epochs: 0.8319
+INFO - dpsgd_diffusion.py - 2025-03-19 21:06:23,076 - Loss: 0.1325, step: 50700
+INFO - dpsgd_diffusion.py - 2025-03-19 21:07:53,567 - Loss: 0.1355, step: 50800
+INFO - dpsgd_diffusion.py - 2025-03-19 21:09:24,857 - Loss: 0.1354, step: 50900
+INFO - dpsgd_diffusion.py - 2025-03-19 21:10:58,335 - Loss: 0.1599, step: 51000
+INFO - dpsgd_diffusion.py - 2025-03-19 21:12:04,477 - Eps-value after 114 epochs: 0.8359
+INFO - dpsgd_diffusion.py - 2025-03-19 21:12:29,632 - Loss: 0.1389, step: 51100
+INFO - dpsgd_diffusion.py - 2025-03-19 21:14:02,219 - Loss: 0.1418, step: 51200
+INFO - dpsgd_diffusion.py - 2025-03-19 21:15:35,405 - Loss: 0.1380, step: 51300
+INFO - dpsgd_diffusion.py - 2025-03-19 21:17:06,445 - Loss: 0.1532, step: 51400
+INFO - dpsgd_diffusion.py - 2025-03-19 21:18:39,403 - Loss: 0.1365, step: 51500
+INFO - dpsgd_diffusion.py - 2025-03-19 21:18:57,119 - Eps-value after 115 epochs: 0.8397
+INFO - dpsgd_diffusion.py - 2025-03-19 21:20:11,410 - Loss: 0.1249, step: 51600
+INFO - dpsgd_diffusion.py - 2025-03-19 21:21:44,233 - Loss: 0.1349, step: 51700
+INFO - dpsgd_diffusion.py - 2025-03-19 21:23:17,153 - Loss: 0.1320, step: 51800
+INFO - dpsgd_diffusion.py - 2025-03-19 21:24:48,094 - Loss: 0.1406, step: 51900
+INFO - dpsgd_diffusion.py - 2025-03-19 21:25:51,371 - Eps-value after 116 epochs: 0.8435
+INFO - dpsgd_diffusion.py - 2025-03-19 21:26:20,275 - Loss: 0.1473, step: 52000
+INFO - dpsgd_diffusion.py - 2025-03-19 21:26:20,293 - Saving snapshot checkpoint and sampling single batch at iteration 52000.
+WARNING - image.py - 2025-03-19 21:26:20,976 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 21:26:48,705 - FID at iteration 52000: 26.913535
+INFO - dpsgd_diffusion.py - 2025-03-19 21:28:20,426 - Loss: 0.1307, step: 52100
+INFO - dpsgd_diffusion.py - 2025-03-19 21:29:53,288 - Loss: 0.1225, step: 52200
+INFO - dpsgd_diffusion.py - 2025-03-19 21:31:25,404 - Loss: 0.1426, step: 52300
+INFO - dpsgd_diffusion.py - 2025-03-19 21:32:56,617 - Loss: 0.1452, step: 52400
+INFO - dpsgd_diffusion.py - 2025-03-19 21:33:11,517 - Eps-value after 117 epochs: 0.8474
+INFO - dpsgd_diffusion.py - 2025-03-19 21:34:27,316 - Loss: 0.1423, step: 52500
+INFO - dpsgd_diffusion.py - 2025-03-19 21:35:57,818 - Loss: 0.1481, step: 52600
+INFO - dpsgd_diffusion.py - 2025-03-19 21:37:30,216 - Loss: 0.1334, step: 52700
+INFO - dpsgd_diffusion.py - 2025-03-19 21:39:01,231 - Loss: 0.1434, step: 52800
+INFO - dpsgd_diffusion.py - 2025-03-19 21:40:01,464 - Eps-value after 118 epochs: 0.8512
+INFO - dpsgd_diffusion.py - 2025-03-19 21:40:33,922 - Loss: 0.1386, step: 52900
+INFO - dpsgd_diffusion.py - 2025-03-19 21:42:05,995 - Loss: 0.1508, step: 53000
+INFO - dpsgd_diffusion.py - 2025-03-19 21:43:36,874 - Loss: 0.1304, step: 53100
+INFO - dpsgd_diffusion.py - 2025-03-19 21:45:08,651 - Loss: 0.1406, step: 53200
+INFO - dpsgd_diffusion.py - 2025-03-19 21:46:39,152 - Loss: 0.1397, step: 53300
+INFO - dpsgd_diffusion.py - 2025-03-19 21:46:49,989 - Eps-value after 119 epochs: 0.8551
+INFO - dpsgd_diffusion.py - 2025-03-19 21:48:10,643 - Loss: 0.1388, step: 53400
+INFO - dpsgd_diffusion.py - 2025-03-19 21:49:43,372 - Loss: 0.1356, step: 53500
+INFO - dpsgd_diffusion.py - 2025-03-19 21:51:15,055 - Loss: 0.1368, step: 53600
+INFO - dpsgd_diffusion.py - 2025-03-19 21:52:47,474 - Loss: 0.1401, step: 53700
+INFO - dpsgd_diffusion.py - 2025-03-19 21:53:41,768 - Eps-value after 120 epochs: 0.8589
+INFO - dpsgd_diffusion.py - 2025-03-19 21:54:18,929 - Loss: 0.1369, step: 53800
+INFO - dpsgd_diffusion.py - 2025-03-19 21:55:50,736 - Loss: 0.1363, step: 53900
+INFO - dpsgd_diffusion.py - 2025-03-19 21:57:22,488 - Loss: 0.1269, step: 54000
+INFO - dpsgd_diffusion.py - 2025-03-19 21:57:22,583 - Saving snapshot checkpoint and sampling single batch at iteration 54000.
+WARNING - image.py - 2025-03-19 21:57:23,273 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 21:57:51,712 - FID at iteration 54000: 26.912302
+INFO - dpsgd_diffusion.py - 2025-03-19 21:59:23,673 - Loss: 0.1267, step: 54100
+INFO - dpsgd_diffusion.py - 2025-03-19 22:00:55,466 - Loss: 0.1498, step: 54200
+INFO - dpsgd_diffusion.py - 2025-03-19 22:01:02,973 - Eps-value after 121 epochs: 0.8628
+INFO - dpsgd_diffusion.py - 2025-03-19 22:02:27,662 - Loss: 0.1434, step: 54300
+INFO - dpsgd_diffusion.py - 2025-03-19 22:03:59,800 - Loss: 0.1490, step: 54400
+INFO - dpsgd_diffusion.py - 2025-03-19 22:05:31,717 - Loss: 0.1280, step: 54500
+INFO - dpsgd_diffusion.py - 2025-03-19 22:07:02,872 - Loss: 0.1342, step: 54600
+INFO - dpsgd_diffusion.py - 2025-03-19 22:07:53,930 - Eps-value after 122 epochs: 0.8666
+INFO - dpsgd_diffusion.py - 2025-03-19 22:08:33,812 - Loss: 0.1392, step: 54700
+INFO - dpsgd_diffusion.py - 2025-03-19 22:10:06,381 - Loss: 0.1456, step: 54800
+INFO - dpsgd_diffusion.py - 2025-03-19 22:11:37,606 - Loss: 0.1436, step: 54900
+INFO - dpsgd_diffusion.py - 2025-03-19 22:13:08,725 - Loss: 0.1338, step: 55000
+INFO - dpsgd_diffusion.py - 2025-03-19 22:14:40,733 - Loss: 0.1348, step: 55100
+INFO - dpsgd_diffusion.py - 2025-03-19 22:14:44,493 - Eps-value after 123 epochs: 0.8704
+INFO - dpsgd_diffusion.py - 2025-03-19 22:16:13,815 - Loss: 0.1380, step: 55200
+INFO - dpsgd_diffusion.py - 2025-03-19 22:17:44,877 - Loss: 0.1363, step: 55300
+INFO - dpsgd_diffusion.py - 2025-03-19 22:19:16,670 - Loss: 0.1294, step: 55400
+INFO - dpsgd_diffusion.py - 2025-03-19 22:20:47,736 - Loss: 0.1413, step: 55500
+INFO - dpsgd_diffusion.py - 2025-03-19 22:21:34,752 - Eps-value after 124 epochs: 0.8743
+INFO - dpsgd_diffusion.py - 2025-03-19 22:22:18,918 - Loss: 0.1436, step: 55600
+INFO - dpsgd_diffusion.py - 2025-03-19 22:23:48,224 - Loss: 0.1345, step: 55700
+INFO - dpsgd_diffusion.py - 2025-03-19 22:25:19,892 - Loss: 0.1443, step: 55800
+INFO - dpsgd_diffusion.py - 2025-03-19 22:26:52,657 - Loss: 0.1283, step: 55900
+INFO - dpsgd_diffusion.py - 2025-03-19 22:28:23,821 - Loss: 0.1359, step: 56000
+INFO - dpsgd_diffusion.py - 2025-03-19 22:28:23,842 - Eps-value after 125 epochs: 0.8780
+INFO - dpsgd_diffusion.py - 2025-03-19 22:28:23,854 - Saving snapshot checkpoint and sampling single batch at iteration 56000.
+WARNING - image.py - 2025-03-19 22:28:24,555 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 22:28:52,190 - FID at iteration 56000: 27.097015
+INFO - dpsgd_diffusion.py - 2025-03-19 22:30:23,844 - Loss: 0.1259, step: 56100
+INFO - dpsgd_diffusion.py - 2025-03-19 22:31:56,570 - Loss: 0.1380, step: 56200
+INFO - dpsgd_diffusion.py - 2025-03-19 22:33:26,803 - Loss: 0.1525, step: 56300
+INFO - dpsgd_diffusion.py - 2025-03-19 22:34:58,447 - Loss: 0.1400, step: 56400
+INFO - dpsgd_diffusion.py - 2025-03-19 22:35:42,343 - Eps-value after 126 epochs: 0.8817
+INFO - dpsgd_diffusion.py - 2025-03-19 22:36:30,043 - Loss: 0.1423, step: 56500
+INFO - dpsgd_diffusion.py - 2025-03-19 22:38:02,497 - Loss: 0.1320, step: 56600
+INFO - dpsgd_diffusion.py - 2025-03-19 22:39:35,433 - Loss: 0.1238, step: 56700
+INFO - dpsgd_diffusion.py - 2025-03-19 22:41:06,975 - Loss: 0.1291, step: 56800
+INFO - dpsgd_diffusion.py - 2025-03-19 22:42:33,503 - Eps-value after 127 epochs: 0.8854
+INFO - dpsgd_diffusion.py - 2025-03-19 22:42:37,155 - Loss: 0.1404, step: 56900
+INFO - dpsgd_diffusion.py - 2025-03-19 22:44:08,834 - Loss: 0.1391, step: 57000
+INFO - dpsgd_diffusion.py - 2025-03-19 22:45:41,269 - Loss: 0.1284, step: 57100
+INFO - dpsgd_diffusion.py - 2025-03-19 22:47:13,564 - Loss: 0.1416, step: 57200
+INFO - dpsgd_diffusion.py - 2025-03-19 22:48:44,547 - Loss: 0.1356, step: 57300
+INFO - dpsgd_diffusion.py - 2025-03-19 22:49:24,929 - Eps-value after 128 epochs: 0.8891
+INFO - dpsgd_diffusion.py - 2025-03-19 22:50:15,791 - Loss: 0.1440, step: 57400
+INFO - dpsgd_diffusion.py - 2025-03-19 22:51:46,162 - Loss: 0.1398, step: 57500
+INFO - dpsgd_diffusion.py - 2025-03-19 22:53:19,414 - Loss: 0.1367, step: 57600
+INFO - dpsgd_diffusion.py - 2025-03-19 22:54:50,342 - Loss: 0.1367, step: 57700
+INFO - dpsgd_diffusion.py - 2025-03-19 22:56:14,341 - Eps-value after 129 epochs: 0.8928
+INFO - dpsgd_diffusion.py - 2025-03-19 22:56:21,714 - Loss: 0.1440, step: 57800
+INFO - dpsgd_diffusion.py - 2025-03-19 22:57:53,710 - Loss: 0.1280, step: 57900
+INFO - dpsgd_diffusion.py - 2025-03-19 22:59:27,549 - Loss: 0.1340, step: 58000
+INFO - dpsgd_diffusion.py - 2025-03-19 22:59:27,588 - Saving snapshot checkpoint and sampling single batch at iteration 58000.
+WARNING - image.py - 2025-03-19 22:59:28,245 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 22:59:55,734 - FID at iteration 58000: 25.797728
+INFO - dpsgd_diffusion.py - 2025-03-19 23:01:27,405 - Loss: 0.1414, step: 58100
+INFO - dpsgd_diffusion.py - 2025-03-19 23:02:58,674 - Loss: 0.1405, step: 58200
+INFO - dpsgd_diffusion.py - 2025-03-19 23:03:35,423 - Eps-value after 130 epochs: 0.8964
+INFO - dpsgd_diffusion.py - 2025-03-19 23:04:31,104 - Loss: 0.1490, step: 58300
+INFO - dpsgd_diffusion.py - 2025-03-19 23:06:03,667 - Loss: 0.1264, step: 58400
+INFO - dpsgd_diffusion.py - 2025-03-19 23:07:36,100 - Loss: 0.1465, step: 58500
+INFO - dpsgd_diffusion.py - 2025-03-19 23:09:06,388 - Loss: 0.1410, step: 58600
+INFO - dpsgd_diffusion.py - 2025-03-19 23:10:26,078 - Eps-value after 131 epochs: 0.9001
+INFO - dpsgd_diffusion.py - 2025-03-19 23:10:36,992 - Loss: 0.1286, step: 58700
+INFO - dpsgd_diffusion.py - 2025-03-19 23:12:08,998 - Loss: 0.1306, step: 58800
+INFO - dpsgd_diffusion.py - 2025-03-19 23:13:41,430 - Loss: 0.1331, step: 58900
+INFO - dpsgd_diffusion.py - 2025-03-19 23:15:12,669 - Loss: 0.1575, step: 59000
+INFO - dpsgd_diffusion.py - 2025-03-19 23:16:43,086 - Loss: 0.1385, step: 59100
+INFO - dpsgd_diffusion.py - 2025-03-19 23:17:15,311 - Eps-value after 132 epochs: 0.9038
+INFO - dpsgd_diffusion.py - 2025-03-19 23:18:13,927 - Loss: 0.1238, step: 59200
+INFO - dpsgd_diffusion.py - 2025-03-19 23:19:46,333 - Loss: 0.1576, step: 59300
+INFO - dpsgd_diffusion.py - 2025-03-19 23:21:16,907 - Loss: 0.1405, step: 59400
+INFO - dpsgd_diffusion.py - 2025-03-19 23:22:49,530 - Loss: 0.1298, step: 59500
+INFO - dpsgd_diffusion.py - 2025-03-19 23:24:06,384 - Eps-value after 133 epochs: 0.9075
+INFO - dpsgd_diffusion.py - 2025-03-19 23:24:21,500 - Loss: 0.1412, step: 59600
+INFO - dpsgd_diffusion.py - 2025-03-19 23:25:52,475 - Loss: 0.1353, step: 59700
+INFO - dpsgd_diffusion.py - 2025-03-19 23:27:24,405 - Loss: 0.1424, step: 59800
+INFO - dpsgd_diffusion.py - 2025-03-19 23:28:56,118 - Loss: 0.1320, step: 59900
+INFO - dpsgd_diffusion.py - 2025-03-19 23:30:28,354 - Loss: 0.1325, step: 60000
+INFO - dpsgd_diffusion.py - 2025-03-19 23:30:28,371 - Saving snapshot checkpoint and sampling single batch at iteration 60000.
+WARNING - image.py - 2025-03-19 23:30:29,028 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-19 23:30:54,478 - FID at iteration 60000: 25.544181
+INFO - dpsgd_diffusion.py - 2025-03-19 23:31:25,850 - Eps-value after 134 epochs: 0.9112
+INFO - dpsgd_diffusion.py - 2025-03-19 23:32:28,923 - Loss: 0.1268, step: 60100
+INFO - dpsgd_diffusion.py - 2025-03-19 23:34:00,015 - Loss: 0.1485, step: 60200
+INFO - dpsgd_diffusion.py - 2025-03-19 23:35:32,761 - Loss: 0.1439, step: 60300
+INFO - dpsgd_diffusion.py - 2025-03-19 23:37:06,432 - Loss: 0.1396, step: 60400
+INFO - dpsgd_diffusion.py - 2025-03-19 23:38:21,059 - Eps-value after 135 epochs: 0.9149
+INFO - dpsgd_diffusion.py - 2025-03-19 23:38:39,557 - Loss: 0.1352, step: 60500
+INFO - dpsgd_diffusion.py - 2025-03-19 23:40:10,827 - Loss: 0.1366, step: 60600
+INFO - dpsgd_diffusion.py - 2025-03-19 23:41:40,899 - Loss: 0.1329, step: 60700
+INFO - dpsgd_diffusion.py - 2025-03-19 23:43:13,369 - Loss: 0.1313, step: 60800
+INFO - dpsgd_diffusion.py - 2025-03-19 23:44:48,250 - Loss: 0.1227, step: 60900
+INFO - dpsgd_diffusion.py - 2025-03-19 23:45:13,489 - Eps-value after 136 epochs: 0.9185
+INFO - dpsgd_diffusion.py - 2025-03-19 23:46:20,985 - Loss: 0.1292, step: 61000
+INFO - dpsgd_diffusion.py - 2025-03-19 23:47:53,369 - Loss: 0.1427, step: 61100
+INFO - dpsgd_diffusion.py - 2025-03-19 23:49:26,120 - Loss: 0.1325, step: 61200
+INFO - dpsgd_diffusion.py - 2025-03-19 23:50:57,804 - Loss: 0.1337, step: 61300
+INFO - dpsgd_diffusion.py - 2025-03-19 23:52:07,246 - Eps-value after 137 epochs: 0.9222
+INFO - dpsgd_diffusion.py - 2025-03-19 23:52:30,002 - Loss: 0.1385, step: 61400
+INFO - dpsgd_diffusion.py - 2025-03-19 23:54:00,876 - Loss: 0.1489, step: 61500
+INFO - dpsgd_diffusion.py - 2025-03-19 23:55:33,117 - Loss: 0.1292, step: 61600
+INFO - dpsgd_diffusion.py - 2025-03-19 23:57:05,509 - Loss: 0.1418, step: 61700
+INFO - dpsgd_diffusion.py - 2025-03-19 23:58:36,453 - Loss: 0.1401, step: 61800
+INFO - dpsgd_diffusion.py - 2025-03-19 23:58:58,605 - Eps-value after 138 epochs: 0.9257
+INFO - dpsgd_diffusion.py - 2025-03-20 00:00:07,586 - Loss: 0.1219, step: 61900
+INFO - dpsgd_diffusion.py - 2025-03-20 00:01:40,522 - Loss: 0.1417, step: 62000
+INFO - dpsgd_diffusion.py - 2025-03-20 00:01:40,558 - Saving snapshot checkpoint and sampling single batch at iteration 62000.
+WARNING - image.py - 2025-03-20 00:01:41,252 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-20 00:02:09,940 - FID at iteration 62000: 25.045595
+INFO - dpsgd_diffusion.py - 2025-03-20 00:03:40,370 - Loss: 0.1296, step: 62100
+INFO - dpsgd_diffusion.py - 2025-03-20 00:05:10,587 - Loss: 0.1459, step: 62200
+INFO - dpsgd_diffusion.py - 2025-03-20 00:06:16,212 - Eps-value after 139 epochs: 0.9292
+INFO - dpsgd_diffusion.py - 2025-03-20 00:06:42,018 - Loss: 0.1277, step: 62300
+INFO - dpsgd_diffusion.py - 2025-03-20 00:08:16,767 - Loss: 0.1294, step: 62400
+INFO - dpsgd_diffusion.py - 2025-03-20 00:09:49,556 - Loss: 0.1443, step: 62500
+INFO - dpsgd_diffusion.py - 2025-03-20 00:11:21,882 - Loss: 0.1329, step: 62600
+INFO - dpsgd_diffusion.py - 2025-03-20 00:12:53,271 - Loss: 0.1302, step: 62700
+INFO - dpsgd_diffusion.py - 2025-03-20 00:13:11,365 - Eps-value after 140 epochs: 0.9328
+INFO - dpsgd_diffusion.py - 2025-03-20 00:14:24,179 - Loss: 0.1410, step: 62800
+INFO - dpsgd_diffusion.py - 2025-03-20 00:15:55,971 - Loss: 0.1380, step: 62900
+INFO - dpsgd_diffusion.py - 2025-03-20 00:17:28,216 - Loss: 0.1383, step: 63000
+INFO - dpsgd_diffusion.py - 2025-03-20 00:18:59,143 - Loss: 0.1347, step: 63100
+INFO - dpsgd_diffusion.py - 2025-03-20 00:20:01,828 - Eps-value after 141 epochs: 0.9363
+INFO - dpsgd_diffusion.py - 2025-03-20 00:20:30,045 - Loss: 0.1241, step: 63200
+INFO - dpsgd_diffusion.py - 2025-03-20 00:22:01,643 - Loss: 0.1419, step: 63300
+INFO - dpsgd_diffusion.py - 2025-03-20 00:23:34,373 - Loss: 0.1500, step: 63400
+INFO - dpsgd_diffusion.py - 2025-03-20 00:25:05,860 - Loss: 0.1379, step: 63500
+INFO - dpsgd_diffusion.py - 2025-03-20 00:26:37,083 - Loss: 0.1370, step: 63600
+INFO - dpsgd_diffusion.py - 2025-03-20 00:26:52,034 - Eps-value after 142 epochs: 0.9398
+INFO - dpsgd_diffusion.py - 2025-03-20 00:28:09,253 - Loss: 0.1321, step: 63700
+INFO - dpsgd_diffusion.py - 2025-03-20 00:29:39,915 - Loss: 0.1360, step: 63800
+INFO - dpsgd_diffusion.py - 2025-03-20 00:31:11,807 - Loss: 0.1325, step: 63900
+INFO - dpsgd_diffusion.py - 2025-03-20 00:32:44,174 - Loss: 0.1402, step: 64000
+INFO - dpsgd_diffusion.py - 2025-03-20 00:32:44,191 - Saving snapshot checkpoint and sampling single batch at iteration 64000.
+WARNING - image.py - 2025-03-20 00:32:44,890 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-20 00:33:12,446 - FID at iteration 64000: 25.330334
+INFO - dpsgd_diffusion.py - 2025-03-20 00:34:12,919 - Eps-value after 143 epochs: 0.9433
+INFO - dpsgd_diffusion.py - 2025-03-20 00:34:45,513 - Loss: 0.1315, step: 64100
+INFO - dpsgd_diffusion.py - 2025-03-20 00:36:17,662 - Loss: 0.1251, step: 64200
+INFO - dpsgd_diffusion.py - 2025-03-20 00:37:48,743 - Loss: 0.1356, step: 64300
+INFO - dpsgd_diffusion.py - 2025-03-20 00:39:20,093 - Loss: 0.1296, step: 64400
+INFO - dpsgd_diffusion.py - 2025-03-20 00:40:52,891 - Loss: 0.1280, step: 64500
+INFO - dpsgd_diffusion.py - 2025-03-20 00:41:04,078 - Eps-value after 144 epochs: 0.9468
+INFO - dpsgd_diffusion.py - 2025-03-20 00:42:24,657 - Loss: 0.1545, step: 64600
+INFO - dpsgd_diffusion.py - 2025-03-20 00:43:56,922 - Loss: 0.1289, step: 64700
+INFO - dpsgd_diffusion.py - 2025-03-20 00:45:27,982 - Loss: 0.1347, step: 64800
+INFO - dpsgd_diffusion.py - 2025-03-20 00:46:59,062 - Loss: 0.1305, step: 64900
+INFO - dpsgd_diffusion.py - 2025-03-20 00:47:54,974 - Eps-value after 145 epochs: 0.9504
+INFO - dpsgd_diffusion.py - 2025-03-20 00:48:31,723 - Loss: 0.1376, step: 65000
+INFO - dpsgd_diffusion.py - 2025-03-20 00:50:01,948 - Loss: 0.1383, step: 65100
+INFO - dpsgd_diffusion.py - 2025-03-20 00:51:33,565 - Loss: 0.1204, step: 65200
+INFO - dpsgd_diffusion.py - 2025-03-20 00:53:04,314 - Loss: 0.1322, step: 65300
+INFO - dpsgd_diffusion.py - 2025-03-20 00:54:34,830 - Loss: 0.1470, step: 65400
+INFO - dpsgd_diffusion.py - 2025-03-20 00:54:41,980 - Eps-value after 146 epochs: 0.9539
+INFO - dpsgd_diffusion.py - 2025-03-20 00:56:04,767 - Loss: 0.1434, step: 65500
+INFO - dpsgd_diffusion.py - 2025-03-20 00:57:36,063 - Loss: 0.1255, step: 65600
+INFO - dpsgd_diffusion.py - 2025-03-20 00:59:08,072 - Loss: 0.1431, step: 65700
+INFO - dpsgd_diffusion.py - 2025-03-20 01:00:40,843 - Loss: 0.1423, step: 65800
+INFO - dpsgd_diffusion.py - 2025-03-20 01:01:32,939 - Eps-value after 147 epochs: 0.9574
+INFO - dpsgd_diffusion.py - 2025-03-20 01:02:13,251 - Loss: 0.1286, step: 65900
+INFO - dpsgd_diffusion.py - 2025-03-20 01:03:44,194 - Loss: 0.1365, step: 66000
+INFO - dpsgd_diffusion.py - 2025-03-20 01:03:44,206 - Saving snapshot checkpoint and sampling single batch at iteration 66000.
+WARNING - image.py - 2025-03-20 01:03:44,878 - Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers).
+INFO - dpsgd_diffusion.py - 2025-03-20 01:04:11,508 - FID at iteration 66000: 24.496061
+INFO - dpsgd_diffusion.py - 2025-03-20 01:05:43,396 - Loss: 0.1336, step: 66100
+INFO - dpsgd_diffusion.py - 2025-03-20 01:07:15,899 - Loss: 0.1316, step: 66200
+INFO - dpsgd_diffusion.py - 2025-03-20 01:08:48,114 - Loss: 0.1436, step: 66300
+INFO - dpsgd_diffusion.py - 2025-03-20 01:08:51,752 - Eps-value after 148 epochs: 0.9609
+INFO - dpsgd_diffusion.py - 2025-03-20 01:10:18,859 - Loss: 0.1377, step: 66400
+INFO - dpsgd_diffusion.py - 2025-03-20 01:11:49,867 - Loss: 0.1324, step: 66500
+INFO - dpsgd_diffusion.py - 2025-03-20 01:13:20,804 - Loss: 0.1325, step: 66600
+INFO - dpsgd_diffusion.py - 2025-03-20 01:14:52,495 - Loss: 0.1422, step: 66700
+INFO - dpsgd_diffusion.py - 2025-03-20 01:15:39,686 - Eps-value after 149 epochs: 0.9644
+INFO - dpsgd_diffusion.py - 2025-03-20 01:16:23,314 - Loss: 0.1355, step: 66800
+INFO - dpsgd_diffusion.py - 2025-03-20 01:17:55,916 - Loss: 0.1304, step: 66900
+INFO - dpsgd_diffusion.py - 2025-03-20 01:19:28,550 - Loss: 0.1438, step: 67000
+INFO - dpsgd_diffusion.py - 2025-03-20 01:20:59,524 - Loss: 0.1349, step: 67100
+INFO - dpsgd_diffusion.py - 2025-03-20 01:22:30,846 - Loss: 0.1272, step: 67200
+INFO - dpsgd_diffusion.py - 2025-03-20 01:22:30,867 - Eps-value after 150 epochs: 0.9680
+INFO - dpsgd_diffusion.py - 2025-03-20 01:22:31,192 - Saving final checkpoint.
+INFO - dpsgd_diffusion.py - 2025-03-20 01:22:31,197 - start to generate 60000 samples
+INFO - dpsgd_diffusion.py - 2025-03-20 02:42:34,608 - Generation Finished!
+INFO - evaluator.py - 2025-03-20 02:42:57,514 - Epoch: 0 Train acc: 75.56 Val acc: 93.24 Test acc94.42; Train loss: 0.7390826965332031 Val loss: 0.0539346923828125
+INFO - evaluator.py - 2025-03-20 02:43:17,206 - Epoch: 1 Train acc: 90.81272727272727 Val acc: 93.06 Test acc94.24; Train loss: 0.28039309671575374 Val loss: 0.053709099578857424
+INFO - evaluator.py - 2025-03-20 02:43:36,684 - Epoch: 2 Train acc: 91.78727272727272 Val acc: 91.78 Test acc93.08999999999999; Train loss: 0.24751131744384766 Val loss: 0.06231972122192383
+INFO - evaluator.py - 2025-03-20 02:43:56,379 - Epoch: 3 Train acc: 92.24181818181818 Val acc: 87.26 Test acc88.3; Train loss: 0.231882933252508 Val loss: 0.09440505981445313
+INFO - evaluator.py - 2025-03-20 02:44:15,823 - Epoch: 4 Train acc: 92.60181818181819 Val acc: 89.28 Test acc90.51; Train loss: 0.22039375974481756 Val loss: 0.0829702392578125
+INFO - evaluator.py - 2025-03-20 02:44:35,258 - Epoch: 5 Train acc: 92.56181818181818 Val acc: 80.30000000000001 Test acc80.97; Train loss: 0.2252791868730025 Val loss: 0.1537090576171875
+INFO - evaluator.py - 2025-03-20 02:44:54,720 - Epoch: 6 Train acc: 93.08727272727273 Val acc: 79.84 Test acc80.42; Train loss: 0.20413020685369318 Val loss: 0.1672684600830078
+INFO - evaluator.py - 2025-03-20 02:45:14,166 - Epoch: 7 Train acc: 93.36727272727273 Val acc: 93.60000000000001 Test acc94.89999999999999; Train loss: 0.19861248768893155 Val loss: 0.050061585998535156
+INFO - evaluator.py - 2025-03-20 02:45:33,815 - Epoch: 8 Train acc: 93.47272727272727 Val acc: 93.24 Test acc93.81; Train loss: 0.1899118995666504 Val loss: 0.05829257659912109
+INFO - evaluator.py - 2025-03-20 02:45:53,237 - Epoch: 9 Train acc: 93.79818181818182 Val acc: 92.64 Test acc93.28999999999999; Train loss: 0.1822035407673229 Val loss: 0.06159943084716797
+INFO - evaluator.py - 2025-03-20 02:46:12,684 - Epoch: 10 Train acc: 93.93636363636364 Val acc: 87.7 Test acc88.94; Train loss: 0.17559306827891957 Val loss: 0.09725801696777343
+INFO - evaluator.py - 2025-03-20 02:46:32,159 - Epoch: 11 Train acc: 94.20363636363636 Val acc: 89.92 Test acc91.41; Train loss: 0.17035845801613547 Val loss: 0.07834832916259765
+INFO - evaluator.py - 2025-03-20 02:46:51,576 - Epoch: 12 Train acc: 94.42363636363636 Val acc: 93.16 Test acc94.06; Train loss: 0.16429014729586514 Val loss: 0.05511786880493164
+INFO - evaluator.py - 2025-03-20 02:47:11,050 - Epoch: 13 Train acc: 94.50181818181818 Val acc: 88.12 Test acc89.25999999999999; Train loss: 0.15975402592745694 Val loss: 0.09246768035888672
+INFO - evaluator.py - 2025-03-20 02:47:30,409 - Epoch: 14 Train acc: 94.69454545454545 Val acc: 28.26 Test acc28.720000000000002; Train loss: 0.15365570869445802 Val loss: 1.7771501953125
+INFO - evaluator.py - 2025-03-20 02:47:49,811 - Epoch: 15 Train acc: 94.86727272727272 Val acc: 70.22 Test acc70.52000000000001; Train loss: 0.1471436412117698 Val loss: 0.3516541320800781
+INFO - evaluator.py - 2025-03-20 02:48:09,471 - Epoch: 16 Train acc: 95.08545454545455 Val acc: 74.44 Test acc74.77000000000001; Train loss: 0.1411645646528764 Val loss: 0.23220602722167968
+INFO - evaluator.py - 2025-03-20 02:48:28,905 - Epoch: 17 Train acc: 95.19818181818181 Val acc: 81.34 Test acc82.61; Train loss: 0.14144691439541904 Val loss: 0.15862254638671874
+INFO - evaluator.py - 2025-03-20 02:48:48,273 - Epoch: 18 Train acc: 94.27454545454546 Val acc: 61.839999999999996 Test acc61.79; Train loss: 0.16725950782082297 Val loss: 0.3480041687011719
+INFO - evaluator.py - 2025-03-20 02:49:07,676 - Epoch: 19 Train acc: 95.58727272727273 Val acc: 74.26 Test acc74.85000000000001; Train loss: 0.1269288198297674 Val loss: 0.21712179565429687
+INFO - evaluator.py - 2025-03-20 02:49:27,082 - Epoch: 20 Train acc: 97.47272727272728 Val acc: 92.58 Test acc93.76; Train loss: 0.07642469702633944 Val loss: 0.06032645874023437
+INFO - evaluator.py - 2025-03-20 02:49:46,503 - Epoch: 21 Train acc: 98.22363636363637 Val acc: 94.88 Test acc95.5; Train loss: 0.05490827924554998 Val loss: 0.04949014129638672
+INFO - evaluator.py - 2025-03-20 02:50:05,918 - Epoch: 22 Train acc: 98.55272727272727 Val acc: 94.48 Test acc95.25; Train loss: 0.04490293816653165 Val loss: 0.06145937423706055
+INFO - evaluator.py - 2025-03-20 02:50:25,531 - Epoch: 23 Train acc: 98.84727272727272 Val acc: 94.48 Test acc95.39; Train loss: 0.0358582793452523 Val loss: 0.0667689353942871
+INFO - evaluator.py - 2025-03-20 02:50:44,943 - Epoch: 24 Train acc: 99.04727272727273 Val acc: 94.1 Test acc94.82000000000001; Train loss: 0.02889103969443928 Val loss: 0.07498108444213868
+INFO - evaluator.py - 2025-03-20 02:51:04,366 - Epoch: 25 Train acc: 99.1909090909091 Val acc: 93.64 Test acc94.28999999999999; Train loss: 0.02379015059037642 Val loss: 0.09454613342285156
+INFO - evaluator.py - 2025-03-20 02:51:23,774 - Epoch: 26 Train acc: 99.23818181818181 Val acc: 94.06 Test acc94.76; Train loss: 0.02234009681181474 Val loss: 0.08546696319580079
+INFO - evaluator.py - 2025-03-20 02:51:43,117 - Epoch: 27 Train acc: 99.37636363636364 Val acc: 93.46 Test acc94.65; Train loss: 0.017882744111798025 Val loss: 0.09259089813232421
+INFO - evaluator.py - 2025-03-20 02:52:02,561 - Epoch: 28 Train acc: 99.4 Val acc: 94.16 Test acc94.84; Train loss: 0.017572021502798255 Val loss: 0.08647503967285156
+INFO - evaluator.py - 2025-03-20 02:52:21,966 - Epoch: 29 Train acc: 99.47636363636364 Val acc: 94.3 Test acc95.05; Train loss: 0.01456817954561927 Val loss: 0.09127318572998047
+INFO - evaluator.py - 2025-03-20 02:52:41,390 - Epoch: 30 Train acc: 99.59090909090908 Val acc: 93.58 Test acc94.63000000000001; Train loss: 0.011811544672467492 Val loss: 0.1014529037475586
+INFO - evaluator.py - 2025-03-20 02:53:01,026 - Epoch: 31 Train acc: 99.48363636363636 Val acc: 94.32000000000001 Test acc95.11; Train loss: 0.014161983927813444 Val loss: 0.09332590026855468
+INFO - evaluator.py - 2025-03-20 02:53:20,378 - Epoch: 32 Train acc: 99.67272727272727 Val acc: 93.88 Test acc94.72; Train loss: 0.009914911448955536 Val loss: 0.1027769302368164
+INFO - evaluator.py - 2025-03-20 02:53:39,794 - Epoch: 33 Train acc: 99.56545454545454 Val acc: 94.17999999999999 Test acc95.03; Train loss: 0.011990657556598837 Val loss: 0.09444704132080078
+INFO - evaluator.py - 2025-03-20 02:53:59,318 - Epoch: 34 Train acc: 99.67454545454545 Val acc: 94.19999999999999 Test acc94.71000000000001; Train loss: 0.009344448012249037 Val loss: 0.10584789123535156
+INFO - evaluator.py - 2025-03-20 02:54:18,775 - Epoch: 35 Train acc: 99.5490909090909 Val acc: 93.56 Test acc94.31; Train loss: 0.012212883897532117 Val loss: 0.11833026123046875
+INFO - evaluator.py - 2025-03-20 02:54:38,194 - Epoch: 36 Train acc: 99.7309090909091 Val acc: 93.4 Test acc94.07; Train loss: 0.007776204984702847 Val loss: 0.12509088745117186
+INFO - evaluator.py - 2025-03-20 02:54:57,608 - Epoch: 37 Train acc: 99.64727272727274 Val acc: 94.24 Test acc94.94; Train loss: 0.010516441877321763 Val loss: 0.09964623718261718
+INFO - evaluator.py - 2025-03-20 02:55:17,057 - Epoch: 38 Train acc: 99.64 Val acc: 94.08 Test acc94.93; Train loss: 0.01025083395215598 Val loss: 0.10398240966796875
+INFO - evaluator.py - 2025-03-20 02:55:36,600 - Epoch: 39 Train acc: 99.53272727272727 Val acc: 93.94 Test acc94.44; Train loss: 0.012285259757529605 Val loss: 0.1061318389892578
+INFO - evaluator.py - 2025-03-20 02:55:56,219 - Epoch: 40 Train acc: 99.92 Val acc: 94.06 Test acc94.66; Train loss: 0.003131053440882401 Val loss: 0.10848050231933594
+INFO - evaluator.py - 2025-03-20 02:56:16,173 - Epoch: 41 Train acc: 99.99090909090908 Val acc: 93.94 Test acc94.81; Train loss: 0.0009756001154976813 Val loss: 0.11073266906738281
+INFO - evaluator.py - 2025-03-20 02:56:36,199 - Epoch: 42 Train acc: 100.0 Val acc: 94.02000000000001 Test acc94.83; Train loss: 0.0005843689032576301 Val loss: 0.11334310302734375
+INFO - evaluator.py - 2025-03-20 02:56:56,187 - Epoch: 43 Train acc: 99.99636363636364 Val acc: 94.1 Test acc95.02000000000001; Train loss: 0.0004743968559598381 Val loss: 0.11518377990722656
+INFO - evaluator.py - 2025-03-20 02:57:16,113 - Epoch: 44 Train acc: 100.0 Val acc: 94.1 Test acc95.02000000000001; Train loss: 0.0003744266798550432 Val loss: 0.116248388671875
+INFO - evaluator.py - 2025-03-20 02:57:36,052 - Epoch: 45 Train acc: 100.0 Val acc: 94.08 Test acc95.05; Train loss: 0.0003336124472150748 Val loss: 0.12017912139892578
+INFO - evaluator.py - 2025-03-20 02:57:56,167 - Epoch: 46 Train acc: 99.99636363636364 Val acc: 94.17999999999999 Test acc95.02000000000001; Train loss: 0.00031782648360187356 Val loss: 0.1222975570678711
+INFO - evaluator.py - 2025-03-20 02:58:16,142 - Epoch: 47 Train acc: 99.99818181818182 Val acc: 94.17999999999999 Test acc95.00999999999999; Train loss: 0.0002285201821814884 Val loss: 0.12540377655029297
+INFO - evaluator.py - 2025-03-20 02:58:36,082 - Epoch: 48 Train acc: 100.0 Val acc: 94.06 Test acc94.98; Train loss: 0.0002406804966232316 Val loss: 0.1271161407470703
+INFO - evaluator.py - 2025-03-20 02:58:56,092 - Epoch: 49 Train acc: 100.0 Val acc: 94.16 Test acc94.94; Train loss: 0.0001569385383955457 Val loss: 0.1301512985229492
+INFO - evaluator.py - 2025-03-20 02:58:56,101 - The best acc of synthetic images on sensitive val and the corresponding acc on test dataset from resnet is 94.88 and 95.5
+INFO - evaluator.py - 2025-03-20 02:58:56,102 - The best acc of synthetic images on noisy sensitive val and the corresponding acc on test dataset from resnet is 94.88 and 95.5
+INFO - evaluator.py - 2025-03-20 02:58:56,102 - The best acc test dataset from resnet is 95.5
+INFO - evaluator.py - 2025-03-20 02:59:22,209 - Epoch: 0 Train acc: 79.63818181818182 Val acc: 89.60000000000001 Test acc90.75999999999999; Train loss: 0.592497438326749 Val loss: 0.08357151184082032
+INFO - evaluator.py - 2025-03-20 02:59:47,139 - Epoch: 1 Train acc: 90.47454545454545 Val acc: 90.48 Test acc91.73; Train loss: 0.28666507700139826 Val loss: 0.07639822845458985
+INFO - evaluator.py - 2025-03-20 03:00:12,080 - Epoch: 2 Train acc: 91.58363636363637 Val acc: 94.06 Test acc94.86; Train loss: 0.25327943163785066 Val loss: 0.048839990234375
+INFO - evaluator.py - 2025-03-20 03:00:37,034 - Epoch: 3 Train acc: 92.03818181818181 Val acc: 91.25999999999999 Test acc92.42; Train loss: 0.23389424188787286 Val loss: 0.06728666763305664
+INFO - evaluator.py - 2025-03-20 03:01:02,182 - Epoch: 4 Train acc: 92.52 Val acc: 92.02 Test acc93.01; Train loss: 0.22447667645541106 Val loss: 0.06310285110473633
+INFO - evaluator.py - 2025-03-20 03:01:27,148 - Epoch: 5 Train acc: 92.61090909090909 Val acc: 89.22 Test acc90.01; Train loss: 0.21864852114590733 Val loss: 0.09023529663085937
+INFO - evaluator.py - 2025-03-20 03:01:52,038 - Epoch: 6 Train acc: 92.98727272727272 Val acc: 93.7 Test acc94.67999999999999; Train loss: 0.20511595552617853 Val loss: 0.04969787139892578
+INFO - evaluator.py - 2025-03-20 03:02:16,964 - Epoch: 7 Train acc: 93.1490909090909 Val acc: 93.26 Test acc94.41000000000001; Train loss: 0.20018161413019353 Val loss: 0.05503996353149414
+INFO - evaluator.py - 2025-03-20 03:02:41,877 - Epoch: 8 Train acc: 93.4 Val acc: 92.67999999999999 Test acc93.97; Train loss: 0.19323875253850764 Val loss: 0.05518281478881836
+INFO - evaluator.py - 2025-03-20 03:03:06,821 - Epoch: 9 Train acc: 93.51454545454546 Val acc: 70.76 Test acc72.1; Train loss: 0.1893104515769265 Val loss: 0.3928179016113281
+INFO - evaluator.py - 2025-03-20 03:03:31,705 - Epoch: 10 Train acc: 93.79454545454546 Val acc: 91.25999999999999 Test acc92.63; Train loss: 0.18324292682300913 Val loss: 0.06880987854003906
+INFO - evaluator.py - 2025-03-20 03:03:56,643 - Epoch: 11 Train acc: 93.74181818181818 Val acc: 80.28 Test acc81.07; Train loss: 0.1812303327040239 Val loss: 0.1609794158935547
+INFO - evaluator.py - 2025-03-20 03:04:21,765 - Epoch: 12 Train acc: 94.03636363636365 Val acc: 85.84 Test acc87.19; Train loss: 0.17249372974742544 Val loss: 0.11900216217041015
+INFO - evaluator.py - 2025-03-20 03:04:46,681 - Epoch: 13 Train acc: 94.18727272727273 Val acc: 87.82 Test acc88.81; Train loss: 0.1686392729325728 Val loss: 0.09975798187255859
+INFO - evaluator.py - 2025-03-20 03:05:11,545 - Epoch: 14 Train acc: 94.37272727272727 Val acc: 86.64 Test acc87.62; Train loss: 0.16248475456237793 Val loss: 0.11303051300048828
+INFO - evaluator.py - 2025-03-20 03:05:36,413 - Epoch: 15 Train acc: 94.55818181818182 Val acc: 32.46 Test acc33.61; Train loss: 0.15735193415555088 Val loss: 1.62463349609375
+INFO - evaluator.py - 2025-03-20 03:06:01,260 - Epoch: 16 Train acc: 94.63454545454546 Val acc: 11.52 Test acc10.68; Train loss: 0.15244728546142577 Val loss: 4.28231015625
+INFO - evaluator.py - 2025-03-20 03:06:26,124 - Epoch: 17 Train acc: 94.89636363636363 Val acc: 85.2 Test acc86.65; Train loss: 0.1454103677923029 Val loss: 0.12946214904785155
+INFO - evaluator.py - 2025-03-20 03:06:50,979 - Epoch: 18 Train acc: 95.14363636363636 Val acc: 92.17999999999999 Test acc93.35; Train loss: 0.1374084912040017 Val loss: 0.06793972854614258
+INFO - evaluator.py - 2025-03-20 03:07:15,984 - Epoch: 19 Train acc: 95.40545454545455 Val acc: 68.26 Test acc68.71000000000001; Train loss: 0.1322345064163208 Val loss: 0.583319140625
+INFO - evaluator.py - 2025-03-20 03:07:40,810 - Epoch: 20 Train acc: 96.81272727272727 Val acc: 95.04 Test acc95.74000000000001; Train loss: 0.09342546851418235 Val loss: 0.047836907958984376
+INFO - evaluator.py - 2025-03-20 03:08:05,588 - Epoch: 21 Train acc: 97.21454545454546 Val acc: 95.17999999999999 Test acc95.57; Train loss: 0.0793705401507291 Val loss: 0.052316688537597654
+INFO - evaluator.py - 2025-03-20 03:08:30,346 - Epoch: 22 Train acc: 97.45636363636365 Val acc: 94.8 Test acc95.19999999999999; Train loss: 0.0720847635269165 Val loss: 0.05826486129760742
+INFO - evaluator.py - 2025-03-20 03:08:55,193 - Epoch: 23 Train acc: 97.85090909090908 Val acc: 94.67999999999999 Test acc94.95; Train loss: 0.06297496696818959 Val loss: 0.0642899284362793
+INFO - evaluator.py - 2025-03-20 03:09:20,039 - Epoch: 24 Train acc: 98.07818181818182 Val acc: 94.44 Test acc94.75; Train loss: 0.05756717575246637 Val loss: 0.06610254516601563
+INFO - evaluator.py - 2025-03-20 03:09:44,887 - Epoch: 25 Train acc: 98.15272727272728 Val acc: 94.92 Test acc95.21; Train loss: 0.05224611848484386 Val loss: 0.0686003662109375
+INFO - evaluator.py - 2025-03-20 03:10:09,746 - Epoch: 26 Train acc: 98.34727272727272 Val acc: 94.78 Test acc94.94; Train loss: 0.046968346747485075 Val loss: 0.07184767456054687
+INFO - evaluator.py - 2025-03-20 03:10:34,812 - Epoch: 27 Train acc: 98.50727272727273 Val acc: 94.42 Test acc94.67; Train loss: 0.042004755427620624 Val loss: 0.07937647094726563
+INFO - evaluator.py - 2025-03-20 03:10:59,655 - Epoch: 28 Train acc: 98.70909090909092 Val acc: 94.38 Test acc94.71000000000001; Train loss: 0.03680317339463667 Val loss: 0.07984271850585938
+INFO - evaluator.py - 2025-03-20 03:11:24,512 - Epoch: 29 Train acc: 98.75090909090909 Val acc: 94.19999999999999 Test acc94.58; Train loss: 0.03463145628842441 Val loss: 0.08593564453125
+INFO - evaluator.py - 2025-03-20 03:11:49,365 - Epoch: 30 Train acc: 98.92 Val acc: 94.39999999999999 Test acc94.67999999999999; Train loss: 0.029718454300273547 Val loss: 0.0912117691040039
+INFO - evaluator.py - 2025-03-20 03:12:14,234 - Epoch: 31 Train acc: 99.05272727272727 Val acc: 94.28 Test acc94.63000000000001; Train loss: 0.02670068536129865 Val loss: 0.09051419067382813
+INFO - evaluator.py - 2025-03-20 03:12:39,144 - Epoch: 32 Train acc: 99.16363636363637 Val acc: 94.16 Test acc94.45; Train loss: 0.02269257065599615 Val loss: 0.0942280288696289
+INFO - evaluator.py - 2025-03-20 03:13:04,090 - Epoch: 33 Train acc: 99.23272727272727 Val acc: 94.56 Test acc94.94; Train loss: 0.021826413796164772 Val loss: 0.09583048248291015
+INFO - evaluator.py - 2025-03-20 03:13:29,010 - Epoch: 34 Train acc: 99.32181818181817 Val acc: 94.17999999999999 Test acc94.61; Train loss: 0.019188195222074336 Val loss: 0.09842825012207031
+INFO - evaluator.py - 2025-03-20 03:13:54,234 - Epoch: 35 Train acc: 99.30909090909091 Val acc: 94.6 Test acc95.00999999999999; Train loss: 0.018924074517596853 Val loss: 0.09065981903076172
+INFO - evaluator.py - 2025-03-20 03:14:19,152 - Epoch: 36 Train acc: 99.37818181818182 Val acc: 94.19999999999999 Test acc95.00999999999999; Train loss: 0.017030822270566768 Val loss: 0.10112169494628906
+INFO - evaluator.py - 2025-03-20 03:14:44,067 - Epoch: 37 Train acc: 99.47272727272727 Val acc: 94.38 Test acc94.84; Train loss: 0.01552648025859486 Val loss: 0.09458132781982422
+INFO - evaluator.py - 2025-03-20 03:15:08,985 - Epoch: 38 Train acc: 99.46000000000001 Val acc: 94.39999999999999 Test acc94.65; Train loss: 0.015644149069352582 Val loss: 0.09981483306884766
+INFO - evaluator.py - 2025-03-20 03:15:33,923 - Epoch: 39 Train acc: 99.49454545454546 Val acc: 94.32000000000001 Test acc94.85; Train loss: 0.014000407101891257 Val loss: 0.10220269927978516
+INFO - evaluator.py - 2025-03-20 03:15:58,836 - Epoch: 40 Train acc: 99.70363636363636 Val acc: 94.58 Test acc94.94; Train loss: 0.009059834492206573 Val loss: 0.10115753021240234
+INFO - evaluator.py - 2025-03-20 03:16:23,723 - Epoch: 41 Train acc: 99.76181818181819 Val acc: 94.62 Test acc95.07; Train loss: 0.007539685107361187 Val loss: 0.10141964874267578
+INFO - evaluator.py - 2025-03-20 03:16:48,601 - Epoch: 42 Train acc: 99.82 Val acc: 94.44 Test acc94.92; Train loss: 0.0060803058196197855 Val loss: 0.10265798645019532
+INFO - evaluator.py - 2025-03-20 03:17:13,686 - Epoch: 43 Train acc: 99.84727272727272 Val acc: 94.5 Test acc94.93; Train loss: 0.005264232963865453 Val loss: 0.10440700225830078
+INFO - evaluator.py - 2025-03-20 03:17:38,557 - Epoch: 44 Train acc: 99.80909090909091 Val acc: 94.54 Test acc94.88; Train loss: 0.0060028378097848455 Val loss: 0.1058521957397461
+INFO - evaluator.py - 2025-03-20 03:18:03,465 - Epoch: 45 Train acc: 99.84363636363636 Val acc: 94.42 Test acc94.84; Train loss: 0.005089184753461318 Val loss: 0.10691873168945312
+INFO - evaluator.py - 2025-03-20 03:18:28,356 - Epoch: 46 Train acc: 99.84545454545454 Val acc: 94.62 Test acc94.85; Train loss: 0.005253311842138117 Val loss: 0.110173583984375
+INFO - evaluator.py - 2025-03-20 03:18:53,256 - Epoch: 47 Train acc: 99.86 Val acc: 94.56 Test acc94.83; Train loss: 0.004571745033833114 Val loss: 0.10888170318603516
+INFO - evaluator.py - 2025-03-20 03:19:18,109 - Epoch: 48 Train acc: 99.88181818181818 Val acc: 94.6 Test acc94.82000000000001; Train loss: 0.004316781237179583 Val loss: 0.10826749572753906
+INFO - evaluator.py - 2025-03-20 03:19:42,986 - Epoch: 49 Train acc: 99.89454545454547 Val acc: 94.38 Test acc94.93; Train loss: 0.004002823740447109 Val loss: 0.10968203430175781
+INFO - evaluator.py - 2025-03-20 03:19:42,991 - The best acc of synthetic images on sensitive val and the corresponding acc on test dataset from wrn is 95.17999999999999 and 95.57
+INFO - evaluator.py - 2025-03-20 03:19:42,991 - The best acc of synthetic images on noisy sensitive val and the corresponding acc on test dataset from wrn is 95.17999999999999 and 95.57
+INFO - evaluator.py - 2025-03-20 03:19:42,991 - The best acc test dataset from wrn is 95.74000000000001
+INFO - evaluator.py - 2025-03-20 03:21:38,157 - Epoch: 0 Train acc: 65.88181818181819 Val acc: 91.46 Test acc92.49000000000001; Train loss: 1.1260622045343573 Val loss: 0.06900620269775391
+INFO - evaluator.py - 2025-03-20 03:23:17,178 - Epoch: 1 Train acc: 89.85636363636364 Val acc: 89.84 Test acc90.10000000000001; Train loss: 0.3065565336747603 Val loss: 0.08426489868164062
+INFO - evaluator.py - 2025-03-20 03:24:56,203 - Epoch: 2 Train acc: 91.4 Val acc: 90.28 Test acc91.3; Train loss: 0.25641488668268375 Val loss: 0.07432210388183594
+INFO - evaluator.py - 2025-03-20 03:26:35,274 - Epoch: 3 Train acc: 91.82181818181819 Val acc: 89.44 Test acc91.27; Train loss: 0.244291570594094 Val loss: 0.07484263153076172
+INFO - evaluator.py - 2025-03-20 03:28:14,309 - Epoch: 4 Train acc: 92.50363636363636 Val acc: 93.54 Test acc94.41000000000001; Train loss: 0.22263645470359109 Val loss: 0.05142635192871094
+INFO - evaluator.py - 2025-03-20 03:29:53,333 - Epoch: 5 Train acc: 92.60545454545455 Val acc: 91.8 Test acc92.54; Train loss: 0.21653414788679642 Val loss: 0.06735547943115235
+INFO - evaluator.py - 2025-03-20 03:31:32,362 - Epoch: 6 Train acc: 93.00181818181818 Val acc: 88.26 Test acc89.84; Train loss: 0.206449057041515 Val loss: 0.09342615966796874
+INFO - evaluator.py - 2025-03-20 03:33:11,315 - Epoch: 7 Train acc: 93.21272727272726 Val acc: 87.83999999999999 Test acc89.52; Train loss: 0.19965579719543458 Val loss: 0.08895448303222656
+INFO - evaluator.py - 2025-03-20 03:34:50,434 - Epoch: 8 Train acc: 93.35272727272728 Val acc: 85.18 Test acc86.11; Train loss: 0.1932761174288663 Val loss: 0.11579034729003906
+INFO - evaluator.py - 2025-03-20 03:36:29,371 - Epoch: 9 Train acc: 93.66909090909091 Val acc: 90.94 Test acc92.19000000000001; Train loss: 0.18293978978937322 Val loss: 0.06994322052001953
+INFO - evaluator.py - 2025-03-20 03:38:08,290 - Epoch: 10 Train acc: 93.68909090909091 Val acc: 81.92 Test acc82.61; Train loss: 0.18225168120644308 Val loss: 0.1401542678833008
+INFO - evaluator.py - 2025-03-20 03:39:47,237 - Epoch: 11 Train acc: 93.96363636363635 Val acc: 82.74000000000001 Test acc83.89; Train loss: 0.17521062511097302 Val loss: 0.1386964599609375
+INFO - evaluator.py - 2025-03-20 03:41:26,184 - Epoch: 12 Train acc: 94.28727272727274 Val acc: 86.72 Test acc87.58; Train loss: 0.1625846918626265 Val loss: 0.12761129302978516
+INFO - evaluator.py - 2025-03-20 03:43:05,137 - Epoch: 13 Train acc: 94.57636363636364 Val acc: 64.94 Test acc64.87; Train loss: 0.1591242934140292 Val loss: 0.35274579467773437
+INFO - evaluator.py - 2025-03-20 03:44:44,109 - Epoch: 14 Train acc: 94.5709090909091 Val acc: 70.76 Test acc71.46000000000001; Train loss: 0.1526966678272594 Val loss: 0.26583002319335935
+INFO - evaluator.py - 2025-03-20 03:46:23,114 - Epoch: 15 Train acc: 94.82727272727273 Val acc: 40.239999999999995 Test acc41.44; Train loss: 0.14732153885581276 Val loss: 0.8977728759765625
+INFO - evaluator.py - 2025-03-20 03:48:02,264 - Epoch: 16 Train acc: 95.18727272727273 Val acc: 71.44 Test acc73.33; Train loss: 0.13393209003101697 Val loss: 0.26012327880859376
+INFO - evaluator.py - 2025-03-20 03:49:41,225 - Epoch: 17 Train acc: 95.60909090909091 Val acc: 74.92 Test acc76.02; Train loss: 0.12475700782429089 Val loss: 0.2220036895751953
+INFO - evaluator.py - 2025-03-20 03:51:20,164 - Epoch: 18 Train acc: 95.83454545454545 Val acc: 39.5 Test acc40.33; Train loss: 0.11609483323530717 Val loss: 1.2555322021484374
+INFO - evaluator.py - 2025-03-20 03:52:59,092 - Epoch: 19 Train acc: 96.28727272727274 Val acc: 39.72 Test acc40.93; Train loss: 0.10397035305716774 Val loss: 1.1392913330078125
+INFO - evaluator.py - 2025-03-20 03:54:38,043 - Epoch: 20 Train acc: 98.65272727272728 Val acc: 92.17999999999999 Test acc93.45; Train loss: 0.043904756606708874 Val loss: 0.07778676910400391
+INFO - evaluator.py - 2025-03-20 03:56:17,005 - Epoch: 21 Train acc: 99.54181818181819 Val acc: 94.0 Test acc94.97; Train loss: 0.019554647350311278 Val loss: 0.06407739944458007
+INFO - evaluator.py - 2025-03-20 03:57:55,958 - Epoch: 22 Train acc: 99.80545454545454 Val acc: 94.66 Test acc95.11; Train loss: 0.010326449450579556 Val loss: 0.06265327529907226
+INFO - evaluator.py - 2025-03-20 03:59:34,891 - Epoch: 23 Train acc: 99.93818181818182 Val acc: 94.48 Test acc95.02000000000001; Train loss: 0.0048429970508272 Val loss: 0.06893036193847656
+INFO - evaluator.py - 2025-03-20 04:01:13,987 - Epoch: 24 Train acc: 99.98727272727272 Val acc: 94.19999999999999 Test acc95.06; Train loss: 0.0024448098540306093 Val loss: 0.07469926071166992
+INFO - evaluator.py - 2025-03-20 04:02:52,926 - Epoch: 25 Train acc: 99.99454545454546 Val acc: 94.16 Test acc94.99; Train loss: 0.0013354793319647962 Val loss: 0.07781326370239258
+INFO - evaluator.py - 2025-03-20 04:04:31,899 - Epoch: 26 Train acc: 100.0 Val acc: 94.14 Test acc94.97; Train loss: 0.0008646682997996157 Val loss: 0.08226811065673828
+INFO - evaluator.py - 2025-03-20 04:06:10,913 - Epoch: 27 Train acc: 100.0 Val acc: 94.17999999999999 Test acc94.91000000000001; Train loss: 0.0006073104245418852 Val loss: 0.08636481475830078
+INFO - evaluator.py - 2025-03-20 04:07:49,838 - Epoch: 28 Train acc: 100.0 Val acc: 94.06 Test acc94.86; Train loss: 0.0004588348038494587 Val loss: 0.09030485229492187
+INFO - evaluator.py - 2025-03-20 04:09:28,853 - Epoch: 29 Train acc: 100.0 Val acc: 94.06 Test acc94.91000000000001; Train loss: 0.0003380963212725791 Val loss: 0.09303530883789063
+INFO - evaluator.py - 2025-03-20 04:11:07,838 - Epoch: 30 Train acc: 100.0 Val acc: 94.06 Test acc94.97; Train loss: 0.000264184124361385 Val loss: 0.09697997283935547
+INFO - evaluator.py - 2025-03-20 04:12:47,016 - Epoch: 31 Train acc: 100.0 Val acc: 93.84 Test acc94.94; Train loss: 0.00022267714975909752 Val loss: 0.09913631896972656
+INFO - evaluator.py - 2025-03-20 04:14:26,044 - Epoch: 32 Train acc: 100.0 Val acc: 93.89999999999999 Test acc94.89999999999999; Train loss: 0.00017164940563115208 Val loss: 0.10204527587890624
+INFO - evaluator.py - 2025-03-20 04:16:05,053 - Epoch: 33 Train acc: 100.0 Val acc: 93.84 Test acc94.83; Train loss: 0.00015571260213513265 Val loss: 0.1030242172241211
+INFO - evaluator.py - 2025-03-20 04:17:44,086 - Epoch: 34 Train acc: 100.0 Val acc: 93.86 Test acc94.78999999999999; Train loss: 0.00012387832445515828 Val loss: 0.10594365081787109
+INFO - evaluator.py - 2025-03-20 04:19:23,088 - Epoch: 35 Train acc: 100.0 Val acc: 93.92 Test acc94.74000000000001; Train loss: 0.0001394360278140415 Val loss: 0.10733709411621094
+INFO - evaluator.py - 2025-03-20 04:21:02,021 - Epoch: 36 Train acc: 100.0 Val acc: 93.78 Test acc94.77; Train loss: 9.404276291924444e-05 Val loss: 0.10868083343505859
+INFO - evaluator.py - 2025-03-20 04:22:40,962 - Epoch: 37 Train acc: 100.0 Val acc: 93.86 Test acc94.76; Train loss: 7.525273089043119e-05 Val loss: 0.11057809295654297
+INFO - evaluator.py - 2025-03-20 04:24:19,920 - Epoch: 38 Train acc: 100.0 Val acc: 93.84 Test acc94.85; Train loss: 6.636969434436072e-05 Val loss: 0.11227693481445312
+INFO - evaluator.py - 2025-03-20 04:25:59,057 - Epoch: 39 Train acc: 100.0 Val acc: 93.88 Test acc94.83; Train loss: 5.297914158806882e-05 Val loss: 0.11360152435302734
+INFO - evaluator.py - 2025-03-20 04:27:38,031 - Epoch: 40 Train acc: 100.0 Val acc: 93.86 Test acc94.88; Train loss: 4.383296644399789e-05 Val loss: 0.11285780487060547
+INFO - evaluator.py - 2025-03-20 04:29:17,028 - Epoch: 41 Train acc: 100.0 Val acc: 93.88 Test acc94.77; Train loss: 4.4438557436859066e-05 Val loss: 0.11500787963867187
+INFO - evaluator.py - 2025-03-20 04:30:56,006 - Epoch: 42 Train acc: 100.0 Val acc: 93.88 Test acc94.87; Train loss: 4.094805940139023e-05 Val loss: 0.11529243011474609
+INFO - evaluator.py - 2025-03-20 04:32:34,923 - Epoch: 43 Train acc: 100.0 Val acc: 93.89999999999999 Test acc94.86; Train loss: 3.693583627570082e-05 Val loss: 0.11616419372558594
+INFO - evaluator.py - 2025-03-20 04:34:13,899 - Epoch: 44 Train acc: 100.0 Val acc: 93.89999999999999 Test acc94.86; Train loss: 3.883271740156819e-05 Val loss: 0.11673873443603516
+INFO - evaluator.py - 2025-03-20 04:35:52,861 - Epoch: 45 Train acc: 100.0 Val acc: 93.94 Test acc94.85; Train loss: 3.9829600339924746e-05 Val loss: 0.1171974624633789
+INFO - evaluator.py - 2025-03-20 04:37:31,805 - Epoch: 46 Train acc: 100.0 Val acc: 93.97999999999999 Test acc94.84; Train loss: 3.759197896261784e-05 Val loss: 0.11844678649902343
+INFO - evaluator.py - 2025-03-20 04:39:10,927 - Epoch: 47 Train acc: 100.0 Val acc: 93.88 Test acc94.8; Train loss: 3.9418673278255895e-05 Val loss: 0.11922978668212891
+INFO - evaluator.py - 2025-03-20 04:40:49,860 - Epoch: 48 Train acc: 100.0 Val acc: 94.0 Test acc94.86; Train loss: 3.5688794366168704e-05 Val loss: 0.11934795989990235
+INFO - evaluator.py - 2025-03-20 04:42:28,823 - Epoch: 49 Train acc: 100.0 Val acc: 93.97999999999999 Test acc94.93; Train loss: 3.3002070697363125e-05 Val loss: 0.1190579574584961
+INFO - evaluator.py - 2025-03-20 04:42:28,828 - The best acc of synthetic images on sensitive val and the corresponding acc on test dataset from resnext is 94.66 and 95.11
+INFO - evaluator.py - 2025-03-20 04:42:28,828 - The best acc of synthetic images on noisy sensitive val and the corresponding acc on test dataset from resnext is 94.66 and 95.11
+INFO - evaluator.py - 2025-03-20 04:42:28,828 - The best acc test dataset from resnext is 95.11
+INFO - evaluator.py - 2025-03-20 04:42:28,829 - The best acc of accuracy (adding noise to the results on the sensitive set of validation set) of synthetic images from resnet, wrn, and resnext are [95.5, 95.57, 95.11].
+INFO - evaluator.py - 2025-03-20 04:42:28,829 - The average and std of accuracy of synthetic images are 95.39 and 0.20
+INFO - evaluator.py - 2025-03-20 05:09:57,456 - The FID of synthetic images is 13.710256180468718
+INFO - evaluator.py - 2025-03-20 05:09:57,457 - The Inception Score of synthetic images is 2.022956371307373
+INFO - evaluator.py - 2025-03-20 05:09:57,457 - The Precision and Recall of synthetic images is 0.47235938906669617 and 0.6275333166122437
+INFO - evaluator.py - 2025-03-20 05:09:57,457 - The FLD of synthetic images is 8.065462112426758
+INFO - evaluator.py - 2025-03-20 05:09:57,457 - The ImageReward of synthetic images is -2.073354103444144

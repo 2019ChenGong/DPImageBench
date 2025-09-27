@@ -1,0 +1,214 @@
+INFO - utils.py - 2025-09-26 15:37:00,081 - {'setup': {'method': 'DP-Kernel', 'run_type': 'normal', 'n_gpus_per_node': 4, 'n_nodes': 1, 'node_rank': 0, 'master_address': '127.0.0.1', 'master_port': 6025, 'omp_n_threads': 8, 'workdir': 'exp/dp-kernel/celeba_male_32_eps1.0-2025-09-26-15-37-00', 'local_rank': 0, 'global_rank': 0, 'global_size': 4, 'root_folder': '.'}, 'public_data': {'name': 'imagenet', 'num_channels': 3, 'resolution': 32, 'n_classes': 1000, 'train_path': 'dataset/imagenet/imagenet_32', 'selective': {'ratio': 1.0}}, 'sensitive_data': {'name': 'celeba_male_32', 'num_channels': 3, 'resolution': 32, 'n_classes': 2, 'train_path': 'dataset/celeba/train_32_Male.zip', 'test_path': 'dataset/celeba/test_32_Male.zip', 'fid_stats': 'dataset/celeba/fid_stats_32.npz'}, 'model': {'image_size': 32, 'Generator': {'z_dim': 60, 'g_shared_dim': 128, 'g_conv_dim': 60, 'attn_g_loc': [2], 'apply_attn': True}, 'sigma_list': [1, 2, 4, 8, 16], 'private_num_classes': 2, 'public_num_classes': 1000, 'ckpt': None, 'local_rank': 0, 'global_rank': 0, 'global_size': 4}, 'pretrain': {'log_dir': 'exp/dp-kernel/celeba_male_32_eps1.0-2025-09-26-15-37-00/pretrain', 'n_epochs': 1, 'lr': 5e-05, 'batch_size': 64, 'cond': True}, 'train': {'max_iter': 200002, 'batch_size': 60, 'lr': 5e-05, 'vis_step': 10000, 'log_dir': 'exp/dp-kernel/celeba_male_32_eps1.0-2025-09-26-15-37-00/train', 'dp': {'epsilon': 1.0, 'delta': 1e-06, 'privacy_history': None}, 'n_splits': 1, 'half_sensitivity': False}, 'gen': {'data_num': 60000, 'batch_size': 1000, 'log_dir': 'exp/dp-kernel/celeba_male_32_eps1.0-2025-09-26-15-37-00/gen', 'n_classes': 2}, 'eval': {'batch_size': 1000, 'mode': 'val'}}
+INFO - dp_kernel.py - 2025-09-26 15:37:00,432 - Number of trainable parameters in model: 3965604
+INFO - dataset_loader.py - 2025-09-26 15:37:02,271 - train size: 145064 val size: 17706
+INFO - dataset_loader.py - 2025-09-26 15:37:02,271 - delta is reset as 5.800209926283058e-07
+INFO - dp_kernel.py - 2025-09-26 15:55:09,904 - Training loss: 0	Loss:0.021701	
+INFO - dp_kernel.py - 2025-09-26 15:55:10,587 - The noise factor is 0.5615234375
+INFO - dp_kernel.py - 2025-09-26 15:55:15,822 - Current iter: 0 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 15:55:15,822 - Training loss: 0	Loss:0.999048	
+INFO - dp_kernel.py - 2025-09-26 16:05:19,413 - Current iter: 10000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 16:05:19,413 - Training loss: 10000	Loss:0.073085	
+INFO - dp_kernel.py - 2025-09-26 16:15:16,908 - Current iter: 20000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 16:15:16,908 - Training loss: 20000	Loss:0.044095	
+INFO - dp_kernel.py - 2025-09-26 16:25:09,628 - Current iter: 30000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 16:25:09,629 - Training loss: 30000	Loss:0.026325	
+INFO - dp_kernel.py - 2025-09-26 16:35:02,439 - Current iter: 40000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 16:35:02,439 - Training loss: 40000	Loss:0.001313	
+INFO - dp_kernel.py - 2025-09-26 16:44:59,265 - Current iter: 50000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 16:44:59,266 - Training loss: 50000	Loss:0.001341	
+INFO - dp_kernel.py - 2025-09-26 16:54:56,403 - Current iter: 60000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 16:54:56,403 - Training loss: 60000	Loss:0.009434	
+INFO - dp_kernel.py - 2025-09-26 17:04:47,779 - Current iter: 70000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 17:04:47,779 - Training loss: 70000	Loss:0.000415	
+INFO - dp_kernel.py - 2025-09-26 17:14:40,349 - Current iter: 80000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 17:14:40,350 - Training loss: 80000	Loss:0.037702	
+INFO - dp_kernel.py - 2025-09-26 17:24:31,897 - Current iter: 90000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 17:24:31,898 - Training loss: 90000	Loss:0.010757	
+INFO - dp_kernel.py - 2025-09-26 17:34:24,140 - Current iter: 100000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 17:34:24,140 - Training loss: 100000	Loss:0.025665	
+INFO - dp_kernel.py - 2025-09-26 17:44:18,266 - Current iter: 110000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 17:44:18,266 - Training loss: 110000	Loss:0.002188	
+INFO - dp_kernel.py - 2025-09-26 17:54:10,962 - Current iter: 120000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 17:54:10,963 - Training loss: 120000	Loss:0.038632	
+INFO - dp_kernel.py - 2025-09-26 18:04:04,013 - Current iter: 130000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 18:04:04,014 - Training loss: 130000	Loss:0.184988	
+INFO - dp_kernel.py - 2025-09-26 18:14:02,861 - Current iter: 140000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 18:14:02,862 - Training loss: 140000	Loss:0.057019	
+INFO - dp_kernel.py - 2025-09-26 18:23:58,613 - Current iter: 150000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 18:23:58,614 - Training loss: 150000	Loss:0.013915	
+INFO - dp_kernel.py - 2025-09-26 18:33:53,823 - Current iter: 160000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 18:33:53,823 - Training loss: 160000	Loss:0.014132	
+INFO - dp_kernel.py - 2025-09-26 18:43:46,964 - Current iter: 170000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 18:43:46,964 - Training loss: 170000	Loss:0.070930	
+INFO - dp_kernel.py - 2025-09-26 18:53:45,924 - Current iter: 180000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 18:53:45,924 - Training loss: 180000	Loss:0.021352	
+INFO - dp_kernel.py - 2025-09-26 19:03:43,621 - Current iter: 190000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 19:03:43,621 - Training loss: 190000	Loss:0.101128	
+INFO - dp_kernel.py - 2025-09-26 19:13:41,024 - Current iter: 200000 Total training iters: 200002
+INFO - dp_kernel.py - 2025-09-26 19:13:41,025 - Training loss: 200000	Loss:0.005441	
+INFO - evaluator.py - 2025-09-26 19:14:31,128 - Epoch: 0 Train acc: 62.02727272727273 Val acc: 77.74200835874845 Test acc77.97314898306783; Train loss: 0.6506416302767667 Val loss: 0.12419219207160422
+INFO - evaluator.py - 2025-09-26 19:15:02,845 - Epoch: 1 Train acc: 85.27090909090909 Val acc: 69.51880718400542 Test acc67.83889389840697; Train loss: 0.2415001507845792 Val loss: 0.20891949800021445
+INFO - evaluator.py - 2025-09-26 19:15:34,335 - Epoch: 2 Train acc: 87.73272727272727 Val acc: 79.29515418502203 Test acc79.14036669672377; Train loss: 0.1948805471940474 Val loss: 0.1581850292102827
+INFO - evaluator.py - 2025-09-26 19:16:05,794 - Epoch: 3 Train acc: 90.60545454545455 Val acc: 78.98452501976732 Test acc78.42901512874462; Train loss: 0.1726771736838601 Val loss: 0.20955064963798906
+INFO - evaluator.py - 2025-09-26 19:16:37,282 - Epoch: 4 Train acc: 93.63090909090909 Val acc: 76.431718061674 Test acc75.34816150686304; Train loss: 0.13618683579184793 Val loss: 0.22205129063467408
+INFO - evaluator.py - 2025-09-26 19:17:08,729 - Epoch: 5 Train acc: 96.00727272727273 Val acc: 79.92770812154072 Test acc79.41589019136359; Train loss: 0.09515180657126687 Val loss: 0.18992855443020507
+INFO - evaluator.py - 2025-09-26 19:17:40,206 - Epoch: 6 Train acc: 97.21636363636364 Val acc: 74.05399299672428 Test acc72.64803125939284; Train loss: 0.06989046484340321 Val loss: 0.2031696870692447
+INFO - evaluator.py - 2025-09-26 19:18:11,663 - Epoch: 7 Train acc: 98.18545454545455 Val acc: 77.78154297978087 Test acc76.58551247370004; Train loss: 0.04794582891464234 Val loss: 0.1641143579934393
+INFO - evaluator.py - 2025-09-26 19:18:43,148 - Epoch: 8 Train acc: 98.59636363636363 Val acc: 69.11216536767198 Test acc67.12754233042781; Train loss: 0.038401011800765994 Val loss: 0.2465516472487588
+INFO - evaluator.py - 2025-09-26 19:19:14,859 - Epoch: 9 Train acc: 98.8690909090909 Val acc: 76.3413532135999 Test acc75.90421801422703; Train loss: 0.03013966501192613 Val loss: 0.2205056949185878
+INFO - evaluator.py - 2025-09-26 19:19:46,365 - Epoch: 10 Train acc: 98.98181818181818 Val acc: 76.12673669942393 Test acc75.18284741007915; Train loss: 0.027886067644032564 Val loss: 0.1785978064972789
+INFO - evaluator.py - 2025-09-26 19:20:17,825 - Epoch: 11 Train acc: 99.2109090909091 Val acc: 75.81045973116458 Test acc75.13275222923555; Train loss: 0.02123735122789036 Val loss: 0.19797432879115395
+INFO - evaluator.py - 2025-09-26 19:20:49,308 - Epoch: 12 Train acc: 99.33818181818181 Val acc: 70.07229187845928 Test acc67.98416992285343; Train loss: 0.018741427356817504 Val loss: 0.314040339681155
+INFO - evaluator.py - 2025-09-26 19:21:20,761 - Epoch: 13 Train acc: 99.37818181818182 Val acc: 77.2450016943409 Test acc77.03135958320809; Train loss: 0.017129911998998035 Val loss: 0.18459427877831402
+INFO - evaluator.py - 2025-09-26 19:21:52,263 - Epoch: 14 Train acc: 99.42363636363636 Val acc: 75.57325200497007 Test acc75.66376114617773; Train loss: 0.015352057379484177 Val loss: 0.20834711846774223
+INFO - evaluator.py - 2025-09-26 19:22:23,721 - Epoch: 15 Train acc: 99.48 Val acc: 75.69750367107196 Test acc76.16972247269813; Train loss: 0.014265276086601344 Val loss: 0.2120273563803407
+INFO - evaluator.py - 2025-09-26 19:22:55,210 - Epoch: 16 Train acc: 99.50727272727272 Val acc: 68.14074325087542 Test acc65.54453461576996; Train loss: 0.013585851935364983 Val loss: 0.46365668239612895
+INFO - evaluator.py - 2025-09-26 19:23:26,953 - Epoch: 17 Train acc: 99.53818181818181 Val acc: 74.92375465943748 Test acc73.83528704538624; Train loss: 0.012726915202493017 Val loss: 0.3150325548065782
+INFO - evaluator.py - 2025-09-26 19:23:58,498 - Epoch: 18 Train acc: 99.5490909090909 Val acc: 76.56726533378516 Test acc75.99939885782987; Train loss: 0.012499453091079539 Val loss: 0.23360998277999204
+INFO - evaluator.py - 2025-09-26 19:24:29,974 - Epoch: 19 Train acc: 99.69454545454546 Val acc: 75.18920140065515 Test acc74.72698126440235; Train loss: 0.008782783303206617 Val loss: 0.22386735627223822
+INFO - evaluator.py - 2025-09-26 19:25:01,489 - Epoch: 20 Train acc: 99.90545454545455 Val acc: 73.74336383146955 Test acc72.8934976455265; Train loss: 0.002395918311466548 Val loss: 0.3161118724016797
+INFO - evaluator.py - 2025-09-26 19:25:32,983 - Epoch: 21 Train acc: 99.98545454545454 Val acc: 74.63006890319666 Test acc73.92044885282036; Train loss: 0.0007584145416082306 Val loss: 0.3512223150101837
+INFO - evaluator.py - 2025-09-26 19:26:04,469 - Epoch: 22 Train acc: 99.99454545454546 Val acc: 75.52806958093302 Test acc75.5435327121531; Train loss: 0.00039840732613705436 Val loss: 0.3773672702177007
+INFO - evaluator.py - 2025-09-26 19:26:35,944 - Epoch: 23 Train acc: 99.98 Val acc: 74.27425731390488 Test acc73.41949704438433; Train loss: 0.0007797941924496131 Val loss: 0.4658211311970298
+INFO - evaluator.py - 2025-09-26 19:27:07,429 - Epoch: 24 Train acc: 99.99636363636364 Val acc: 75.18355359765052 Test acc74.7720669271616; Train loss: 0.000324422134232538 Val loss: 0.45720879349966553
+INFO - evaluator.py - 2025-09-26 19:27:39,137 - Epoch: 25 Train acc: 99.98727272727272 Val acc: 75.2004970066644 Test acc75.59863741108104; Train loss: 0.00041302711945238776 Val loss: 0.4576607659672878
+INFO - evaluator.py - 2025-09-26 19:28:10,630 - Epoch: 26 Train acc: 99.97454545454545 Val acc: 75.47159155088671 Test acc75.85412283338343; Train loss: 0.0007409369057266635 Val loss: 0.4682988341643987
+INFO - evaluator.py - 2025-09-26 19:28:42,103 - Epoch: 27 Train acc: 99.99090909090908 Val acc: 75.1101321585903 Test acc74.6969241558962; Train loss: 0.00034832371430662036 Val loss: 0.5299099670430839
+INFO - evaluator.py - 2025-09-26 19:29:13,608 - Epoch: 28 Train acc: 99.97272727272727 Val acc: 74.25731390489099 Test acc73.04879270614167; Train loss: 0.0006603372243301816 Val loss: 0.5868343024499993
+INFO - evaluator.py - 2025-09-26 19:29:45,105 - Epoch: 29 Train acc: 99.92181818181818 Val acc: 73.31413080311758 Test acc71.72627993187055; Train loss: 0.00267856370471365 Val loss: 0.47956805227571164
+INFO - evaluator.py - 2025-09-26 19:30:16,608 - Epoch: 30 Train acc: 99.96363636363637 Val acc: 75.957302609285 Test acc75.65875162809338; Train loss: 0.0014422902649459007 Val loss: 0.47690518417022304
+INFO - evaluator.py - 2025-09-26 19:30:48,093 - Epoch: 31 Train acc: 99.97090909090909 Val acc: 76.49384389472496 Test acc75.89920849614266; Train loss: 0.0009322814970298416 Val loss: 0.45573556284493516
+INFO - evaluator.py - 2025-09-26 19:31:19,620 - Epoch: 32 Train acc: 99.94727272727273 Val acc: 76.14368010843782 Test acc74.9624286143673; Train loss: 0.0014351592041758439 Val loss: 0.48943580240499335
+INFO - evaluator.py - 2025-09-26 19:31:51,350 - Epoch: 33 Train acc: 99.98181818181818 Val acc: 77.18852366429459 Test acc77.07644524596734; Train loss: 0.0006069680483654586 Val loss: 0.47181202685861257
+INFO - evaluator.py - 2025-09-26 19:32:22,856 - Epoch: 34 Train acc: 99.93454545454546 Val acc: 73.72642042245566 Test acc72.10199378819757; Train loss: 0.0018525751640575685 Val loss: 0.570021926326616
+INFO - evaluator.py - 2025-09-26 19:32:54,346 - Epoch: 35 Train acc: 99.97272727272727 Val acc: 74.4945216310855 Test acc72.95862138062319; Train loss: 0.0007537134785022565 Val loss: 0.621169352792662
+INFO - evaluator.py - 2025-09-26 19:33:25,859 - Epoch: 36 Train acc: 99.97818181818182 Val acc: 74.0765842087428 Test acc72.98867848912934; Train loss: 0.0009314049041057429 Val loss: 0.5651927272788444
+INFO - evaluator.py - 2025-09-26 19:33:57,328 - Epoch: 37 Train acc: 99.9509090909091 Val acc: 75.42076132384501 Test acc74.35627692615971; Train loss: 0.001539907056159361 Val loss: 0.5488024610025821
+INFO - evaluator.py - 2025-09-26 19:34:28,858 - Epoch: 38 Train acc: 99.92181818181818 Val acc: 73.568281938326 Test acc72.45766957218716; Train loss: 0.0020280587952869774 Val loss: 0.5545621738586805
+INFO - evaluator.py - 2025-09-26 19:35:00,356 - Epoch: 39 Train acc: 99.97454545454545 Val acc: 75.32474867276629 Test acc74.4063721070033; Train loss: 0.0007598742378468159 Val loss: 0.43656383804395404
+INFO - evaluator.py - 2025-09-26 19:35:32,122 - Epoch: 40 Train acc: 99.98727272727272 Val acc: 75.5054783689145 Test acc74.96743813245166; Train loss: 0.0004547254624739501 Val loss: 0.4451272573011091
+INFO - evaluator.py - 2025-09-26 19:36:03,632 - Epoch: 41 Train acc: 100.0 Val acc: 75.90647238224331 Test acc75.403266205791; Train loss: 9.522059718067546e-05 Val loss: 0.4732182915434519
+INFO - evaluator.py - 2025-09-26 19:36:35,165 - Epoch: 42 Train acc: 100.0 Val acc: 74.87292443239579 Test acc74.09077246768861; Train loss: 7.804753585759582e-05 Val loss: 0.5297690580810354
+INFO - evaluator.py - 2025-09-26 19:37:06,667 - Epoch: 43 Train acc: 100.0 Val acc: 75.75398170111826 Test acc75.04759042180143; Train loss: 4.9578195039066486e-05 Val loss: 0.5285799566613851
+INFO - evaluator.py - 2025-09-26 19:37:38,197 - Epoch: 44 Train acc: 100.0 Val acc: 75.25132723370609 Test acc74.49153391443744; Train loss: 4.2934584621385013e-05 Val loss: 0.5769453041165424
+INFO - evaluator.py - 2025-09-26 19:38:09,733 - Epoch: 45 Train acc: 100.0 Val acc: 75.12707556760421 Test acc74.39635307083459; Train loss: 3.68407394059349e-05 Val loss: 0.5810205814435255
+INFO - evaluator.py - 2025-09-26 19:38:41,259 - Epoch: 46 Train acc: 99.99818181818182 Val acc: 75.70315147407658 Test acc74.99749524095782; Train loss: 6.251616110920705e-05 Val loss: 0.5933710742667343
+INFO - evaluator.py - 2025-09-26 19:39:12,761 - Epoch: 47 Train acc: 100.0 Val acc: 75.16096238563199 Test acc74.3312293357379; Train loss: 4.308491987070407e-05 Val loss: 0.6322454618193074
+INFO - evaluator.py - 2025-09-26 19:39:44,524 - Epoch: 48 Train acc: 100.0 Val acc: 74.79385519033096 Test acc73.95551547941088; Train loss: 2.2100721739215344e-05 Val loss: 0.6504742699828536
+INFO - evaluator.py - 2025-09-26 19:40:16,025 - Epoch: 49 Train acc: 100.0 Val acc: 75.35298768778945 Test acc74.49153391443744; Train loss: 1.8669888853781397e-05 Val loss: 0.6351299434546817
+INFO - evaluator.py - 2025-09-26 19:40:16,033 - The best acc of synthetic images on sensitive val and the corresponding acc on test dataset from resnet is 79.92770812154072 and 79.41589019136359
+INFO - evaluator.py - 2025-09-26 19:40:16,034 - The best acc of synthetic images on noisy sensitive val and the corresponding acc on test dataset from resnet is 79.92770812154072 and 79.41589019136359
+INFO - evaluator.py - 2025-09-26 19:40:16,034 - The best acc test dataset from resnet is 79.41589019136359
+INFO - evaluator.py - 2025-09-26 19:40:56,161 - Epoch: 0 Train acc: 64.84181818181818 Val acc: 75.52242177792839 Test acc76.60555054603748; Train loss: 0.5722886539806019 Val loss: 0.16510690835375147
+INFO - evaluator.py - 2025-09-26 19:41:35,689 - Epoch: 1 Train acc: 85.14545454545454 Val acc: 80.45860160397605 Test acc80.35267007313897; Train loss: 0.2820801435990767 Val loss: 0.16099134596218487
+INFO - evaluator.py - 2025-09-26 19:42:15,270 - Epoch: 2 Train acc: 90.9309090909091 Val acc: 84.4685417372642 Test acc84.99148381925659; Train loss: 0.18464986971074884 Val loss: 0.12983361785726655
+INFO - evaluator.py - 2025-09-26 19:42:54,823 - Epoch: 3 Train acc: 94.30909090909091 Val acc: 82.32237659550435 Test acc81.73028754633805; Train loss: 0.13047418452176182 Val loss: 0.1635520406783563
+INFO - evaluator.py - 2025-09-26 19:43:34,403 - Epoch: 4 Train acc: 96.20363636363636 Val acc: 83.11306901615272 Test acc83.38843803226129; Train loss: 0.09307732533541593 Val loss: 0.18648919528128266
+INFO - evaluator.py - 2025-09-26 19:44:13,934 - Epoch: 5 Train acc: 97.22545454545455 Val acc: 82.39579803456455 Test acc82.84240056106601; Train loss: 0.06941410562341864 Val loss: 0.14944983438948353
+INFO - evaluator.py - 2025-09-26 19:44:53,762 - Epoch: 6 Train acc: 97.73454545454545 Val acc: 82.06822546029593 Test acc82.05590622182146; Train loss: 0.05841895762356845 Val loss: 0.19308995731965198
+INFO - evaluator.py - 2025-09-26 19:45:33,335 - Epoch: 7 Train acc: 98.42181818181818 Val acc: 81.61075341692083 Test acc81.28444043682997; Train loss: 0.04024155760678378 Val loss: 0.21454236349331837
+INFO - evaluator.py - 2025-09-26 19:46:12,897 - Epoch: 8 Train acc: 98.67818181818183 Val acc: 80.36823675590196 Test acc79.96693718064323; Train loss: 0.0355522982803258 Val loss: 0.22104707254900793
+INFO - evaluator.py - 2025-09-26 19:46:52,460 - Epoch: 9 Train acc: 98.87818181818182 Val acc: 80.65062690613351 Test acc80.6131650135257; Train loss: 0.03004332856915214 Val loss: 0.23751681620934906
+INFO - evaluator.py - 2025-09-26 19:47:32,001 - Epoch: 10 Train acc: 99.07090909090908 Val acc: 80.37388455890658 Test acc80.11221320508966; Train loss: 0.02506436745145104 Val loss: 0.206959271880714
+INFO - evaluator.py - 2025-09-26 19:48:11,564 - Epoch: 11 Train acc: 99.22 Val acc: 81.0120862984299 Test acc81.66015429315699; Train loss: 0.021283353611014105 Val loss: 0.21173429128262708
+INFO - evaluator.py - 2025-09-26 19:48:51,095 - Epoch: 12 Train acc: 99.32545454545455 Val acc: 80.2496328928047 Test acc80.42781284440437; Train loss: 0.018269926980408756 Val loss: 0.27517116335062314
+INFO - evaluator.py - 2025-09-26 19:49:30,655 - Epoch: 13 Train acc: 99.24181818181819 Val acc: 81.12504235852253 Test acc81.61506863039776; Train loss: 0.019944855601137335 Val loss: 0.2686490005360449
+INFO - evaluator.py - 2025-09-26 19:50:10,403 - Epoch: 14 Train acc: 99.49454545454546 Val acc: 79.64531797130915 Test acc79.04017633503658; Train loss: 0.014080144176699899 Val loss: 0.2512418410205227
+INFO - evaluator.py - 2025-09-26 19:50:49,940 - Epoch: 15 Train acc: 99.50181818181818 Val acc: 80.52637524003163 Test acc80.16230838593327; Train loss: 0.013904492526704615 Val loss: 0.26139650654014485
+INFO - evaluator.py - 2025-09-26 19:51:29,469 - Epoch: 16 Train acc: 99.48545454545454 Val acc: 80.99514288941602 Test acc81.11411682196173; Train loss: 0.014613612686233087 Val loss: 0.22663984618644237
+INFO - evaluator.py - 2025-09-26 19:52:09,002 - Epoch: 17 Train acc: 99.56363636363636 Val acc: 81.40178470574946 Test acc81.5098687506262; Train loss: 0.012168754932826216 Val loss: 0.21483991935968696
+INFO - evaluator.py - 2025-09-26 19:52:48,531 - Epoch: 18 Train acc: 99.57818181818182 Val acc: 81.50909296283746 Test acc81.02895501452761; Train loss: 0.011855506736920639 Val loss: 0.1951551317805074
+INFO - evaluator.py - 2025-09-26 19:53:28,083 - Epoch: 19 Train acc: 99.64181818181818 Val acc: 82.41838924658308 Test acc82.24125839094279; Train loss: 0.010308905047178268 Val loss: 0.2202340512441051
+INFO - evaluator.py - 2025-09-26 19:54:07,628 - Epoch: 20 Train acc: 99.90909090909092 Val acc: 80.80311758725855 Test acc80.38773669972949; Train loss: 0.0028691998943347822 Val loss: 0.26101424655550204
+INFO - evaluator.py - 2025-09-26 19:54:47,185 - Epoch: 21 Train acc: 99.96909090909091 Val acc: 80.31175872585564 Test acc80.0320609157399; Train loss: 0.0012845105080018667 Val loss: 0.29298462238094164
+INFO - evaluator.py - 2025-09-26 19:55:26,969 - Epoch: 22 Train acc: 99.97454545454545 Val acc: 79.62837456229526 Test acc79.16040476906122; Train loss: 0.0010109553997235542 Val loss: 0.3092352766836079
+INFO - evaluator.py - 2025-09-26 19:56:06,498 - Epoch: 23 Train acc: 99.94909090909091 Val acc: 78.56093979441997 Test acc77.69762548842802; Train loss: 0.0012794816558545626 Val loss: 0.34788990440872797
+INFO - evaluator.py - 2025-09-26 19:56:46,030 - Epoch: 24 Train acc: 99.96727272727273 Val acc: 78.46492714334124 Test acc77.79781585011521; Train loss: 0.0008345771061806855 Val loss: 0.3923257594861029
+INFO - evaluator.py - 2025-09-26 19:57:25,630 - Epoch: 25 Train acc: 99.96545454545455 Val acc: 79.7074438043601 Test acc79.3908426009418; Train loss: 0.0011105652781330387 Val loss: 0.36688493370780917
+INFO - evaluator.py - 2025-09-26 19:58:05,183 - Epoch: 26 Train acc: 99.96545454545455 Val acc: 79.3629278210776 Test acc79.48602344454464; Train loss: 0.0009103841624392027 Val loss: 0.38464405280000863
+INFO - evaluator.py - 2025-09-26 19:58:44,735 - Epoch: 27 Train acc: 99.95454545454545 Val acc: 79.76956963741104 Test acc79.80162308385933; Train loss: 0.0014250127563062546 Val loss: 0.3719611741534252
+INFO - evaluator.py - 2025-09-26 19:59:24,272 - Epoch: 28 Train acc: 99.96909090909091 Val acc: 79.21608494295718 Test acc78.75463380422804; Train loss: 0.001181809721779163 Val loss: 0.4025986009057223
+INFO - evaluator.py - 2025-09-26 20:00:03,803 - Epoch: 29 Train acc: 99.96727272727273 Val acc: 79.16525471591551 Test acc78.40897705640717; Train loss: 0.0010464452247114175 Val loss: 0.42669281485012583
+INFO - evaluator.py - 2025-09-26 20:00:43,574 - Epoch: 30 Train acc: 99.95636363636363 Val acc: 79.20478933694793 Test acc78.25368199579201; Train loss: 0.0011175545074775899 Val loss: 0.4027558545076307
+INFO - evaluator.py - 2025-09-26 20:01:23,098 - Epoch: 31 Train acc: 99.95818181818181 Val acc: 78.08087653902632 Test acc76.97124536619577; Train loss: 0.0011157979975830214 Val loss: 0.3938454111242084
+INFO - evaluator.py - 2025-09-26 20:02:02,619 - Epoch: 32 Train acc: 99.96727272727273 Val acc: 77.86626002485033 Test acc76.71075042580904; Train loss: 0.0009520702530947429 Val loss: 0.4326727847843995
+INFO - evaluator.py - 2025-09-26 20:02:42,162 - Epoch: 33 Train acc: 99.97272727272727 Val acc: 79.09183327685531 Test acc78.30878669471997; Train loss: 0.0006539532856370153 Val loss: 0.4194231540701907
+INFO - evaluator.py - 2025-09-26 20:03:21,700 - Epoch: 34 Train acc: 99.95454545454545 Val acc: 79.61707895628601 Test acc79.25558561266406; Train loss: 0.0014143496230636216 Val loss: 0.42143983408971974
+INFO - evaluator.py - 2025-09-26 20:04:01,262 - Epoch: 35 Train acc: 99.90545454545455 Val acc: 79.33468880605444 Test acc78.29876765855126; Train loss: 0.002650760434929874 Val loss: 0.4285861542840792
+INFO - evaluator.py - 2025-09-26 20:04:40,815 - Epoch: 36 Train acc: 99.96545454545455 Val acc: 80.66192251214278 Test acc80.64823164011622; Train loss: 0.0009229005259924716 Val loss: 0.3902835137127995
+INFO - evaluator.py - 2025-09-26 20:05:20,360 - Epoch: 37 Train acc: 99.97818181818182 Val acc: 80.41341917993901 Test acc79.78659452960625; Train loss: 0.000810486451760781 Val loss: 0.43391017726379827
+INFO - evaluator.py - 2025-09-26 20:06:00,137 - Epoch: 38 Train acc: 99.96363636363637 Val acc: 78.97322941375805 Test acc77.74772066927162; Train loss: 0.001139736549308079 Val loss: 0.4531468359424639
+INFO - evaluator.py - 2025-09-26 20:06:39,517 - Epoch: 39 Train acc: 99.98727272727272 Val acc: 80.57720546707331 Test acc80.02204187957118; Train loss: 0.0005202843769032783 Val loss: 0.481015134609097
+INFO - evaluator.py - 2025-09-26 20:07:18,868 - Epoch: 40 Train acc: 99.98545454545454 Val acc: 79.72438721337399 Test acc79.0101192265304; Train loss: 0.00045296074531665494 Val loss: 0.5021507119265274
+INFO - evaluator.py - 2025-09-26 20:07:58,235 - Epoch: 41 Train acc: 99.99272727272728 Val acc: 79.73003501637864 Test acc78.8848812744214; Train loss: 0.00027506007070954763 Val loss: 0.5044917786685569
+INFO - evaluator.py - 2025-09-26 20:08:37,596 - Epoch: 42 Train acc: 99.99818181818182 Val acc: 79.58883994126285 Test acc78.64442440637211; Train loss: 0.00013366748986141333 Val loss: 0.5154251103803531
+INFO - evaluator.py - 2025-09-26 20:09:16,961 - Epoch: 43 Train acc: 99.99272727272728 Val acc: 79.25561956398961 Test acc78.26871055004509; Train loss: 0.00022921334295507138 Val loss: 0.5275610752810224
+INFO - evaluator.py - 2025-09-26 20:09:56,345 - Epoch: 44 Train acc: 99.99818181818182 Val acc: 79.34033660905908 Test acc78.4189960925759; Train loss: 0.00013905681228894867 Val loss: 0.5255189639463891
+INFO - evaluator.py - 2025-09-26 20:10:35,737 - Epoch: 45 Train acc: 99.99636363636364 Val acc: 78.99582062577657 Test acc77.85793006712754; Train loss: 0.00022952559329762813 Val loss: 0.540243423067216
+INFO - evaluator.py - 2025-09-26 20:11:15,324 - Epoch: 46 Train acc: 99.99636363636364 Val acc: 78.97887721676268 Test acc77.74772066927162; Train loss: 0.00010532182438989614 Val loss: 0.5438016716752311
+INFO - evaluator.py - 2025-09-26 20:11:54,683 - Epoch: 47 Train acc: 99.99636363636364 Val acc: 78.12605896306337 Test acc77.1065023544735; Train loss: 0.00012650023892102498 Val loss: 0.5738801989570979
+INFO - evaluator.py - 2025-09-26 20:12:34,047 - Epoch: 48 Train acc: 99.99636363636364 Val acc: 78.54399638540607 Test acc77.4721971746318; Train loss: 9.360722177966222e-05 Val loss: 0.5710914445491642
+INFO - evaluator.py - 2025-09-26 20:13:13,414 - Epoch: 49 Train acc: 99.99636363636364 Val acc: 78.73602168756354 Test acc77.70764452459673; Train loss: 0.00013753235591661492 Val loss: 0.5660160417598775
+INFO - evaluator.py - 2025-09-26 20:13:13,419 - The best acc of synthetic images on sensitive val and the corresponding acc on test dataset from wrn is 84.4685417372642 and 84.99148381925659
+INFO - evaluator.py - 2025-09-26 20:13:13,419 - The best acc of synthetic images on noisy sensitive val and the corresponding acc on test dataset from wrn is 84.4685417372642 and 84.99148381925659
+INFO - evaluator.py - 2025-09-26 20:13:13,419 - The best acc test dataset from wrn is 84.99148381925659
+INFO - evaluator.py - 2025-09-26 20:15:38,268 - Epoch: 0 Train acc: 78.22545454545454 Val acc: 71.46729922060318 Test acc72.73319306682697; Train loss: 0.44887428283691405 Val loss: 0.42674347237518356
+INFO - evaluator.py - 2025-09-26 20:18:02,327 - Epoch: 1 Train acc: 92.41636363636364 Val acc: 73.70382921043715 Test acc74.10580102194169; Train loss: 0.1559971613103693 Val loss: 0.4188764506001453
+INFO - evaluator.py - 2025-09-26 20:20:26,441 - Epoch: 2 Train acc: 96.24545454545455 Val acc: 74.74302496328929 Test acc73.78018234645826; Train loss: 0.09183270937312733 Val loss: 0.34346127744368965
+INFO - evaluator.py - 2025-09-26 20:22:50,490 - Epoch: 3 Train acc: 97.89090909090909 Val acc: 74.72043375127075 Test acc74.15088668470094; Train loss: 0.0543897395697507 Val loss: 0.3374211858466939
+INFO - evaluator.py - 2025-09-26 20:25:14,831 - Epoch: 4 Train acc: 98.5 Val acc: 62.84310403253135 Test acc60.17433122933574; Train loss: 0.040392800357125024 Val loss: 0.5481891793665018
+INFO - evaluator.py - 2025-09-26 20:27:38,888 - Epoch: 5 Train acc: 98.7309090909091 Val acc: 68.5191460521857 Test acc66.2208195571586; Train loss: 0.03310422246889635 Val loss: 0.4599591225779529
+INFO - evaluator.py - 2025-09-26 20:30:02,957 - Epoch: 6 Train acc: 99.11090909090909 Val acc: 68.88625324748674 Test acc67.32792305380222; Train loss: 0.02320743190158497 Val loss: 0.4481686788481615
+INFO - evaluator.py - 2025-09-26 20:32:27,002 - Epoch: 7 Train acc: 99.18727272727273 Val acc: 70.17395233254264 Test acc68.33483618875864; Train loss: 0.022865148598497566 Val loss: 0.3578009661962444
+INFO - evaluator.py - 2025-09-26 20:34:51,029 - Epoch: 8 Train acc: 99.3 Val acc: 70.17395233254264 Test acc68.28474100791504; Train loss: 0.01900452606840567 Val loss: 0.4751102142006506
+INFO - evaluator.py - 2025-09-26 20:37:15,049 - Epoch: 9 Train acc: 99.51272727272728 Val acc: 73.51180390827969 Test acc72.27231740306583; Train loss: 0.012441234754703262 Val loss: 0.39008947562244967
+INFO - evaluator.py - 2025-09-26 20:39:39,134 - Epoch: 10 Train acc: 99.46000000000001 Val acc: 71.8513498249181 Test acc70.50896703737101; Train loss: 0.015591933192854578 Val loss: 0.31578107743590184
+INFO - evaluator.py - 2025-09-26 20:42:03,211 - Epoch: 11 Train acc: 99.52181818181818 Val acc: 61.70224782559585 Test acc58.54623785191865; Train loss: 0.013013646918399768 Val loss: 0.8432613774826065
+INFO - evaluator.py - 2025-09-26 20:44:27,465 - Epoch: 12 Train acc: 99.57636363636364 Val acc: 68.68858014232464 Test acc66.20579100290553; Train loss: 0.011567326439646157 Val loss: 0.4094078471589786
+INFO - evaluator.py - 2025-09-26 20:46:51,414 - Epoch: 13 Train acc: 99.63090909090909 Val acc: 74.67525132723371 Test acc73.81023945496443; Train loss: 0.009831455667045984 Val loss: 0.3189282022491493
+INFO - evaluator.py - 2025-09-26 20:49:15,390 - Epoch: 14 Train acc: 99.69454545454546 Val acc: 74.03704958771038 Test acc72.94359282637011; Train loss: 0.008798583425242793 Val loss: 0.3486090857982905
+INFO - evaluator.py - 2025-09-26 20:51:39,363 - Epoch: 15 Train acc: 99.67272727272727 Val acc: 76.29052298655823 Test acc75.53351367598437; Train loss: 0.008920905891323293 Val loss: 0.28096010110532577
+INFO - evaluator.py - 2025-09-26 20:54:03,390 - Epoch: 16 Train acc: 99.56545454545454 Val acc: 65.23777250649498 Test acc62.814347259793614; Train loss: 0.011778372306444428 Val loss: 0.4714679707245249
+INFO - evaluator.py - 2025-09-26 20:56:27,431 - Epoch: 17 Train acc: 99.65454545454546 Val acc: 76.82141646899356 Test acc77.1565975353171; Train loss: 0.009862376408346675 Val loss: 0.32054878630423217
+INFO - evaluator.py - 2025-09-26 20:58:51,352 - Epoch: 18 Train acc: 99.78363636363636 Val acc: 70.58059414887609 Test acc68.42500751427713; Train loss: 0.0061669833566824145 Val loss: 0.4715091520469094
+INFO - evaluator.py - 2025-09-26 21:01:15,351 - Epoch: 19 Train acc: 99.62727272727273 Val acc: 67.30486840618998 Test acc64.97845907223724; Train loss: 0.010743368502232162 Val loss: 0.4387832498545029
+INFO - evaluator.py - 2025-09-26 21:03:39,572 - Epoch: 20 Train acc: 99.96363636363637 Val acc: 75.06494973455325 Test acc74.4314196974251; Train loss: 0.0012676697260276839 Val loss: 0.3753471533942193
+INFO - evaluator.py - 2025-09-26 21:06:03,596 - Epoch: 21 Train acc: 99.99454545454546 Val acc: 75.13837117361346 Test acc74.56667668570283; Train loss: 0.00035191627346741204 Val loss: 0.42215334664869075
+INFO - evaluator.py - 2025-09-26 21:08:27,677 - Epoch: 22 Train acc: 99.99818181818182 Val acc: 76.01942844233594 Test acc75.6938182546839; Train loss: 0.000201696740440093 Val loss: 0.455871830225718
+INFO - evaluator.py - 2025-09-26 21:10:51,682 - Epoch: 23 Train acc: 100.0 Val acc: 76.13803230543319 Test acc75.78398958020239; Train loss: 0.000161941692923111 Val loss: 0.49219376863388914
+INFO - evaluator.py - 2025-09-26 21:13:15,719 - Epoch: 24 Train acc: 100.0 Val acc: 75.61278662600247 Test acc75.00751427712655; Train loss: 0.00011900580168214881 Val loss: 0.5033492981667144
+INFO - evaluator.py - 2025-09-26 21:15:39,703 - Epoch: 25 Train acc: 100.0 Val acc: 76.02507624534056 Test acc75.72387536319006; Train loss: 8.36429229866057e-05 Val loss: 0.5189186112565347
+INFO - evaluator.py - 2025-09-26 21:18:03,707 - Epoch: 26 Train acc: 100.0 Val acc: 76.08155427538688 Test acc76.01442741208295; Train loss: 6.204097552531906e-05 Val loss: 0.543860564430622
+INFO - evaluator.py - 2025-09-26 21:20:27,742 - Epoch: 27 Train acc: 100.0 Val acc: 76.14932791144244 Test acc75.8691513876365; Train loss: 5.9707338767475446e-05 Val loss: 0.5593111785161324
+INFO - evaluator.py - 2025-09-26 21:22:51,985 - Epoch: 28 Train acc: 100.0 Val acc: 76.02507624534056 Test acc75.84410379721471; Train loss: 4.465542201604959e-05 Val loss: 0.5712765114436402
+INFO - evaluator.py - 2025-09-26 21:25:15,994 - Epoch: 29 Train acc: 100.0 Val acc: 75.68056026205807 Test acc75.20789500050095; Train loss: 5.477482878308034e-05 Val loss: 0.5906285064362893
+INFO - evaluator.py - 2025-09-26 21:27:39,964 - Epoch: 30 Train acc: 100.0 Val acc: 76.05896306336834 Test acc75.62368500150286; Train loss: 3.1337643817559264e-05 Val loss: 0.6111683239576494
+INFO - evaluator.py - 2025-09-26 21:30:03,915 - Epoch: 31 Train acc: 100.0 Val acc: 76.07025866937761 Test acc75.82406572487727; Train loss: 2.5805343507024438e-05 Val loss: 0.6274935443240021
+INFO - evaluator.py - 2025-09-26 21:32:27,957 - Epoch: 32 Train acc: 100.0 Val acc: 75.62973003501638 Test acc75.44334235046588; Train loss: 2.145429909386704e-05 Val loss: 0.630959705890107
+INFO - evaluator.py - 2025-09-26 21:34:51,936 - Epoch: 33 Train acc: 99.99818181818182 Val acc: 75.65796905003953 Test acc75.46338042280333; Train loss: 6.341323409261267e-05 Val loss: 0.6383588259386825
+INFO - evaluator.py - 2025-09-26 21:37:15,934 - Epoch: 34 Train acc: 99.99818181818182 Val acc: 75.49983056590986 Test acc75.5435327121531; Train loss: 0.00011670181925784908 Val loss: 0.6847275402483181
+INFO - evaluator.py - 2025-09-26 21:39:39,966 - Epoch: 35 Train acc: 100.0 Val acc: 75.43205692985428 Test acc75.11271415689811; Train loss: 2.7749265020710565e-05 Val loss: 0.6173655726364827
+INFO - evaluator.py - 2025-09-26 21:42:04,191 - Epoch: 36 Train acc: 100.0 Val acc: 75.60149101999323 Test acc75.43332331429717; Train loss: 3.0334458722865582e-05 Val loss: 0.6346513314474966
+INFO - evaluator.py - 2025-09-26 21:44:28,180 - Epoch: 37 Train acc: 100.0 Val acc: 75.58454761097933 Test acc75.44835186855025; Train loss: 8.253081618766538e-06 Val loss: 0.6678786864324329
+INFO - evaluator.py - 2025-09-26 21:46:52,115 - Epoch: 38 Train acc: 100.0 Val acc: 75.5788998079747 Test acc75.4283137962128; Train loss: 8.46427752407263e-06 Val loss: 0.6935783135450642
+INFO - evaluator.py - 2025-09-26 21:49:16,055 - Epoch: 39 Train acc: 100.0 Val acc: 75.47159155088671 Test acc75.25799018134455; Train loss: 9.913409701316182e-06 Val loss: 0.7052419230074286
+INFO - evaluator.py - 2025-09-26 21:51:40,065 - Epoch: 40 Train acc: 100.0 Val acc: 75.42640912684966 Test acc75.33313295260996; Train loss: 5.630121870705228e-06 Val loss: 0.7221196053001984
+INFO - evaluator.py - 2025-09-26 21:54:04,022 - Epoch: 41 Train acc: 100.0 Val acc: 75.33604427877556 Test acc75.30808536218817; Train loss: 3.7699997601976063e-06 Val loss: 0.74170795726356
+INFO - evaluator.py - 2025-09-26 21:56:28,049 - Epoch: 42 Train acc: 100.0 Val acc: 75.30215746074776 Test acc75.23795210900711; Train loss: 6.851364038522495e-06 Val loss: 0.7509529219769252
+INFO - evaluator.py - 2025-09-26 21:58:52,059 - Epoch: 43 Train acc: 100.0 Val acc: 75.25697503671071 Test acc75.23294259092276; Train loss: 4.617150097320436e-06 Val loss: 0.7757845820107326
+INFO - evaluator.py - 2025-09-26 22:01:16,236 - Epoch: 44 Train acc: 100.0 Val acc: 75.21744041567831 Test acc75.22292355475403; Train loss: 4.731067222166985e-06 Val loss: 0.7774000935913762
+INFO - evaluator.py - 2025-09-26 22:03:40,209 - Epoch: 45 Train acc: 100.0 Val acc: 75.25697503671071 Test acc75.18284741007915; Train loss: 2.891479341740354e-06 Val loss: 0.7734126081631492
+INFO - evaluator.py - 2025-09-26 22:06:04,156 - Epoch: 46 Train acc: 100.0 Val acc: 75.24567943070146 Test acc75.09267608456067; Train loss: 3.084615778249661e-06 Val loss: 0.7675431433685969
+INFO - evaluator.py - 2025-09-26 22:08:28,191 - Epoch: 47 Train acc: 100.0 Val acc: 75.26827064271998 Test acc75.33814247069431; Train loss: 2.7886906598889087e-06 Val loss: 0.8032241040510631
+INFO - evaluator.py - 2025-09-26 22:10:52,252 - Epoch: 48 Train acc: 100.0 Val acc: 75.15531458262735 Test acc75.09267608456067; Train loss: 2.350373477192782e-06 Val loss: 0.7885825367118227
+INFO - evaluator.py - 2025-09-26 22:13:16,331 - Epoch: 49 Train acc: 100.0 Val acc: 75.00847170450695 Test acc74.9123334335237; Train loss: 3.606352787416902e-06 Val loss: 0.7846410120730614
+INFO - evaluator.py - 2025-09-26 22:13:16,335 - The best acc of synthetic images on sensitive val and the corresponding acc on test dataset from resnext is 76.82141646899356 and 77.1565975353171
+INFO - evaluator.py - 2025-09-26 22:13:16,336 - The best acc of synthetic images on noisy sensitive val and the corresponding acc on test dataset from resnext is 76.82141646899356 and 77.1565975353171
+INFO - evaluator.py - 2025-09-26 22:13:16,336 - The best acc test dataset from resnext is 77.1565975353171
+INFO - evaluator.py - 2025-09-26 22:13:16,336 - The best acc of accuracy (adding noise to the results on the sensitive set of validation set) of synthetic images from resnet, wrn, and resnext are [79.41589019136359, 84.99148381925659, 77.1565975353171].
+INFO - evaluator.py - 2025-09-26 22:13:16,336 - The average and std of accuracy of synthetic images are 80.52 and 3.29
+INFO - evaluator.py - 2025-09-26 22:38:52,453 - The FID of synthetic images is 136.87624713826824
+INFO - evaluator.py - 2025-09-26 22:38:52,454 - The Inception Score of synthetic images is 2.5805015563964844
+INFO - evaluator.py - 2025-09-26 22:38:52,454 - The Precision and Recall of synthetic images is 0.13636666536331177 and 0.00020680527086369693
+INFO - evaluator.py - 2025-09-26 22:38:52,454 - The FLD of synthetic images is 14.962387084960938
+INFO - evaluator.py - 2025-09-26 22:38:52,455 - The ImageReward of synthetic images is -1.8263041948986327
