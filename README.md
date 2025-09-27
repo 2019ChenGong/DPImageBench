@@ -164,7 +164,8 @@ DPImageBench/
 │   ├── rq3.sh                  
 │   └── test_classifier.py                                            
 ├── utils/                      # Helper classes and functions supporting various operations
-│   └── utils.py                    
+│   └── utils.py     
+├── training_demo               # Training demo of synthesis methods              
 ├── README.md                   # Main project documentation
 └── requirements.txt            # Dependencies required for the project
 ```
@@ -632,6 +633,8 @@ If synthetic images are used as the validation set (`model.eval = syn`), the fir
 INFO - evaluator.py - 2024-11-12 09:06:18,148 - The best acc of accuracy (using synthetic images as the validation set) of synthetic images from resnet, wrn, and resnext are [59.48, 63.99, 59.53].
 ```
 The synthetic images can be found at the `./exp/<algorithm_name>/<file_name>/gen/gen.npz`.
+
+We provide the training demo of log files for different method in [demo](./training_demo/).
 
 ### 4.5 Results Visualization
 
