@@ -43,9 +43,10 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
       - [4.4.2 Results Explanation](#442-results-explanation)
     - [4.5 Results Visualization](#45-results-visualization)
   - [5. Customization](#5-customization)
-  - [6. Main Results](#6-main-results)
-  - [7. Contacts](#7-contacts)
-  - [8. Citation](#8-citation)
+  - [6. Computational Resource Requirements](#6-computational-resource-requirements)
+  - [7. Main Results](#7-main-results)
+  - [8. Contacts](#8-contacts)
+  - [9. Citation](#9-citation)
   - [Acknowledgment](#acknowledgement)
 
 ### Updates 
@@ -737,7 +738,66 @@ python run.py setup.n_gpus_per_node=4 --method <name-of-your-algorithm> --epsilo
 
 Other processes are the same.
 
-## 6. Main Results
+## 6. Computational Resource Requirements
+
+All methods are implemented on a server equipped with four NVIDIA GeForce A6000 Ada GPUs and 512GB of memory. The synthesizer sizes for the GAN-based and diffusion-based methods are 5.6M and 3.8M. For GAN, the generator size is 3.8M, and
+the discriminator size is 1.8M. The following table provides an analysis of GPU memory usage and runtime for the methods studied in DPImageBench using the CIFAR-10 dataset.
+
+| **Algorithm**   | **Stage**   | **Memory** | **Runtime** | **Max Memory** |
+|-----------------|-------------|------------|-------------|----------------|
+| **DP-MERF**     | Pretrain    | 0 GB       | 0 H         | 18.6 GB        |
+|                 | Fine-tune   | 3.5 GB     | 0.02 H      |                |
+|                 | Synthesis   | 18.6 GB    | 0.03 H      |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **DP-NTK**      | Pretrain    | 0 GB       | 0 H         | 21.3 GB        |
+|                 | Fine-tune   | 4.8 GB     | 7.75 H      |                |
+|                 | Synthesis   | 19.1 GB    | 0.05 H      |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **DP-Kernel**   | Pretrain    | 0 GB       | 0 H         | 22.5 GB        |
+|                 | Fine-tune   | 8.8 GB     | 3.6 H       |                |
+|                 | Synthesis   | 19.0 GB    | 0.05 H      |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **PE**          | Pretrain    | 0 GB       | 0 H         | 183.0 GB       |
+|                 | Fine-tune   | 0 GB       | 0 H         |                |
+|                 | Synthesis   | 183.0 GB   | 12.0 H      |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **GS-WGAN**     | Pretrain    | 21.6 GB    | 18.3 H      | 21.6 GB        |
+|                 | Fine-tune   | 21.6 GB    | 0.6 H       |                |
+|                 | Synthesis   | 20.0 GB    | 0.01 H      |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **DP-GAN**      | Pretrain    | 0 GB       | 0 H         | 46.1 GB        |
+|                 | Fine-tune   | 46.1 GB    | 3.25 H      |                |
+|                 | Synthesis   | 20.1 GB    | 0.03 H      |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **DPDM**        | Pretrain    | 0 GB       | 0 H         | 96.3 GB        |
+|                 | Fine-tune   | 96.3 GB    | 20.5 H      |                |
+|                 | Synthesis   | 32.1 GB    | 0.17 H      |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **DP-FETA**     | Pretrain    | 3.4 GB     | 7.2 H       | 96.3 GB        |
+|                 | Fine-tune   | 96.3 GB    | 20.5 H      |                |
+|                 | Synthesis   | 32.1 GB    | 0.17 H      |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **PDP-Diffusion** | Pretrain  | 34.3 GB    | 32.0 H      | 96.3 GB        |
+|                 | Fine-tune   | 96.3 GB    | 20.5 H      |                |
+|                 | Synthesis   | 32.1 GB    | 0.17 H      |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **DP-LDM (SD)** | Pretrain    | 34.3 GB    | 32.0 H      | 96.3 GB        |
+|                 | Fine-tune   | 60.0 GB    | 9.1 H       |                |
+|                 | Synthesis   | 32.1 GB    | 0.17 H      |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **DP-LDM**      | Pretrain    | 40.0 GB    | 75.0 H      | 40.0 GB        |
+|                 | Fine-tune   | 20.8 GB    | 2.5 H       |                |
+|                 | Synthesis   | 5.8 GB     | 0.5 H       |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **DP-LORA**     | Pretrain    | 40.0 GB    | 75.0 H      | 40.0 GB        |
+|                 | Fine-tune   | 35.6 GB    | 20.5 H      |                |
+|                 | Synthesis   | 5.8 GB     | 0.5 H       |                |
+|-----------------|-------------|------------|-------------|----------------|
+| **PrivImage**   | Pretrain    | 34.3 GB    | 32.0 H      | 96.3 GB        |
+|                 | Fine-tune   | 96.3 GB    | 20.5 H      |                |
+|                 | Synthesis   | 32.1 GB    | 0.17 H      |                |
+
+## 7. Main Results
 
 Acc (%) of the classifier trained on synthetic images under eps = (1.0 / 10.0).
 
@@ -888,7 +948,7 @@ Fidelity evaluations of synthetic Camelyon images under eps = 10.0.
 
 
 
-## 7. Contacts
+## 8. Contacts
 If you have any question about our work or this repository, please don't hesitate to contact us by emails or open an issue under this project.
 
 - Chen Gong (ChenG_abc@outlook.com)
@@ -896,7 +956,7 @@ If you have any question about our work or this repository, please don't hesitat
 - Kecen Li (likecen2023@ia.ac.cn)
 
 
-## 8. Citation
+## 9. Citation
 
 ```text
 @article{dpimagebench,
