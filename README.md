@@ -740,7 +740,7 @@ Other processes are the same.
 
 ## 6. Computational Resource Requirements
 
-All methods are implemented on a server equipped with four NVIDIA GeForce A6000 Ada GPUs and 512GB of memory. The synthesizer sizes for the GAN-based and diffusion-based methods are 5.6M and 3.8M. For GAN, the generator size is 3.8M, and
+All methods are implemented on a server equipped with four NVIDIA GeForce A6000 Ada GPUs and 512GB of memory. The number of synthesizer parameter for the GAN-based and diffusion-based methods are 5.6M and 3.8M. For GAN, the generator size is 3.8M, and
 the discriminator size is 1.8M. The following table provides an analysis of GPU memory usage and runtime for the methods studied in DPImageBench using the CIFAR-10 dataset.
 
 | **Algorithm**   | **Stage**   | **Memory** | **Runtime** | **Max Memory** |
