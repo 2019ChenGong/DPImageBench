@@ -7,7 +7,7 @@ Authors: [Chen Gong*](https://2019chengong.github.io/), [Kecen Li*](https://scho
 
 "*" means equal contributions.
 
-Accepeted by CCS 2025.
+Accepted by CCS 2025.
 
 DPImageBench is an open-source toolkit developed to facilitate the research and application of DP image synthesis. DPImageBench simplifies the access, understanding, and assessment of DP image synthesis, making it accessible to both researchers and the broader community. The strengths of DPImageBench are presented as follows. 
 
