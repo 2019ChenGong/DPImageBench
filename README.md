@@ -200,9 +200,15 @@ dataset/
 ...
 ```
 
-Since ImageNet 64x64 and 128x128 are two large, you need to download and preprocess them locally.
+Note that downloading and preprocessing Places365, and ImageNet 64x64 and 128x128 typically takes several days due to its large size. Therefore, these datasets are not processed by default. You need to download and preprocess them locally.
 
-First, download the original ImageNet
+For Places365, please navigate to the `data` directory and run:
+
+```bash
+python preprocess_dataset.py --data_name places365
+```
+
+For Imagenet, first, download the original ImageNet
 
 ```
 cd ./dataset/imagenet && mkdir ImageNet && cd ImageNet
@@ -231,7 +237,6 @@ Finally, rescale the ImageNet into the needed relolution using `./data/process_i
 cd ./data
 sh process_imagenet.sh
 ```
-
 
 ### 4.3 Running
 

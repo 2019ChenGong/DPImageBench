@@ -304,7 +304,7 @@ def main(config):
                 sensitive_train_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "camelyon17_32", "train"), transform=transforms.ToTensor())
                 sensitive_test_set = torchvision.datasets.ImageFolder(root=os.path.join(data_dir, "camelyon17_32", "test"), transform=transforms.ToTensor())
             elif data_name == "places365":
-                # _ = torchvision.datasets.Places365(root=data_dir, small=True, download=True)
+                _ = torchvision.datasets.Places365(root=data_dir, small=True, download=True)
                 resize_images(os.path.join(data_dir, "data_256_standard"), os.path.join(data_dir, "data_{}_standard".format(config.resolution)), (config.resolution, config.resolution))
                 return
             elif data_name == "emnist":
@@ -353,7 +353,7 @@ def main(config):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_name', nargs="*", default=["mnist", "fmnist", "cifar10", "cifar100", "celeba", "camelyon", "imagenet", "places365", "emnist"], help='List of datasets to use. Default is all provided datasets.')
+    parser.add_argument('--data_name', nargs="*", default=["mnist", "fmnist", "cifar10", "cifar100", "celeba", "camelyon", "imagenet", "emnist"], help='List of datasets to use. Default is all provided datasets.')
     parser.add_argument('--resolution', default=32, type=int, help='Resolution of the images. Default is 32.')
     parser.add_argument('--c', default=3, type=int, help='Number of color channels in the images. Default is 3 (RGB).')
     parser.add_argument('--fid_batch_size', default=500, type=int, help='Batch size for FID calculation. Default is 500.')
