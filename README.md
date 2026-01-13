@@ -964,6 +964,14 @@ If you have any question about our work or this repository, please don't hesitat
 ## 9. Citation
 
 ```text
+@inproceedings{gong2025dpimagebench,
+  title={Dpimagebench: A unified benchmark for differentially private image synthesis},
+  author={Gong, Chen and Li, Kecen and Lin, Zinan and Wang, Tianhao},
+  booktitle={Proceedings of the 2025 ACM SIGSAC Conference on Computer and Communications Security},
+  pages={4139--4153},
+  year={2025}
+}
+
 @article{dpimagebench,
   author = {Chen Gong and Kecen Li and Zinan Lin and Tianhao Wang},
   title = {DPImageBench: A Unified Benchmark for Differentially Private Image Synthesis},
