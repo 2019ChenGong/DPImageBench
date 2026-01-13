@@ -51,7 +51,7 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 
 ### Updates 
 
-- 🎉 **(2026.01.11)** We add a new SOTA DP image synthesizer [FETA-Pro] (presented at USENIX Security ’26)(https://arxiv.org/abs/2601.06368) to DPImageBench! Please try it out!
+- 🎉 **(2026.01.11)** We add a new SOTA DP image synthesizer [FETA-Pro](https://arxiv.org/abs/2601.06368) (presented at USENIX Security ’26) to DPImageBench! Please try it out!
 - 🎉 **(2025.08.22)** We add a new privacy accounting method [PRV](https://arxiv.org/abs/2106.02848) to DPImageBench! Please refer to [4.3.4 Other Privacy Accountant](#434-other-privacy-accountant) for details and try it out!
 - 🎉 **(2025.04.05)** We add a new SOTA DP image synthesizer [DP-FETA](https://arxiv.org/abs/2504.01395) to DPImageBench! Please try it out!
 - 🎉 **(2025.03.30)** We imporve the PE by providing the option of using our own pretrained diffusion models, unrestricted by fixed APIs.
