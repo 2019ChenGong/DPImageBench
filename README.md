@@ -59,8 +59,6 @@ DPImageBench is an open-source toolkit developed to facilitate the research and 
 - 🎉 **(2025.01.23)** We add a new SOTA DP image synthesizer [DP-LORA](https://arxiv.org/abs/2406.01355) to DPImageBench! Please try it out!
 - 🎉 **(2024.11.19)** We're thrilled to announce the release of initial version of DPImageBench!
 
-### Todo
-
 ## 2. Introduction
 
 ### 2.1 Currently Supported Algorithms
@@ -77,7 +75,7 @@ We list currently supported DP image synthesis methods as follows.
   | DP-GAN            |  [\[arXiv 2020\] Differentially Private Generative Adversarial Network (arxiv.org)](https://arxiv.org/abs/1802.06739) |
   | DPDM          |  [\[TMLR 2023\] Differentially Private Diffusion Models](https://openreview.net/forum?id=ZPpQk7FJXF) |
   | DP-FETA          |  [\[SP 2025\] From Easy to Hard: Building a Shortcut for Differentially Private Image Synthesis](https://arxiv.org/abs/2504.01395) |
-  | FETA-Pro          |  [\[UESNIX Security 2026\] From Easy to Hard++: Promoting Differentially Private Image Synthesis Through Spatial-Frequency Curriculum](https://arxiv.org/abs/2601.06368) |
+  | DP-FETA-Pro          |  [\[UESNIX Security 2026\] From Easy to Hard++: Promoting Differentially Private Image Synthesis Through Spatial-Frequency Curriculum](https://arxiv.org/abs/2601.06368) |
   | PDP-Diffusion       | [\[2302.13861\] Differentially Private Diffusion Models Generate Useful Synthetic Images (arxiv.org)](https://arxiv.org/abs/2302.13861) |
   | DP-LDM            | [\[TMLR 2024\] Differentially Private Latent Diffusion Models](https://arxiv.org/abs/2305.15759) |
   | DP-LoRA           | [\[arXiv 2024\] Differentially Private Fine-Tuning of Diffusion Models](https://arxiv.org/abs/2406.01355) |
