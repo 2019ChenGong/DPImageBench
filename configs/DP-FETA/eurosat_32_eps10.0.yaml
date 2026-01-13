@@ -9,7 +9,7 @@ setup:
   omp_n_threads: 8
   workdir: null
 public_data:
-  name: central_mean
+  name: null
   num_channels: 1
   resolution: 28
   n_classes: 1000
@@ -101,6 +101,9 @@ pretrain:
     n_noise_samples: 1
     n_classes: 1000
   cond: true
+  mode: time
+  n_epochs_time: 160
+  batch_size_time: 50
 train:
   log_dir: null
   seed: 0

@@ -168,7 +168,10 @@ class CentralDataset(Dataset):
                 for cls in range(num_classes):
                     
                     x_cls = x if num_classes==1 else x[y==cls]
-                    # logging.info('{} {} {}'.format(c, cls, x_cls.shape[0]))
+                    if x.shape[-1] == 64:
+                        ds = 1/4
+                    elif x.shape[-1] == 128:
+                        ds = 1/8
 
                     sensitivity_m = np.sqrt((ds**2) * np.prod(x_cls.shape[1:])) / (batch_size//num_classes)
 
@@ -234,7 +237,7 @@ class CentralDataset(Dataset):
                     break
             if c == sample_num:
                 break
-        return torch.cat(central_x), central_y
+        return torch.cat(central_x), torch.tensor(central_y).long()
 
     def post_process(self, x):
         is_gray = x.shape[1] == 1
@@ -309,7 +312,7 @@ def load_data(config):
             else:
                 public_train_set = SpecificClassPlaces365(public_train_set_, specific_class)
         elif config.public_data.name == "emnist":
-            public_train_set_ = torchvision.datasets.EMNIST(root=config.public_data.train_path, split="letters", train=True)
+            public_train_set_ = torchvision.datasets.EMNIST(root=config.public_data.train_path, split="letters", train=True, download=True, transform=trans)
             if specific_class is None:
                 public_train_set = public_train_set_
             else:

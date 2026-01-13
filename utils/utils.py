@@ -132,6 +132,47 @@ def parse_config(opt, unknown):
         return config
     config.model.private_num_classes = config.sensitive_data.n_classes
     config.model.public_num_classes = config.public_data.n_classes
-    if config.public_data.name is None or opt.method in ['PrivImage', 'DP-FETA']:
+    if config.public_data.name is None or opt.method in ['PrivImage', 'DP-FETA', 'DP-FETA-Pro', 'DPDM']:
         config.model.public_num_classes = config.model.private_num_classes
+    if opt.method == 'DP-FETA-Pro':
+        config.train.freq.log_dir = config.setup.workdir + "/train_freq"
+        config.gen.freq.log_dir = config.setup.workdir + "/gen_freq"
+        config.gen.freq.n_classes = config.sensitive_data.n_classes
+        config.public_data.central.sigma = config.train.sigma_time
+        config.train.freq.dp.sigma = config.train.sigma_freq
+    if 'mode' in config.pretrain:
+        if config.pretrain.mode == 'time':
+            if opt.method != 'DP-FETA':
+                aux_config_path = config_path.replace(opt.method, 'DP-FETA')
+                aux_configs = [OmegaConf.load(aux_config_path)]
+                aux_config = OmegaConf.merge(*aux_configs, cli)
+                config['public_data']['central'] = aux_config['public_data']['central']
+                config['pretrain']['mode'] = aux_config['pretrain']['mode']
+                config['pretrain']['batch_size_time'] = aux_config['pretrain']['batch_size_time']
+                config['pretrain']['n_epochs_time'] = aux_config['pretrain']['n_epochs_time']
+                config['train']['sigma_time'] = aux_config['train']['sigma_time']
+                config.public_data.central.sigma = config.train.sigma_time
+        else:
+            if opt.method != 'DP-FETA-Pro':
+                aux_config_path = config_path.replace(opt.method, 'DP-FETA-Pro')
+                aux_configs = [OmegaConf.load(aux_config_path)]
+                aux_config = OmegaConf.merge(*aux_configs, cli)
+                config['public_data']['central'] = aux_config['public_data']['central']
+                config['model']['freq'] = aux_config['model']['freq']
+                config['pretrain']['mode'] = aux_config['pretrain']['mode']
+                config['pretrain']['batch_size_time'] = aux_config['pretrain']['batch_size_time']
+                config['pretrain']['n_epochs_time'] = aux_config['pretrain']['n_epochs_time']
+                config['pretrain']['batch_size_freq'] = aux_config['pretrain']['batch_size_freq']
+                config['pretrain']['n_epochs_freq'] = aux_config['pretrain']['n_epochs_freq']
+                config['train']['freq'] = aux_config['train']['freq']
+                config['train']['sigma_freq'] = aux_config['train']['sigma_freq']
+                config['train']['sigma_time'] = aux_config['train']['sigma_time']
+                config['train']['sigma_sensitivity_ratio'] = aux_config['train']['sigma_sensitivity_ratio']
+                config['gen']['freq'] = aux_config['gen']['freq']
+
+                config.train.freq.log_dir = config.setup.workdir + "/train_freq"
+                config.gen.freq.log_dir = config.setup.workdir + "/gen_freq"
+                config.gen.freq.n_classes = config.sensitive_data.n_classes
+                config.public_data.central.sigma = config.train.sigma_time
+                config.train.freq.dp.sigma = config.train.sigma_freq
     return config

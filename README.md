@@ -268,7 +268,7 @@ def main(config):
 We list the key hyper-parameters below, including their explanations and available options.
 
 - `--data_name`: means the sensitive dataset; the option is [`mnist_28`, `fmnist_28`, `cifar10_32`, `cifar100_32`, `eurosat_32`, `celeba_male_32`, `camelyon_32`].
-- `--method`: the method to train the DP image synthesizers; the option is [`DP-NTK`, `DP-Kernel`, `DP-MERF`, `DPGAN`, `DP-LDM-SD`, `DP-LDM`, `DP-LORA`, `DPDM`, `DP-FETA`, `PE`, `GS-WGAN`, `PDP-Diffusion`, `PrivImage`].
+- `--method`: the method to train the DP image synthesizers; the option is [`DP-NTK`, `DP-Kernel`, `DP-MERF`, `DPGAN`, `DP-LDM-SD`, `DP-LDM`, `DP-LORA`, `DPDM`, `DP-FETA`, `DP-FETA-Pro`, `PE`, `GS-WGAN`, `PDP-Diffusion`, `PrivImage`].
 - `--epsilon`: the privacy budget 10.0; the option is [`1.0`, `10.0`].
 - `--exp_description`: the notes for the name of result folders.
 - `setup.n_gpus_per_node`: means the number of GPUs to be used for training.
@@ -974,4 +974,4 @@ If you have any question about our work or this repository, please don't hesitat
 
 ## Acknowledgement
  
-Part of code is borrowed from [DP-MERF](https://github.com/ParkLabML/DP-MERF), [DP-Kernel](https://github.com/antoninschrab/dpkernel), [DP-NTK](https://github.com/Justinyangjy/DP-NTK), [GS-WGAN](https://github.com/DingfanChen/Private-Set), [DPAGN](https://github.com/illidanlab/dpgan), [PE](https://github.com/microsoft/DPSDA), [DPDM](https://github.com/nv-tlabs/DPDM), [DP-FETA](https://github.com/SunnierLee/DP-FETA), [DP-LDM](https://github.com/SaiyueLyu/DP-LDM), [DP-LORA](https://github.com/EzzzLi/DP-LORA), [PrivImage](https://github.com/SunnierLee/DP-ImaGen). We have elaborate them on the Appendix B.1 of our paper. We sincerely thank them for their contributions to the community.
+Part of code is borrowed from [DP-MERF](https://github.com/ParkLabML/DP-MERF), [DP-Kernel](https://github.com/antoninschrab/dpkernel), [DP-NTK](https://github.com/Justinyangjy/DP-NTK), [GS-WGAN](https://github.com/DingfanChen/Private-Set), [DPAGN](https://github.com/illidanlab/dpgan), [PE](https://github.com/microsoft/DPSDA), [DPDM](https://github.com/nv-tlabs/DPDM), [DP-FETA](https://github.com/SunnierLee/DP-FETA), [DP-FETA-Pro](https://github.com/2019ChenGong/Feta-Pro), [DP-LDM](https://github.com/SaiyueLyu/DP-LDM), [DP-LORA](https://github.com/EzzzLi/DP-LORA), [PrivImage](https://github.com/SunnierLee/DP-ImaGen). We have elaborate them on the Appendix B.1 of our paper. We sincerely thank them for their contributions to the community.

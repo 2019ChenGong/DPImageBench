@@ -7,7 +7,7 @@ setup:
   master_address: 127.0.0.1
   master_port: 6025
   omp_n_threads: 8
-  workdir: null
+  workdir: exp/dpdm/mnist_28_eps1.0
 public_data:
   name: null
   num_channels: 3
@@ -18,16 +18,16 @@ public_data:
     ratio: 1.0
   central:
     batch_size: 12000
-    sigma: 5
-    sample_num: 1
+    sigma: 10
+    sample_num: 250
 sensitive_data:
-  name: cifar100
+  name: celeba_male_32
   num_channels: 3
   resolution: 32
-  n_classes: 100
-  train_path: dataset/cifar100/train_32.zip
-  test_path: dataset/cifar100/test_32.zip
-  fid_stats: dataset/cifar100/fid_stats_32.npz
+  n_classes: 2
+  train_path: dataset/celeba/train_32_Male.zip
+  test_path: dataset/celeba/test_32_Male.zip
+  fid_stats: dataset/celeba/fid_stats_32.npz
 model:
   ckpt: null
   denoiser_name: edm
@@ -69,19 +69,35 @@ model:
     tmax: 80.0
     rho: 7.0
     guid_scale: 0.0
-  private_num_classes: 100
+  private_num_classes: 2
   public_num_classes: 1000
+  freq:
+    img_size: 32
+    Generator:
+      z_dim: 60
+      g_shared_dim: 128
+      g_conv_dim: 60
+      attn_g_loc:
+      - 2
+      apply_attn: true
+    n_feat: 3072
+    d_rff: 10000
+    rff_sigma: '105'
+    mmd_type: sphere
+    private_num_classes: 2
+    public_num_classes: 1000
+    ckpt: null
 pretrain:
   log_dir: null
   seed: 0
-  batch_size: 50
-  n_epochs: 2000
+  batch_size: 1024
+  n_epochs: 160
   log_freq: 100
-  snapshot_freq: 100
+  snapshot_freq: 2000
   snapshot_threshold: 1
   save_freq: 100000
   save_threshold: 1
-  fid_freq: 100
+  fid_freq: 2000
   fid_samples: 5000
   fid_threshold: 1
   optim:
@@ -96,9 +112,11 @@ pretrain:
     n_noise_samples: 1
     n_classes: 1000
   cond: true
-  mode: time
-  n_epochs_time: 2000
+  n_epochs_time: 1000
+  n_epochs_freq: 10
   batch_size_time: 50
+  batch_size_freq: 256
+  mode: time_freq
 train:
   log_dir: null
   seed: 0
@@ -126,18 +144,40 @@ train:
     p_mean: -1.2
     p_std: 1.2
     n_noise_samples: 32
-    n_classes: 100
+    n_classes: 2
   dp:
+    sdq: null
     max_grad_norm: 0.001
-    delta: 1e-5
-    epsilon: 1.0
+    delta: 1e-6
+    epsilon: 10.0
     max_physical_batch_size: 8192
-    privacy_history: null
   n_splits: 64
+  freq:
+    epochs: 5
+    batch_size: 100
+    lr: 0.01
+    lr_decay: 0.9
+    log_interval: 10000
+    log_dir: null
+    num_channels: 3
+    resolution: 32
+    dp:
+      epsilon: 10.0
+      delta: 1e-6
+    n_splits: 1
+  sigma_freq: 8.2
+  sigma_time: 50
+  sigma_sensitivity_ratio: 0.5
 gen:
   data_num: 60000
   batch_size: 1000
   log_dir: null
+  freq:
+    data_num: 60000
+    batch_size: 1000
+    log_dir: null
+    num_channels: 3
+    resolution: 32
 eval:
   batch_size: 1000
   mode: val

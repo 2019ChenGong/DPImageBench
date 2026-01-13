@@ -23,7 +23,7 @@ def load_model(config, sess=None):
         model = PE(config.model, config.setup.local_rank)
     elif config.setup.method == 'dpsgd-diffusion':
         from models.dpsgd_diffusion import DP_Diffusion
-        model = DP_Diffusion(config.model, config.setup.local_rank)
+        model = DP_Diffusion(config.model, config.setup.local_rank, config)
     elif config.setup.method == 'dpsgd-ldm':
         from models.dpsgd_ldm_sc import DP_LDM
         model = DP_LDM(config, config.setup.local_rank)

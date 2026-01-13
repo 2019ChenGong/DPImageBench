@@ -134,6 +134,34 @@ def generate_batch(sampling_fn, sampling_shape, device, labels, n_classes):
 
     return x, labels
 
+def generate_batch_grad(sampling_fn, sampling_shape, device, labels, n_classes, noise=None, yy=None):
+    x = torch.randn(sampling_shape, device=device) if noise is None else noise.to(device)
+    if labels is None:
+        if n_classes is not None:
+            raise ValueError(
+                'Need to set labels for class-conditional sampling.')
+
+        x = sampling_fn(x)
+    else:
+        if yy is not None:
+            labels = yy.to(device)
+        elif isinstance(labels, int):
+            if labels == n_classes:
+                labels = torch.randint(
+                    n_classes, (sampling_shape[0],)).to(x.device)
+            elif sampling_shape[0] % labels == 0:
+                labels = torch.tensor(
+                    [[i] * labels for i in range(n_classes)], device=x.device).view(-1)
+            else:
+                raise NotImplementedError
+        else:
+            raise NotImplementedError
+
+        x = sampling_fn(x, labels)
+
+    x = (x / 2. + .5)
+
+    return x, labels
 
 def sample_batch_show(sample_dir, counter, max_samples, sampling_fn, sampling_shape, device, labels, n_classes):
     x = torch.randn(sampling_shape, device=device)
